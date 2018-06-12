@@ -1,0 +1,67 @@
+build*_*_*.log
+obj*_*_*/
+build
+dist
+log ~*
+*.log
+*.egg-info
+*.egg
+*.o
+tmp
+.coverage
+coverage
+coverage.xml
+.profile
+profile
+xunit.xml
+.virtual/
+.build/
+.test/
+_t/
+*.db
+__pycache__
+
+# sandbox executable
+core/sandbox/sandbox
+
+#python specific
+*.pyc
+
+#vagrant specific
+.vagrant
+
+## generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
+*.swo
+*.out
+
+## ctags file
+tags
+TAGS.gz
+
+.ropeproject
+
+#eclipse specific
+.settings/*
+
+#compiled msgpack file
+_msgpack.c
+
+#clique manager specific, temporary current yet.
+cmd.dat
+
+#For Test
+*.rec
+
+#test
+ca.srl
+privkey.pem
+.srl
+
+# CLIQUE
+maint/prota_addr
+
+*.idea/
