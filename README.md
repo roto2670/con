@@ -20,6 +20,9 @@
 
 ### 5. Go the http://127.0.0.1:16000
 
+### 6. Quit
+    ctrl + c
+    deactivate
 
 
 # Reference
