@@ -63,7 +63,7 @@ google
 }
 """
 
-DEFAULT_PHOTO_URL = '''/static/images/img.jpg'''
+DEFAULT_PHOTO_URL = '''/static/images/user.png'''
 
 
 @auth.production_loader
