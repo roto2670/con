@@ -27,7 +27,7 @@ class User(UserMixin, db.Model):
       setattr(self, property, value)
 
   def __repr__(self):
-    return self
+    return self.email
 
 
 @login_manager.user_loader

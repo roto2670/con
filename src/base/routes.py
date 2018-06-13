@@ -10,7 +10,6 @@ from base import blueprint
 from base.models import User
 from base import db, login_manager, auth
 
-
 import logging
 
 

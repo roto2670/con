@@ -3,6 +3,12 @@ from products import blueprint
 from flask import render_template, request, redirect, url_for
 from flask_login import login_required
 import flask_login
+from flask_login import (
+    current_user
+)
+from base import db
+
+from products.models import Product
 
 import logging
 
@@ -13,24 +19,37 @@ def create():
   if request.method == "GET":
     return render_template("product_create.html")
   else:
-    logging.info("name : %s", str(request.form['name']))
-    logging.info("desc : %s", str(request.form['desc']))
-    return redirect('management')
+    prd = Product(prdname=request.form['name'],
+                  description=request.form['desc'],
+                  user_id=current_user.id)
+    db.session.add(prd)
+    db.session.commit()
+    return redirect('products/management')
 
 
 @blueprint.route('/remove', methods=['GET'])
 @login_required
 def remove():
-  return redirect('management')
+  prd_id = request.args.get('id')
+  prd = Product.query.get(prd_id)
+  db.session.delete(prd)
+  db.session.commit()
+  return redirect('products/management')
 
 
 @blueprint.route('/product', methods=['GET', 'POST'])
 def product():
-  logging.info("query string : %s", str(request.query_string))
   if request.method == "GET":
     return render_template('product.html')
   else:
     pass
+
+
+@blueprint.route('/management', methods=['GET'])
+def get_list():
+  user_id = current_user.id
+  prds = Product.query.filter_by(user_id=user_id).all()
+  return render_template("management.html", prds=prds)
 
 
 @blueprint.route('/<template>')

@@ -27,7 +27,6 @@ blueprint = Blueprint(
 @blueprint.route('/login', methods={'GET', 'POST'})
 def login():
   if not current_user.is_authenticated:
-    logging.info("### cur ext : %s", current_app.extensions)
     return current_app.extensions['firebase_auth'].login()
   else:
     return redirect(url_for('home_blueprint.index'))

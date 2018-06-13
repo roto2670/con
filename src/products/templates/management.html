@@ -35,17 +35,19 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th>#</th>
+                    <th></th>
                     <th>Name</th>
                     <th>Description</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th scope="row">1</th>
-                    <td><a href="/products/product?id=1">Naran</a></td>
-                    <td>Test</td>
-                  </tr>
+                  {% for prd in prds %}
+                    <tr>
+                      <th scope="row"></th>
+                      <td><a href="/products/product?id={{ prd.id }}">{{ prd.prdname }}</a></td>
+                      <td>{{ prd.description }}</td>
+                    </tr>
+                  {% endfor %}
                 </tbody>
               </table>
               <button type="button" class="btn btn-round btn-default">
