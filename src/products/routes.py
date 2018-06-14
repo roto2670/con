@@ -1,16 +1,24 @@
-
-from products import blueprint
-from flask import render_template, request, redirect, url_for
-from flask_login import login_required
-import flask_login
-from flask_login import (
-    current_user
-)
-from base import db
-
-from products.models import Product
+# -*- coding: utf-8 -*-
+#
+# Copyright 2017-2018 Naran Inc. All rights reserved.
+#  __    _ _______ ______   _______ __    _
+# |  |  | |   _   |    _ | |   _   |  |  | |
+# |   |_| |  |_|  |   | || |  |_|  |   |_| |
+# |       |       |   |_||_|       |       |
+# |  _    |       |    __  |       |  _    |
+# | | |   |   _   |   |  | |   _   | | |   |
+# |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import logging
+
+import flask_login
+from flask import render_template, request, redirect
+from flask_login import login_required
+from flask_login import current_user
+
+from base import db
+from products import blueprint
+from products.models import Product
 
 
 @blueprint.route('/create', methods=['GET', 'POST'])
@@ -38,6 +46,7 @@ def remove():
 
 
 @blueprint.route('/product', methods=['GET', 'POST'])
+@login_required
 def product():
   if request.method == "GET":
     return render_template('product.html')
@@ -46,6 +55,7 @@ def product():
 
 
 @blueprint.route('/management', methods=['GET'])
+@login_required
 def get_list():
   user_id = current_user.id
   prds = Product.query.filter_by(user_id=user_id).all()
@@ -56,15 +66,3 @@ def get_list():
 @login_required
 def route_template(template):
   return render_template(template + '.html')
-
-
-def _get_product_list():
-  prd_list = []
-  if current_user:
-    user_id = current_user.id
-    prd_list = Product.query.filter_by(user_id=user_id).all()
-  return prd_list
-
-
-def get_product_list():
-  return dict(product_list=_get_product_list())

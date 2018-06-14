@@ -1,5 +1,16 @@
-from base import db, login_manager
+# -*- coding: utf-8 -*-
+#
+# Copyright 2017-2018 Naran Inc. All rights reserved.
+#  __    _ _______ ______   _______ __    _
+# |  |  | |   _   |    _ | |   _   |  |  | |
+# |   |_| |  |_|  |   | || |  |_|  |   |_| |
+# |       |       |   |_||_|       |       |
+# |  _    |       |    __  |       |  _    |
+# | | |   |   _   |   |  | |   _   | | |   |
+# |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
+
 from sqlalchemy import Column, Integer, String
+from base import db, login_manager
 
 
 class Product(db.Model):

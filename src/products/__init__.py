@@ -1,5 +1,15 @@
+# -*- coding: utf-8 -*-
+#
+# Copyright 2017-2018 Naran Inc. All rights reserved.
+#  __    _ _______ ______   _______ __    _
+# |  |  | |   _   |    _ | |   _   |  |  | |
+# |   |_| |  |_|  |   | || |  |_|  |   |_| |
+# |       |       |   |_||_|       |       |
+# |  _    |       |    __  |       |  _    |
+# | | |   |   _   |   |  | |   _   | | |   |
+# |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
+
 from flask import Blueprint
-from flask_login import current_user
 
 blueprint = Blueprint(
     'products_blueprint',

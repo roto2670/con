@@ -1,8 +1,20 @@
-from base import db, login_manager
+# -*- coding: utf-8 -*-
+#
+# Copyright 2017-2018 Naran Inc. All rights reserved.
+#  __    _ _______ ______   _______ __    _
+# |  |  | |   _   |    _ | |   _   |  |  | |
+# |   |_| |  |_|  |   | || |  |_|  |   |_| |
+# |       |       |   |_||_|       |       |
+# |  _    |       |    __  |       |  _    |
+# | | |   |   _   |   |  | |   _   | | |   |
+# |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
+
+import logging
+
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String
 
-import logging
+from base import db, login_manager
 
 
 class User(UserMixin, db.Model):
@@ -34,9 +46,3 @@ class User(UserMixin, db.Model):
 def user_loader(id):
   return User.query.get(id)
 
-
-@login_manager.request_loader
-def request_loader(request):
-  username = request.form.get('username')
-  user = User.query.filter_by(username=username).first()
-  return user if user else None

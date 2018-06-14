@@ -1,4 +1,15 @@
-from flask import render_template, redirect, request, url_for, _request_ctx_stack
+# -*- coding: utf-8 -*-
+#
+# Copyright 2017-2018 Naran Inc. All rights reserved.
+#  __    _ _______ ______   _______ __    _
+# |  |  | |   _   |    _ | |   _   |  |  | |
+# |   |_| |  |_|  |   | || |  |_|  |   |_| |
+# |       |       |   |_||_|       |       |
+# |  _    |       |    __  |       |  _    |
+# | | |   |   _   |   |  | |   _   | | |   |
+# |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
+
+from flask import render_template, redirect, request, url_for
 from flask_login import (
     current_user,
     login_required,
@@ -7,9 +18,8 @@ from flask_login import (
 )
 
 from base import blueprint
-from base.models import User
 from base import db, login_manager, auth
-
+from base.models import User
 from products.models import Product
 
 
@@ -120,9 +130,10 @@ def internal_error(error):
 
 ## context processor
 
+
 def _get_product_list():
   product_list = []
-  if current_user:
+  if current_user and current_user.is_authenticated:
     user_id = current_user.id
     product_list = Product.query.filter_by(user_id=user_id).all()
   return product_list

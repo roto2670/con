@@ -1,18 +1,30 @@
+# -*- coding: utf-8 -*-
+#
+# Copyright 2017-2018 Naran Inc. All rights reserved.
+#  __    _ _______ ______   _______ __    _
+# |  |  | |   _   |    _ | |   _   |  |  | |
+# |   |_| |  |_|  |   | || |  |_|  |   |_| |
+# |       |       |   |_||_|       |       |
+# |  _    |       |    __  |       |  _    |
+# | | |   |   _   |   |  | |   _   | | |   |
+# |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import sys
+
 import logging
 import logging.handlers
+from config import DebugConfig
 from importlib import import_module
 
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from config import DebugConfig
 
-from base import db, auth, login_manager
 import base.routes
+from base import db, auth, login_manager
 
 sys.dont_write_bytecode = True
+
 
 def register_extensions(app):
   db.init_app(app)
@@ -36,25 +48,27 @@ def register_blueprints(app):
 
 
 def configure_database(app):
+  @app.before_first_request
+  def initialize_database():
+    db.create_all()
 
-    @app.before_first_request
-    def initialize_database():
-        db.create_all()
-
-    @app.teardown_request
-    def shutdown_session(exception=None):
-        db.session.remove()
+  @app.teardown_request
+  def shutdown_session(exception=None):
+    db.session.remove()
 
 
 def configure_logs(app):
   level = logging.DEBUG
+  log_path = app.config.get('LOG_PATH')
+  max_bytes = int(app.config.get('LOG_MAX_BYTES'))
+  backup_count = int(app.config.get('LOG_BACKUP_COUNT'))
   formatter = logging.Formatter('%(levelname)s\t[%(asctime)s]\t'
                                 '%(lineno)d\t%(module)s\t'
                                 '%(funcName)s\t%(message)s')
   logging.getLogger().setLevel(level)
-  handler = logging.handlers.RotatingFileHandler(app.config.get('LOG_PATH'),
-                                                 maxBytes=int(app.config.get('LOG_MAX_BYTES')),
-                                                 backupCount=int(app.config.get('LOG_BACKUP_COUNT')))
+  handler = logging.handlers.RotatingFileHandler(log_path,
+                                                 maxBytes=max_bytes,
+                                                 backupCount=backup_count)
   handler.setFormatter(formatter)
   logging.getLogger().addHandler(handler)
 
@@ -70,5 +84,5 @@ def create_app():
 
 
 if  __name__ == '__main__':
-  app = create_app()
-  app.run(host='127.0.0.1', port=16000)
+  _app = create_app()
+  _app.run(host='127.0.0.1', port=16000)
