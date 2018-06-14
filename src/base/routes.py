@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for
+from flask import render_template, redirect, request, url_for, _request_ctx_stack
 from flask_login import (
     current_user,
     login_required,
@@ -10,7 +10,7 @@ from base import blueprint
 from base.models import User
 from base import db, login_manager, auth
 
-import logging
+from products.models import Product
 
 
 @blueprint.route('/')
@@ -67,7 +67,6 @@ DEFAULT_PHOTO_URL = '''/static/images/user.png'''
 
 @auth.production_loader
 def production_sign_in(token):
-  logging.info("token : %s", token)
   user = User.query.filter_by(firebase_user_id=token['sub']).one_or_none()
   if not user:
     user = User(firebase_user_id=token['sub'])
@@ -117,3 +116,17 @@ def not_found_error(error):
 @blueprint.errorhandler(500)
 def internal_error(error):
   return render_template('errors/page_500.html'), 500
+
+
+## context processor
+
+def _get_product_list():
+  product_list = []
+  if current_user:
+    user_id = current_user.id
+    product_list = Product.query.filter_by(user_id=user_id).all()
+  return product_list
+
+
+def get_product_list():
+  return dict(product_list=_get_product_list())

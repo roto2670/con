@@ -22,4 +22,4 @@ class Product(db.Model):
       setattr(self, property, value)
 
   def __repr__(self):
-      return self.prd
+      return self.prdname

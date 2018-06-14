@@ -56,3 +56,15 @@ def get_list():
 @login_required
 def route_template(template):
   return render_template(template + '.html')
+
+
+def _get_product_list():
+  prd_list = []
+  if current_user:
+    user_id = current_user.id
+    prd_list = Product.query.filter_by(user_id=user_id).all()
+  return prd_list
+
+
+def get_product_list():
+  return dict(product_list=_get_product_list())

@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from config import DebugConfig
 
 from base import db, auth, login_manager
+import base.routes
 
 sys.dont_write_bytecode = True
 
@@ -17,6 +18,8 @@ def register_extensions(app):
   db.init_app(app)
   auth.init_app(app)
   login_manager.init_app(app)
+  # custom
+  app.context_processor(base.routes.get_product_list)
 
 
 def register_blueprints(app):
@@ -56,7 +59,6 @@ def configure_logs(app):
   logging.getLogger().addHandler(handler)
 
 
-
 def create_app():
   app = Flask(__name__, static_folder='base/static')
   app.config.from_object(DebugConfig)
@@ -66,8 +68,6 @@ def create_app():
   configure_database(app)
   return app
 
-
-app = create_app()
 
 if  __name__ == '__main__':
   app = create_app()
