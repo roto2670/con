@@ -1,11 +1,11 @@
-
 {% extends "base_site.html" %}
 
-{% block title %} Products {% endblock title %}
+{% block title %} Organization {% endblock title %}
 
 {% block stylesheets %}
   {{ super() }}
 {% endblock stylesheets %}
+
 
 {% block content %}
   <div class="right_col" role="main">
@@ -13,7 +13,7 @@
       <!-- start page title -->
       <div class="page-title">
         <div class="title_left">
-          <h3>Product <small>list</small></h3>
+          <h3>Organization <small>example</small></h3>
         </div>
 
         <div class="title_right">
@@ -28,7 +28,7 @@
         <div class="col-md-6 col-sm-6 col-xs-12">
           <div class="x_panel">
             <div class="x_title">
-              <h2>Product <small>list</small></h2>
+              <h2>Organization <small>list</small></h2>
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -38,26 +38,30 @@
                     <th></th>
                     <th>Name</th>
                     <th>Description</th>
+                    <th>Remove</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for prd in prds %}
+                  {% for org in orgs %}
                     <tr>
                       <th scope="row"></th>
-                      <td><a href="/products/product?id={{ prd.id }}">{{ prd.prdname }}</a></td>
-                      <td>{{ prd.description }}</td>
+                      <td>{{ org.orgname }}</td>
+                      <td>{{ org.description }}</td>
+                      <td><a href="/organization/remove?id={{ org.id }}"><span class="fa fa-remove"></a></span></td>
                     </tr>
                   {% endfor %}
                 </tbody>
               </table>
               <button type="button" class="btn btn-round btn-default">
-                <a href="/products/create">Create</a>
+                <a href="/organization/create">Create</a>
               </button>
             </div>
           </div>
         </div>
       </div>
       <!-- End row -->
+
+
 
     </div>
   </div>

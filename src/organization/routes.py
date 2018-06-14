@@ -17,41 +17,40 @@ from flask_login import login_required
 from flask_login import current_user
 
 from base import db
-from products import blueprint
-from products.models import Product
+from organization import blueprint
+from organization.models import Organization
+
+
+@blueprint.route('/', methods=['GET'])
+@login_required
+def default_route():
+  user_id = current_user.id
+  orgs = Organization.query.filter_by(user_id=user_id).all()
+  return render_template("organization.html", orgs=orgs)
 
 
 @blueprint.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
   if request.method == "GET":
-    return render_template("product_create.html")
+    return render_template("create.html")
   else:
-    prd = Product(prdname=request.form['name'],
-                  description=request.form['desc'],
-                  user_id=current_user.id)
-    db.session.add(prd)
+    org = Organization(orgname=request.form['name'],
+                       description=request.form['desc'],
+                       user_id=current_user.id)
+    db.session.add(org)
     db.session.commit()
-    return redirect('products/' + str(prd.id) + '/product')
+    return redirect('profile/organization')
 
 
 @blueprint.route('/remove', methods=['GET'])
 @login_required
 def remove():
-  prd_id = request.args.get('id')
-  prd = Product.query.get(prd_id)
-  db.session.delete(prd)
+  org_id = request.args.get('id')
+  org = Organization.query.get(org_id)
+  db.session.delete(org)
   db.session.commit()
-  return redirect('products/management')
-
-
-@blueprint.route('/<product_id>/product', methods=['GET', 'POST'])
-@login_required
-def product(product_id):
-  if request.method == "GET":
-    return render_template('product.html')
-  else:
-    pass
+  return redirect('organization')
 
 
 @blueprint.route('/<template>')
