@@ -32,6 +32,7 @@ def register_extensions(app):
   login_manager.init_app(app)
   # custom
   app.context_processor(base.routes.get_product_list)
+  app.context_processor(base.routes.get_current_product)
 
 
 def register_blueprints(app):
@@ -40,6 +41,7 @@ def register_blueprints(app):
       'home',
       'organization',
       'products',
+      'endpoints',
       'settings',
       'login'
   ]

@@ -6,14 +6,18 @@
 
     <ul class="nav navbar-nav">
         <div class="btn-group">
-            <button type="button" class="btn btn-danger">Products</button>
+            {% if current_product %}
+              <button type="button" class="btn btn-danger">{{ current_product.prdname }}</button>
+            {% else %}
+              <button type="button" class="btn btn-danger">Products</button>
+            {% endif %}
             <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
               <span class="caret"></span>
               <span class="sr-only">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu" role="menu">
               {% for product in product_list %}
-                <li><a href="/products/{{ product.id }}/product">{{ product.prdname }}</a></li>
+                <li><a href="/products/{{ product.id }}/general">{{ product.prdname }}</a></li>
               {% endfor %}
               <li class="divider"></li>
               <li><a href="/products/create">Create New Product</a>

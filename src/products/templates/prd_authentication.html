@@ -1,0 +1,78 @@
+
+{% extends "base_site.html" %}
+
+{% block title %} Authentication {% endblock title %}
+
+{% block stylesheets %}
+  {{ super() }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <!-- start page title -->
+      <div class="page-title">
+        <div class="title_left">
+        </div>
+
+        <div class="title_right">
+        </div>
+      </div>
+      <!-- end page title -->
+
+      <div class="clearfix"></div>
+
+      <!-- start row -->
+      <div class="">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2> Authentication </h2>
+              <div class="clearfix"></div>
+            </div>
+
+            <div class="x_content">
+              <form id="authentication" class="form-horizontal form-label-left" method="post">
+                <div class="col-md-7">
+                  <h3>Access Token</h3>
+                  <div class="form-group">
+                    <label class="control-label col-md-0" for="accessToken">
+                    </label>
+                    <div class="col-md-12">
+                      <input type="text" value="testAccessToken" id="accessToken" name="accessToken" class="form-control col-md-6 col-xs-6" readonly onclick="copyToClipboard(id);">
+                    </div>
+                  </div>
+
+                  <br>
+                  <h3>Push Notification Keys</h3>
+                  <div class="form-group">
+                    <label class="control-label col-md-2" for="iosNotiKey">IOS <span class="required">*</span>
+                    </label>
+                    <div class="col-md-10">
+                      <input type="text" id="iosNotiKey" name="iosNotiKey" required="required" class="form-control col-md-6 col-xs-6">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-md-2" for="androidNotiKey">Android <span class="required">*</span>
+                    </label>
+                    <div class="col-md-10">
+                      <input type="text" id="androidNotiKey" name="androidNotiKey" required="required" class="form-control col-md-6 col-xs-6">
+                    </div>
+                  </div>
+
+                  <br>
+                  <button type="submit" class="btn btn-default">Save</button>
+                </div>
+
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- End row -->
+
+    </div>
+  </div>
+
+{% endblock content %}

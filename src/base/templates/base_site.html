@@ -95,6 +95,16 @@
         <script src="{{ url_for('static', filename='vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js') }}"></script>
         <!-- starrr -->
         <script src="{{ url_for('static', filename='vendors/starrr/dist/starrr.js') }}"></script>
+
+        <!-- Custom function -->
+        <script>
+          function copyToClipboard(value) {
+            var copyText = document.getElementById(value);
+            copyText.select();
+            document.execCommand("copy");
+            alert("Copied to clipboard");
+          }
+        </script>
       {% endblock %}
       <!-- Custom Theme Scripts -->
       <script src="{{ url_for('static', filename='build/js/custom.js') }}"></script>

@@ -141,3 +141,23 @@ def _get_product_list():
 
 def get_product_list():
   return dict(product_list=_get_product_list())
+
+
+CUR_PRODUCT = {}
+
+def set_current_product(cur_product):
+  CUR_PRODUCT['cur'] = cur_product
+
+
+def _get_current_product():
+  if current_user and current_user.is_authenticated:
+    if 'cur' in CUR_PRODUCT:
+      return CUR_PRODUCT['cur']
+    else:
+      return None
+  else:
+    return None
+
+
+def get_current_product():
+  return dict(current_product=_get_current_product())

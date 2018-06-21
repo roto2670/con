@@ -1,0 +1,88 @@
+
+{% extends "base_site.html" %}
+
+{% block title %} Admins {% endblock title %}
+
+{% block stylesheets %}
+  {{ super() }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <!-- start page title -->
+      <div class="page-title">
+        <div class="title_left">
+        </div>
+
+        <div class="title_right">
+        </div>
+      </div>
+      <!-- end page title -->
+
+      <div class="clearfix"></div>
+
+      <!-- start row -->
+      <div class="">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2> Admins </h2>
+              <div class="clearfix"></div>
+            </div>
+
+            <div class="x_content">
+                <div class="col-md-7">
+                  <h3>Owner</h3>
+                    <div class="alert owner-email-list fade in">
+                      <button type="button" class="close" aria-label="Close">
+                      </button>
+                      <strong>Owner@email.com</strong>
+                    </div>
+
+                  <h3>Member</h3>
+                    <div class="alert member-email-list fade in">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                      </button>
+                      <strong>Member@email.com</strong>
+                    </div>
+                    <div class="alert member-email-list fade in">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                      </button>
+                      <strong>Member@email.com</strong>
+                    </div>
+
+                  <form id="admins" class="form-horizontal form-label-left" method="post">
+                      <h3>Invite Member</h3>
+                      <div class="form-group">
+                        <label class="control-label col-md-0" for="newMemberEmail">
+                        </label>
+                        <div class="col-md-12">
+                          <input type="text" placeHolder="member@email.com" id="newMemberEmail" name="newMemberEmail" required="required" class="form-control col-md-6 col-xs-6">
+                        </div>
+                      </div>
+
+                      <br>
+                      <button type="submit" class="btn btn-default">Send Invite</button>
+                  </form>
+
+
+                  <h3>Invited Member</h3>
+                    <div class="alert member-email-list fade in">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                      </button>
+                      <strong>Member@email.com</strong>
+                    </div>
+
+                </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- End row -->
+
+    </div>
+  </div>
+
+{% endblock content %}

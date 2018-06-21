@@ -1,0 +1,141 @@
+
+{% extends "base_site.html" %}
+
+{% block title %} Tests {% endblock title %}
+
+{% block stylesheets %}
+  {{ super() }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <!-- start page title -->
+      <div class="page-title">
+        <div class="title_left">
+        </div>
+
+        <div class="title_right">
+        </div>
+      </div>
+      <!-- end page title -->
+
+      <div class="clearfix"></div>
+
+      <!-- start row -->
+      <div class="">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2> Tests </h2>
+              <div class="clearfix"></div>
+
+
+                <form id="tests" class="form-horizontal form-label-left" method="post">
+                  <div class="form-group">
+                    <label class="control-label col-md-1 col-sm-1 col-xs-1">Version</label>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                      <select class="form-control" id="version" name="version" onchange="this.form.submit()">
+                        {% for version in version_list %}
+                          {% if selected and selected == version %}
+                            <option id="{{ version }}" selected>{{ version }}</option>
+                          {% else %}
+                            <option id="{{ version }}">{{ version }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="control-label col-md-1 col-sm-1 col-xs-1">Gadget</label>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                      <select class="form-control" id="gadget" name="gadget" onchange="this.form.submit()">
+                        {% for _gadget in gadget_list %}
+                          {% if gadget and gadget == _gadget %}
+                            <option id="{{ _gadget }}" selected>{{ _gadget }}</option>
+                          {% else %}
+                            <option id="{{ _gadget }}">{{ _gadget }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </form>
+
+            </div>
+            <div class="x_content">
+
+                <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="panel">
+                      <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <h4 class="panel-title">Test1</h4>
+                      </a>
+                      <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="panel-body">
+
+                          <div class="bs-example" data-example-id="simple-jumbotron">
+                            <div class="jumbotron">
+                                <h1>Test</h1>
+                                <p>Test</p>
+                                Test
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                    <div class="panel">
+                      <a class="panel-heading collapsed" role="tab" id="headingTwo" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        <h4 class="panel-title">Test2</h4>
+                      </a>
+                      <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                        <div class="panel-body">
+
+                          <div class="bs-example" data-example-id="simple-jumbotron">
+                            <div class="jumbotron">
+                                <h1>Test</h1>
+                                <p>Test</p>
+                                Test
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                    <div class="panel">
+                      <a class="panel-heading collapsed" role="tab" id="headingThree" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        <h4 class="panel-title">Test3</h4>
+                      </a>
+                      <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                        <div class="panel-body">
+
+                          <div class="bs-example" data-example-id="simple-jumbotron">
+                            <div class="jumbotron">
+                                <h1>Test</h1>
+                                <p>Test</p>
+                                Test
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+
+
+
+
+
+            </div><!-- End x_content-->
+          </div><!-- End x_panel-->
+        </div>
+
+      </div>
+      <!-- End row -->
+
+    </div>
+  </div>
+
+{% endblock content %}
