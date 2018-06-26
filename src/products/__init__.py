@@ -11,6 +11,8 @@
 
 from flask import Blueprint
 
+from products import api
+
 blueprint = Blueprint(
     'products_blueprint',
     __name__,

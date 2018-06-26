@@ -10,17 +10,12 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 from flask import render_template, redirect, request, url_for
-from flask_login import (
-    current_user,
-    login_required,
-    login_user,
-    logout_user
-)
+from flask_login import current_user, login_required, login_user, logout_user
 
+import products
 from base import blueprint
 from base import db, login_manager, auth
-from base.models import User
-from products.models import Product
+from login.models import User
 
 
 @blueprint.route('/')
@@ -77,14 +72,17 @@ DEFAULT_PHOTO_URL = '''/static/images/user.png'''
 
 @auth.production_loader
 def production_sign_in(token):
+  # https://firebase.google.com/docs/auth/admin/verify-id-tokens?hl=ko
   user = User.query.filter_by(firebase_user_id=token['sub']).one_or_none()
   if not user:
     user = User(firebase_user_id=token['sub'])
     db.session.add(user)
+  user.name = token.get('name')
   user.email = token['email']
   user.email_verified = token['email_verified']
-  user.username = token.get('name')
+  user.sign_in_provider = token['firebase']['sign_in_provider']
   user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
+  user.developer_id = "testdevid"  # TODO: change developer id in invite email
   db.session.commit()
   login_user(user)
   return redirect(url_for('base_blueprint.route_default'))
@@ -132,27 +130,31 @@ def internal_error(error):
 
 
 def _get_product_list():
-  product_list = []
+  # TODO: handle current user
   if current_user and current_user.is_authenticated:
-    user_id = current_user.id
-    product_list = Product.query.filter_by(user_id=user_id).all()
-  return product_list
+    product_list = products.api.get_product_list(current_user.developer_id)
+    return product_list
+  else:
+    return []
 
 
 def get_product_list():
   return dict(product_list=_get_product_list())
 
 
-CUR_PRODUCT = {}
+CUR_PRODUCT = {}  # {user_id : CUR_PRODUCT}
 
 def set_current_product(cur_product):
-  CUR_PRODUCT['cur'] = cur_product
+  # TODO: handle current user
+  if current_user and current_user.is_authenticated:
+    CUR_PRODUCT[current_user.id] = cur_product
 
 
 def _get_current_product():
+  # TODO: handle current user
   if current_user and current_user.is_authenticated:
-    if 'cur' in CUR_PRODUCT:
-      return CUR_PRODUCT['cur']
+    if current_user.id in CUR_PRODUCT:
+      return CUR_PRODUCT[current_user.id]
     else:
       return None
   else:

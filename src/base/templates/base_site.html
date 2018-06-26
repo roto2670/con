@@ -55,11 +55,13 @@
             <!-- {{ content }} -->
           {% endblock content %}
 
+          <!-- Footer
           {% block footer %}
             <footer>
               {% include "site_template/footer.html" %}
             </footer>
           {% endblock footer %}
+          -->
         </div>
       </div>
 
@@ -96,7 +98,7 @@
         <!-- starrr -->
         <script src="{{ url_for('static', filename='vendors/starrr/dist/starrr.js') }}"></script>
 
-        <!-- Custom function -->
+        <!-- Custom function(jslee) -->
         <script>
           function copyToClipboard(value) {
             var copyText = document.getElementById(value);

@@ -11,7 +11,7 @@
 
 import logging
 
-from flask import render_template, request
+from flask import render_template, redirect, request, Response
 from flask_login import login_required
 
 from endpoints import blueprint
@@ -52,3 +52,23 @@ def tests(product_id):
     return render_template('ep_tests.html', version_list=MOCK_LIST,
                            gadget_list=MOCK_GADGET_LIST, gadget=gadget,
                            selected=version)
+
+
+@blueprint.route('/<product_id>/upload', methods=['POST'])
+@login_required
+def upload_header_file(product_id):
+  #TODO: Handle upload content
+  upload_file = request.files['file']
+  content = upload_file.read()
+  # TODO: Check format?? Or send to cloud server
+  logging.info("Upload file content : %s", content)
+  return redirect('endpoints/' + product_id + '/specifications')
+
+
+@blueprint.route('/<product_id>/download', methods=['GET'])
+@login_required
+def download_header_file(product_id):
+  #TODO: Handle download content
+  content = '{"name": "micorobot"}'
+  return Response(content, mimetype='application/json',
+                  headers={'Content-Disposition':'attachment;filename=microbot.json'})

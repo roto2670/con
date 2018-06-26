@@ -65,6 +65,16 @@
                 </div>
               </div>
 
+              <!-- Upload Button -->
+              <form id="upload" action="/endpoints/{{ current_product.product_id }}/upload" method="POST" enctype="multipart/form-data">
+                <label class="btn btn-default btn-file">Upload
+                <input type="file" name="file" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
+                </label>
+              </form>
+
+              <!-- Download button -->
+              <a href="/endpoints/{{ current_product.product_id }}/download"><button class="btn btn-default">Download</button></a>
+
             </div><!-- End x_content -->
           </div><!-- End x_panel-->
         </div>
