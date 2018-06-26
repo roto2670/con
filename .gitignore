@@ -1,6 +1,5 @@
 build*_*_*.log
 obj*_*_*/
-build
 dist
 log ~*
 *.log
@@ -15,7 +14,6 @@ coverage.xml
 profile
 xunit.xml
 .virtual/
-.build/
 .test/
 _t/
 *.db
