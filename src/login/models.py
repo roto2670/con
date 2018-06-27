@@ -12,7 +12,7 @@
 import logging
 
 from flask_login import UserMixin
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Boolean, Column, Integer, String
 
 from base import db, login_manager
 
