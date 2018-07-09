@@ -19,7 +19,9 @@
               {% for product in product_list %}
                 <li><a href="/products/{{ product.product_id }}/general">{{ product.name }}</a></li>
               {% endfor %}
-              <li class="divider"></li>
+              {% if product_list %}
+                <li class="divider"></li>
+              {% endif %}
               <li><a href="/products/create">Create New Product</a>
             </ul>
           </div>

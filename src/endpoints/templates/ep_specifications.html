@@ -10,17 +10,6 @@
 {% block content %}
   <div class="right_col" role="main">
     <div class="">
-      <!-- start page title -->
-      <div class="page-title">
-        <div class="title_left">
-        </div>
-
-        <div class="title_right">
-        </div>
-      </div>
-      <!-- end page title -->
-
-      <div class="clearfix"></div>
 
       <div class=""><!-- start row -->
         <div class="col-md-12 col-sm-12 col-xs-12">
@@ -52,14 +41,9 @@
                 <div class="bs-example" data-example-id="simple-jumbotron">
                   <div class="jumbotron">
                     {% if selected %}
-                      <h1>{{ selected }}</h1>
-                      <h2>Json</h2>
-                      <p>Json</p>
-                      Json
+                      {{ content }}
                     {% else %}
-                      <h1>Json</h1>
-                      <p>Json</p>
-                      Json
+                      {{ content }}
                     {% endif %}
                   </div>
                 </div>

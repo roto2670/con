@@ -9,10 +9,12 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import json
 import logging
 
-from flask import render_template, redirect, request, Response
+from flask import abort, render_template, redirect, request, Response
 from flask_login import login_required
+from markupsafe import Markup
 
 from endpoints import blueprint
 
@@ -24,15 +26,16 @@ MOCK_GADGET_LIST = ['iPhone', 'Nexus']
 @login_required
 def specifications(product_id):
   # TODO: Upload
+  content = {}
   if request.method == "GET":
     selected = MOCK_LIST[0] if MOCK_LIST else None
     return render_template('ep_specifications.html', version_list=MOCK_LIST,
-                           selected=selected)
+                           selected=selected, content=content)
   else:
     version = request.form['version']
     logging.info("%s", version)
     return render_template('ep_specifications.html', version_list=MOCK_LIST,
-                           selected=version)
+                           selected=version, content=content)
 
 
 @blueprint.route('/<product_id>/tests', methods=['GET', 'POST'])
@@ -70,5 +73,5 @@ def upload_header_file(product_id):
 def download_header_file(product_id):
   #TODO: Handle download content
   content = '{"name": "micorobot"}'
-  return Response(content, mimetype='application/json',
-                  headers={'Content-Disposition':'attachment;filename=microbot.json'})
+  return Response(content, mimetype='text/x-c',
+                  headers={'Content-Disposition':'attachment;filename=mib.h'})
