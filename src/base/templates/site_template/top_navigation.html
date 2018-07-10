@@ -4,7 +4,7 @@
       <a id="menu_toggle"><i class="fa fa-bars"></i></a>
     </div>
 
-    <ul class="nav navbar-nav">
+    <div class="nav navbar-nav navbar-btn">
         <div class="btn-group">
             {% if current_product %}
               <button type="button" class="btn btn-danger">{{ current_product.name }}</button>
@@ -24,8 +24,8 @@
               {% endif %}
               <li><a href="/products/create">Create New Product</a>
             </ul>
-          </div>
-        </ul>
+        </div>
+    </div>
 
     <ul class="nav navbar-nav navbar-right">
       <li class="">

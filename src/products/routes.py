@@ -76,7 +76,9 @@ def authentication(product_id):
     access_token = request.form['accessToken']
     ios_noti_key = request.form['iosNotiKey']
     android_noti_key = request.form['androidNotiKey']
-    logging.info("%s, %s, %s", access_token, ios_noti_key, android_noti_key)
+    hook_client_key = request.form['hookClientKey']
+    logging.info("%s, %s, %s, %s", access_token, ios_noti_key,
+                 android_noti_key, hook_client_key)
     return redirect('products/' + product_id + '/authentication')
 
 

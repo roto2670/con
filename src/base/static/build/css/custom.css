@@ -4273,3 +4273,40 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 .cursor-pointer {
     cursor: pointer
 }
+
+/** jslee custom. json viewer **/
+@media (max-height: 1100px) {
+    .json-height {
+        height: 40em;
+    }
+}
+@media (max-height: 1000px) {
+    .json-height {
+        height: 37em;
+    }
+}
+@media (max-height: 950px) {
+    .json-height {
+        height: 35em;
+    }
+}
+@media (max-height: 850px) {
+    .json-height {
+        height: 30em;
+    }
+}
+@media (max-height: 680px) {
+    .json-height {
+        height: 20em;
+    }
+}
+@media (max-height: 550px) {
+    .json-height {
+        height: 15em;
+    }
+}
+@media (max-height: 480px) {
+    .json-height {
+        height: 12em;
+    }
+}

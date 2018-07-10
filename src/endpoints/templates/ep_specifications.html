@@ -7,6 +7,17 @@
   {{ super() }}
 {% endblock stylesheets %}
 
+{% block javascripts %}
+  {{ super() }}
+  <script>
+    var jsonData = {{ content | tojson }};
+    if (jsonData !== null && !jQuery.isEmptyObject(jsonData)) {
+      document.getElementById("jsonField").innerHTML = JSON.stringify(jsonData, undefined, 4);
+    }
+  </script>
+{% endblock javascripts %}
+
+
 {% block content %}
   <div class="right_col" role="main">
     <div class="">
@@ -25,39 +36,42 @@
 
               <div class="col-md-9 col-sm-9 col-xs-12">
                 <form id="specifications" method="post">
-                  <select class="form-control" id="version" name="version" onchange="this.form.submit()">
-                    {% for version in version_list %}
-                      {% if selected and selected == version %}
-                        <option id="{{ version }}" selected>{{ version }}</option>
-                      {% else %}
-                        <option id="{{ version }}">{{ version }}</option>
-                      {% endif %}
-                    {% endfor %}
-                  </select>
+                  {% if version_list %}
+                    <select class="form-control" id="version" name="version" onchange="this.form.submit()">
+                      {% for version in version_list %}
+                        {% if selected and selected == version %}
+                          <option id="{{ version }}" selected>{{ version }}</option>
+                        {% else %}
+                          <option id="{{ version }}">{{ version }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                  {% else %}
+                    <select class="form-control" id="version" name="version" onchange="this.form.submit()" disabled>
+                      <option>Please upload specifications file</option>
+                    </select>
+                  {% endif %}
                 </form>
 
                 <br>
 
-                <div class="bs-example" data-example-id="simple-jumbotron">
-                  <div class="jumbotron">
-                    {% if selected %}
-                      {{ content }}
-                    {% else %}
-                      {{ content }}
-                    {% endif %}
-                  </div>
-                </div>
+                <pre class="json-padding json-height jumbotron" id="jsonField">
+                </pre>
               </div>
 
               <!-- Upload Button -->
               <form id="upload" action="/endpoints/{{ current_product.product_id }}/upload" method="POST" enctype="multipart/form-data">
                 <label class="btn btn-default btn-file">Upload
-                <input type="file" name="file" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
+                  <input type="file" name="file" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
                 </label>
               </form>
 
               <!-- Download button -->
-              <a href="/endpoints/{{ current_product.product_id }}/download"><button class="btn btn-default">Download</button></a>
+              {% if version_list %}
+                <a href="/endpoints/{{ current_product.product_id }}/download"><button class="btn btn-default">Download</button></a>
+              {% else %}
+                <a href="/endpoints/{{ current_product.product_id }}/download"><button class="btn btn-default" disabled>Download</button></a>
+              {% endif %}
 
             </div><!-- End x_content -->
           </div><!-- End x_panel-->

@@ -9,7 +9,6 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-import json
 import logging
 
 from flask import abort, render_template, redirect, request, Response
@@ -26,7 +25,16 @@ MOCK_GADGET_LIST = ['iPhone', 'Nexus']
 @login_required
 def specifications(product_id):
   # TODO: Upload
-  content = {}
+  content = {"hi": "hi",
+             "hello1": {"123": 123, "hihi": "hihi"},
+             "hello2": {"123": 123, "hihi": "hihi"},
+             "hello3": {"123": 123, "hihi": "hihi"},
+             "hello4": {"123": 123, "hihi": "hihi"},
+             "hello5": {"123": 123, "hihi": "hihi"},
+             "hello7": {"123": 123, "hihi": "hihi"},
+             "hello8": {"123": 123, "hihi": "hihi"},
+             "hello9": {"123": 123, "hihi": "hihi"},
+             "hello10": {"123": 123, "hihi": "hihi"}}
   if request.method == "GET":
     selected = MOCK_LIST[0] if MOCK_LIST else None
     return render_template('ep_specifications.html', version_list=MOCK_LIST,
