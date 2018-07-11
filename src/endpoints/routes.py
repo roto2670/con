@@ -21,20 +21,62 @@ MOCK_LIST = ['v1.0.1', 'v0.4.1', 'v0.2.1', 'v0.0.1']
 MOCK_GADGET_LIST = ['iPhone', 'Nexus']
 
 
+def _get_content():
+  content = {
+      "product": "mibp",
+      "requests": [
+          {"type": "request",
+           "name": "push",
+           "id": 1,
+           "params": [{"name": "req_id",
+                       "type": "uint8_t",
+                       "length": 1,
+                       "default": 0}],
+           "return": [{"name": "result",
+                       "type": "uint8_t",
+                       "length": 1,
+                       "default": 0}],
+           "timeout": 3
+          },
+          {"type": "request",
+           "name": "release",
+           "id": 2,
+           "params": [],
+           "return": [{"name": "result",
+                       "type": "uint8_t",
+                       "length": 1,
+                       "default": 0}
+                     ],
+           "timeout": 3
+          }
+      ],
+      "events": [
+          {"type": "event",
+           "name": "press",
+           "id": 1,
+           "values": [{"name": "major",
+                       "type": "uint8_t",
+                       "length": 1,
+                       "default": 0},
+                      {"name": "minor",
+                       "type": "uint8_t",
+                       "length": 1,
+                       "default": 0},
+                      {"name": "build",
+                       "type": "uint8_t",
+                       "length": 1,
+                       "default": 0}]
+          }
+      ]
+  }
+  return content
+
+
 @blueprint.route('/<product_id>/specifications', methods=['GET', 'POST'])
 @login_required
 def specifications(product_id):
   # TODO: Upload
-  content = {"hi": "hi",
-             "hello1": {"123": 123, "hihi": "hihi"},
-             "hello2": {"123": 123, "hihi": "hihi"},
-             "hello3": {"123": 123, "hihi": "hihi"},
-             "hello4": {"123": 123, "hihi": "hihi"},
-             "hello5": {"123": 123, "hihi": "hihi"},
-             "hello7": {"123": 123, "hihi": "hihi"},
-             "hello8": {"123": 123, "hihi": "hihi"},
-             "hello9": {"123": 123, "hihi": "hihi"},
-             "hello10": {"123": 123, "hihi": "hihi"}}
+  content = _get_content()
   if request.method == "GET":
     selected = MOCK_LIST[0] if MOCK_LIST else None
     return render_template('ep_specifications.html', version_list=MOCK_LIST,
@@ -50,19 +92,20 @@ def specifications(product_id):
 @login_required
 def tests(product_id):
   # TODO: Test
+  content = _get_content()
   if request.method == "GET":
     selected = MOCK_LIST[0] if MOCK_LIST else None
     gadget = MOCK_GADGET_LIST[0] if MOCK_GADGET_LIST else None
     return render_template('ep_tests.html', version_list=MOCK_LIST,
                            gadget_list=MOCK_GADGET_LIST, gadget=gadget,
-                           selected=selected)
+                           selected=selected, content=content)
   else:
     version = request.form['version']
     gadget = request.form['gadget']
     logging.info("%s, %s", version, gadget)
     return render_template('ep_tests.html', version_list=MOCK_LIST,
                            gadget_list=MOCK_GADGET_LIST, gadget=gadget,
-                           selected=version)
+                           selected=version, content=content)
 
 
 @blueprint.route('/<product_id>/upload', methods=['POST'])
