@@ -3,39 +3,23 @@
 
 {% block title %} Authentication {% endblock title %}
 
-{% block stylesheets %}
-  {{ super() }}
-{% endblock stylesheets %}
-
 {% block content %}
   <div class="right_col" role="main">
     <div class="">
-      <!-- start page title -->
-      <div class="page-title">
-        <div class="title_left">
-        </div>
 
-        <div class="title_right">
-        </div>
-      </div>
-      <!-- end page title -->
-
-      <div class="clearfix"></div>
-
-      <!-- start row -->
-      <div class="">
+      <div class="row">  <!-- Start row -->
         <div class="col-md-12 col-sm-12 col-xs-12">
-          <div class="x_panel">
+          <div class="x_panel">  <!-- start x_panel -->
             <div class="x_title">
               <h2> Authentication </h2>
               <div class="clearfix"></div>
             </div>
 
-            <div class="x_content">
+            <div class="x_content">  <!-- start x_content -->
               <form id="authentication" class="form-horizontal form-label-left" method="post">
                 <div class="col-md-8">
                   <h3>Access Token</h3>
-                  <div class="form-group">
+                  <div class="item form-group">
                     <label class="control-label col-md-0" for="accessToken">
                     </label>
                     <div class="col-md-12">
@@ -44,25 +28,8 @@
                   </div>
 
                   <br>
-                  <h3>Push Notification Keys</h3>
-                  <div class="form-group">
-                    <label class="control-label col-md-2" for="iosNotiKey">IOS <span class="required">*</span>
-                    </label>
-                    <div class="col-md-10">
-                      <input type="text" id="iosNotiKey" name="iosNotiKey" required="required" class="form-control col-md-6 col-xs-6">
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="control-label col-md-2" for="androidNotiKey">Android <span class="required">*</span>
-                    </label>
-                    <div class="col-md-10">
-                      <input type="text" id="androidNotiKey" name="androidNotiKey" required="required" class="form-control col-md-6 col-xs-6">
-                    </div>
-                  </div>
-
-                  <br>
                   <h3>Hook URL</h3>
-                  <div class="form-group">
+                  <div class="item form-group">
                     <label class="control-label col-md-2" for="hookClientKey">Client Key <span class="required">*</span>
                     </label>
                     <div class="col-md-10">
@@ -71,16 +38,85 @@
                   </div>
 
                   <br>
+                  <h3>Push Notification Keys</h3>
+
+                  <h4>Android</h4>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2" for="androidNotiKey">Key <span class="required">*</span>
+                    </label>
+                    <div class="col-md-10">
+                      <input type="text" id="androidNotiKey" name="androidNotiKey" required="required" class="form-control col-md-6 col-xs-6" placeholder="Key">
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2" for="androidPackageName">Name <span class="required">*</span>
+                    </label>
+                    <div class="col-md-10">
+                      <input type="text" id="androidPackageName" name="androidPackageName" required="required" class="form-control col-md-6 col-xs-6" placeholder="Package Name">
+                    </div>
+                  </div>
+
+                  <br>
+                  <h4>IOS</h4>
+                  <h5>Dev</h5>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2" for="iosBundleIdentifier">Identifier <span class="required">*</span>
+                    </label>
+                    <div class="col-md-10">
+                      <input type="text" id="iosBundleIdentifier" name="iosBundleIdentifier" required="required" class="form-control col-md-6 col-xs-6" placeholder="Bundle Identifier">
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2" for="iosPassword">Password <span class="required">*</span>
+                    </label>
+                    <div class="col-md-10">
+                      <input type="text" id="iosPassword" name="iosPassword" required="required" class="form-control col-md-6 col-xs-6" placeholder="Password">
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2" for="upload">File <span class="required">*</span>
+                    </label>
+                      <label class="btn btn-default btn-file">Upload
+                        <input type="file" name="file" form="upload" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
+                      </label>
+                  </div>
+                  <br>
+                  <h5>Production</h5>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2" for="iosBundleIdentifier">Identifier <span class="required">*</span>
+                    </label>
+                    <div class="col-md-10">
+                      <input type="text" id="iosBundleIdentifier" name="iosBundleIdentifier" required="required" class="form-control col-md-6 col-xs-6" placeholder="Bundle Identifier">
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2" for="iosPassword">Password <span class="required">*</span>
+                    </label>
+                    <div class="col-md-10">
+                      <input type="text" id="iosPassword" name="iosPassword" required="required" class="form-control col-md-6 col-xs-6" placeholder="Password">
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2" for="upload">File <span class="required">*</span>
+                    </label>
+                      <label class="btn btn-default btn-file">Upload
+                        <input type="file" name="file" form="upload" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
+                      </label>
+                  </div>
+
+                  <br>
                   <button type="submit" class="btn btn-default">Save</button>
                 </div>
-
               </form>
-            </div>
 
-          </div>
+              <!-- Upload file -->
+              <form id="upload" name="upload" action="/products/{{ current_product.product_id }}/upload" method="POST" enctype="multipart/form-data">
+              </form>
+            </div>  <!-- End x_content -->
+
+          </div>  <!-- End x_panel -->
         </div>
-      </div>
-      <!-- End row -->
+      </div>  <!-- End row-->
 
     </div>
   </div>

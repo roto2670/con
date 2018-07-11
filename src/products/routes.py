@@ -74,12 +74,28 @@ def authentication(product_id):
     return render_template('prd_authentication.html')
   else:
     access_token = request.form['accessToken']
-    ios_noti_key = request.form['iosNotiKey']
-    android_noti_key = request.form['androidNotiKey']
     hook_client_key = request.form['hookClientKey']
-    logging.info("%s, %s, %s, %s", access_token, ios_noti_key,
-                 android_noti_key, hook_client_key)
+
+    android_noti_key = request.form['androidNotiKey']
+    android_package_name = request.form['androidPackageName']
+
+    ios_bundle_identifier = request.form['iosBundleIdentifier']
+    ios_password = request.form['iosPassword']
+    logging.info("accesstoken, hook : %s, %s", access_token, hook_client_key)
+    logging.info("android : %s, %s", android_noti_key, android_package_name)
+    logging.info("ios : %s, %s", ios_bundle_identifier, ios_password)
     return redirect('products/' + product_id + '/authentication')
+
+
+@blueprint.route('/<product_id>/upload', methods=['POST'])
+@login_required
+def upload_header_file(product_id):
+  #TODO: Handle upload content
+  upload_file = request.files['file']
+  content = upload_file.read()
+  # TODO: Check format?? Or send to cloud server
+  logging.info("Upload file content : %s", content)
+  return redirect('products/' + product_id + '/authentication')
 
 
 @blueprint.route('/<product_id>/admins', methods=['GET', 'POST'])

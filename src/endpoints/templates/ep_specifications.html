@@ -3,10 +3,6 @@
 
 {% block title %} Specifications {% endblock title %}
 
-{% block stylesheets %}
-  {{ super() }}
-{% endblock stylesheets %}
-
 {% block javascripts %}
   {{ super() }}
   <script>
@@ -22,7 +18,7 @@
   <div class="right_col" role="main">
     <div class="">
 
-      <div class=""><!-- start row -->
+      <div class="row"><!-- start row -->
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="x_panel">
 
@@ -62,7 +58,7 @@
               <!-- Upload Button -->
               <form id="upload" action="/endpoints/{{ current_product.product_id }}/upload" method="POST" enctype="multipart/form-data">
                 <label class="btn btn-default btn-file">Upload
-                  <input type="file" name="file" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
+                  <input type="file" name="file" form="upload" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
                 </label>
               </form>
 
