@@ -24,10 +24,8 @@ MOCK_GADGET_LIST = ['iPhone', 'Nexus']
 def _get_content():
   content = {
       "product": "mibp",
-      "requests": [
-          {"type": "request",
-           "name": "push",
-           "id": 1,
+      "request": [
+          {"name": "push",
            "params": [{"name": "req_id",
                        "type": "uint8_t",
                        "length": 1,
@@ -38,9 +36,7 @@ def _get_content():
                        "default": 0}],
            "timeout": 3
           },
-          {"type": "request",
-           "name": "release",
-           "id": 2,
+          {"name": "release",
            "params": [],
            "return": [{"name": "result",
                        "type": "uint8_t",
@@ -50,22 +46,17 @@ def _get_content():
            "timeout": 3
           }
       ],
-      "events": [
-          {"type": "event",
-           "name": "press",
-           "id": 1,
+      "event": [
+          {"name": "press",
            "values": [{"name": "major",
                        "type": "uint8_t",
-                       "length": 1,
-                       "default": 0},
+                       "length": 1},
                       {"name": "minor",
                        "type": "uint8_t",
-                       "length": 1,
-                       "default": 0},
+                       "length": 1},
                       {"name": "build",
                        "type": "uint8_t",
-                       "length": 1,
-                       "default": 0}]
+                       "length": 1}]
           }
       ]
   }
