@@ -13,24 +13,26 @@
     <div class="menu_section">
       <ul class="nav side-menu">
         <li><a href="/"><i class="fa fa-area-chart"></i>Dashboard</a></li>
-        <!-- Product -->
-        <li><a><i class="fa fa-keyboard-o"></i> Product <span class="fa fa-chevron-down"></span></a>
-          <ul class="nav child_menu">
-              <li><a href="/products/{{ current_product.product_id }}/general">General</a></li>
-              <!-- TODO: Branding
-              <li><a href="/products/{{ current_product.product_id }}/branding">Branding</a></li>
-              -->
-              <li><a href="/products/{{ current_product.product_id }}/authentication">Authentication</a></li>
-              <li><a href="/products/{{ current_product.product_id }}/admins">Admins</a></li>
-          </ul>
-        </li>
-        <!-- Endpoints -->
-        <li><a><i class="fa fa-gears"></i> Endpoints <span class="fa fa-chevron-down"></span></a>
-          <ul class="nav child_menu">
-              <li><a href="/endpoints/{{ current_product.product_id }}/specifications">Specifications</a></li>
-              <li><a href="/endpoints/{{ current_product.product_id }}/tests">Tests</a></li>
-          </ul>
-        </li>
+        {% if current_product %}
+          <!-- Product -->
+          <li><a><i class="fa fa-keyboard-o"></i> Product <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+                <li><a href="/products/{{ current_product.product_id }}/general">General</a></li>
+                <!-- TODO: Branding
+                <li><a href="/products/{{ current_product.product_id }}/branding">Branding</a></li>
+                -->
+                <li><a href="/products/{{ current_product.product_id }}/authentication">Authentication</a></li>
+                <li><a href="/products/{{ current_product.product_id }}/admins">Admins</a></li>
+            </ul>
+          </li>
+          <!-- Endpoints -->
+          <li><a><i class="fa fa-gears"></i> Endpoints <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+                <li><a href="/endpoints/{{ current_product.product_id }}/specifications">Specifications</a></li>
+                <li><a href="/endpoints/{{ current_product.product_id }}/tests">Tests</a></li>
+            </ul>
+          </li>
+        {% endif %}
         <!-- TODO: Settings
         <li><a href="/settings"><i class="fa fa-cog"></i> Settings </a></li>
         -->
