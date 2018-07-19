@@ -9,23 +9,24 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import json
+import datetime
 import logging
 
-import flask_login
 from flask import render_template, request, redirect
 from flask_login import login_required
 from flask_login import current_user
 
+import apis
 from base import db
+from models import Organization, User
 from organization import blueprint
-from organization.models import Organization
 
 
 @blueprint.route('/', methods=['GET'])
 @login_required
 def default_route():
-  user_id = current_user.id
-  orgs = Organization.query.filter_by(user_id=user_id).all()
+  orgs = Organization.query.filter_by().all()
   return render_template("organization.html", orgs=orgs)
 
 
@@ -35,12 +36,31 @@ def create():
   if request.method == "GET":
     return render_template("create.html")
   else:
-    org = Organization(orgname=request.form['name'],
-                       description=request.form['desc'],
-                       user_id=current_user.id)
-    db.session.add(org)
-    db.session.commit()
-    return redirect('profile/organization')
+    name = request.form['name']
+    owner = request.form['owner']
+    is_org = Organization.query.filter_by(name=name).one_or_none()
+    if is_org:
+      return redirect('/organization')
+    else:
+      ret = apis.create_org(owner)
+      org = Organization(id=ret['id'],
+                         users=json.dumps(ret['users']),
+                         products=json.dumps(ret['products']),
+                         tokens=json.dumps(ret['tokens']),
+                         kinds=json.dumps(ret['kinds']),
+                         name=name,
+                         owner=json.dumps([owner]),
+                         member=json.dumps([]),
+                         created_time=datetime.datetime.utcnow(),
+                         last_update=datetime.datetime.utcnow())
+      db.session.add(org)
+      db.session.commit()
+      #TODO:
+      user = User.query.filter_by(email=owner).one_or_none()
+      if user:
+        user.organization_id = ret['id']
+        db.session.commit()
+      return redirect('/organization')
 
 
 @blueprint.route('/remove', methods=['GET'])

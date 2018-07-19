@@ -7,17 +7,17 @@
     <div class="nav navbar-nav navbar-btn">
         <div class="btn-group">
             {% if current_product %}
-              <button type="button" class="btn btn-danger">{{ current_product.name }}</button>
+              <button type="button" class="btn btn-primary product-title">{{ current_product.id }}</button>
             {% else %}
-              <button type="button" class="btn btn-danger">Products</button>
+              <button type="button" class="btn btn-primary product-title">Products</button>
             {% endif %}
-            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
               <span class="caret"></span>
               <span class="sr-only">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu" role="menu">
               {% for product in product_list %}
-                <li><a href="/products/{{ product.product_id }}/general">{{ product.name }}</a></li>
+                <li><a href="/products/{{ product.id }}/general">{{ product.id }}</a></li>
               {% endfor %}
               {% if product_list %}
                 <li class="divider"></li>
@@ -36,7 +36,7 @@
         <ul class="dropdown-menu dropdown-usermenu pull-right">
           <li><a href="/organization"><i class="fa fa-users pull-right"></i>Organization</a></li>
           <li><a href="/settings"><i class="fa fa-cog pull-right"></i>Settings</a></li>
-          <li><a href="#"><i class="fa fa-file-text-o pull-right"></i>Documentation</a></li>
+          <li><a href="/doc"><i class="fa fa-file-text-o pull-right"></i>Documentation</a></li>
           <li><a href="https://support.thenaran.com/" target="_blank"><i class="fa fa-support pull-right"></i>Support</a></li>
           <li><a href="/auth/sign-out"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
         </ul>

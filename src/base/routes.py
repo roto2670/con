@@ -9,18 +9,39 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import os
 from flask import render_template, redirect, request, url_for, abort
+from flask import send_from_directory
 from flask_login import current_user, login_required, login_user, logout_user
-
-import products
+import datetime
+import logging
+import apis
 from base import blueprint
 from base import db, login_manager, auth
-from login.models import User
+from models import User
 
+BASE = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static', 'doc')
 
 @blueprint.route('/')
 def route_default():
   return redirect(url_for('login_blueprint.login'))
+
+
+@blueprint.route('/doc')
+def route_doc():
+  return render_template('doc.html')
+
+
+@blueprint.route('/file/<file_name>')
+def route_file(file_name):
+  return send_from_directory(directory=BASE, filename=file_name)
+
+
+@blueprint.route('/welcome')
+@login_required
+def route_welcome():
+  # TODO : not ftl
+  return render_template('welcome.html')
 
 
 @blueprint.route('/<template>')
@@ -73,16 +94,19 @@ DEFAULT_PHOTO_URL = '''/static/images/user.png'''
 @auth.production_loader
 def production_sign_in(token):
   # https://firebase.google.com/docs/auth/admin/verify-id-tokens?hl=ko
-  user = User.query.filter_by(firebase_user_id=token['sub']).one_or_none()
+  user = User.query.filter_by(id=token['sub']).one_or_none()
   if not user:
-    user = User(firebase_user_id=token['sub'])
+    user = User(id=token['sub'],
+                firebase_user_id=token['sub'])
     db.session.add(user)
   user.name = token.get('name')
   user.email = token['email']
   user.email_verified = token['email_verified']
   user.sign_in_provider = token['firebase']['sign_in_provider']
   user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
-  user.developer_id = "testdevid"  # TODO: change developer id in invite email
+  user.last_access_time = datetime.datetime.utcnow()
+  logging.info("### request : %s", dir(request))
+  user.ip_address = request.remote_addr
   db.session.commit()
   login_user(user)
   return redirect(url_for('base_blueprint.route_default'))
@@ -132,7 +156,7 @@ def internal_error(error):
 def _get_product_list():
   # TODO: handle current user
   if current_user and current_user.is_authenticated:
-    product_list = products.api.get_product_list(current_user.developer_id)
+    product_list = apis.get_product_list(current_user.organization_id)
     return product_list
   else:
     return []
