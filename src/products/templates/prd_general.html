@@ -17,14 +17,18 @@
             </div>
 
             <div class="x_content">
+              <!--
               <form id="general" class="form-horizontal form-label-left" method="post">
+                  <button type="submit" class="btn btn-default">Save</button>
+              </form>
+              -->
                 <div class="col-md-7">
                   <h3>Product Name</h3>
                   <div class="form-group">
                     <label class="control-label col-md-0" for="prdName">
                     </label>
                     <div class="col-md-12">
-                      <input type="text" value="{{ current_product.name }}" id="prdName" name="prdName" class="form-control col-md-6 col-xs-6" readonly>
+                      <input type="text" value="{{ current_product.id }}" id="prdName" name="prdName" class="form-control col-md-6 col-xs-6" readonly>
                     </div>
                   </div>
 
@@ -34,25 +38,13 @@
                     <label class="control-label col-md-0" for="prdKey">
                     </label>
                     <div class="col-md-12">
-                      <input type="text" value="testProductKey" id="prdKey" name="prdKey" class="cursor-pointer form-control col-md-6 col-xs-6" readonly onclick="copyToClipboard(id);">
+                      <input type="text" value="{{ current_product.key }}" id="prdKey" name="prdKey" class="cursor-pointer form-control col-md-6 col-xs-6" readonly onclick="copyToClipboard(id);">
                     </div>
                   </div>
 
                   <br>
-                  <h3>Outgoing hook URL</h3>
-                  <div class="form-group">
-                    <label class="control-label col-md-0" for="hookUrl">
-                    </label>
-                    <div class="col-md-12">
-                      <input type="text" value="https://microbot.is" id="hookUrl" name="hookUrl" class="cursor-pointer form-control col-md-6 col-xs-6" readonly onclick="copyToClipboard(id);">
-                    </div>
-                  </div>
-
-                  <br>
-                  <button type="submit" class="btn btn-default">Save</button>
                 </div>
 
-              </form>
             </div>
 
           </div>

@@ -17,24 +17,31 @@
           <!-- Product -->
           <li><a><i class="fa fa-keyboard-o"></i> Product <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-                <li><a href="/products/{{ current_product.product_id }}/general">General</a></li>
+                <li><a href="/products/{{ current_product.id }}/general">General</a></li>
                 <!-- TODO: Branding
                 <li><a href="/products/{{ current_product.product_id }}/branding">Branding</a></li>
                 -->
-                <li><a href="/products/{{ current_product.product_id }}/authentication">Authentication</a></li>
-                <li><a href="/products/{{ current_product.product_id }}/admins">Admins</a></li>
+                <li><a href="/products/{{ current_product.id }}/authentication">Authentication</a></li>
+                <li><a href="/products/{{ current_product.id }}/admins">Admins</a></li>
             </ul>
           </li>
           <!-- Endpoints -->
           <li><a><i class="fa fa-gears"></i> Endpoints <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-                <li><a href="/endpoints/{{ current_product.product_id }}/specifications">Specifications</a></li>
-                <li><a href="/endpoints/{{ current_product.product_id }}/tests">Tests</a></li>
+                <li><a href="/endpoints/{{ current_product.id }}/specifications">Specifications</a></li>
+                <li><a href="/endpoints/{{ current_product.id }}/tests">Tests</a></li>
             </ul>
           </li>
         {% endif %}
         <!-- TODO: Settings
         <li><a href="/settings"><i class="fa fa-cog"></i> Settings </a></li>
+        -->
+        <!-- TODO: about Admin
+        <li><a><i class="fa fa-gears"></i> Orgnization <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu">
+              <li><a href="/organization">Specifications</a></li>
+          </ul>
+        </li>
         -->
       </ul>
     </div>
@@ -49,7 +56,7 @@
     <a data-toggle="tooltip" data-placement="top" title="Settings">
       <span class="fa fa-cog" aria-hidden="true"></span>
     </a>
-    <a data-toggle="tooltip" data-placement="top" title="Documentation">
+    <a data-toggle="tooltip" data-placement="top" title="Documentation" href="/doc">
       <span class="fa fa-file-text-o" aria-hidden="true"></span>
     </a>
     <a data-toggle="tooltip" data-placement="top" title="Logout" href="/auth/sign-out">

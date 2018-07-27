@@ -3,6 +3,18 @@
 
 {% block title %} Tests {% endblock title %}
 
+{% block javascripts %}
+  {{ super() }}
+  <script>
+    function testCall(productId, gadget, endpointName) {
+      jQuery.post("/endpoints/" + productId + "/testcall/" + gadget + "/" + endpointName, "{}")
+      .done(function(data){
+         document.getElementById("resp" + endpointName).innerHTML = data;
+      });
+    }
+  </script>
+{% endblock javascripts %}
+
 {% block content %}
   <div class="right_col" role="main">
     <div class="">
@@ -20,30 +32,42 @@
                   <div class="form-group">
                     <label class="control-label col-md-1 col-sm-1 col-xs-1">Version</label>
                     <div class="col-md-6 col-sm-6 col-xs-6">
-                      <select class="form-control" id="version" name="version" onchange="this.form.submit()">
-                        {% for version in version_list %}
-                          {% if selected and selected == version %}
-                            <option id="{{ version }}" selected>{{ version }}</option>
-                          {% else %}
-                            <option id="{{ version }}">{{ version }}</option>
-                          {% endif %}
-                        {% endfor %}
-                      </select>
+                      {% if version_list %}
+                        <select class="form-control" id="version" name="version" onchange="this.form.submit()">
+                          {% for version in version_list %}
+                            {% if selected and selected == version %}
+                              <option id="{{ version }}" selected>{{ version }}</option>
+                            {% else %}
+                              <option id="{{ version }}">{{ version }}</option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+                      {% else %}
+                        <select class="form-control" id="version" name="version" disabled>
+                          <option>Please upload specifications file</option>
+                        </select>
+                      {% endif %}
                     </div>
                   </div>
 
                   <div class="form-group">
                     <label class="control-label col-md-1 col-sm-1 col-xs-1">Gadget</label>
                     <div class="col-md-6 col-sm-6 col-xs-6">
-                      <select class="form-control" id="gadget" name="gadget" onchange="this.form.submit()">
-                        {% for _gadget in gadget_list %}
-                          {% if gadget and gadget == _gadget %}
-                            <option id="{{ _gadget }}" selected>{{ _gadget }}</option>
-                          {% else %}
-                            <option id="{{ _gadget }}">{{ _gadget }}</option>
-                          {% endif %}
-                        {% endfor %}
-                      </select>
+                      {% if gadget_list %}
+                        <select class="form-control" id="gadget" name="gadget" onchange="this.form.submit()">
+                          {% for _gadget in gadget_list %}
+                            {% if gadget and gadget == _gadget %}
+                              <option id="{{ _gadget.id }}" selected>{{ _gadget.name }}</option>
+                            {% else %}
+                              <option id="{{ _gadget.id }}">{{ _gadget.name }}</option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+                      {% else %}
+                        <select class="form-control" id="gadget" name="gadget" disabled>
+                          <option> Can not find gadget </option>
+                        </select>
+                      {% endif %}
                     </div>
                   </div>
                 </form>
@@ -53,13 +77,14 @@
 
                 <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
 
-                  {% for request in content['request'] %}
+                  {% for request in content['requests'] %}
                     <div class="panel">
                       <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#r{{ request['name'] }}" aria-expanded="true" aria-controls="r{{ request['name'] }}">
                         <h3 class="panel-title">{{ request['name'] }} ({{ content['product'] }})</h3>
                       </a>
                       <div id="r{{ request['name'] }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                         <div class="panel-body">
+                        <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget.id }}', '{{ request["name"]}}');">Test</button>
                           <!-- request? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
@@ -67,13 +92,14 @@
                                 name : {{ request['name'] }}<br>
                                 timeout : {{ request['timeout'] }}<br>
                                 params : {{ request['params'] }}<br>
-                                return : {{ request['return'] }}<br>
+                                return : {{ request['returns'] }}<br>
                             </div>
                           </div>
                           <!-- response? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
                               <h3>Response</h3>
+                              <div id="resp{{ request['name'] }}"></div>
                             </div>
                           </div>
                         </div>
@@ -81,7 +107,7 @@
                     </div>
                   {% endfor %}
 
-                  {% for event in content['event'] %}
+                  {% for event in content['events'] %}
                     <div class="panel">
                       <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#e{{ event['name'] }}" aria-expanded="true" aria-controls="e{{ event['name'] }}">
                         <h3 class="panel-title">{{ event['name'] }} ({{ content['product'] }})</h3>

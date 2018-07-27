@@ -13,7 +13,6 @@
   </script>
 {% endblock javascripts %}
 
-
 {% block content %}
   <div class="right_col" role="main">
     <div class="">
@@ -29,7 +28,6 @@
             </div>
 
             <div class="x_content">
-
               <div class="col-md-9 col-sm-9 col-xs-12">
                 <form id="specifications" method="post">
                   {% if version_list %}
@@ -56,7 +54,7 @@
               </div>
 
               <!-- Upload Button -->
-              <form id="upload" action="/endpoints/{{ current_product.product_id }}/upload" method="POST" enctype="multipart/form-data">
+              <form id="upload" action="/endpoints/{{ current_product.id }}/upload" method="POST" enctype="multipart/form-data">
                 <label class="btn btn-default btn-file">Upload
                   <input type="file" name="file" form="upload" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
                 </label>
@@ -64,9 +62,9 @@
 
               <!-- Download button -->
               {% if version_list %}
-                <a href="/endpoints/{{ current_product.product_id }}/download"><button class="btn btn-default">Download</button></a>
+                <a href="/endpoints/{{ current_product.id }}/{{ selected }}/download"><button class="btn btn-default">Download</button></a>
               {% else %}
-                <a href="/endpoints/{{ current_product.product_id }}/download"><button class="btn btn-default" disabled>Download</button></a>
+                <a href="/endpoints/{{ current_product.id }}/{{ selected }}/download"><button class="btn btn-default" disabled>Download</button></a>
               {% endif %}
 
             </div><!-- End x_content -->
