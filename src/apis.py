@@ -117,14 +117,14 @@ def update_android_key(organization_id):
 
 def update_ios_key(organization_id, kind, cert, secret, is_dev=False):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.2q2o6bhvcg6
-  url = BASE_URL + 'developers/' + organization_id + '/key'
+  url = BASE_URL + 'developers/' + organization_id + '/key/' + kind + "/ios"
   headers = {}
   data = {
       "kind": kind,
       "platform": "ios",
       "cert": cert,
       "secret": secret,
-      "stage": 0 if is_dev else 1  # 0 -> dev, 1 -> production
+      "stage": 1 if is_dev else 0  # 1 -> dev, 0 -> production
   }
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(data))

@@ -217,7 +217,9 @@ def upload_ios_production_file(product_id):
   upload_file = request.files['file']
   content = upload_file.read()
   # TODO: Check format?? Or send to cloud server
-  logging.info("Upload file content : %s", content)
+  noti_key = NotiKey.query.filter_by(product_id=product_id).one_or_none()
+  ret = cmds.send_noti_key(product_id, noti_key, content, is_dev=False)
+  logging.info("### ret : %s", ret)
   return redirect('products/' + product_id + '/authentication')
 
 

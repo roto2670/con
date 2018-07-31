@@ -15,15 +15,17 @@
               <span class="caret"></span>
               <span class="sr-only">Toggle Dropdown</span>
             </button>
-            <ul class="dropdown-menu" role="menu">
-              {% for product in product_list %}
-                <li><a href="/products/{{ product.id }}/general">{{ product.id }}</a></li>
-              {% endfor %}
-              {% if product_list %}
-                <li class="divider"></li>
-              {% endif %}
-              <li><a href="/products/create">Create New Product</a>
-            </ul>
+            {% if current_user.organization_id %}
+              <ul class="dropdown-menu" role="menu">
+                {% for product in product_list %}
+                  <li><a href="/products/{{ product.id }}/general">{{ product.id }}</a></li>
+                {% endfor %}
+                {% if product_list %}
+                  <li class="divider"></li>
+                {% endif %}
+                <li><a href="/products/create">Create New Product</a>
+              </ul>
+            {% endif %}
         </div>
     </div>
 

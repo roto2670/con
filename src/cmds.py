@@ -68,9 +68,9 @@ def send_noti_key(product_id, noti_key, content, is_dev=False):
   product = apis.get_product(product_id, current_user.organization_id)
   if _allow_send_noti_key(noti_key, is_dev):
     bundle_id = noti_key.ios_dev_bundle_id \
-        if is_dev else product.ios_production_bundle_id
+        if is_dev else noti_key.ios_production_bundle_id
     password = noti_key.ios_dev_password \
-        if is_dev else product.ios_production_password
+        if is_dev else noti_key.ios_production_password
     cert, secret_key = _generate_noti_key(product_id, content, password)
     ret = apis.update_ios_key(product.developer_id, bundle_id, cert, secret_key,
                               is_dev=is_dev)
