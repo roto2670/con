@@ -36,7 +36,7 @@ def get_user(email_addr):
   params = {"email": email_addr}
   try:
     resp = requests.get(url, headers=headers, data=json.dumps(data), params=params)
-    value = json.loads(resp.text)
+    value = resp.json()
     return value['v']
   except:
     logging.exception("Raise error.")
@@ -65,7 +65,7 @@ def create_product(product_name, developer_id):
   }
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(data))
-    value = json.loads(resp.text)
+    value = resp.json()
     return value['v']
   except:
     logging.exception("Raise error.")
@@ -86,7 +86,7 @@ def update_product(product_name, product, hook_url=None, hook_client_key=None):
   if data:
     try:
       resp = requests.post(url, headers=headers, data=json.dumps(data))
-      value = json.loads(resp.text)
+      value = resp.json()
       return value['v']
     except:
       logging.exception("Raise error.")
@@ -108,7 +108,7 @@ def update_android_key(organization_id):
   }
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(data))
-    value = json.loads(resp.text)
+    value = resp.json()
     return value['v']
   except:
     logging.exception("Raise error.")
@@ -128,7 +128,7 @@ def update_ios_key(organization_id, kind, cert, secret, is_dev=False):
   }
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(data))
-    value = json.loads(resp.text)
+    value = resp.json()
     return value['v']
   except:
     logging.exception("Raise error")
@@ -164,7 +164,7 @@ def register_specifications(product_id, version, specification):
   }
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(data))
-    value = json.loads(resp.text)
+    value = resp.json()
     return value['v']
   except:
     logging.exception("Raise error.")
@@ -186,8 +186,8 @@ def call_endpoint(gadget_id, endpoint_name, data):
   headers = {}
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(data))
-    if resp.status_code == 200:
-      value = json.loads(resp.text)
+    if resp.ok:
+      value = resp.json()
       return value['v']
     else:
       return None
@@ -202,7 +202,7 @@ def get_endpoint_result(gadget_id, task_id):
   data = {}
   try:
     resp = requests.get(url, headers=headers, data=json.dumps(data))
-    value = json.loads(resp.text)
+    value = resp.json()
     return value['v']
   except:
     logging.exception("Raise error.")
@@ -224,7 +224,7 @@ def create_org(email):
   }
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(data))
-    value = json.loads(resp.text)
+    value = resp.json()
     return value['v']
   except:
     logging.exception("Raise error.")
