@@ -9,7 +9,6 @@ from time import monotonic
 from urllib.parse import urlparse
 from werkzeug.http import parse_cache_control_header
 
-import logging
 
 blueprint = Blueprint(
     'login_blueprint',

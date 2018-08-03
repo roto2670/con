@@ -32,18 +32,18 @@
                   <div class="form-group">
                     <label class="control-label col-md-1 col-sm-1 col-xs-1">Version</label>
                     <div class="col-md-6 col-sm-6 col-xs-6">
-                      {% if version_list %}
-                        <select class="form-control" id="version" name="version" onchange="this.form.submit()">
-                          {% for version in version_list %}
-                            {% if selected and selected == version %}
-                              <option id="{{ version }}" selected>{{ version }}</option>
+                      {% if specification_list %}
+                        <select class="form-control" id="specification" name="specification" onchange="this.form.submit()">
+                          {% for specification in specification_list %}
+                            {% if selected and selected.id == specification.id %}
+                              <option id="{{ specification.version }}" value="{{ specification.id }}" selected>{{ specification.version }}</option>
                             {% else %}
-                              <option id="{{ version }}">{{ version }}</option>
+                              <option id="{{ specification.version }}" value="{{ specification.id }}">{{ specification.version }}</option>
                             {% endif %}
                           {% endfor %}
                         </select>
                       {% else %}
-                        <select class="form-control" id="version" name="version" disabled>
+                        <select class="form-control" id="specification" name="specification" disabled>
                           <option>Please upload specifications file</option>
                         </select>
                       {% endif %}
@@ -84,7 +84,7 @@
                       </a>
                       <div id="r{{ request['name'] }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                         <div class="panel-body">
-                        <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget.id }}', '{{ request["name"]}}');">Test</button>
+                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget.id }}', '{{ request["name"]}}');">Test</button>
                           <!-- request? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
@@ -114,18 +114,20 @@
                       </a>
                       <div id="e{{ event['name'] }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                         <div class="panel-body">
+                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget.id }}', '{{ event["name"]}}');">Test</button>
                           <!-- request? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
                               <h3>Request</h3>
                                 name : {{ event['name'] }}<br>
-                                values : {{ event['values'] }}<br>
+                                params : {{ event['params'] }}<br>
                             </div>
                           </div>
                           <!-- response? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
                               <h3>Response</h3>
+                              <div id="resp{{ event['name'] }}"></div>
                             </div>
                           </div>
                         </div>

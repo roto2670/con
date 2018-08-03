@@ -15,7 +15,6 @@ import tempfile
 import subprocess
 
 from OpenSSL import crypto
-from flask_login import current_user
 
 import apis
 
@@ -41,8 +40,7 @@ def _get_secret_key(private_key_path, secret_key_path):
     logging.exception("Raise error while generate secret key.")
 
 
-def _generate_noti_key(product_id, content, password):
-  product = apis.get_product(product_id, current_user.organization_id)
+def _generate_noti_key(content, password):
   p12 = crypto.load_pkcs12(content, password)
   tmp_private_key_path = tempfile.mkstemp()[1]
   tmp_secret_key_path = tempfile.mkstemp()[1]
@@ -54,27 +52,13 @@ def _generate_noti_key(product_id, content, password):
   return cert.decode(), secret_key.decode()
 
 
-def _allow_send_noti_key(noti_key, is_dev=False):
-  if is_dev:
-    bundle_id = noti_key.ios_dev_bundle_id
-    password = noti_key.ios_dev_password
-  else:
-    bundle_id = noti_key.ios_production_bundle_id
-    password = noti_key.ios_production_password
-  return bundle_id and password
+def send_noti_key(organization_id, bundle_id, password , content, is_dev):
+  cert, secret_key = _generate_noti_key(content, password)
+  ret = apis.update_ios_key(organization_id, bundle_id, cert, secret_key,
+                            is_dev)
+  return ret
 
 
-def send_noti_key(product_id, noti_key, content, is_dev=False):
-  product = apis.get_product(product_id, current_user.organization_id)
-  if _allow_send_noti_key(noti_key, is_dev):
-    bundle_id = noti_key.ios_dev_bundle_id \
-        if is_dev else noti_key.ios_production_bundle_id
-    password = noti_key.ios_dev_password \
-        if is_dev else noti_key.ios_production_password
-    cert, secret_key = _generate_noti_key(product_id, content, password)
-    ret = apis.update_ios_key(product.developer_id, bundle_id, cert, secret_key,
-                              is_dev=is_dev)
-    return ret
-  else:
-    # TODO: error handle
-    return False
+def get_res_path():
+  path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'res')
+  return  path

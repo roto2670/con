@@ -10,15 +10,17 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import os
+import uuid
 from flask import render_template, redirect, request, url_for, abort
 from flask import send_from_directory
 from flask_login import current_user, login_required, login_user, logout_user
 import datetime
 import logging
 import apis
+import in_apis
 from base import blueprint
 from base import db, login_manager, auth
-from models import User
+from models import User, Permission
 
 BASE = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static', 'doc')
 
@@ -38,10 +40,15 @@ def route_file(file_name):
 
 
 @blueprint.route('/welcome')
-@login_required
-def route_welcome():
-  # TODO : not ftl
+def welcome():
+  # TODO : Tester
   return render_template('welcome.html')
+
+
+@blueprint.route('/nowelcome')
+def welcome_no_ftl():
+  # TODO : Tester
+  return render_template('welcome_noftl.html')
 
 
 @blueprint.route('/<template>')
@@ -105,8 +112,15 @@ def production_sign_in(token):
   user.sign_in_provider = token['firebase']['sign_in_provider']
   user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
   user.last_access_time = datetime.datetime.utcnow()
-  logging.info("### request : %s", dir(request))
   user.ip_address = request.remote_addr
+  invite = in_apis.get_invite_by_email(token['email'])
+  if invite:
+    user.organization_id = invite.organization_id
+  db.session.commit()
+  permission = Permission(id=uuid.uuid4().hex,
+                          permission='777',
+                          user_id=user.id)
+  db.session.add(permission)
   db.session.commit()
   login_user(user)
   return redirect(url_for('base_blueprint.route_default'))
@@ -156,7 +170,7 @@ def internal_error(error):
 def _get_product_list():
   # TODO: handle current user
   if current_user and current_user.is_authenticated:
-    product_list = apis.get_product_list(current_user.organization_id)
+    product_list = in_apis.get_product_list(current_user.organization_id)
     return product_list
   else:
     return []

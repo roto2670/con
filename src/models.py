@@ -14,10 +14,16 @@
 from flask_login import UserMixin
 from sqlalchemy import ForeignKey
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
+from sqlalchemy.orm import relationship, backref
 
 # self
 from base import db, login_manager
 
+
+# LEVEL
+OWNER = 0
+MEMBER = 1
+TESTER = 2
 
 class User(UserMixin, db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
@@ -36,8 +42,10 @@ class User(UserMixin, db.Model):
   photo_url = Column(String(225))
   last_access_time = Column(DateTime)
   ip_address = Column(String(75))
+  level = Column(Integer)
 
-  organization_id = Column(String, ForeignKey('organization.id'))
+  organization_id = Column(String(75), ForeignKey('organization.id'))
+  permission = relationship('Permission', uselist=False, backref='user')
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -54,21 +62,34 @@ def user_loader(id):
   return User.query.get(id)
 
 
+class Permission(db.Model):
+  __tablename__ = 'permission'
+
+  id = Column(String(75), primary_key=True)
+  permission = Column(String(15))
+  user_id = Column(String(75), ForeignKey('user.id'))
+
+
 class Organization(db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   __tablename__ = 'organization'
 
-  id = Column(String, primary_key=True)
+  id = Column(String(75), primary_key=True)
   users = Column(Text)  # list, 테스트가 가능한 모든 유저
   products = Column(Text)  # list
   tokens = Column(Text)  # dict
   kinds = Column(Text)  # dict
   # ======= upper cloud data
-  name = Column(String(120))
+  name = Column(String(120), unique=True)
+  original_name = Column(String(120), unique=True)
   owner = Column(Text)  # list
   member = Column(Text)  # list
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
+
+  user_list = relationship("User", backref='organization', cascade="all, delete")
+  product_list = relationship("Product", backref='organization', cascade="all, delete")
+  noti_key = relationship("NotiKey", backref='organization', cascade="all, delete")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -84,20 +105,27 @@ class Organization(db.Model):
       return self.name
 
 
+# stage
+STAGE_RELEASE = 0
+STAGE_PRE_RELEASE = 1
+STAGE_DEV = 2
+STAGE_ARCHIVE = 3
+
 class Product(db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   __tablename__ = 'product'
 
   id = Column(String(75), primary_key=True)
+  code = Column(String(75))
   developer_id = Column(String(75))
   key = Column(String(75))
-  hook_url = Column(String(120))
-  hook_client_key = Column(String(120))
-  # ======= upper cloud data
   name = Column(String(75))
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
-  organization_id = Column(String, ForeignKey('organization.id'))
+  organization_id = Column(String(75), ForeignKey('organization.id'))
+
+  product_stage_list = relationship("ProductStage", backref='product', cascade="all, delete")
+  tester_list = relationship("Tester", backref='product', cascade="all, delete")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -110,19 +138,86 @@ class Product(db.Model):
       setattr(self, property, value)
 
   def __repr__(self):
-      return self.id
+    return self.id
+
+
+class ProductStage(db.Model):
+  # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
+  __tablename__ = 'product_stage'
+
+  id = Column(String(75), primary_key=True)
+  hook_url = Column(String(120))
+  hook_client_key = Column(String(120))
+  stage = Column(Integer)
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  product_id = Column(String(75), ForeignKey('product.id'))
+  model_list = relationship("Model", backref='product_stage', cascade="all, delete")
+  endpoint = relationship('Endpoint', uselist=False, backref='product_stage', cascade="all, delete")
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      # depending on whether value is an iterable or not, we must
+      # unpack it's value (when **kwargs is request.form, some values
+      # will be a 1-element list)
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        # the ,= unpack of a singleton fails PEP8 (travis flake8 test)
+        value = value[0]
+      setattr(self, property, value)
+
+  def __repr__(self):
+    return self.id
+
+
+class Model(db.Model):
+  # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
+  __tablename__ = 'model'
+
+  id = Column(String(75), primary_key=True)
+  code = Column(Integer)
+  name = Column(String(75))
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  product_stage_id = Column(String(75), ForeignKey('product_stage.id'))
+  firmware_list = relationship("Firmware", backref='model', cascade="all, delete")
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      # depending on whether value is an iterable or not, we must
+      # unpack it's value (when **kwargs is request.form, some values
+      # will be a 1-element list)
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        # the ,= unpack of a singleton fails PEP8 (travis flake8 test)
+        value = value[0]
+      setattr(self, property, value)
+
+  def __repr__(self):
+    return self.id
 
 
 class Endpoint(db.Model):
 
   __tablename__ = 'endpoint'
 
-  id = Column(Integer, primary_key=True)
+  id = Column(String(75), primary_key=True)
   version = Column(String(75))
   specifications = Column(Text)
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
   organization_id = Column(String(75))
+  product_stage_id = Column(String(75), ForeignKey('product_stage.id'))
 
-  product_id = Column(String(75), ForeignKey('product.id'))
+
+# state
+DEV_STATE = 1
+PRODUCTION_STATE = 0
+
+# platform
+ANDROID = 1
+IOS = 0
 
 
 class NotiKey(db.Model):
@@ -130,12 +225,70 @@ class NotiKey(db.Model):
   __tablename__ = 'notikey'
 
   id = Column(Integer, primary_key=True)
-  android_key = Column(String(75))
-  android_package_name = Column(String(75))
-  ios_dev_bundle_id = Column(String(75))
-  ios_dev_password = Column(String(75))
-  ios_production_bundle_id = Column(String(75))
-  ios_production_password = Column(String(75))
-  organization_id = Column(String(75))
+  typ = Column(Integer)
+  name = Column(String(75)) # ios : bundle_id, android : package_name
+  key = Column(String(75))  # ios : password, android : key
+  is_dev = Column(Integer)  # only ios, 0->production, 1->dev
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  organization_id = Column(String(75), ForeignKey('organization.id'))
 
+
+class Invite(db.Model):
+
+  __tablename__ = 'invite'
+
+  id = Column(String(75), primary_key=True)
+  email = Column(String(75))
+  organization_id = Column(String(75))
+  product_id = Column(String(75))
+  key = Column(String(75))
+  level = Column(Integer)
+  invited_time = Column(DateTime)
+  invited_user = Column(String(75))
+  accepted = Column(Integer)
+  accepted_time = Column(DateTime)
+
+
+class Tester(db.Model):
+
+  __tablename__ = 'tester'
+
+  id = Column(String(75), primary_key=True)
+  email = Column(String(75))
+  authorized = Column(Boolean, default=False)
+  level = Column(Integer)
+  organization_id = Column(String(75))
   product_id = Column(String(75), ForeignKey('product.id'))
+
+
+FIRMWARE_RELEASE = 0
+FIRMWARE_PRE_RELEASE = 1
+FIRMWARE_DEV = 2
+FIRMWARE_ARCHIVE = 3
+
+
+class Firmware(db.Model):
+
+  __tablename__ = 'firmware'
+
+  id = Column(String(75), primary_key=True)
+  version = Column(String(75))
+  path = Column(String(225))
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  model_id = Column(String(75), ForeignKey('model.id'))
+  stage = relationship('FirmwareStage', uselist=False, backref='firmware', cascade="all, delete")
+
+
+class FirmwareStage(db.Model):
+  __tablename__ = 'firmware_stage'
+
+  id = Column(String(75), primary_key=True)
+  version = Column(String(75))
+  stage = Column(Integer)
+  before_stage = Column(Integer)
+  last_updated_time = Column(DateTime)
+  firmware_id = Column(String(75), ForeignKey('firmware.id'))

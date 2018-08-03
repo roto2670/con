@@ -43,6 +43,7 @@ def register_blueprints(app):
       'products',
       'endpoints',
       'settings',
+      'release',
       'login'
   ]
   for blueprint in blueprints:

@@ -4,6 +4,20 @@
 {% block title %} Organization {% endblock title %}
 
 {% block content %}
+  {% if error_msg %}
+    <script>
+      onload = function() {
+        new PNotify({
+          title: '{{ error_msg.title }}',
+          text: '{{ error_msg.msg }}',
+          type: 'error',
+          hide: true,
+          styling: 'bootstrap3'
+      });
+      }
+    </script>
+  {% endif %}
+
   <div class="right_col" role="main">
     <div class="">
       <!-- start row -->
@@ -17,6 +31,7 @@
             </div>
             <div class="x_content">
               <br />
+
               <form id="create" class="form-horizontal form-label-left" method="post">
 
                 <div class="form-group">
@@ -26,36 +41,26 @@
                     <input type="text" id="name" name="name" required="required" class="form-control col-md-7 col-xs-12">
                   </div>
                 </div>
-                <div class="form-group">
-                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="owner">Owner <span class="required">*</span>
-                  </label>
-                  <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" id="owner" name="owner" required="required" class="form-control col-md-7 col-xs-12"
-                        placeholder="mail@example.com">
-                  </div>
-                </div>
                 <div class="ln_solid"></div>
                 <div class="form-group">
                   <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                    <button class="btn btn-primary" type="button">Cancel</button>
-  		            <button class="btn btn-primary" type="reset">Reset</button>
                     <button type="submit" class="btn btn-success">Create</button>
                   </div>
                 </div>
-
               </form>
+
             </div>
           </div>
         </div>
 
-
-
-
-      </div>
-      <!-- End row -->
-
-
+      </div><!-- End row -->
     </div>
   </div>
 
 {% endblock content %}
+
+{% block javascripts %}
+  {{ super() }}
+  <!-- validator -->
+  <script src="{{ url_for('static', filename='vendors/validator/validator.js') }}"></script>
+{% endblock javascripts %}

@@ -87,11 +87,14 @@ MIBIO_JSON = '''
 
 
 HEADER_FRAME = '''
+#pragma pack(1)
 #ifndef GADGET_H__
 #define GADGET_H__
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#define FIRMWARE_VERSION_MAJOR {major_ver}
+#define FIRMWARE_VERSION_MINOR {minor_ver}
 #define REQUEST_CNT {requests_num}
 #define EVENT_CNT {events_num}
 typedef void (*ep_hnd) (void* self, void* cb_data);
@@ -116,6 +119,7 @@ static void mib_init(void) {{
 '''
 
 NAME_KEY = '''product'''
+VER_KEY = '''version'''
 REQUESTS_KEY = '''requests'''
 EVENTS_KEY = '''events'''
 
@@ -297,6 +301,8 @@ class MibEndpoints(object):
     _events_struct.close()
 
     _lib_body = HEADER_FRAME.format(
+        major_ver=self._major_ver,
+        minor_ver=self._minor_ver,
         events_define=_events_define.getvalue(),
         requests_define=_requests_define.getvalue(),
         request_funcs_interface=_req_funcs_interface.getvalue(),
@@ -313,6 +319,7 @@ class MibEndpoints(object):
   def build(json_data):
     _ep = MibEndpoints()
     _ep.name = json_data[NAME_KEY]
+    _ep.set_version(*json_data[VER_KEY].split('.'))
     _ep_id = -1
     for _req in json_data[REQUESTS_KEY]:
       _ep_name = _req['name']
@@ -338,6 +345,13 @@ class MibEndpoints(object):
                       'id': _evt_id})
     return _ep
 
+  def set_version(self, major, minor):
+    """
+    Set request item
+    """
+    self._major_ver = major
+    self._minor_ver = minor
+
   def set_requests(self, name, attr):
     """
     Set request item
@@ -357,7 +371,7 @@ class MibEndpoints(object):
 if __name__ == '__main__':
   import json
   import os
-  _file_name = 'test.json'
+  _file_name = 'sense.json'
   if os.path.exists(_file_name):
     with open(_file_name, 'r') as testf:
       _data = testf.read().strip()

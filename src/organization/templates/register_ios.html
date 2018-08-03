@@ -1,0 +1,98 @@
+{% extends "base_site.html" %}
+
+{% block title %} Register IOS {% endblock title %}
+
+{% block content %}
+  {% if error_msg %}
+    <script>
+      onload = function() {
+        new PNotify({
+          title: '{{ error_msg.title }}',
+          text: '{{ error_msg.msg }}',
+          type: 'error',
+          hide: true,
+          styling: 'bootstrap3'
+      });
+      }
+    </script>
+  {% endif %}
+  <div class="right_col" role="main">
+    <div class="">
+      <!-- start row -->
+      <div class="row">
+
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>Register IOS </h2>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <form action="/organization/register/ios" method="post"
+                      class="form-horizontal form-label-left" enctype="multipart/form-data">
+
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="dev">State <span class="required">*</span>
+                      </label>
+                      <div class="btn-group col-md-6 col-sm-6 col-xs-12" data-toggle="buttons">
+                        <label class="btn btn-default active" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                          <input type="radio" name="state" value="1" required="required" id="state"
+                              class="form-control col-md-7 col-xs-12" checked> Dev
+                        </label>
+                        <label class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                          <input type="radio" name="state" value="0" required="required" id="state"
+                              class="form-control col-md-7 col-xs-12"> Production
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="bundleId">Bundle ID <span class="required">*</span>
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="text" id="bundleId" name="bundleId" required="required" class="form-control col-md-7 col-xs-12"
+                            value="" placeholder="Bundle ID">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="password">Password <span class="required">*</span>
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="password" id="password" name="password" required="required" class="form-control col-md-7 col-xs-12",
+                            value="" placeholder="Password">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="file">File <span class="required">*</span>
+                      </label>
+                      <input type="file" id="file" name="file" accept="application/x-pkcs12"
+                          required="required" class="control-label col-md-3 col-sm-3 col-xs-12"/>
+                    </div>
+
+
+                    <div class="ln_solid"></div>
+                    <div class="form-group">
+                      <div class="col-md-6 col-md-offset-3">
+                        <a href={{ referrer }}>
+                            <button type="button" class="btn btn-primary">Cancel</button>
+                        </a>
+                        <button id="send" type="submit" class="btn btn-success">Register</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+
+
+
+
+
+      </div>  <!-- End row -->
+
+    </div>
+  </div>
+
+{% endblock content %}
