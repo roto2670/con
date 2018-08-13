@@ -17,37 +17,44 @@
             </div>
 
             <div class="x_content">
-              <!--
-              <form id="general" class="form-horizontal form-label-left" method="post">
-                  <button type="submit" class="btn btn-default">Save</button>
-              </form>
-              -->
-                <div class="col-md-7">
-                  <h3>Product Name</h3>
-                  <div class="form-group">
-                    <label class="control-label col-md-0" for="prdName">
-                    </label>
-                    <div class="col-md-12">
-                      <input type="text" value="{{ current_product.id }}" id="prdName" name="prdName" class="form-control col-md-6 col-xs-6" readonly>
-                    </div>
+              <div class="col-md-7">
+                <h3>Code</h3>
+                <div class="form-group">
+                  <label class="control-label col-md-0" for="code">
+                  </label>
+                  <div class="col-md-12">
+                    <input type="text" value="{{ current_product.id }}" id="code" name="code"
+                        class="form-control col-md-6 col-xs-6" readonly>
                   </div>
-
-                  <br>
-                  <h3>Product Key</h3>
-                  <div class="form-group">
-                    <label class="control-label col-md-0" for="prdKey">
-                    </label>
-                    <div class="col-md-12">
-                      <input type="text" value="{{ current_product.key }}" id="prdKey" name="prdKey" class="cursor-pointer form-control col-md-6 col-xs-6" readonly onclick="copyToClipboard(id);">
-                    </div>
-                  </div>
-
-                  <br>
                 </div>
 
-            </div>
+                <br>
+                <h3>Product Name</h3>
+                <div class="form-group">
+                  <label class="control-label col-md-0" for="prdName">
+                  </label>
+                  <div class="col-md-12">
+                    <input type="text" value="{{ current_product.name }}" id="prdName" name="prdName"
+                        class="form-control col-md-6 col-xs-6" readonly>
+                  </div>
+                </div>
 
-          </div>
+                <br>
+                <h3>Product Key</h3>
+                <div class="form-group">
+                  <label class="control-label col-md-0" for="prdKey">
+                  </label>
+                  <div class="col-md-12">
+                    <input type="text" value="{{ current_product.key }}" id="prdKey" name="prdKey"
+                        class="cursor-pointer form-control col-md-6 col-xs-6" readonly onclick="copyToClipboard(id);">
+                  </div>
+                </div>
+
+                <br>
+              </div>
+
+            </div>  <!-- End x_content -->
+          </div>  <!-- End x_panel -->
         </div>
       </div>  <!-- End row -->
 

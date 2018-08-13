@@ -7,3 +7,5 @@ gunicorn
 PyJWT
 requests
 cryptography
+mysqlclient
+sendgrid

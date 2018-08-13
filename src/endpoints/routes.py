@@ -17,88 +17,79 @@ from flask_login import login_required, current_user
 
 import apis
 import builder
-from base import db
-from models import Endpoint
+import in_apis
+import models
+import base.routes
 from endpoints import blueprint
-
-MOCK_GADGET_LIST = ['iPhone', 'Nexus']
 
 
 @blueprint.route('/<product_id>/specifications', methods=['GET', 'POST'])
 @login_required
 def specifications(product_id):
+  _set_product(product_id)
+  product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
+  model_list = product_dev_stage.model_list
+  specification_list = []
+  if product_dev_stage.endpoint:
+    specification_list.append(in_apis.get_specifications(product_dev_stage.endpoint.id))
   if request.method == "GET":
-    version_list = apis.get_specifications_list(product_id)
-    v_list = []
-    for version in version_list:
-      v_list.append(version.version)
-    if version_list:
-      selected = version_list[-1].version
-      content = json.loads(version_list[-1].specifications)
+    if specification_list:
+      specification = specification_list[-1]
+      content = json.loads(specification.specifications)
     else:
-      selected = None
+      specification = None
       content = {}
-    return render_template('ep_specifications.html', version_list=v_list,
-                           selected=selected, content=content)
+    product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
+    model_list = product_dev_stage.model_list
+    return render_template('ep_specifications.html',
+                           specification_list=specification_list,
+                           selected=specification, content=content,
+                           model_list=model_list)
   else:
-    ver = request.form['version']
-    version_list = apis.get_specifications_list(product_id)
-    logging.info("#### version list : %s", version_list)
-    v_list = []
-    for version in version_list:
-      v_list.append(version.version)
-    selected = apis.get_specifications(product_id, ver)
-    logging.info("## selected : %s", selected)
-    content = json.loads(selected.specifications)
-    logging.info("## selected : %s", content)
-    logging.info("%s", ver)
-    return render_template('ep_specifications.html', version_list=v_list,
-                           selected=ver, content=content)
+    specification_id = request.form['specifications']
+    specification = in_apis.get_specifications(specification_id)
+    content = json.loads(specification.specifications)
+    return render_template('ep_specifications.html',
+                           specification_list=specification_list,
+                           selected=specification, content=content,
+                           model_list=model_list)
 
 
 @blueprint.route('/<product_id>/tests', methods=['GET', 'POST'])
 @login_required
 def tests(product_id):
-  # TODO: Test
+  _set_product(product_id)
+  gadgets = apis.get_gadget_list(current_user.email)
+  product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
+  specification_list = []
+  if product_dev_stage.endpoint:
+    specification_list.append(in_apis.get_specifications(product_dev_stage.endpoint.id))
   if request.method == "GET":
-    version_list = apis.get_specifications_list(product_id)
-    v_list = []
-    for version in version_list:
-      v_list.append(version.version)
-    if version_list:
-      selected = version_list[-1].version
-      content = json.loads(version_list[-1].specifications)
+    if specification_list:
+      selected = specification_list[-1]
+      content = json.loads(selected.specifications)
     else:
       selected = None
       content = {}
-    user_info = apis.get_user(current_user.email)
-    logging.info("## user info : %s", user_info)
-    gadgets = apis.get_gadget_list(current_user.email)
     gadget = gadgets[-1] if gadgets else None
-    return render_template('ep_tests.html', version_list=v_list,
+    return render_template('ep_tests.html', specification_list=specification_list,
                            gadget_list=gadgets, gadget=gadget,
                            selected=selected, content=content)
   else:
-    ver = request.form['version']
-    version_list = apis.get_specifications_list(product_id)
-    v_list = []
-    for version in version_list:
-      v_list.append(version.version)
-    selected = apis.get_specifications(product_id, ver)
+    specification_id = request.form['specification']
+    selected = in_apis.get_specifications(specification_id)
     content = json.loads(selected.specifications)
 
     gadget = request.form['gadget']
-    logging.info("%s, %s", ver, gadget)
-    gadgets = apis.get_gadget_list(current_user.email)
-    return render_template('ep_tests.html', version_list=v_list,
+    return render_template('ep_tests.html', specification_list=specification_list,
                            gadget_list=gadgets, gadget=gadget,
-                           selected=ver, content=content)
+                           selected=selected, content=content)
 
 
 @blueprint.route('/<product_id>/upload', methods=['POST'])
 @login_required
 def upload_header_file(product_id):
-  #TODO: Handle upload content
+  product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
   upload_file = request.files['file']
   content = upload_file.read()
   # TODO: Check format?? Or send to cloud server
@@ -108,40 +99,51 @@ def upload_header_file(product_id):
     json_content = json.loads(decode_content)
     if json_content['product'] != product_id:
       return redirect('endpoints/' + product_id + '/specifications')
-    ret = apis.register_specifications(product_id, json_content['version'], decode_content)
-    old_specifications = apis.get_specifications(product_id, json_content['version'])
-    if old_specifications:
-      old_specifications.specifications = decode_content
+    ret = apis.register_specifications(product_id, json_content['version'],
+                                       decode_content, models.STAGE_DEV)
+    if ret:
+      if product_dev_stage.endpoint:
+        in_apis.update_specifications(product_dev_stage.endpoint.id,
+                                      current_user.email,
+                                      decode_content)
+      else:
+        in_apis.create_specifications(json_content['version'], decode_content,
+                                      current_user.email,
+                                      current_user.organization_id,
+                                      product_dev_stage.id)
+      return redirect('endpoints/' + product_id + '/specifications')
     else:
-      endpoint = Endpoint(version=json_content['version'],
-                          specifications=decode_content,
-                          organization_id=current_user.organization_id,
-                          product_id=product_id)
-      db.session.add(endpoint)
-    db.session.commit()
-    logging.info("ret : %s", ret)
-    return redirect('endpoints/' + product_id + '/specifications')
+      abort(500)
   except:
-    logging.exception("### riase error")
+    logging.exception("Raise error while upload header file.")
     return redirect('endpoints/' + product_id + '/specifications')
 
 
-@blueprint.route('/<product_id>/<version>/download', methods=['GET'])
+@blueprint.route('/<product_id>/<specification_id>/<model_id>/download', methods=['GET'])
 @login_required
-def download_header_file(product_id, version):
-  #TODO: Handle download content
-  content = apis.get_specifications(product_id, version)
-  h_builder = builder.MibEndpoints.build(json.loads(content.specifications))
-  _header = h_builder.to_lib_body()
-  return Response(_header, mimetype='text/x-c',
-                  headers={'Content-Disposition':'attachment;filename=gadget.h'})
+def download_header_file(product_id, specification_id, model_id):
+  content = in_apis.get_specifications(specification_id)
+  model = in_apis.get_model(model_id)
+  build_number = 0
+  if model.firmware_list:
+    build_number = len(model.firmware_list) + 1
+
+  try:
+    # TODO: Handle build number when upper 255
+    h_builder = builder.MibEndpoints.build(json.loads(content.specifications))
+    _header = h_builder.to_lib_body()
+    return Response(_header, mimetype='text/x-c',
+                    headers={'Content-Disposition':'attachment;filename=gadget.h'})
+  except:
+    logging.exception("Raise error while download header file.")
+    abort(500)
 
 
 @blueprint.route('/<product_id>/testcall/<gadget>/<endpoint_name>', methods=['POST'])
 @login_required
 def test_call(product_id, gadget, endpoint_name):
-  logging.info("### test call. %s", endpoint_name)
-  product =  apis.get_product(product_id, current_user.organization_id)
+  logging.info("Test call. %s", endpoint_name)
+  product =  in_apis.get_product(product_id)
   # TODO: data
   args = [14]
   kwargs = {}
@@ -151,10 +153,15 @@ def test_call(product_id, gadget, endpoint_name):
       "kwargs": kwargs
   }
   task_id = apis.call_endpoint(gadget, endpoint_name, data)
-  logging.info("### task id : %s", task_id)
+  logging.info("%s endpoint task id : %s", endpoint_name, task_id)
   if task_id:
     ret = apis.get_endpoint_result(gadget, task_id)
-    logging.info("### ret : %s", ret)
+    logging.info("%s endpoint result : %s", endpoint_name, ret)
     return json.dumps(ret)
   else:
     return "Fail"
+
+
+def _set_product(product_id):
+  product = in_apis.get_product(product_id)
+  base.routes.set_current_product(product)

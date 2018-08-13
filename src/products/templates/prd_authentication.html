@@ -4,6 +4,20 @@
 {% block title %} Authentication {% endblock title %}
 
 {% block content %}
+  {% if error_msg %}
+    <script>
+      onload = function() {
+        new PNotify({
+          title: '{{ error_msg.title }}',
+          text: '{{ error_msg.msg }}',
+          type: 'error',
+          hide: true,
+          styling: 'bootstrap3'
+      });
+      }
+    </script>
+  {% endif %}
+
   <div class="right_col" role="main">
     <div class="">
 
@@ -22,15 +36,9 @@
                 <div class="item form-group">
                   <label class="control-label col-md-0" for="accessToken"></label>
                   <div class="col-md-12">
-                    {% if token %}
-                      <input type="text" value="{{ token }}" id="accessToken"
-                          name="accessToken" class="cursor-pointer form-control col-md-6 col-xs-6"
-                            readonly onclick="copyToClipboard(id);">
-                    {% else %}
-                      <input type="text" value="" id="accessToken"
-                          name="accessToken" class="cursor-pointer form-control col-md-6 col-xs-6"
-                            readonly onclick="copyToClipboard(id);">
-                    {% endif %}
+                    <input type="text" value="{{ token }}" id="accessToken"
+                        name="accessToken" class="cursor-pointer form-control col-md-6 col-xs-6"
+                          readonly onclick="copyToClipboard(id);">
                   </div>
                 </div>
               </div>
@@ -61,107 +69,6 @@
                 </div>
               </form>
 
-              <div class="col-md-8">
-                <br>
-                <h3>Push Notification Keys</h3>
-                <h4>Android</h4>
-                <form id="androidNoti" action="/products/{{ current_product.id }}/android/notikey"
-                    class="form-horizontal form-label-left" method="post">
-                  <div class="item form-group">
-                    <label class="control-label col-md-2" for="androidNotiKey">Key <span class="required">*</span>
-                    </label>
-                    <div class="col-md-10">
-                      <input type="text" id="androidNotiKey" name="androidNotiKey" required="required"
-                          value="{{ noti_key.android_key}}" class="form-control col-md-6 col-xs-6" placeholder="Key">
-                    </div>
-                  </div>
-                  <div class="item form-group">
-                    <label class="control-label col-md-2" for="androidPackageName">Name <span class="required">*</span>
-                    </label>
-                    <div class="col-md-10">
-                      <input type="text" id="androidPackageName" name="androidPackageName" required="required"
-                          value="{{ noti_key.android_package_name }}" class="form-control col-md-6 col-xs-6" placeholder="Package Name">
-                    </div>
-                  </div>
-                  <button type="submit" class="btn btn-default">Save</button>
-                </form>
-
-                <br>
-                <h4>IOS</h4>
-                <form id="iosDevNoti" action="/products/{{ current_product.id }}/ios/dev/notikey"
-                    class="form-horizontal form-label-left" method="post">
-                  <h5>Dev</h5>
-                  <div class="item form-group">
-                    <label class="control-label col-md-2" for="iosDevBundleIdentifier">Identifier <span class="required">*</span>
-                    </label>
-                    <div class="col-md-10">
-                      <input type="text" id="iosDevBundleIdentifier" name="iosDevBundleIdentifier" required="required"
-                          value="{{ noti_key.ios_dev_bundle_id }}" class="form-control col-md-6 col-xs-6" placeholder="Bundle Identifier">
-                    </div>
-                  </div>
-                  <div class="item form-group">
-                    <label class="control-label col-md-2" for="iosDevPassword">Password <span class="required">*</span>
-                    </label>
-                    <div class="col-md-10">
-                      <input type="password" id="iosDevPassword" name="iosDevPassword" required="required"
-                          value="{{ noti_key.ios_dev_password  }}" class="form-control col-md-6 col-xs-6" placeholder="Password">
-                    </div>
-                  </div>
-                  <div class="item form-group">
-                    <label class="control-label col-md-2" for="upload">File <span class="required">*</span>
-                    </label>
-                      <label class="btn btn-default btn-file">Upload
-                        <input type="file" name="file" form="uploadIosDev" accept="application/x-pkcs12"
-                            style="display: none;" onChange="this.form.submit();"/>
-                      </label>
-                  </div>
-                  <button type="submit" class="btn btn-default">Save</button>
-                </form>
-
-                <br>
-
-                <form id="iosProductionNoti" action="/products/{{ current_product.id }}/ios/production/notikey"
-                    class="form-horizontal form-label-left" method="post">
-                  <h5>Production</h5>
-                  <div class="item form-group">
-                    <label class="control-label col-md-2" for="iosBundleIdentifier">Identifier <span class="required">*</span>
-                    </label>
-                    <div class="col-md-10">
-                      <input type="text" id="iosBundleIdentifier" name="iosBundleIdentifier"
-                          value="{{ noti_key.ios_production_bundle_id }}" required="required"
-                              class="form-control col-md-6 col-xs-6" placeholder="Bundle Identifier">
-                    </div>
-                  </div>
-                  <div class="item form-group">
-                    <label class="control-label col-md-2" for="iosPassword">Password <span class="required">*</span>
-                    </label>
-                    <div class="col-md-10">
-                      <input type="password" id="iosPassword" name="iosPassword" required="required"
-                          value="{{ noti_key.ios_production_password }}" class="form-control col-md-6 col-xs-6"
-                              placeholder="Password">
-                    </div>
-                  </div>
-                  <div class="item form-group">
-                    <label class="control-label col-md-2" for="upload">File <span class="required">*</span>
-                    </label>
-                      <label class="btn btn-default btn-file">Upload
-                        <input type="file" name="file" form="uploadIosProduction" accept="application/x-pkcs12"
-                            style="display: none;" onChange="this.form.submit();"/>
-                      </label>
-                  </div>
-
-                  <br>
-                  <button type="submit" class="btn btn-default">Save</button>
-                </form>
-              </div>
-
-              <!-- Upload file -->
-              <form id="uploadIosDev" name="uploadIosDev" action="/products/{{ current_product.id }}/ios/dev/upload"
-                  method="POST" enctype="multipart/form-data">
-              </form>
-              <form id="uploadIosProduction" name="uploadIosProduction" action="/products/{{ current_product.id }}/ios/production/upload"
-                  method="POST" enctype="multipart/form-data">
-              </form>
             </div>  <!-- End x_content -->
 
           </div>  <!-- End x_panel -->

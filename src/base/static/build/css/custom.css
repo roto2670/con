@@ -4256,12 +4256,17 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 
 
 /** jslee custom **/
-.owner-email-list {
+.tester-email-list {
     color: #000000;
     background-color: #8e8e8e37;
     border-color: #8e8e8e37;
 }
-.member-email-list {
+.tester-email-list-no-ftl {
+    color: #000000;
+    background-color: #ff000037;
+    border-color: #8e8e8e37;
+}
+.invite-email-list {
     color: #000000;
     background-color: #8e8e8e37;
     border-color: #8e8e8e37;
@@ -4275,6 +4280,12 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 .error-message {
     color: #ff0000;
     font-weight: bold;
+}
+.only-eng {
+    ime-mode: disabled
+}
+.only-lower {
+    text-transform: lowercase
 }
 
 /** jslee custom. json viewer **/

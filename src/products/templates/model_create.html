@@ -1,7 +1,7 @@
 
 {% extends "base_site.html" %}
 
-{% block title %} Products {% endblock title %}
+{% block title %} Model {% endblock title %}
 
 {% block content %}
   {% if error_msg %}
@@ -26,13 +26,14 @@
           <div class="x_panel">  <!-- start x_panel -->
 
             <div class="x_title">
-              <h2>Create <small>new product</small></h2>
+              <h2>Create <small>new model</small></h2>
               <div class="clearfix"></div>
             </div>
 
             <div class="x_content">  <!-- start x_content -->
               <br />
-              <form id="create" class="form-horizontal form-label-left" method="post">
+              <form id="create" class="form-horizontal form-label-left" method="post"
+                  action="/products/{{ current_product.id }}/model/create">
 
                 <div class="form-group">
                   <label class="control-label col-md-3 col-sm-3 col-xs-12" for="code">Code <span class="required">*</span>

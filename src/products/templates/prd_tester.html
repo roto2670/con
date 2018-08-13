@@ -1,0 +1,83 @@
+
+{% extends "base_site.html" %}
+
+{% block title %} Tester {% endblock title %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+
+      <div class="row"> <!-- Start Row -->
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">  <!-- Start x_panel -->
+
+            <div class="x_title"> <!-- Start x_title -->
+              <h2> Tester </h2>
+              <div class="clearfix"></div>
+            </div> <!-- End x_ttiel -->
+
+            <div class="x_content">  <!-- Start x_content -->
+              <div class="col-md-7">
+
+                <h3>Tester</h3>
+                  {% for tester in tester_list %}
+                    {% if tester.authorized %}
+                      <div class="alert tester-email-list fade in">
+                        <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/delete">
+                          <button type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                          </button>
+                          <strong>{{ tester.email }}</strong>
+                        </a>
+                      </div>
+                    {% else %}
+                      <div class="alert tester-email-list-no-ftl fade in">
+                        <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/delete">
+                          <button type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                          </button>
+                          <strong>{{ tester.email }}</strong>
+                        </a>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+
+
+                <form id="tester" class="form-horizontal form-label-left" method="post">
+                  <h3>Invite Member</h3>
+                  <div class="form-group">
+                    <label class="control-label col-md-0" for="newTesterEmail">
+                    </label>
+                    <div class="col-md-12">
+                      <input type="text" placeHolder="tester@email.com" id="newTesterEmail"
+                          name="newTesterEmail" required="required" class="form-control col-md-6 col-xs-6">
+                    </div>
+                  </div>
+
+                  <br>
+                  <button type="submit" class="btn btn-default">Send Invite</button>
+                </form>
+
+                <h3>Invited Member</h3>
+                  {% for invite in invite_list %}
+                    <div class="alert invite-email-list fade in">
+                      <a href="/products/{{ current_product.id }}/invite/tester/{{ invite.id }}/delete">
+                        <button type="button" class="close" aria-label="Close">
+                          <span aria-hidden="true">×</span>
+                        </button>
+                        <strong>{{ invite.email }}</strong>
+                      </a>
+                    </div>
+                  {% endfor %}
+
+                </div>
+            </div>  <!-- End x_content-->
+
+          </div>  <!-- End x_panel -->
+        </div>
+      </div>  <!-- End row -->
+
+    </div>
+  </div>
+
+{% endblock content %}

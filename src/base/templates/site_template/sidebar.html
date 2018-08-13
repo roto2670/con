@@ -18,11 +18,9 @@
           <li><a><i class="fa fa-keyboard-o"></i> Product <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
                 <li><a href="/products/{{ current_product.id }}/general">General</a></li>
-                <!-- TODO: Branding
-                <li><a href="/products/{{ current_product.product_id }}/branding">Branding</a></li>
-                -->
+                <li><a href="/products/{{ current_product.id }}/model">Model</a></li>
                 <li><a href="/products/{{ current_product.id }}/authentication">Authentication</a></li>
-                <li><a href="/products/{{ current_product.id }}/admins">Admins</a></li>
+                <li><a href="/products/{{ current_product.id }}/tester">Tester</a></li>
             </ul>
           </li>
           <!-- Endpoints -->
@@ -32,17 +30,12 @@
                 <li><a href="/endpoints/{{ current_product.id }}/tests">Tests</a></li>
             </ul>
           </li>
+          <li><a><i class="fa fa-gears"></i> Release <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+                <li><a href="/release/{{ current_product.id }}/list">Release</a></li>
+            </ul>
+          </li>
         {% endif %}
-        <!-- TODO: Settings
-        <li><a href="/settings"><i class="fa fa-cog"></i> Settings </a></li>
-        -->
-        <!-- TODO: about Admin
-        <li><a><i class="fa fa-gears"></i> Orgnization <span class="fa fa-chevron-down"></span></a>
-          <ul class="nav child_menu">
-              <li><a href="/organization">Specifications</a></li>
-          </ul>
-        </li>
-        -->
       </ul>
     </div>
   </div>
@@ -50,10 +43,10 @@
 
   <!-- /menu footer buttons -->
   <div class="sidebar-footer hidden-small">
-    <a data-toggle="tooltip" data-placement="top" title="Organization">
+    <a data-toggle="tooltip" data-placement="top" title="Organization" href="/organization">
       <span class="fa fa-users" aria-hidden="true"></span>
     </a>
-    <a data-toggle="tooltip" data-placement="top" title="Settings">
+    <a data-toggle="tooltip" data-placement="top" title="Settings" href="/settings">
       <span class="fa fa-cog" aria-hidden="true"></span>
     </a>
     <a data-toggle="tooltip" data-placement="top" title="Documentation" href="/doc">

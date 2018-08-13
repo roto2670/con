@@ -6,16 +6,16 @@
 
     <div class="nav navbar-nav navbar-btn">
         <div class="btn-group">
-            {% if current_product %}
-              <button type="button" class="btn btn-primary product-title">{{ current_product.id }}</button>
-            {% else %}
-              <button type="button" class="btn btn-primary product-title">Products</button>
-            {% endif %}
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
             {% if current_user.organization_id %}
+              {% if current_product %}
+                <button type="button" class="btn btn-primary product-title">{{ current_product.id }}</button>
+              {% else %}
+                <button type="button" class="btn btn-primary product-title">Products</button>
+              {% endif %}
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
               <ul class="dropdown-menu" role="menu">
                 {% for product in product_list %}
                   <li><a href="/products/{{ product.id }}/general">{{ product.id }}</a></li>

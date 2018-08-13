@@ -9,37 +9,29 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-import json
-import logging
+import datetime
 
-from flask import current_app, redirect, render_template, url_for
+from flask import current_app, redirect, render_template, request, url_for
 from flask_login import current_user
 
-import apis
+import in_apis
 from base import db
 from login import blueprint
-from models import User
 
 
 @blueprint.route('/login', methods={'GET', 'POST'})
 def login():
   if not current_user.is_authenticated:
     return current_app.extensions['firebase_auth'].login()
-  elif not current_user.authorized:
-    user_info = apis.get_user(current_user.email)
-    logging.info("## user info : %s", user_info)
-    if user_info['user'] and user_info['user']['authorized']:
-      user = User.query.filter_by(id=current_user.id).one_or_none()
-      user.language = user_info['user']['language']
-      user.authorized = user_info['user']['authorized']
-      user.account_ids = json.dumps(user_info['user']['account_ids'])
-      db.session.commit()
-      return redirect(url_for('home_blueprint.index'))
-    else:
-      # TODO: not ftl handle
-      return redirect(url_for('base_blueprint.route_welcome'))
   else:
-    return redirect(url_for('home_blueprint.index'))
+    user = in_apis.get_user(current_user.id)
+    user.last_access_time = datetime.datetime.utcnow()
+    user.ip_address = request.remote_addr
+    db.session.commit()
+    if not current_user.organization_id:
+      return redirect(url_for('organization_blueprint.create'))
+    else:
+      return redirect(url_for('home_blueprint.index'))
 
 
 @blueprint.route('/sign-in', methods={'POST'})

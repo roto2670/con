@@ -10,6 +10,18 @@
     if (jsonData !== null && !jQuery.isEmptyObject(jsonData)) {
       document.getElementById("jsonField").innerHTML = JSON.stringify(jsonData, undefined, 4);
     }
+
+    function onDownload(productId) {
+      var specification = document.getElementById('specification2');
+      var model = document.getElementById('model');
+      if (specification.value === null || specification.value === "") {
+        alert("Please selected specification.");
+      } else if (model.value === null || model.value === "") {
+        alert("Please selected model.");
+      } else {
+        window.location.href = "/endpoints/" + productId + "/" + specification.value + "/" + model.value + "/download";
+      }
+    }
   </script>
 {% endblock javascripts %}
 
@@ -29,44 +41,116 @@
 
             <div class="x_content">
               <div class="col-md-9 col-sm-9 col-xs-12">
-                <form id="specifications" method="post">
-                  {% if version_list %}
-                    <select class="form-control" id="version" name="version" onchange="this.form.submit()">
-                      {% for version in version_list %}
-                        {% if selected and selected == version %}
-                          <option id="{{ version }}" selected>{{ version }}</option>
-                        {% else %}
-                          <option id="{{ version }}">{{ version }}</option>
-                        {% endif %}
-                      {% endfor %}
-                    </select>
-                  {% else %}
-                    <select class="form-control" id="version" name="version" onchange="this.form.submit()" disabled>
-                      <option>Please upload specifications file</option>
-                    </select>
-                  {% endif %}
-                </form>
 
-                <br>
+                  <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                      <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#tab_content1" id="specification-tab" role="tab" data-toggle="tab" aria-expanded="true">Specification</a>
+                        </li>
+                        <li role="presentation" class=""><a href="#tab_content2" role="tab" id="headerFile-tab" data-toggle="tab" aria-expanded="false">Header File</a>
+                        </li>
+                      </ul>
 
-                <pre class="json-padding json-height jumbotron" id="jsonField">
-                </pre>
+                      <div id="myTabContent" class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="specification-tab">
+                          <div class="x_content">
+                            <div class="">
+                              <form id="specifications" method="post">
+                                {% if specification_list %}
+                                  <select class="form-control" id="specification" name="specification" onchange="this.form.submit()">
+                                    {% for specification in specification_list %}
+                                      {% if selected and selected.version == specification.version %}
+                                        <option id="{{ specification.id }}" value="{{ specification.id }}" selected>{{ specification.version }}</option>
+                                      {% else %}
+                                        <option id="{{ specification.id }}" value="{{ specification.id }}">{{ specification.version }}</option>
+                                      {% endif %}
+                                    {% endfor %}
+                                  </select>
+                                {% else %}
+                                  <select class="form-control" id="specification" name="specification" onchange="this.form.submit()" disabled>
+                                    <option>Please upload specifications file</option>
+                                  </select>
+                                {% endif %}
+                              </form>
+
+                              <br>
+
+                              <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+                                <div class="panel">
+                                  <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#jsonSpec" aria-expanded="true" aria-controls="jsonSpec">
+                                    <h3 class="panel-title">Specification</h3>
+                                  </a>
+                                  <div id="jsonSpec" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                    <div class="panel-body">
+                                        {% if specification_list %}
+                                          <pre class="json-padding json-height jumbotron" id="jsonField">
+                                          </pre>
+                                        {% endif %}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                            </div>
+
+                            <br>
+
+                            <!-- Upload Button -->
+                            <form id="upload" action="/endpoints/{{ current_product.id }}/upload" method="POST" enctype="multipart/form-data">
+                              <label class="btn btn-default btn-file">Upload
+                                <input type="file" name="file" form="upload" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
+                              </label>
+                            </form>
+                          </div>
+                        </div>  <!-- end specification-tab -->
+
+                        <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="headerFile-tab">
+                          <div class="x_content">
+                            {% if specification_list %}
+                              <select class="form-control" id="specification2" name="specification2">
+                                {% for specification in specification_list %}
+                                  {% if selected and selected.version == specification.version %}
+                                    <option id="{{ specification.id }}" value="{{ specification.id }}" selected>
+                                      {{ specification.version }}
+                                    </option>
+                                  {% else %}
+                                    <option id="{{ specification.id }}" value="{{ specification.id }}">
+                                      {{ specification.version }}
+                                    </option>
+                                  {% endif %}
+                                {% endfor %}
+                              </select>
+                            {% else %}
+                              <select class="form-control" id="specification2" name="specification2" disabled>
+                                <option value="">Please upload specifications file</option>
+                              </select>
+                            {% endif %}
+
+                            <br>
+
+                            {% if model_list %}
+                              <select class="form-control" id="model" name="model">
+                                {% for model in model_list %}
+                                  <option id="{{ model.id }}" value="{{ model.id }}" selected>{{ model.name }}</option>
+                                {% endfor %}
+                              </select>
+                            {% else %}
+                              <select class="form-control" id="model" name="model" disabled>
+                                <option value="">Please create model</option>
+                              </select>
+                            {% endif %}
+
+                            <br>
+
+                            <!-- Download button -->
+                            <button class="btn btn-default" onclick="onDownload('{{ current_product.id }}');">Download</button>
+                          </div>
+                        </div>  <!-- headerFile-tab -->
+
+                      </div>
+                    </div>
+
+
               </div>
-
-              <!-- Upload Button -->
-              <form id="upload" action="/endpoints/{{ current_product.id }}/upload" method="POST" enctype="multipart/form-data">
-                <label class="btn btn-default btn-file">Upload
-                  <input type="file" name="file" form="upload" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
-                </label>
-              </form>
-
-              <!-- Download button -->
-              {% if version_list %}
-                <a href="/endpoints/{{ current_product.id }}/{{ selected }}/download"><button class="btn btn-default">Download</button></a>
-              {% else %}
-                <a href="/endpoints/{{ current_product.id }}/{{ selected }}/download"><button class="btn btn-default" disabled>Download</button></a>
-              {% endif %}
-
             </div><!-- End x_content -->
           </div><!-- End x_panel-->
         </div>

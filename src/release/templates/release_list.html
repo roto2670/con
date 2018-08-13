@@ -1,0 +1,225 @@
+
+{% extends "base_site.html" %}
+
+{% block title %} Release {% endblock title %}
+
+
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+
+      <!-- start row -->
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2> Tests </h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+
+                <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+                  <div class="panel">
+                    <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion"
+                        href="#release" aria-expanded="true" aria-controls="release">
+                      <h3 class="panel-title">Release</h3>
+                    </a>
+                    <div id="release" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                      <div class="panel-body">
+                        <table class="table table-striped">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Version</th>
+                              <th>Model Number</th>
+                              <th>Updated User</th>
+                              <th>Updated Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for release in release_list %}
+                              <tr>
+                                <td>{{ release.product.name }}</td>
+                                <td>{{ release.endpoint.version }}</td>
+                                <td>{{ release.model_list|length }}</td>
+                                <td></td>
+                                <td>{{ release.last_updated_time }}</td>
+                              </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="panel">
+                    <a class="panel-heading" role="tab" id="headingTwo" data-toggle="collapse" data-parent="#accordion"
+                        href="#preRelease" aria-expanded="true" aria-controls="preRelease">
+                      <h3 class="panel-title">Pre Release</h3>
+                    </a>
+                    <div id="preRelease" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                      <div class="panel-body">
+                        <table class="table table-striped">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Version</th>
+                              <th>Model Number</th>
+                              <th>Updated User</th>
+                              <th>Updated Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for pre_release in pre_release_list %}
+                              <tr>
+                                <td>{{ pre_release.product.name }}</td>
+                                <td>{{ pre_release.endpoint.version }}</td>
+                                <td>{{ pre_release.model_list|length }}</td>
+                                <td></td>
+                                <td>{{ pre_release.last_updated_time }}</td>
+                              </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+
+                        {% if pre_release_list %}
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Release</button>
+                        {% else %}
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm" disabled>Release</button>
+                        {% endif %}
+                        <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-sm">
+                              <div class="modal-content">
+
+                                <div class="modal-header">
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                                  </button>
+                                  <h4 class="modal-title" id="preRelease">Release</h4>
+                                </div>
+                                <div>
+                                  <form id="preRelease" method="post" action="/release/{{ current_product.id }}/release">
+                                    <div class="modal-body">
+                                      <h4>Release ok?</h4>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                      <button type="submit" class="btn btn-primary">Ok</button>
+                                    </div>
+                                  </form>
+                                </div>
+
+                              </div>
+                            </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="panel">
+                    <a class="panel-heading" role="tab" id="headingThree" data-toggle="collapse" data-parent="#accordion"
+                        href="#dev" aria-expanded="true" aria-controls="dev">
+                      <h3 class="panel-title">Dev</h3>
+                    </a>
+                    <div id="dev" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                      <div class="panel-body">
+                        <table class="table table-striped">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Version</th>
+                              <th>Model Number</th>
+                              <th>Updated User</th>
+                              <th>Updated Time</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for dev in dev_list %}
+                              <tr>
+                                <td>{{ dev.product.name }}</td>
+                                <td>{{ dev.endpoint.version }}</td>
+                                <td>{{ dev.model_list|length }}</td>
+                                <td></td>
+                                <td>{{ dev.last_updated_time }}</td>
+                              </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Pre Release</button>
+                        <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-sm">
+                              <div class="modal-content">
+
+                                <div class="modal-header">
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                                  </button>
+                                  <h4 class="modal-title" id="preRelease">Pre Release</h4>
+                                </div>
+                                <div>
+                                  <form id="preRelease" method="post" action="/release/{{ current_product.id }}/pre_release">
+                                    <div class="modal-body">
+                                      <h4>Pre release ok?</h4>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                      <button type="submit" class="btn btn-primary">Ok</button>
+                                    </div>
+                                  </form>
+                                </div>
+
+                              </div>
+                            </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="panel">
+                      <a class="panel-heading" role="tab" id="headingFour" data-toggle="collapse" data-parent="#accordion"
+                          href="#archive" aria-expanded="true" aria-controls="archive">
+                        <h3 class="panel-title">Archive</h3>
+                      </a>
+                      <div id="archive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+                        <div class="panel-body">
+                          <table class="table table-striped">
+                            <thead>
+                              <tr>
+                                <th>Name</th>
+                                <th>Version</th>
+                                <th>Model Number</th>
+                                <th>Updated User</th>
+                                <th>Updated Time</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for archive in archive_list %}
+                                <tr>
+                                  <td>{{ archive.product.name }}</td>
+                                  <td>{{ archive.endpoint.version }}</td>
+                                  <td>{{ archive.model_list|length }}</td>
+                                  <td></td>
+                                  <td>{{ archive.last_updated_time }}</td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+
+            </div><!-- End x_content-->
+          </div><!-- End x_panel-->
+        </div>
+
+      </div>
+      <!-- End row -->
+
+    </div>
+  </div>
+
+{% endblock content %}

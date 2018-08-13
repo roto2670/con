@@ -9,14 +9,12 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+from flask import Blueprint
 
-from flask import render_template
-from flask_login import login_required
-
-from settings import blueprint
-
-
-@blueprint.route('/', methods=['GET'])
-@login_required
-def default_route():
-  return render_template("settings.html")
+blueprint = Blueprint(
+    'release_blueprint',
+    __name__,
+    url_prefix='/release',
+    template_folder='templates',
+    static_folder='static'
+)
