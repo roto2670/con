@@ -1,6 +1,5 @@
 build*_*_*.log
 obj*_*_*/
-dist
 log ~*
 *.log
 *.egg-info
