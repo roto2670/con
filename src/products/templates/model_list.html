@@ -26,6 +26,7 @@
                     <tr>
                       <th>Name</th>
                       <th>Code</th>
+                      <th>DELETE</th>
                     </tr>
                   </thead>
 
@@ -34,6 +35,7 @@
                       <tr>
                         <td><a href="/products/{{ current_product.id }}/model/{{ model.id }}">{{ model.name }}</a></td>
                         <td>{{ model.code }}</td>
+                        <td><a href="/products/{{ current_product.id }}/model/{{ model.id }}/delete"> Delete</a></td>
                       </tr>
                     {% endfor %}
                   </tbody>

@@ -119,6 +119,13 @@ def get_model_list(product_id):
   return model
 
 
+def delete_model(id):
+  model = get_model(id)
+  if model:
+    db.session.delete(model)
+    db.session.commit()
+
+
 # }}}
 
 

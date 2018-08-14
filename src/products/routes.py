@@ -114,6 +114,13 @@ def create_model(product_id):
         abort(500)
 
 
+@blueprint.route('/<product_id>/model/<model_id>/delete', methods=['GET', 'POST'])
+@login_required
+def delete_model(product_id, model_id):
+  in_apis.delete_model(model_id)
+  return redirect("/products/" + product_id + "/model")
+
+
 @blueprint.route('/<product_id>/general', methods=['GET'])
 @login_required
 def general(product_id):
