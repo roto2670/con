@@ -381,7 +381,11 @@ def _delete_before_pre_release(product_id):
 
 def pre_release(product_id):
   dev = get_product_stage_by_dev(product_id)
-  prd_ret = apis.update_product_stage(product_id, dev, dev.endpoint.version,
+  model_number_list = []
+  for model in dev.model_list:
+    model_number_list.append(model.code)
+  prd_ret = apis.update_product_stage(product_id, dev, model_number_list,
+                                      dev.endpoint.version,
                                       models.STAGE_PRE_RELEASE)
   if prd_ret:
     _delete_before_pre_release(product_id)
@@ -436,7 +440,11 @@ def pre_release(product_id):
 
 def release(product_id):
   _pre_release = get_product_stage_by_pre_release(product_id)
+  model_number_list = []
+  for model in _pre_release.model_list:
+    model_number_list.append(model.code)
   prd_ret = apis.update_product_stage(product_id, _pre_release,
+                                      model_number_list,
                                       _pre_release.endpoint.version,
                                       models.STAGE_RELEASE)
   if prd_ret:

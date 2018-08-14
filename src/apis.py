@@ -232,13 +232,15 @@ def update_about_hook(product_id, stage, hook_url=None, hook_client_key=None):
     return None
 
 
-def update_product_stage(product_id, product_stage, version, stage):
+def update_product_stage(product_id, product_stage, model_number_list,
+                         version, stage):
   url = BASE_URL + 'products/' + product_id + "/" + version + "/stages/" + str(stage)
   # TODO: headers
   headers = {}
   data = {
-    "hook_url": product_stage.hook_url,
-    "hook_client_key": product_stage.hook_client_key
+      "model_numbers": model_number_list,
+      "hook_url": product_stage.hook_url,
+      "hook_client_key": product_stage.hook_client_key
   }
 
   if IS_DEV:
