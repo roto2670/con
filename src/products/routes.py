@@ -228,7 +228,7 @@ def confirm_mail():
     in_apis.create_tester(invite.email, invite.organization_id,
                           invite.product_id, tester_authorized)
     # TODO:
-    ret = apis.register_tester(organization_id, invite.email,
+    ret = apis.register_tester(organization_id, invite.product_id, invite.email,
                                 models.STAGE_PRE_RELEASE)
     if tester_authorized:
       return redirect(url_for('base_blueprint.welcome'))

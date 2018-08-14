@@ -17,6 +17,7 @@ xunit.xml
 _t/
 *.db
 __pycache__
+backup_db
 
 # sandbox executable
 core/sandbox/sandbox

@@ -389,12 +389,12 @@ def register_firmware(product_id, version, model_number, firmware_binary):
 # {{{  Tester
 
 
-def register_tester(organization_id, tester_mail, stage):
+def register_tester(organization_id, product_id, tester_mail, stage):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.pd0151kuq7uk
   url = BASE_URL + '/developers/' + organization_id + "/users/" + tester_mail
   headers = {}
   data = {
-    "stage": stage
+    product_id: stage
   }
   try:
     if IS_DEV:
