@@ -87,32 +87,62 @@ MIBIO_JSON = '''
 
 
 HEADER_FRAME = '''
-#pragma pack(1)
+/******************************************************
+*
+*
+*
+*
+*       DO NOT FIX THIS FILE
+*
+*
+*
+*
+*******************************************************/
+
 #ifndef GADGET_H__
 #define GADGET_H__
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "microbot.h"
+
 #define FIRMWARE_VERSION_MAJOR {major_ver}
 #define FIRMWARE_VERSION_MINOR {minor_ver}
+#define FIRMWARE_BUILD_NUMBER {build_num}
+#define MODEL_NUMBER {model_num}
 #define REQUEST_CNT {requests_num}
 #define EVENT_CNT {events_num}
-typedef void (*ep_hnd) (void* self, void* cb_data);
-typedef void (*p_endpoints) (ep_hnd* self, void* data);
 
-static char MIB_PRODUCT_NAME[] = "{product_name}";  // max 12 char
-static p_endpoints endpoints[REQUEST_CNT];
-static uint32_t return_size[REQUEST_CNT];
+static char MIB_PRODUCT_NAME[PRODUCT_NAME_LEN]  = "{product_name}";  // max 12
+
+#pragma pack(push,1)
+
 {requests_define}
 
 {events_define}
+
+#pragma pack(pop)
 
 {request_funcs_interface}
 
 #ifndef GADGET_INIT__
 #define GADGET_INIT__
-static void mib_init(void) {{
+static uint32_t mib_init(mib_init_t* init_data) {{
+  uint32_t err_code = NRF_SUCCESS;
+  init_data->endpoints = (p_endpoints*)malloc(sizeof(p_endpoints) * REQUEST_CNT);
+  init_data->return_size = (uint32_t*)malloc(sizeof(uint32_t) * REQUEST_CNT);
   {main_body}
+
+  init_data->model_number = MODEL_NUMBER;
+  init_data->firmware_version_major = FIRMWARE_VERSION_MAJOR;
+  init_data->firmware_version_minor = FIRMWARE_VERSION_MINOR;
+  init_data->firmware_build_number = FIRMWARE_BUILD_NUMBER;
+  memcpy(init_data->product_name, MIB_PRODUCT_NAME, PRODUCT_NAME_LEN);
+
+  init_data->endpoint_length = REQUEST_CNT;
+
+  err_code = mib_initialize(init_data);
+  return err_code;
 }}
 #endif // GADGET_INIT__
 #endif // GADGET_H__
@@ -180,11 +210,11 @@ EVENT_ENUM_FORM = '''
   MIB_EVT_{name} = {e_id},'''
 
 MAIN_EP_VALUE = '''
-  endpoints[MIB_EP_{name_up}] = {name_low};'''
+  init_data->endpoints[MIB_EP_{name_up}] = {name_low};'''
 MAIN_EP_RET_VALUE = '''
-  return_size[MIB_EP_{name_up}] = sizeof(*{name_low}_return_size);'''
+  init_data->return_size[MIB_EP_{name_up}] = sizeof(*{name_low}_return_size);'''
 MAIN_EP_RET_NONE_VALUE = '''
-  return_size[MIB_EP_{name_up}] = 0;'''
+  init_data->return_size[MIB_EP_{name_up}] = 0;'''
 
 
 class MibEndpoints(object):
@@ -195,7 +225,7 @@ class MibEndpoints(object):
     self._requests = {}
     self._events = {}
 
-  def to_lib_body(self):
+  def to_lib_body(self, model_num, build_num=0):
     _main_body = StringIO()
     _req_funcs_interface = StringIO()
     _requests_define = StringIO()
@@ -251,8 +281,7 @@ class MibEndpoints(object):
       if _returns:
         _return_struct = RETURN_STRUCT_FORM.format(
             name=req_name,
-            output_values=_outputs.getvalue()
-            )
+            output_values=_outputs.getvalue())
       else:
         _return_struct = ''
       _outputs.close()
@@ -303,6 +332,8 @@ class MibEndpoints(object):
     _lib_body = HEADER_FRAME.format(
         major_ver=self._major_ver,
         minor_ver=self._minor_ver,
+        build_num=build_num,
+        model_num=model_num,
         events_define=_events_define.getvalue(),
         requests_define=_requests_define.getvalue(),
         request_funcs_interface=_req_funcs_interface.getvalue(),
@@ -371,6 +402,17 @@ class MibEndpoints(object):
 if __name__ == '__main__':
   import json
   import os
+  import sys
+  model_num = sys.argv[1]
+  build_num = sys.argv[2]
+  _file_name = ''
+  try:
+    _file_name = sys.argv[3]
+    if not _file_name:
+      _file_name = 'sense.json'
+  except:
+    pass
+
   _file_name = 'sense.json'
   if os.path.exists(_file_name):
     with open(_file_name, 'r') as testf:
@@ -379,5 +421,5 @@ if __name__ == '__main__':
     _data = MIBIO_JSON
   _json_data = json.loads(_data)
   b = MibEndpoints.build(_json_data)
-  _header = b.to_lib_body()
+  _header = b.to_lib_body(model_num, build_num)
   print(_header)
