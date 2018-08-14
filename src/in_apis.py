@@ -108,12 +108,14 @@ def get_model(id):
 
 
 def get_model_by_code(code, product_id):
-  model = Model.query.filter_by(code=code, product_id=product_id).one_or_none()
+  dev_stage = get_product_stage_by_dev(product_id)
+  model = Model.query.filter_by(code=code, product_stage_id=dev_stage.id).one_or_none()
   return model
 
 
 def get_model_list(product_id):
-  model = Model.query.filter_by(product_id=product_id).all()
+  dev_stage = get_product_stage_by_dev(product_id)
+  model = Model.query.filter_by(product_stage_id=dev_stage.id).all()
   return model
 
 

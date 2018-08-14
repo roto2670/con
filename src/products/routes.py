@@ -93,12 +93,7 @@ def create_model(product_id):
     if _model_list:
       code = len(_model_list) + 1
 
-    if re.compile(r'\D').findall(code):
-      error_msg = {"title": "Invalid Code",
-                   "msg": "Only number can be entered. Range 0 ~ 655350."}
-      return render_template("prd_create.html", referrer=referrer,
-                             error_msg=error_msg)
-    elif code < 0 or code > 65535:
+    if code < 0 or code > 65535:
       error_msg = {"title": "Max model",
                    "msg": "Max model"}
       return render_template("prd_create.html", referrer=referrer,

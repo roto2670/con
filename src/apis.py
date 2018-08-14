@@ -268,7 +268,7 @@ def update_product_stage(product_id, product_stage, model_number_list,
 
 def create_model(product_id, model_number, model_name):
    # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.fs7h307c0m2e
-  url = BASE_URL + 'products/' + product_id + '/models/' + model_number
+  url = BASE_URL + 'products/' + product_id + '/models/' + str(model_number)
   # TODO: headers
   headers = {}
   data = {
@@ -362,7 +362,7 @@ def get_org(organization_id):
 
 def register_firmware(product_id, version, model_number, firmware_binary):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.x8fr9nhc0l1f
-  url = BASE_URL + 'products/' + product_id + '/' + version + '/firmware/' + model_number
+  url = BASE_URL + 'products/' + product_id + '/' + version + '/firmware/' + str(model_number)
   # TODO: headers
   headers = {
       "Content-Type:": "application/octet-stream"
