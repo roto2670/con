@@ -159,7 +159,11 @@
                           </tbody>
                         </table>
 
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Pre Release</button>
+                        {% if dev_list[0].endpoint.version and dev_list[0].model_list %}
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Pre Release</button>
+                        {% else %}
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm" disabled>Pre Release</button>
+                        {% endif %}
                         <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog modal-sm">
                               <div class="modal-content">
