@@ -131,7 +131,7 @@ def download_header_file(product_id, specification_id, model_id):
   try:
     # TODO: Handle build number when upper 255
     h_builder = builder.MibEndpoints.build(json.loads(content.specifications))
-    _header = h_builder.to_lib_body()
+    _header = h_builder.to_lib_body(model.code, build_number)
     return Response(_header, mimetype='text/x-c',
                     headers={'Content-Disposition':'attachment;filename=gadget.h'})
   except:
