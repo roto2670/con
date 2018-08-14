@@ -33,6 +33,8 @@
                               <th>Name</th>
                               <th>Version</th>
                               <th>Model Number</th>
+                              <th>Hook Url</th>
+                              <th>Hook Client Key</th>
                               <th>Updated User</th>
                               <th>Updated Time</th>
                             </tr>
@@ -43,6 +45,8 @@
                                 <td>{{ release.product.name }}</td>
                                 <td>{{ release.endpoint.version }}</td>
                                 <td>{{ release.model_list|length }}</td>
+                                <td>{{ release.hook_url }}</td>
+                                <td>{{ release.hook_client_key }}</td>
                                 <td></td>
                                 <td>{{ release.last_updated_time }}</td>
                               </tr>
@@ -66,6 +70,8 @@
                               <th>Name</th>
                               <th>Version</th>
                               <th>Model Number</th>
+                              <th>Hook Url</th>
+                              <th>Hook Client Key</th>
                               <th>Updated User</th>
                               <th>Updated Time</th>
                             </tr>
@@ -76,6 +82,8 @@
                                 <td>{{ pre_release.product.name }}</td>
                                 <td>{{ pre_release.endpoint.version }}</td>
                                 <td>{{ pre_release.model_list|length }}</td>
+                                <td>{{ pre_release.hook_url }}</td>
+                                <td>{{ pre_release.hook_client_key }}</td>
                                 <td></td>
                                 <td>{{ pre_release.last_updated_time }}</td>
                               </tr>
@@ -130,6 +138,8 @@
                               <th>Name</th>
                               <th>Version</th>
                               <th>Model Number</th>
+                              <th>Hook Url</th>
+                              <th>Hook Client Key</th>
                               <th>Updated User</th>
                               <th>Updated Time</th>
                             </tr>
@@ -140,6 +150,8 @@
                                 <td>{{ dev.product.name }}</td>
                                 <td>{{ dev.endpoint.version }}</td>
                                 <td>{{ dev.model_list|length }}</td>
+                                <td>{{ dev.hook_url }}</td>
+                                <td>{{ dev.hook_client_key }}</td>
                                 <td></td>
                                 <td>{{ dev.last_updated_time }}</td>
                               </tr>
@@ -190,6 +202,8 @@
                                 <th>Name</th>
                                 <th>Version</th>
                                 <th>Model Number</th>
+                                <th>Hook Url</th>
+                                <th>Hook Client Key</th>
                                 <th>Updated User</th>
                                 <th>Updated Time</th>
                               </tr>
@@ -200,6 +214,8 @@
                                   <td>{{ archive.product.name }}</td>
                                   <td>{{ archive.endpoint.version }}</td>
                                   <td>{{ archive.model_list|length }}</td>
+                                  <td>{{ archive.hook_url }}</td>
+                                  <td>{{ archive.hook_client_key }}</td>
                                   <td></td>
                                   <td>{{ archive.last_updated_time }}</td>
                                 </tr>

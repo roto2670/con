@@ -106,13 +106,12 @@ def update_ios_key(organization_id, kind, cert, secret, is_dev):
 # {{{ Endpoints
 
 
-def register_specifications(product_id, version, specification, stage):
+def register_specifications(product_id, version, specification):
   url = BASE_URL + 'products/' + product_id + "/" + version + "/endpoints"
   # TODO: headers
   # TODO: stage
   headers = {}
   data = {
-      "stage": stage,  # 0 -> release, 1 -> dev, 2 -> pre-release, 3 -> release
       "specification": specification
   }
   try:
@@ -184,12 +183,15 @@ def create_product(product_name, developer_id):
   try:
     if IS_DEV:
       _test_data = {
-          "id": "test_product",
-          "developer_id": "test_dev",
-          "key": "test_product_key",
+          "id": product_name,
+          "developer_id": developer_id,
+          "key": "df4f925b5233fc50b1a298e878d85367",
           "hook_url": "",
           "hook_client_key": ""
       }
+      # mibp : cac9095c6a3e7764af27b51ca9ec41ee
+      # mibs : b9a0d9f2b062bd1d52089f74eb194ae0
+      # mibio : df4f925b5233fc50b1a298e878d85367
       return _test_data
     else:
       resp = requests.post(url, headers=headers, data=json.dumps(data))
@@ -204,16 +206,15 @@ def create_product(product_name, developer_id):
     return None
 
 
-def update_product(product_id, product, hook_url=None, hook_client_key=None):
-  # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.khxm4rwdkhy2
-  url = BASE_URL + 'products/' + product_id
+def update_about_hook(product_id, stage, hook_url=None, hook_client_key=None):
+  # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.9y2x4jt3mifj
+  url = BASE_URL + 'products/' + product_id + "/stages/" + str(stage) + "/hook"
   # TODO: headers
   headers = {}
-  data = {}
-  if hook_url is not None and hook_url != product.hook_url:
-    data['hook_url'] = hook_url
-  if hook_client_key is not None and hook_client_key != product.hook_client_key:
-    data['hook_client_key'] = hook_client_key
+  data = {
+      "hook_url": hook_url,
+      "hook_client_key": hook_client_key
+  }
 
   if data:
     try:
@@ -222,7 +223,7 @@ def update_product(product_id, product, hook_url=None, hook_client_key=None):
         value = resp.json()
         return value['v']
       else:
-        logging.warn("Update product Response Text : %s", resp.text)
+        logging.warn("Update about hook Response Text : %s", resp.text)
         return None
     except:
       logging.exception("Raise error.")
@@ -231,11 +232,14 @@ def update_product(product_id, product, hook_url=None, hook_client_key=None):
     return None
 
 
-def update_product_stage(product_id, version, stage):
+def update_product_stage(product_id, product_stage, version, stage):
   url = BASE_URL + 'products/' + product_id + "/" + version + "/stages/" + str(stage)
   # TODO: headers
   headers = {}
-  data = {}
+  data = {
+    "hook_url": product_stage.hook_url,
+    "hook_client_key": product_stage.hook_client_key
+  }
 
   if IS_DEV:
     _test_data = True
@@ -301,6 +305,33 @@ def create_org(email):
   try:
     if IS_DEV:
       _test_data = {
+          "id" : "993a39cdeed84d72851efe581b9a74ed",
+          "users" : [],
+          "products": [],
+          "tokens": {"access": "d45eb188dd4511251ae7073a447050ad"},
+          "kinds": {}
+      }
+      return _test_data
+    else:
+      resp = requests.post(url, headers=headers, data=json.dumps(data))
+      if resp.ok:
+        value = resp.json()
+        return value['v']
+      else:
+        logging.warn("Create Organization Response Text : %s", resp.text)
+        return None
+  except:
+    logging.exception("Raise error.")
+    return None
+
+
+def get_org(organization_id):
+  url = BASE_URL + 'developers/' + organization_id
+  # TODO: headers
+  headers = {}
+  try:
+    if IS_DEV:
+      _test_data = {
           "id" : "test_dev",
           "users" : [],
           "products": [],
@@ -309,7 +340,7 @@ def create_org(email):
       }
       return _test_data
     else:
-      resp = requests.post(url, headers=headers, data=json.dumps(data))
+      resp = requests.get(url, headers=headers)
       if resp.ok:
         value = resp.json()
         return value['v']
@@ -335,15 +366,70 @@ def register_firmware(product_id, version, model_number, firmware_binary):
       "Content-Type:": "application/octet-stream"
   }
   try:
-    resp = requests.post(url, headers=headers, data=firmware_binary)
-    if resp.ok:
-      value = resp.json()
-      return value['v']
+    if IS_DEV:
+      _test_data = "https://test.firmware"
+      return _test_data
     else:
-      logging.warn("Register firmware Response Text : %s", resp.text)
-      return None
+      resp = requests.post(url, headers=headers, data=firmware_binary)
+      if resp.ok:
+        value = resp.json()
+        return value['v']
+      else:
+        logging.warn("Register firmware Response Text : %s", resp.text)
+        return None
   except:
     logging.exception("Raise error.")
     return None
+
+# }}}
+
+
+# {{{  Tester
+
+
+def register_tester(organization_id, tester_mail, stage):
+  # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.pd0151kuq7uk
+  url = BASE_URL + '/developers/' + organization_id + "/users/" + tester_mail
+  headers = {}
+  data = {
+    "stage": stage
+  }
+  try:
+    if IS_DEV:
+      _test_data = True
+      return _test_data
+    else:
+      resp = requests.post(url, headers=headers, data=json.dumps(data))
+      if resp.ok:
+        value = resp.json()
+        return value['v']
+      else:
+        logging.warn("Regsiter tester Response Text : %s", resp.text)
+        return None
+  except:
+    logging.exception("Raise error.")
+    return None
+
+
+def delete_tester(organization_id, tester_email):
+  # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.ij1rw8ajky3e
+  url = BASE_URL + '/developers/' + organization_id + "/users/" + tester_mail
+  headers = {}
+  try:
+    if IS_DEV:
+      _test_data = True
+      return _test_data
+    else:
+      resp = requests.delete(url, headers=headers)
+      if resp.ok:
+        value = resp.json()
+        return value['v']
+      else:
+        logging.warn("Regsiter tester Response Text : %s", resp.text)
+        return None
+  except:
+    logging.exception("Raise error.")
+    return None
+
 
 # }}}

@@ -23,20 +23,25 @@
                   {% for tester in tester_list %}
                     {% if tester.authorized %}
                       <div class="alert tester-email-list fade in">
+                        <strong>{{ tester.email }}</strong>
                         <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/delete">
                           <button type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span class="fa fa-remove"></span>
                           </button>
-                          <strong>{{ tester.email }}</strong>
                         </a>
                       </div>
                     {% else %}
                       <div class="alert tester-email-list-no-ftl fade in">
+                        <strong>{{ tester.email }}</strong>
                         <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/delete">
                           <button type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span class="fa fa-remove"></span>
                           </button>
-                          <strong>{{ tester.email }}</strong>
+                        </a>
+                        <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/refresh">
+                          <button type="button" class="close" aria-label="Close">
+                            <span class="fa fa-refresh"></span>
+                          </button>
                         </a>
                       </div>
                     {% endif %}
@@ -61,11 +66,11 @@
                 <h3>Invited Member</h3>
                   {% for invite in invite_list %}
                     <div class="alert invite-email-list fade in">
+                      <strong>{{ invite.email }}</strong>
                       <a href="/products/{{ current_product.id }}/invite/tester/{{ invite.id }}/delete">
                         <button type="button" class="close" aria-label="Close">
-                          <span aria-hidden="true">×</span>
+                          <span class="fa fa-remove"></span>
                         </button>
-                        <strong>{{ invite.email }}</strong>
                       </a>
                     </div>
                   {% endfor %}

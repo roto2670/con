@@ -66,14 +66,12 @@ def create():
       ret = apis.create_org(owner_email)
       if ret:
         org = Organization(id=ret['id'],
-                           users=json.dumps(ret['users']),
+                           users=json.dumps([owner_email]),
                            products=json.dumps(ret['products']),
                            tokens=json.dumps(ret['tokens']),
                            kinds=json.dumps(ret['kinds']),
                            name=name.lower(),
                            original_name=name,
-                           owner=json.dumps([owner_email]),
-                           member=json.dumps([]),
                            created_time=datetime.datetime.utcnow(),
                            last_update=datetime.datetime.utcnow())
         db.session.add(org)

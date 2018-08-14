@@ -31,15 +31,12 @@ class User(UserMixin, db.Model):
 
   id = Column(String(75), primary_key=True)
   email = Column(String(75), unique=True, nullable=False)
-  language = Column(String(15))
-  account_ids = Column(Text)  # list
-  authorized = Column(Boolean, default=False)
-  # ====== upper cloud data
   name = Column(String(75))
   firebase_user_id = Column(String(75), unique=True)
   email_verified = Column(Boolean, default=False, nullable=False)
   sign_in_provider = Column(String(75))
   photo_url = Column(String(225))
+  created_time = Column(DateTime)
   last_access_time = Column(DateTime)
   ip_address = Column(String(75))
   level = Column(Integer)
@@ -82,8 +79,6 @@ class Organization(db.Model):
   # ======= upper cloud data
   name = Column(String(120), unique=True)
   original_name = Column(String(120), unique=True)
-  owner = Column(Text)  # list
-  member = Column(Text)  # list
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
 

@@ -31,6 +31,7 @@ from models import Invite, Tester, Firmware, FirmwareStage
 def create_product(product_name, product_obj):
   # product_obj : response from microbot cloud
   product = Product(id=product_obj['id'],
+                    code=product_obj['id'],
                     developer_id=product_obj['developer_id'],
                     key=product_obj['key'],
                     name=product_name,
@@ -307,6 +308,11 @@ def update_tester_to_authorized(id):
     db.session.commit()
 
 
+def get_tester(id, product_id):
+  tester = Tester.query.filter_by(id=id, product_id=product_id).one_or_none()
+  return tester
+
+
 def get_tester_by_email(email_addr, product_id):
   tester = Tester.query.filter_by(email=email_addr, product_id=product_id).one_or_none()
   return tester
@@ -331,10 +337,10 @@ def delete_tester(id):
 # {{{ Firmware
 
 
-def create_firmware(version, user_email, model_id):
+def create_firmware(version, user_email, url_path, model_id):
   firmware = Firmware(id=uuid.uuid4().hex,
                       version=version,
-                      path='',
+                      path=url_path,
                       created_time=datetime.datetime.utcnow(),
                       last_updated_time=datetime.datetime.utcnow(),
                       last_updated_user=user_email,
@@ -375,92 +381,75 @@ def _delete_before_pre_release(product_id):
 
 def pre_release(product_id):
   dev = get_product_stage_by_dev(product_id)
-  ep_ret = apis.register_specifications(product_id, dev.endpoint.version,
-                                        dev.endpoint.specifications,
-                                        models.STAGE_PRE_RELEASE)
-  if ep_ret:
-    prd_ret = apis.update_product_stage(product_id, dev.endpoint.version,
-                                        models.STAGE_PRE_RELEASE)
-    if prd_ret:
-      _delete_before_pre_release(product_id)
-      ep = get_specifications(dev.endpoint.id)
-      model_list = dev.model_list
+  prd_ret = apis.update_product_stage(product_id, dev, dev.endpoint.version,
+                                      models.STAGE_PRE_RELEASE)
+  if prd_ret:
+    _delete_before_pre_release(product_id)
+    ep = get_specifications(dev.endpoint.id)
+    model_list = dev.model_list
 
-      make_transient(dev)
-      dev.id = uuid.uuid4().hex
-      dev.stage = models.STAGE_PRE_RELEASE
-      dev.created_time = datetime.datetime.utcnow()
-      dev.last_updated_time = datetime.datetime.utcnow()
+    make_transient(dev)
+    dev.id = uuid.uuid4().hex
+    dev.stage = models.STAGE_PRE_RELEASE
+    dev.created_time = datetime.datetime.utcnow()
+    dev.last_updated_time = datetime.datetime.utcnow()
 
-      make_transient(ep)
-      ep.id = uuid.uuid4().hex
-      ep.created_time = datetime.datetime.utcnow()
-      ep.last_updated_time = datetime.datetime.utcnow()
-      ep.last_updated_user = current_user.email
-      ep.product_stage_id = dev.id
+    make_transient(ep)
+    ep.id = uuid.uuid4().hex
+    ep.created_time = datetime.datetime.utcnow()
+    ep.last_updated_time = datetime.datetime.utcnow()
+    ep.last_updated_user = current_user.email
+    ep.product_stage_id = dev.id
 
-      for model in model_list:
-        firmware_list = model.firmware_list
-        make_transient(model)
-        model.id = uuid.uuid4().hex
-        model.created_time = datetime.datetime.utcnow()
-        model.last_updated_time = datetime.datetime.utcnow()
-        model.last_updated_user = current_user.email
-        model.product_stage_id = dev.id
-        for firmware in firmware_list:
-          make_transient(firmware)
-          firmware.id = uuid.uuid4().hex
-          firmware.created_time = datetime.datetime.utcnow()
-          firmware.last_updated_time = datetime.datetime.utcnow()
-          firmware.last_updated_user = current_user.email
-          firmware.model_id = model.id
+    for model in model_list:
+      firmware_list = model.firmware_list
+      make_transient(model)
+      model.id = uuid.uuid4().hex
+      model.created_time = datetime.datetime.utcnow()
+      model.last_updated_time = datetime.datetime.utcnow()
+      model.last_updated_user = current_user.email
+      model.product_stage_id = dev.id
+      for firmware in firmware_list:
+        make_transient(firmware)
+        firmware.id = uuid.uuid4().hex
+        firmware.created_time = datetime.datetime.utcnow()
+        firmware.last_updated_time = datetime.datetime.utcnow()
+        firmware.last_updated_user = current_user.email
+        firmware.model_id = model.id
 
-          firmware_stage = get_firmware_stage(firmware.firmware_stage.id)
-          make_transient(firmware_stage)
-          firmware_stage.id = uuid.uuid4().hex
-          firmware_stage.last_updated_time = datetime.datetime.utcnow()
-          firmware_stage.firmware_id = firmware.id
-          db.session.add(firmware_stage)
-          db.session.add(firmware)
-        db.session.add(model)
+        firmware_stage = get_firmware_stage(firmware.firmware_stage.id)
+        make_transient(firmware_stage)
+        firmware_stage.id = uuid.uuid4().hex
+        firmware_stage.last_updated_time = datetime.datetime.utcnow()
+        firmware_stage.firmware_id = firmware.id
+        db.session.add(firmware_stage)
+        db.session.add(firmware)
+      db.session.add(model)
 
-      db.session.add(ep)
-      db.session.add(dev)
-      db.session.commit()
-      return True
-    else:
-      ep_ret = apis.register_specifications(product_id, dev.endpoint.version,
-                                            dev.endpoint.specifications,
-                                            models.STAGE_DEV)
-      return False
+    db.session.add(ep)
+    db.session.add(dev)
+    db.session.commit()
+    return True
   else:
     return False
 
 
 def release(product_id):
   _pre_release = get_product_stage_by_pre_release(product_id)
-  ep_ret = apis.register_specifications(product_id, _pre_release.endpoint.version,
-                                        _pre_release.endpoint.specifications,
-                                        models.STAGE_RELEASE)
-  if ep_ret:
-    prd_ret = apis.update_product_stage(product_id, _pre_release.endpoint.version,
-                                        models.STAGE_RELEASE)
-    if prd_ret:
-      _release = get_product_stage_by_release(product_id)
-      if _release:
-        _release.stage = models.STAGE_ARCHIVE
-        _release.last_updated_time = datetime.datetime.utcnow()
-        db.session.commit()
-
-      _pre_release.stage = models.STAGE_RELEASE
-      _pre_release.last_updated_time = datetime.datetime.utcnow()
+  prd_ret = apis.update_product_stage(product_id, _pre_release,
+                                      _pre_release.endpoint.version,
+                                      models.STAGE_RELEASE)
+  if prd_ret:
+    _release = get_product_stage_by_release(product_id)
+    if _release:
+      _release.stage = models.STAGE_ARCHIVE
+      _release.last_updated_time = datetime.datetime.utcnow()
       db.session.commit()
-      return True
-    else:
-      ep_ret = apis.register_specifications(product_id, _pre_release.endpoint.version,
-                                            _pre_release.endpoint.specifications,
-                                            models.STAGE_PRE_RELEASE)
-      return False
+
+    _pre_release.stage = models.STAGE_RELEASE
+    _pre_release.last_updated_time = datetime.datetime.utcnow()
+    db.session.commit()
+    return True
   else:
     return False
 

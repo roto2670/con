@@ -31,8 +31,7 @@ def register_extensions(app):
   auth.init_app(app)
   login_manager.init_app(app)
   # custom
-  app.context_processor(base.routes.get_product_list)
-  app.context_processor(base.routes.get_current_product)
+  app.context_processor(base.routes.about_product)
 
 
 def register_blueprints(app):

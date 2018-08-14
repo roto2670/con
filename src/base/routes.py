@@ -11,18 +11,21 @@
 
 import os
 import uuid
-from flask import render_template, redirect, request, url_for, abort
-from flask import send_from_directory
-from flask_login import current_user, login_required, login_user, logout_user
 import datetime
 import logging
-import apis
+
+from flask import render_template, redirect, request, url_for
+from flask import send_from_directory
+from flask_login import current_user, login_required, login_user, logout_user
+
 import in_apis
 from base import blueprint
 from base import db, login_manager, auth
 from models import User, Permission
 
+
 BASE = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static', 'doc')
+
 
 @blueprint.route('/')
 def route_default():
@@ -111,6 +114,7 @@ def production_sign_in(token):
   user.email_verified = token['email_verified']
   user.sign_in_provider = token['firebase']['sign_in_provider']
   user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
+  user.created_time = datetime.datetime.utcnow()
   user.last_access_time = datetime.datetime.utcnow()
   user.ip_address = request.remote_addr
   invite = in_apis.get_invite_by_email(token['email'])
@@ -167,29 +171,25 @@ def internal_error(error):
 ## context processor
 
 
+CUR_PRODUCT = {}  # {user_id : CUR_PRODUCT}
+
+
 def _get_product_list():
-  # TODO: handle current user
   if current_user and current_user.is_authenticated:
     product_list = in_apis.get_product_list(current_user.organization_id)
+    if current_user.id not in CUR_PRODUCT and product_list:
+      set_current_product(product_list[-1])
     return product_list
   else:
     return []
 
 
-def get_product_list():
-  return dict(product_list=_get_product_list())
-
-
-CUR_PRODUCT = {}  # {user_id : CUR_PRODUCT}
-
 def set_current_product(cur_product):
-  # TODO: handle current user
   if current_user and current_user.is_authenticated:
     CUR_PRODUCT[current_user.id] = cur_product
 
 
 def _get_current_product():
-  # TODO: handle current user
   if current_user and current_user.is_authenticated:
     if current_user.id in CUR_PRODUCT:
       return CUR_PRODUCT[current_user.id]
@@ -199,5 +199,6 @@ def _get_current_product():
     return None
 
 
-def get_current_product():
-  return dict(current_product=_get_current_product())
+def about_product():
+  return dict(current_product=_get_current_product(),
+              product_list=_get_product_list())

@@ -14,6 +14,7 @@ import re
 import json
 import uuid
 import logging
+import datetime
 import urllib.parse
 
 from flask import abort, render_template, request, redirect, url_for
@@ -64,6 +65,7 @@ def create():
           product_list = json.loads(org.products)
           product_list.append(ret['id'])
           org.products = json.dumps(product_list)
+          org.last_updated_time = datetime.datetime.utcnow()
           db.session.commit()
         _set_product(product.id)
         return redirect('products/' + ret['id'] + '/model/create')
@@ -134,12 +136,12 @@ def authentication(product_id):
 def hook(product_id):
   hook_url = request.form['hookUrl']
   hook_client_key = request.form['hookClientKey']
-  product = in_apis.get_product(product_id)
-  ret = apis.update_product(product_id, product, hook_url, hook_client_key)
+  ret = apis.update_about_hook(product_id, models.STAGE_DEV, hook_url, hook_client_key)
 
   if ret:
-    product.hook_url = ret['hook_url']
-    product.hook_client_key = ret['hook_client_key']
+    dev = in_apis.get_product_stage_by_dev(product_id)
+    dev.hook_url = hook_url
+    dev.hook_client_key = hook_client_key
     db.session.commit()
     return redirect('products/' + product_id + '/authentication')
   else:
@@ -185,7 +187,25 @@ def _send_invite(email_addr, product_id):
 @blueprint.route('/<product_id>/tester/<tester_id>/delete')
 @login_required
 def remove_tester(product_id, tester_id):
-  in_apis.delete_tester(tester_id)
+  tester = in_apis.get_tester(tester_id, product_id)
+  if tester:
+    ret = apis.delete_tester(tester.organization_id, tester.email)
+    if ret:
+      in_apis.delete_tester(tester_id)
+    else:
+      logging.warn("Failed to delete tester. Tester : %s", tester.email)
+  return redirect('products/' + product_id + '/tester')
+
+
+@blueprint.route('/<product_id>/tester/<tester_id>/refresh')
+@login_required
+def check_authorized(product_id, tester_id):
+  tester = in_apis.get_tester(tester_id, product_id)
+  if tester:
+    tester_info = apis.get_user(tester.email)
+    tester_authorized = tester_info['user']['authorized']
+    if tester_authorized:
+      in_apis.update_tester_to_authorized(tester.id)
   return redirect('products/' + product_id + '/tester')
 
 
@@ -207,6 +227,9 @@ def confirm_mail():
     tester_authorized = tester_info['user']['authorized']
     in_apis.create_tester(invite.email, invite.organization_id,
                           invite.product_id, tester_authorized)
+    # TODO:
+    ret = apis.register_tester(organization_id, invite.email,
+                                models.STAGE_PRE_RELEASE)
     if tester_authorized:
       return redirect(url_for('base_blueprint.welcome'))
     else:
@@ -260,7 +283,8 @@ def upload_firmware(product_id, model_id):
     version = model.product_stage.endpoint.version
     ret = apis.register_firmware(product_id, version, model.code, content)
     if ret:
-      firmware = in_apis.create_firmware(version, current_user.email, model.id)
+      firmware = in_apis.create_firmware(version, current_user.email, ret,
+                                         model.id)
       firmware_stage = in_apis.create_firmware_stage(firmware.id, version,
                                                      models.FIRMWARE_DEV)
       return redirect('products/' + product_id + '/model/' + model_id)

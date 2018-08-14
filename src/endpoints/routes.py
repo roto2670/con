@@ -100,7 +100,7 @@ def upload_header_file(product_id):
     if json_content['product'] != product_id:
       return redirect('endpoints/' + product_id + '/specifications')
     ret = apis.register_specifications(product_id, json_content['version'],
-                                       decode_content, models.STAGE_DEV)
+                                       decode_content)
     if ret:
       if product_dev_stage.endpoint:
         in_apis.update_specifications(product_dev_stage.endpoint.id,
@@ -144,9 +144,18 @@ def download_header_file(product_id, specification_id, model_id):
 def test_call(product_id, gadget, endpoint_name):
   logging.info("Test call. %s", endpoint_name)
   product =  in_apis.get_product(product_id)
-  # TODO: data
-  args = [14]
+  dev_stage = in_apis.get_product_stage_by_dev(product_id)
+  specification = json.loads(dev_stage.endpoint.specifications)
+
+  args = []
   kwargs = {}
+
+  request_list = specification['requests']
+  for req in request_list:
+    if endpoint_name == req['name']:
+      for param in req['params']:
+        args.append(param['default'])
+
   data = {
       "key": product.key,
       "args": args,
