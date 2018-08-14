@@ -9,20 +9,21 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import json
+
 from flask import render_template
 from flask_login import login_required, current_user
 
+import in_apis
 from home import blueprint
-
-import apis
 
 
 @blueprint.route('/index')
 @login_required
 def index():
-  org = apis.get_org(current_user.organization_id)
-  return render_template('index.html', users=org['users'],
-                         products=org['products'])
+  org = in_apis.get_organization(current_user.organization_id)
+  return render_template('index.html', users=json.loads(org.users),
+                         products=json.loads(org.products))
 
 
 @blueprint.route('/<template>')
