@@ -107,8 +107,13 @@ def get_model(id):
   return model
 
 
-def get_model_by_code(code):
-  model = Model.query.filter_by(code=code).one_or_none()
+def get_model_by_code(code, product_id):
+  model = Model.query.filter_by(code=code, product_id=product_id).one_or_none()
+  return model
+
+
+def get_model_list(product_id):
+  model = Model.query.filter_by(product_id=product_id).all()
   return model
 
 

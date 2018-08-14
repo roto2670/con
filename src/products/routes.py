@@ -87,19 +87,23 @@ def create_model(product_id):
       # TODO:  change referrer url
       referrer = "/products/" + product_id + "/model"
 
-    code = request.form['code']
     name = request.form['name']
+    code = 0
+    _model_list = in_apis.get_model_list(product_id)
+    if _model_list:
+      code = len(_model_list) + 1
+
     if re.compile(r'\D').findall(code):
       error_msg = {"title": "Invalid Code",
                    "msg": "Only number can be entered. Range 0 ~ 655350."}
       return render_template("prd_create.html", referrer=referrer,
                              error_msg=error_msg)
-    elif int(code) < 0 or int(code) > 65535:
-      error_msg = {"title": "Invalid Code",
-                   "msg": "Code Range 0 ~ 65535."}
+    elif code < 0 or code > 65535:
+      error_msg = {"title": "Max model",
+                   "msg": "Max model"}
       return render_template("prd_create.html", referrer=referrer,
                              error_msg=error_msg)
-    has_model = in_apis.get_model_by_code(code)
+    has_model = in_apis.get_model_by_code(code, product_id)
     if has_model:
       error_msg = {"title": "Exists Model",
                    "msg": "The model with that code already exists. Please enter a different code."}
