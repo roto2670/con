@@ -10,6 +10,10 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 
+import os
+import apis
+
+
 class Config(object):
   SECRET_KEY = 'key'
   SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
@@ -18,7 +22,10 @@ class Config(object):
   FIREBASE_API_KEY = 'AIzaSyANO3vuNoPC1eQjqsIJeZzGZhl1gWAPbro'
   FIREBASE_PROJECT_ID = 'console-4196c'
   FIREBASE_AUTH_SIGN_IN_OPTIONS = 'email,google'
-  LOG_PATH = '/tmp/console.log'
+  if apis.IS_DEV:
+    LOG_PATH = '/tmp/console.log'
+  else:
+    LOG_PATH = os.path.join(os.path.expanduser('~'), 'log', 'console.log')
   LOG_BACKUP_COUNT = 10
   LOG_MAX_BYTES = 10485760
 
