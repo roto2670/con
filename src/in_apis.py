@@ -9,9 +9,7 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-import json
 import uuid
-import logging
 import datetime
 
 from flask_login import current_user
