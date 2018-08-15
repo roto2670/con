@@ -269,7 +269,6 @@ class MibEndpoints(object):
           _form = VALUE_FORM
         else:
           _form = ARRAY_VALUE_FORM
-        print(ret_attr)
         _outputs.write(_form.format(
             value_type=ret_attr['type'],
             name=ret_attr['name'],
