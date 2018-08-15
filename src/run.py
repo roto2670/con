@@ -13,13 +13,14 @@ import sys
 
 import logging
 import logging.handlers
-from config import DebugConfig
+from config import DebugConfig, ProductionConfig
 from importlib import import_module
 
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
+import apis
 import base.routes
 from base import db, auth, login_manager
 
@@ -78,7 +79,10 @@ def configure_logs(app):
 
 def create_app():
   app = Flask(__name__, static_folder='base/static')
-  app.config.from_object(DebugConfig)
+  if apis.IS_DEV:
+    app.config.from_object(DebugConfig)
+  else:
+    app.config.from_object(ProductionConfig)
   configure_logs(app)
   register_extensions(app)
   register_blueprints(app)
@@ -88,4 +92,12 @@ def create_app():
 
 if  __name__ == '__main__':
   _app = create_app()
-  _app.run(host='127.0.0.1', port=16000)
+  if apis.IS_DEV:
+    _app.run(host='127.0.0.1', port=16000)
+  else:
+    cur_path = os.path.dirname(os.path.abspath(__file__))
+    ssl_path = os.path.join(cur_path, 'ssl')
+    ssl_crt = os.path.join(ssl_path, 'console_microbot_is.crt')
+    ssl_key = os.path.join(ssl_path, 'console_microbot_is.key')
+    _app.run(host='127.0.0.1', port=5000, ssl_context=(ssl_crt, ssl_key))
+
