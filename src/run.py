@@ -11,6 +11,7 @@
 
 import sys
 
+import os
 import logging
 import logging.handlers
 from config import DebugConfig, ProductionConfig
