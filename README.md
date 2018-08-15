@@ -25,6 +25,10 @@
     deactivate
 
 
+# Using gunicorn
+    gunicorn -w 3 --certfile ssl/console_microbot_is.crt --keyfile ssl/console_microbot_is.key -b 127.0.0.1:5000 run:__app
+
+
 # Reference
 
 ### https://github.com/afourmy/flask-gentelella

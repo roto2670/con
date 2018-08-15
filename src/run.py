@@ -91,6 +91,11 @@ def create_app():
   return app
 
 
+if not apis.IS_DEV:
+  # gunicorn
+  __app = create_app()
+
+
 if  __name__ == '__main__':
   _app = create_app()
   if apis.IS_DEV:
