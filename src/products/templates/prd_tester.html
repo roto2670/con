@@ -20,17 +20,6 @@
               <div class="col-md-7">
 
                 <h3>Tester</h3>
-                      <div class="alert tester-email-list fade in">
-                        <strong>jslee@narantech.com</strong>
-                        <a href="/products/{{ current_product.id }}/tester/111/delete">
-                          <button type="button" class="close" aria-label="Close">
-                            <span class="fa fa-remove"></span>
-                          </button>
-                        </a>
-                          <button type="button" class="close">
-                            <span class=""><small>[Change PreRelease]</small></span>
-                          </button>
-                      </div>
                   {% for tester in tester_list %}
                     {% if tester.authorized %}
                       <div class="alert tester-email-list fade in">
