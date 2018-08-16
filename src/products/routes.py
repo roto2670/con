@@ -280,14 +280,15 @@ def upload_firmware(product_id, model_id):
           allow_stage_list.append(models.STAGE_RELEASE)
           break
     return render_template('register_firmware.html', referrer=referrer,
-                           allow_stage_list=allow_stage_list)
+                           allow_stage_list=allow_stage_list, model=model)
   else:
     state = int(request.form['state'])
     upload_file = request.files['file']
     content = upload_file.read()
     model = in_apis.get_model(model_id)
     version = model.product_stage.endpoint.version
-    ret = apis.register_firmware(product_id, version, model.code, content)
+    ret_json = cmds.get_hex_to_json(content)
+    ret = apis.register_firmware(product_id, version, model.code, ret_json)
     if ret:
       firmware = in_apis.create_firmware(version, current_user.email, ret,
                                          model.id)

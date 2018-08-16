@@ -41,8 +41,8 @@ def create_product(product_name, product_obj):
   db.session.add(product)
   db.session.commit()
   product_stage = ProductStage(id=uuid.uuid4().hex,
-                               hook_url=product_obj['hook_url'],
-                               hook_client_key=product_obj['hook_client_key'],
+                               hook_url="",
+                               hook_client_key="",
                                stage=models.STAGE_DEV,
                                created_time=datetime.datetime.utcnow(),
                                last_updated_time=datetime.datetime.utcnow(),

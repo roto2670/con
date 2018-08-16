@@ -10,11 +10,13 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import os
+import json
 import logging
 import tempfile
 import subprocess
 
 from OpenSSL import crypto
+from intelhex import IntelHex
 
 import apis
 
@@ -62,3 +64,15 @@ def send_noti_key(organization_id, bundle_id, password , content, is_dev):
 def get_res_path():
   path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'res')
   return  path
+
+
+def get_hex_to_json(hex_content):
+  tmp_file = tempfile.mkstemp()[1]
+  with open(tmp_file, 'wb') as f:
+    f.write(hex_content)
+  ih = IntelHex(tmp_file)
+  bin_array = ih.tobinarray()
+  bin_list = bin_array.tolist()
+  ret_json = json.dumps(bin_list)
+  logging.debug("hex to json : %s", ret_json)
+  return ret_json

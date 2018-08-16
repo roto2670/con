@@ -9,3 +9,4 @@ requests
 cryptography
 mysqlclient
 sendgrid
+intelhex
