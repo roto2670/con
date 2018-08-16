@@ -10,6 +10,7 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import os
+import json
 import uuid
 import datetime
 import logging
@@ -120,6 +121,10 @@ def production_sign_in(token):
   invite = in_apis.get_invite_by_email(token['email'])
   if invite:
     user.organization_id = invite.organization_id
+    org = in_apis.get_organization(invite.organization_id)
+    users = json.loads(org.users)
+    users.append(token['email'])
+    org.users = json.dumps(users)
   db.session.commit()
   permission = Permission(id=uuid.uuid4().hex,
                           permission='777',

@@ -180,14 +180,37 @@ def _send_invite(email_addr, product_id):
   key = uuid.uuid4().hex
   auth_url = request.host_url + 'products/confirm?key=' + key + '&o=' + \
       current_user.organization_id
-  content = content.format(auth_url=auth_url)
+  _product = in_apis.get_product(product_id)
+  title = "Invite to {} tester".format(_product.name)
+  msg = "Invite you to {} tester. If you accept the invitation,<br> your Gadget can be used for testing.".format(_product.name)
+  content = content.format(auth_url=auth_url, title=title, msg=msg)
   try:
-    mail.send(email_addr, 'Tester Invite', content)
+    mail.send(email_addr, title, content)
     in_apis.create_invite(email_addr, key, current_user.email,
-                          current_user.organization_id, level=models.TESTER,
+                          current_user.organization_id, level=models.TESTER_PRE_RELEASE,
                           product_id=product_id)
   except:
     logging.exception("Raise error")
+
+
+@blueprint.route('/<product_id>/tester/<tester_id>/change/<level>')
+@login_required
+def change_tester_level(product_id, tester_id, level):
+  tester = in_apis.get_tester(tester_id, product_id)
+  if tester:
+    ret = apis.register_tester(tester.organization_id, product_id, tester.email,
+                               int(level))
+    if ret:
+      tester.level = level
+      return redirect('products/' + product_id + '/tester')
+    else:
+      logging.warn("Failed to change tester level. Id : %s, ret : %s",
+                   tester_id, ret)
+      return redirect('products/' + product_id + '/tester')
+  else:
+    logging.warn("Can not find tester. Id : %s", tester_id)
+    return redirect('products/' + product_id + '/tester')
+
 
 
 @blueprint.route('/<product_id>/tester/<tester_id>/delete')
