@@ -122,9 +122,12 @@ def send_invite():
   key = uuid.uuid4().hex
   auth_url = request.host_url + 'organization/confirm?key=' + key + \
       '&o=' + current_user.organization_id
-  content = content.format(auth_url=auth_url)
+  org = in_apis.get_organization(current_user.organization_id)
+  title = "Invite to {} member".format(org.original_name)
+  msg = "Invite you to {} member. If you accept the invitation, you can develop it as a member of {} in MicroBot Console.".format(org.original_name)
+  content = content.format(auth_url=auth_url, title=title, msg=msg)
   try:
-    mail.send(email_addr, 'Invite', content)
+    mail.send(email_addr, title, content)
     in_apis.create_invite(email_addr, key, current_user.email,
                           current_user.organization_id)
   except:
@@ -142,6 +145,13 @@ def confirm_mail():
     if current_user.is_anonymous:
       return redirect(url_for('login_blueprint.login'))
     else:
+      user = in_apis.get_user(current_user.id)
+      user.organization_id = organization_id
+      org = in_apis.get_organization(organization_id)
+      users = json.loads(org.users)
+      users.append(user.email)
+      org.users = json.dumps(users)
+      db.session.commit()
       return redirect(url_for('home_blueprint.index'))
   else:
     abort(400)

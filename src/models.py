@@ -246,6 +246,10 @@ class Invite(db.Model):
   accepted_time = Column(DateTime)
 
 
+# Tester Level
+TESTER_PRE_RELEASE = 1
+TESTER_DEV = 2
+
 class Tester(db.Model):
 
   __tablename__ = 'tester'
