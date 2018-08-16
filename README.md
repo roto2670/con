@@ -28,6 +28,10 @@
 # Using gunicorn
     gunicorn -w 3 --certfile ssl/console_microbot_is.crt --keyfile ssl/console_microbot_is.key -b 127.0.0.1:5000 run:__app
 
+# Using MySQL for Google Cloud SQL
+    wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+    chmod +x cloud_sql_proxy
+    ./cloud_sql_proxy -instances=protacloud:us-west1:console=tcp:3306 -credential_file=console_db.json
 
 # Reference
 
