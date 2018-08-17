@@ -22,7 +22,7 @@ import models
 from base import db
 from models import Product, ProductStage, Model
 from models import Endpoint, NotiKey, Organization, User
-from models import Invite, Tester, Firmware, FirmwareStage
+from models import Invite, Tester, Firmware
 
 
 # {{{ Product
@@ -367,22 +367,6 @@ def create_firmware(version, user_email, url_path, model_id):
   return firmware
 
 
-def create_firmware_stage(firmware_id, version, stage):
-  firmware_stage = FirmwareStage(id=uuid.uuid4().hex,
-                                 version=version,
-                                 stage=stage,
-                                 last_updated_time=datetime.datetime.utcnow(),
-                                 firmware_id=firmware_id)
-  db.session.add(firmware_stage)
-  db.session.commit()
-  return firmware_stage
-
-
-def get_firmware_stage(id):
-  firmware_stage = FirmwareStage.query.filter_by(id=id).one_or_none()
-  return firmware_stage
-
-
 # }}}
 
 
@@ -438,12 +422,6 @@ def pre_release(product_id):
         firmware.last_updated_user = current_user.email
         firmware.model_id = model.id
 
-        firmware_stage = get_firmware_stage(firmware.firmware_stage.id)
-        make_transient(firmware_stage)
-        firmware_stage.id = uuid.uuid4().hex
-        firmware_stage.last_updated_time = datetime.datetime.utcnow()
-        firmware_stage.firmware_id = firmware.id
-        db.session.add(firmware_stage)
         db.session.add(firmware)
       db.session.add(model)
 

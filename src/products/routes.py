@@ -320,8 +320,6 @@ def upload_firmware(product_id, model_id):
     if ret:
       firmware = in_apis.create_firmware(version, current_user.email, ret,
                                          model.id)
-      firmware_stage = in_apis.create_firmware_stage(firmware.id, version,
-                                                     models.FIRMWARE_DEV)
       return redirect('products/' + product_id + '/model/' + model_id)
     else:
       logging.warn("Raise error. model : %s", model_id)
