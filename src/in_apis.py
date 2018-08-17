@@ -221,8 +221,9 @@ def create_specifications(version, specifications, user_email, organization_id,
   db.session.commit()
 
 
-def update_specifications(id, user_email, specifications):
+def update_specifications(id, user_email, version, specifications):
   specification = get_specifications(id)
+  specification.version = version
   specification.last_updated_time = datetime.datetime.utcnow()
   specification.last_updated_user = user_email
   specification.specifications = specifications

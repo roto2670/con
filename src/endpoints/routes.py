@@ -122,7 +122,7 @@ def upload_header_file(product_id):
     if ret:
       if product_dev_stage.endpoint:
         in_apis.update_specifications(product_dev_stage.endpoint.id,
-                                      current_user.email,
+                                      current_user.email, json_content['version'],
                                       decode_content)
       else:
         in_apis.create_specifications(json_content['version'], decode_content,
