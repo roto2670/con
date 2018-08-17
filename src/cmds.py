@@ -74,11 +74,12 @@ def get_hex_to_json(hex_content):
   ih = IntelHex(tmp_file)
   bin_array = ih.tobinarray()
   bin_list = bin_array.tolist()
-  with open(json_tempfile, 'w') as f:
-    json.dump(bin_list, f)
-  with open(json_tempfile, 'rb') as f:
-    ret_json = f.read()
+  ret_json = json.dump(bin_list)
+  #with open(json_tempfile, 'w') as f:
+    #json.dump(bin_list, f)
+  #with open(json_tempfile, 'rb') as f:
+  #  ret_json = f.read()
   os.remove(tmp_file)
-  os.remove(json_tempfile)
+  #os.remove(json_tempfile)
   logging.debug("hex to json : %s", ret_json)
   return ret_json

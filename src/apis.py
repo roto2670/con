@@ -390,7 +390,7 @@ def register_firmware(product_id, version, model_number, firmware_binary):
   url = BASE_URL + 'products/' + product_id + '/' + version + '/firmware/' + str(model_number)
   # TODO: headers
   headers = {
-      "Content-Type:": "application/octet-stream"
+      "Content-Type": "application/octet-stream"
   }
   try:
     if IS_DEV:
