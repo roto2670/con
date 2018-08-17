@@ -284,7 +284,7 @@ def model_list(product_id):
 def model_info(product_id, model_id):
   _set_product(product_id)
   model = in_apis.get_model(model_id)
-  return render_template('model.html', model=model)
+  return render_template('model.html', model=model, firmware_list=model.firmware_list)
 
 
 @blueprint.route('/<product_id>/model/<model_id>/firmware', methods=['GET', 'POST'])
