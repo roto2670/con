@@ -55,11 +55,22 @@ def specifications(product_id):
                            model_list=model_list)
 
 
+def _build_gadget_dict(gadgets):
+  gadget_dict = {}
+  for _gadget in gadgets:
+    if _gadget['stage'] == 2:  # only dev level
+      for __gadget in _gadget['gadgets']:
+        display = "{} ({})".format(__gadget['name'], _gadget['email'])
+        gadget_dict[__gadget['id']] = display
+  return gadget_dict
+
+
 @blueprint.route('/<product_id>/tests', methods=['GET', 'POST'])
 @login_required
 def tests(product_id):
   _set_product(product_id)
-  gadgets = apis.get_gadget_list(current_user.email)
+  gadgets = apis.get_gadget_list(product_id)
+  gadget_dict = _build_gadget_dict(gadgets)
   product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
   specification_list = []
   if product_dev_stage.endpoint:
@@ -71,18 +82,23 @@ def tests(product_id):
     else:
       selected = None
       content = {}
-    gadget = gadgets[-1] if gadgets else None
+    gadget = None
+    if gadget_dict:
+      _key = list(gadget_dict.keys())[0]
+      gadget = {_key : gadget_dict[_key]}
     return render_template('ep_tests.html', specification_list=specification_list,
-                           gadget_list=gadgets, gadget=gadget,
+                           gadget_dict=gadget_dict, gadget=gadget,
                            selected=selected, content=content)
   else:
     specification_id = request.form['specification']
     selected = in_apis.get_specifications(specification_id)
     content = json.loads(selected.specifications)
 
-    gadget = request.form['gadget']
+    gadget = None
+    if request.form['gadget'] in gadget_dict:
+      gadget = {request.form['gadget'] : gadget_dict[request.form['gadget']]}
     return render_template('ep_tests.html', specification_list=specification_list,
-                           gadget_list=gadgets, gadget=gadget,
+                           gadget_dict=gadget_dict, gadget=gadget,
                            selected=selected, content=content)
 
 

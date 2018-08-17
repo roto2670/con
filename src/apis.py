@@ -44,12 +44,37 @@ def get_user(email_addr):
     return None
 
 
-def get_gadget_list(email_addr):
-  ret = get_user(email_addr)
-  if 'gadgets' in ret:
-    return ret['gadgets']
-  else:
-    return []
+def get_gadget_list(product_id):
+  # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
+  # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.am4og2rdbcu7
+  url = BASE_URL + 'products/' + product_id + "/testers"
+  headers = {}
+  try:
+    if IS_DEV:
+      _test_data = [
+          {'email': 'tester@example.com',
+           'stage': 2,
+           'gadgets': [
+               {
+                   'id': 'testgadget_id',
+                   'mac': 'testgadget_mac',
+                   'name': 'testgadget_name',
+                   'kind': 'testgadget_kind'
+               }
+           ]}
+      ]
+      return _test_data
+    else:
+      resp = requests.get(url, headers=headers)
+      if resp.ok:
+        value = resp.json()
+        return value['v']
+      else:
+        logging.warn("Register android key Response Text : %s", resp.text)
+        return None
+  except:
+    logging.exception("Raise error.")
+    return None
 
 
 # }}}

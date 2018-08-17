@@ -53,13 +53,13 @@
                   <div class="form-group">
                     <label class="control-label col-md-1 col-sm-1 col-xs-1">Gadget</label>
                     <div class="col-md-6 col-sm-6 col-xs-6">
-                      {% if gadget_list %}
+                      {% if gadget_dict %}
                         <select class="form-control" id="gadget" name="gadget" onchange="this.form.submit()">
-                          {% for _gadget in gadget_list %}
-                            {% if gadget and gadget == _gadget %}
-                              <option id="{{ _gadget.id }}" selected>{{ _gadget.name }}</option>
+                          {% for key, value in gadget_dict.items() %}
+                            {% if gadget and key in gadget %}
+                              <option id="{{ key }}" selected>{{ value }}</option>
                             {% else %}
-                              <option id="{{ _gadget.id }}">{{ _gadget.name }}</option>
+                              <option id="{{ key }}">{{ value }}</option>
                             {% endif %}
                           {% endfor %}
                         </select>
