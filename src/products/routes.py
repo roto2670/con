@@ -187,7 +187,7 @@ def _send_invite(email_addr, product_id):
   try:
     mail.send(email_addr, title, content)
     in_apis.create_invite(email_addr, key, current_user.email,
-                          current_user.organization_id, level=models.TESTER_PRE_RELEASE,
+                          current_user.organization_id, level=models.TESTER,
                           product_id=product_id)
   except:
     logging.exception("Raise error")

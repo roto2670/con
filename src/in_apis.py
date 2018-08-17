@@ -277,7 +277,8 @@ def get_invite_list(organization_id):
 
 
 def get_invite_list_by_tester(product_id, organization_id):
-  invite_list = Invite.query.filter_by(level=models.TESTER, product_id=product_id,
+  invite_list = Invite.query.filter_by(level=models.TESTER,
+                                       product_id=product_id,
                                        organization_id=organization_id).all()
   return invite_list
 
