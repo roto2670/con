@@ -69,8 +69,10 @@ def _build_gadget_dict(gadgets):
 @login_required
 def tests(product_id):
   _set_product(product_id)
+  gadget_dict = {}
   gadgets = apis.get_gadget_list(product_id)
-  gadget_dict = _build_gadget_dict(gadgets)
+  if gadgets:
+    gadget_dict = _build_gadget_dict(gadgets)
   product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
   specification_list = []
   if product_dev_stage.endpoint:
