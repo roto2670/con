@@ -58,7 +58,7 @@ def specifications(product_id):
 def _build_gadget_dict(gadgets):
   gadget_dict = {}
   for _gadget in gadgets:
-    if _gadget['stage'] == 2:  # only dev level
+    if _gadget['stage'] == models.STAGE_PRE_RELEASE:
       for __gadget in _gadget['gadgets']:
         display = "{} ({})".format(__gadget['name'], _gadget['email'])
         gadget_dict[__gadget['id']] = display
