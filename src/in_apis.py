@@ -272,12 +272,13 @@ def get_invite_by_email(email):
 
 
 def get_invite_list(organization_id):
-  invite_list = Invite.query.filter_by(organization_id=organization_id).all()
+  invite_list = Invite.query.filter_by(organization_id=organization_id,
+                                       accepted=0).all()
   return invite_list
 
 
 def get_invite_list_by_tester(product_id, organization_id):
-  invite_list = Invite.query.filter_by(level=models.TESTER,
+  invite_list = Invite.query.filter_by(level=models.TESTER, accepted=0,
                                        product_id=product_id,
                                        organization_id=organization_id).all()
   return invite_list
