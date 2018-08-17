@@ -72,7 +72,7 @@
                           {% for firmware in firmware_list %}
                             <tr>
                               <td>{{ firmware.version }}</td>
-                              <td>{{ firmware.product_stage.stage }}</td>
+                              <td>{{ firmware.model.product_stage.stage }}</td>
                               <td>{{ firmware.last_updated_user }}</td>
                               <td>{{ firmware.last_updated_time }}</td>
                             </tr>
