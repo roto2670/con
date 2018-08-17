@@ -292,6 +292,7 @@ def model_info(product_id, model_id):
 def upload_firmware(product_id, model_id):
   referrer = "/products/" + product_id + "/model/" + model_id
   if request.method == "GET":
+    _set_product(product_id)
     model = in_apis.get_model(model_id)
     allow_stage_list = [models.STAGE_DEV]
     pre_release = in_apis.get_product_stage_by_pre_release(product_id)
