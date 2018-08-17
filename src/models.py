@@ -279,4 +279,3 @@ class Firmware(db.Model):
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   model_id = Column(String(75), ForeignKey('model.id'))
-  stage = relationship('FirmwareStage', uselist=False, backref='firmware', cascade="all, delete")
