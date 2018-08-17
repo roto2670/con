@@ -78,5 +78,7 @@ def get_hex_to_json(hex_content):
     json.dump(bin_list, f)
   with open(json_tempfile, 'rb') as f:
     ret_json = f.read()
+  os.remove(tmp_file)
+  os.remove(json_tempfile)
   logging.debug("hex to json : %s", ret_json)
   return ret_json
