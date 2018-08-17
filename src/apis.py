@@ -414,9 +414,9 @@ def register_firmware(product_id, version, model_number, firmware_binary):
 # {{{  Tester
 
 
-def register_tester(organization_id, product_id, tester_mail, stage):
+def register_tester(organization_id, product_id, tester_email, stage):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.pd0151kuq7uk
-  url = BASE_URL + '/developers/' + organization_id + "/users/" + tester_mail
+  url = BASE_URL + '/developers/' + organization_id + "/users/" + tester_email
   headers = {}
   data = {
     product_id: stage
@@ -440,7 +440,7 @@ def register_tester(organization_id, product_id, tester_mail, stage):
 
 def delete_tester(organization_id, tester_email):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.ij1rw8ajky3e
-  url = BASE_URL + '/developers/' + organization_id + "/users/" + tester_mail
+  url = BASE_URL + '/developers/' + organization_id + "/users/" + tester_email
   headers = {}
   try:
     if IS_DEV:
