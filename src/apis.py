@@ -438,16 +438,17 @@ def register_tester(organization_id, product_id, tester_email, stage):
     return None
 
 
-def delete_tester(organization_id, tester_email):
+def delete_tester(organization_id, product_id, tester_email):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.ij1rw8ajky3e
   url = BASE_URL + '/developers/' + organization_id + "/users/" + tester_email
   headers = {}
+  params = {"products": [product_id]}
   try:
     if IS_DEV:
       _test_data = True
       return _test_data
     else:
-      resp = requests.delete(url, headers=headers)
+      resp = requests.delete(url, headers=headers, params=params)
       if resp.ok:
         value = resp.json()
         return value['v']
