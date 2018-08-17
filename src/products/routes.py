@@ -218,7 +218,7 @@ def change_tester_level(product_id, tester_id, level):
 def remove_tester(product_id, tester_id):
   tester = in_apis.get_tester(tester_id, product_id)
   if tester:
-    ret = apis.delete_tester(tester.organization_id, tester.email)
+    ret = apis.delete_tester(tester.organization_id, product_id, tester.email)
     if ret:
       in_apis.delete_tester(tester_id)
     else:
