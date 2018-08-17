@@ -254,15 +254,19 @@ def confirm_mail():
     in_apis.update_invite(key, organization_id)
     tester_info = apis.get_user(invite.email)
     tester_authorized = tester_info['user']['authorized']
-    in_apis.create_tester(invite.email, invite.organization_id,
-                          invite.product_id, tester_authorized)
     # TODO:
     ret = apis.register_tester(organization_id, invite.product_id, invite.email,
                                 models.STAGE_PRE_RELEASE)
-    if tester_authorized:
-      return redirect(url_for('base_blueprint.welcome'))
+    if ret:
+      in_apis.create_tester(invite.email, invite.organization_id,
+                            invite.product_id, tester_authorized,
+                            models.STAGE_PRE_RELEASE)
+      if tester_authorized:
+        return redirect(url_for('base_blueprint.welcome'))
+      else:
+        return redirect(url_for('base_blueprint.welcome_no_ftl'))
     else:
-      return redirect(url_for('base_blueprint.welcome_no_ftl'))
+      abort(500)
   else:
     abort(400)
 

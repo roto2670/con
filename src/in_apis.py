@@ -304,11 +304,11 @@ def delete_invite(invite_id):
 # {{{ Tester
 
 
-def create_tester(email, organization_id, product_id, authorized):
+def create_tester(email, organization_id, product_id, authorized, stage):
   tester = Tester(id=uuid.uuid4().hex,
                   email=email,
                   authorized=authorized,
-                  level=models.TESTER,
+                  level=stage,
                   organization_id=organization_id,
                   product_id=product_id)
   db.session.add(tester)
