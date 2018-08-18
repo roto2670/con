@@ -124,7 +124,7 @@ def send_invite():
       '&o=' + current_user.organization_id
   org = in_apis.get_organization(current_user.organization_id)
   title = "Invite to {} member".format(org.original_name)
-  msg = "Invite you to {} member. If you accept the invitation, you can develop it as a member of {} in MicroBot Console.".format(org.original_name)
+  msg = "Invite you to {} member. If you accept the invitation, you can develop it as a member of {} in MicroBot Console.".format(org.original_name, org.original_name)
   content = content.format(auth_url=auth_url, title=title, msg=msg)
   try:
     mail.send(email_addr, title, content)
