@@ -266,7 +266,7 @@ def get_invite(key, organization_id):
 
 
 def get_invite_by_email(email):
-  invite = Invite.query.filter_by(email=email).one_or_none()
+  invite = Invite.query.filter_by(level=models.MEMBER, email=email).one_or_none()
   return invite
 
 

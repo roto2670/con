@@ -119,7 +119,7 @@ def production_sign_in(token):
   user.last_access_time = datetime.datetime.utcnow()
   user.ip_address = request.remote_addr
   invite = in_apis.get_invite_by_email(token['email'])
-  if invite:
+  if not user.organization_id and invite:
     user.organization_id = invite.organization_id
     org = in_apis.get_organization(invite.organization_id)
     users = json.loads(org.users)
