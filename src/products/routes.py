@@ -77,6 +77,7 @@ def create():
 @login_required
 def create_model(product_id):
   if request.method == "GET":
+    _set_product(product_id)
     parse_ret = urllib.parse.urlparse(request.referrer)
     referrer = parse_ret.path if parse_ret else "/"
     return render_template("model_create.html", referrer=referrer)
@@ -112,6 +113,13 @@ def create_model(product_id):
         return redirect('products/' + product_id + '/general')
       else:
         abort(500)
+
+
+@blueprint.route('/<product_id>/delete', methods=['GET', 'POST'])
+@login_required
+def delete_product(product_id):
+  in_apis.delete_product(product_id)
+  return redirect("/organization")
 
 
 @blueprint.route('/<product_id>/model/<model_id>/delete', methods=['GET', 'POST'])
@@ -276,7 +284,12 @@ def confirm_mail():
 def model_list(product_id):
   _set_product(product_id)
   dev_product = in_apis.get_product_stage_by_dev(product_id)
-  return render_template('model_list.html', model_list=dev_product.model_list)
+  release_product = in_apis.get_product_stage_by_release(product_id)
+  release_list = []
+  if release_product:
+    release_list = release_product.model_list
+  return render_template('model_list.html', model_list=dev_product.model_list,
+                         release_list=release_list)
 
 
 @blueprint.route('/<product_id>/model/<model_id>', methods=['GET'])

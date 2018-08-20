@@ -9,6 +9,7 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import json
 import uuid
 import datetime
 
@@ -88,6 +89,13 @@ def get_product_stage_by_archive(product_id):
   return product_stage
 
 
+def delete_product(id):
+  product = get_product(id)
+  if product:
+    db.session.delete(product)
+    db.session.commit()
+
+
 def create_model(model_name, model_code, product_stage_id, user_email):
   model = Model(id=uuid.uuid4().hex,
                 code=model_code,
@@ -130,6 +138,22 @@ def delete_model(id):
 # {{{  Organization
 
 
+def create_organization(owner_email, organization_name, ret):
+  # ret -> developer object from cloud server
+  org = Organization(id=ret['id'],
+                     users=json.dumps([owner_email]),
+                     products=json.dumps(ret['products']),
+                     tokens=json.dumps(ret['tokens']),
+                     kinds=json.dumps(ret['kinds']),
+                     name=organization_name.lower(),
+                     original_name=organization_name,
+                     created_time=datetime.datetime.utcnow(),
+                     last_updated_time=datetime.datetime.utcnow())
+  db.session.add(org)
+  db.session.commit()
+  return org
+
+
 def get_organization(organization_id):
   org = Organization.query.filter_by(id=organization_id).one_or_none()
   return org
@@ -138,6 +162,13 @@ def get_organization(organization_id):
 def get_organization_by_name(name):
   org = Organization.query.filter_by(name=name.lower()).one_or_none()
   return org
+
+
+def delete_organization(organization_id):
+  org = Organization.query.filter_by(id=organization_id).one_or_none()
+  if org:
+    db.session.delete(org)
+    db.session.commit()
 
 
 # }}}
@@ -297,6 +328,16 @@ def delete_invite(invite_id):
   if invite:
     db.session.delete(invite)
     db.session.commit()
+
+
+def delete_invite_by_product(product_id):
+  ret = Invite.query.filter_by(product_id=product_id).delete()
+  db.session.commit()
+
+
+def delete_invite_by_organization(organization_id):
+  ret = Invite.query.filter_by(organization_id=organization_id).delete()
+  db.session.commit()
 
 
 # }}}

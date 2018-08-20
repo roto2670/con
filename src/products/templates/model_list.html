@@ -26,6 +26,7 @@
                     <tr>
                       <th>Name</th>
                       <th>Code</th>
+                      <th>Delete</th>
                     </tr>
                   </thead>
 
@@ -34,6 +35,11 @@
                       <tr>
                         <td><a href="/products/{{ current_product.id }}/model/{{ model.id }}">{{ model.name }}</a></td>
                         <td>{{ model.code }}</td>
+                        {% if current_user.level == 0 and not release_list %}
+                          <td><a href="/products/{{ current_product.id }}/model/{{ model.id }}/delete"><i class="fa fa-remove"></i></a></td>
+                        {% else %}
+                          <td></td>
+                        {% endif %}
                       </tr>
                     {% endfor %}
                   </tbody>

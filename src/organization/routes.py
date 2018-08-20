@@ -12,7 +12,6 @@
 import os
 import json
 import uuid
-import datetime
 import logging
 
 from flask import abort, render_template, request, redirect, url_for
@@ -25,7 +24,6 @@ import in_apis
 import models
 import mail
 from base import db
-from models import Organization
 from organization import blueprint
 
 
@@ -38,10 +36,17 @@ def default_route():
     product_list = in_apis.get_product_list(current_user.organization_id)
     user_list = in_apis.get_user_list(current_user.organization_id)
     invite_list = in_apis.get_invite_list(current_user.organization_id)
+    release_list = []
+    for product in product_list:
+      _release_list = in_apis.get_product_stage_by_release(product.id)
+      if _release_list:
+        for _release in _release_list:
+          release_list.append(_release.id)
     return render_template("organization.html", org=org,
                            noti_key_list=noti_key_list, user_list=user_list,
                            product_list=product_list,
-                           invite_list=invite_list)
+                           invite_list=invite_list,
+                           release_list=release_list)
   else:
     return redirect("/organization/create")
 
@@ -65,17 +70,7 @@ def create():
     else:
       ret = apis.create_org(owner_email)
       if ret:
-        org = Organization(id=ret['id'],
-                           users=json.dumps([owner_email]),
-                           products=json.dumps(ret['products']),
-                           tokens=json.dumps(ret['tokens']),
-                           kinds=json.dumps(ret['kinds']),
-                           name=name.lower(),
-                           original_name=name,
-                           created_time=datetime.datetime.utcnow(),
-                           last_update=datetime.datetime.utcnow())
-        db.session.add(org)
-        db.session.commit()
+        org = in_apis.create_organization(owner_email, name, ret)
         user = in_apis.get_user_by_email(owner_email)
         if user:
           user.organization_id = ret['id']
@@ -160,5 +155,26 @@ def confirm_mail():
 @blueprint.route('/invite/<invite_id>')
 @login_required
 def delete_invite(invite_id):
-  in_apis.delete_invite(invite_id)
-  return redirect('organization')
+  try:
+    in_apis.delete_invite(invite_id)
+    return redirect('organization')
+  except:
+    logging.exception("Raise error while delete invite. Id : %s", invite_id)
+    abort(500)
+
+
+@blueprint.route('/delete', methods=['POST'])
+@login_required
+def delete_organization():
+  if current_user.level == models.OWNER:
+    try:
+      organization_id = current_user.organization_id
+      in_apis.delete_invite_by_organization(organization_id)
+      in_apis.delete_organization(organization_id)
+      return redirect('/')
+    except:
+      logging.exception("Raise error while delete organization. Id : %s",
+                        current_user.organization_id)
+      abort(500)
+  else:
+    return redirect('/')

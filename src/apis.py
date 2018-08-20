@@ -44,7 +44,7 @@ def get_user(email_addr):
     return None
 
 
-def get_gadget_list(product_id):
+def get_gadget_list_by_tester(product_id):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.am4og2rdbcu7
   url = BASE_URL + 'products/' + product_id + "/testers"
@@ -62,6 +62,41 @@ def get_gadget_list(product_id):
                    'kind': 'testgadget_kind'
                }
            ]}
+      ]
+      return _test_data
+    else:
+      resp = requests.get(url, headers=headers)
+      if resp.ok:
+        value = resp.json()
+        return value['v']
+      else:
+        logging.warn("Register android key Response Text : %s", resp.text)
+        return None
+  except:
+    logging.exception("Raise error.")
+    return None
+
+
+def get_gadget_list(product_id):
+  url = BASE_URL + 'products/' + product_id + "/gadgets"
+  headers = {}
+  try:
+    if IS_DEV:
+      _test_data = [
+          {"id": "b405b03cc357d3cc18076a4d3735b292", "mac": "f2d63434da93",
+           "name": "mibs(f2d6)", "kind": "mibs", "firmware_version": "1.1.9",
+           "model_number": None, "model_name": None, "sdk_version": "0.1",
+           "hub_id": "f1bac4169156cd1f29da073c51de33d5",
+           "account_id": "dbb0cf4a18a37f79f13126e4407f1d75",
+           "user_id": "d3e4022166cf428218f87aa8a1759aee", "status": 1,
+           "rssi": 0, "battery": 90},
+          {"id": "b405b03cc357d3cc18076a4d3735b2e2", "mac": "f2d63434da93",
+           "name": "mibs(f2d6)", "kind": "mibs", "firmware_version": "1.0.9",
+           "model_number": None, "model_name": None, "sdk_version": "0.1",
+           "hub_id": "f1bac4169156cd1f29da073c51de33e5",
+           "account_id": "dbb0cf4a18a37f79f13126e440ef1d75",
+           "user_id": "d3e4022166cf428218f87aa8a1759eee", "status": 0,
+           "rssi": 0, "battery": 90}
       ]
       return _test_data
     else:

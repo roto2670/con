@@ -70,7 +70,7 @@ def _build_gadget_dict(gadgets):
 def tests(product_id):
   _set_product(product_id)
   gadget_dict = {}
-  gadgets = apis.get_gadget_list(product_id)
+  gadgets = apis.get_gadget_list_by_tester(product_id)
   if gadgets:
     gadget_dict = _build_gadget_dict(gadgets)
   product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
