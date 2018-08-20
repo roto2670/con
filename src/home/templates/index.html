@@ -50,8 +50,8 @@
                 </div>
                 <div class="w_center w_55">
                   <div class="progress">
-                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{ ((value / infos['firmware']|length) * 100)|int }}"
-                       aria-valuemin="0" aria-valuemax="100" style="width: {{ ((value / infos['firmware']|length) * 100)|int }}%;">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{ ((value / infos['total_firmware']|length) * 100)|int }}"
+                       aria-valuemin="0" aria-valuemax="100" style="width: {{ ((value / infos['total_firmware']|length) * 100)|int }}%;">
                       <span class="sr-only">{{ value }}</span>
                     </div>
                   </div>

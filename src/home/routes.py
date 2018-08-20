@@ -44,11 +44,13 @@ def _build_product_info(product_id):
       'total_gadgets': 0,
       'offline': 0,
       'online': 0,
-      'firmware': {}
+      'firmware': {},
+      'total_firmware': 0
   }
   if gadget_list:
     _tmp_user = []
     _tmp_firmware = {}
+    _tmp_total_firmware = 0
     _info['total_gadgets'] = len(gadget_list)
     for gadget in gadget_list:
       if gadget['status']:
@@ -58,12 +60,15 @@ def _build_product_info(product_id):
       if gadget['firmware_version']:
         if gadget['firmware_version'] in _tmp_firmware:
           _tmp_firmware[gadget['firmware_version']] += 1
+          _tmp_total_firmware += 1
         else:
           _tmp_firmware[gadget['firmware_version']] = 1
+          _tmp_total_firmware += 1
       if gadget['user_id'] and gadget['user_id'] not in _tmp_user:
         _tmp_user.append(gadget['user_id'])
     _info['total_users'] = len(_tmp_user)
     _info['firmware'] = _tmp_firmware
+    _info['total_firmware'] = _tmp_total_firmware
     _info['created_time'] = time.time()
     return _info
   else:
@@ -97,10 +102,7 @@ def index():
       current_product = product_list[-1]
       base.routes.set_current_product(current_product)
   infos = _get_product_info(current_product.id)
-  org = in_apis.get_organization(current_user.organization_id)
-  return render_template('index.html', users=json.loads(org.users),
-                         products=json.loads(org.products),
-                         infos=infos)
+  return render_template('index.html', infos=infos)
 
 
 @blueprint.route('/<template>')
