@@ -62,6 +62,7 @@ def _build_product_info(product_id):
           _tmp_firmware[gadget['firmware_version']] = 1
       if gadget['user_id'] and gadget['user_id'] not in _tmp_user:
         _tmp_user.append(gadget['user_id'])
+    _info['total_users'] = len(_tmp_user)
     _info['firmware'] = _tmp_firmware
     _info['created_time'] = time.time()
     return _info
