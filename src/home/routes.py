@@ -10,14 +10,12 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import time
-import json
 import logging
 
 from flask import render_template
 from flask_login import login_required, current_user
 
 import apis
-import in_apis
 import base.routes
 from home import blueprint
 
@@ -97,7 +95,6 @@ def index():
   current_product = base.routes.about_product()['current_product']
   if not current_product:
     product_list = base.routes.about_product()['product_list']
-    logging.info("## product_list : %s", product_list)
     if product_list:
       current_product = product_list[-1]
       base.routes.set_current_product(current_product)

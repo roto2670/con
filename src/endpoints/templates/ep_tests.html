@@ -9,7 +9,10 @@
     function testCall(productId, gadget, endpointName) {
       jQuery.post("/endpoints/" + productId + "/testcall/" + gadget + "/" + endpointName, "{}")
       .done(function(data){
-         document.getElementById("resp" + endpointName).innerHTML = data;
+        var jsonData = JSON.parse(data);
+        document.getElementById("resp" + endpointName + "status").innerHTML = jsonData.status;
+        document.getElementById("resp" + endpointName + "time").innerHTML = jsonData.time;
+        document.getElementById("resp" + endpointName + "ret").innerHTML = jsonData.ret;
       });
     }
   </script>
@@ -99,7 +102,9 @@
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
                               <h3>Response</h3>
-                              <div id="resp{{ request['name'] }}"></div>
+                              <div id="resp{{ request['name'] }}status"></div>
+                              <div id="resp{{ request['name'] }}time"></div>
+                              <div id="resp{{ request['name'] }}ret"></div>
                             </div>
                           </div>
                         </div>
@@ -127,7 +132,9 @@
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
                               <h3>Response</h3>
-                              <div id="resp{{ event['name'] }}"></div>
+                              <div id="resp{{ event['name'] }}status"></div>
+                              <div id="resp{{ event['name'] }}time"></div>
+                              <div id="resp{{ event['name'] }}ret"></div>
                             </div>
                           </div>
                         </div>

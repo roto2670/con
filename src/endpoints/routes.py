@@ -10,6 +10,7 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import json
+import time
 import logging
 
 from flask import abort, render_template, redirect, request, Response
@@ -191,14 +192,26 @@ def test_call(product_id, gadget, endpoint_name):
       "args": args,
       "kwargs": kwargs
   }
+  st_time = time.time()
   task_id = apis.call_endpoint(gadget, endpoint_name, data)
   logging.info("%s endpoint task id : %s", endpoint_name, task_id)
   if task_id:
     ret = apis.get_endpoint_result(gadget, task_id)
+    end_time = time.time()
     logging.info("%s endpoint result : %s", endpoint_name, ret)
-    return json.dumps(ret)
+    ret_data = {
+        "status": "Success",
+        "time": round(end_time - st_time, 3),
+        "ret": ret
+    }
   else:
-    return "Fail"
+    end_time = time.time()
+    ret_data = {
+        "status": "Fail",
+        "time": round(end_time - st_time, 3),
+        "ret": {}
+    }
+  return json.dumps(ret_data)
 
 
 def _set_product(product_id):

@@ -11,3 +11,4 @@ mysqlclient
 sendgrid
 intelhex
 PyMySql
+google-cloud-datastore
