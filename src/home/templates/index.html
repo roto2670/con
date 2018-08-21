@@ -67,7 +67,6 @@
         </div>
       </div>
 
-
       <div class="col-md-4 col-sm-4 col-xs-12">
         <div class="x_panel tile fixed_height_320 overflow_hidden">
           <div class="x_title">
@@ -108,9 +107,51 @@
         </div>
       </div>
 
-
+      <div class="col-md-4 col-sm-4 col-xs-12">
+        <div class="x_panel tile fixed_height_320">
+          <div class="x_title">
+            <h2>Battery Average</h2>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div class="dashboard-widget-content">
+              <div class="center-margin center-align">
+                  <canvas width="250" height="140" id="chart_gauge_001" class="" style="height: 140px;"></canvas>
+                  <div class="goal-wrapper">
+                    <span id="gauge-text001" class="gauge-value">0</span>
+                    <span class="gauge-value">%</span>
+                    <span id="goal-text" class="goal-value margin-left-10em">100%</span>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
+
+
+      <!--
+
+    <div class="row">
+        <div class="col-md-4 col-sm-4 col-xs-12">
+            <div class="x_panel tile fixed_height_320">
+              <div class="x_title">
+                <h2>Name</h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <div class="dashboard-widget-content">
+                  <div class="center-margin center-align">
+                      <canvas width="250" height="140" id="word-cloud" class="" style="width: 140px;height: 140px;"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+      -->
+
   </div>
 {% endblock content %}
 
@@ -138,6 +179,9 @@
   <script src="{{ url_for('static', filename='vendors/jqvmap/dist/jquery.vmap.js') }}"></script>
   <script src="{{ url_for('static', filename='vendors/jqvmap/dist/maps/jquery.vmap.world.js') }}"></script>
   <script src="{{ url_for('static', filename='vendors/jqvmap/examples/js/jquery.vmap.sampledata.js') }}"></script>
+  <!-- D3 cloud -->
+  <script src="{{ url_for('static', filename='vendors/d3/d3.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendors/d3-cloud/build/d3.layout.cloud.js') }}"></script>
 
   <script>
     function connectionGraph(offData, onData) {
@@ -173,6 +217,55 @@
 
     }
     connectionGraph('{{ infos["offline"] }}', '{{ infos["online"] }}');
+
+    function averageBattery(battery) {
+      var chart_gauge_settings = {
+        lines: 12,
+        angle: 0,
+        lineWidth: 0.4,
+        pointer: {
+          length: 0.75,
+          strokeWidth: 0.042,
+          color: '#1D212A'
+        },
+        limitMax: 'true',
+        colorStart: '#1ABC9C',
+        colorStop: '#1ABC9C',
+        strokeColor: '#F0F3F3',
+        generateGradient: true
+      };
+        var chart_gauge_001_elem = document.getElementById('chart_gauge_001');
+        var chart_gauge_001 = new Gauge(chart_gauge_001_elem).setOptions(chart_gauge_settings);
+        chart_gauge_001.maxValue = 100;
+        chart_gauge_001.animationSpeed = 20;
+        chart_gauge_001.set(parseInt(battery));
+        chart_gauge_001.setTextField(document.getElementById("gauge-text001"));
+    }
+    averageBattery('{{ infos["avg_battery"] }}');
+
+    function nameCloud(nameList) {
+      test = [{"word": "hi"}, {"word": "hello"}]
+
+      d3.layout.cloud().size([500,500])
+        .words(test.map(function(d) {
+          return {text: d.word, size: 0};
+        }))
+        .on("end", draw)
+        .start();
+
+      function draw(words) {
+        d3.select("word-cloud").append("svg")
+          .attr("width", 300)
+          .attr("height", 300)
+          .append("g")
+          .selectAll("text")
+          .data(words)
+          .enter().append("text")
+          .text(function(d) { return d.text; });
+      }
+    }
+    nameCloud('{{ infos["name_list"] }}');
+
   </script>
 
 {% endblock javascripts %}
