@@ -165,6 +165,7 @@
           </div>
 
       <!--
+      -->
 
         <div class="col-md-4 col-sm-4 col-xs-12">
             <div class="x_panel tile fixed_height_320">
@@ -173,15 +174,19 @@
                 <div class="clearfix"></div>
               </div>
               <div class="x_content">
+                <div id="wordcloud" class="dashboard-widget-content">
+                </div>
+                <!--
+
                 <div class="dashboard-widget-content">
                   <div class="center-margin center-align">
                       <canvas width="250" height="140" id="word-cloud" class="" style="width: 140px;height: 140px;"></canvas>
                   </div>
                 </div>
+                -->
               </div>
             </div>
           </div>
-      -->
     </div>
 
   </div>
@@ -214,6 +219,7 @@
   <!-- D3 cloud -->
   <script src="{{ url_for('static', filename='vendors/d3/d3.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendors/d3-cloud/build/d3.layout.cloud.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendors/d3-wordcloud/d3.wordcloud.js') }}"></script>
 
   <script>
     function connectionGraph(offData, onData) {
@@ -276,28 +282,14 @@
     }
     averageBattery('{{ infos["avg_battery"] }}');
 
-    function nameCloud(nameList) {
-      test = [{"word": "hi"}, {"word": "hello"}]
-
-      d3.layout.cloud().size([500,500])
-        .words(test.map(function(d) {
-          return {text: d.word, size: 0};
-        }))
-        .on("end", draw)
+    function nameCloud1(nameList) {
+      d3.wordcloud()
+        .size([300,200])
+        .selector('#wordcloud')
+        .words(JSON.parse(nameList))
         .start();
-
-      function draw(words) {
-        d3.select("word-cloud").append("svg")
-          .attr("width", 300)
-          .attr("height", 300)
-          .append("g")
-          .selectAll("text")
-          .data(words)
-          .enter().append("text")
-          .text(function(d) { return d.text; });
-      }
     }
-    nameCloud('{{ infos["name_list"] }}');
+    nameCloud1('{{ infos["name_list"]|safe }}');
 
   </script>
 

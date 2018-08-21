@@ -10,6 +10,7 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import time
+import json
 import logging
 
 from flask import render_template
@@ -79,14 +80,16 @@ def _build_product_info(product_id):
         else:
           _tmp_model_dict[gadget['model_name']] = 1
       _tmp_battery += gadget.get('battery', 0)
-      _tmp_name_list.append(gadget['name'])
+      # TODO: size check
+      _name_value = {'text': gadget['name'], 'size': 2}
+      _tmp_name_list.append(_name_value)
 
     _info['total_users'] = len(_tmp_user)
     _info['firmware'] = _tmp_firmware
     _info['total_firmware'] = _tmp_total_firmware
     _info['created_time'] = time.time()
     _info['avg_battery'] = int((_tmp_battery / len(gadget_list)))
-    _info['name_list'] = _tmp_name_list
+    _info['name_list'] = json.dumps(_tmp_name_list)
     _info['model'] = _tmp_model_dict
     return _info
   else:
