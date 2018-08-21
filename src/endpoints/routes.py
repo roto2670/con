@@ -86,11 +86,13 @@ def tests(product_id):
       selected = None
       content = {}
     gadget = None
+    gadget_id = None
     if gadget_dict:
       _key = list(gadget_dict.keys())[0]
       gadget = {_key : gadget_dict[_key]}
+      gadget_id = _key
     return render_template('ep_tests.html', specification_list=specification_list,
-                           gadget_dict=gadget_dict, gadget=gadget,
+                           gadget_dict=gadget_dict, gadget=gadget, gadget_id=gadget_id,
                            selected=selected, content=content)
   else:
     specification_id = request.form['specification']

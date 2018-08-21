@@ -94,7 +94,7 @@
                       </a>
                       <div id="r{{ request['name'] }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                         <div class="panel-body">
-                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget.keys()|list }}', '{{ request["name"]}}');">Test</button>
+                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget_id }}', '{{ request["name"]}}');">Test</button>
                           <!-- request? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
@@ -126,7 +126,7 @@
                       </a>
                       <div id="e{{ event['name'] }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                         <div class="panel-body">
-                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget.keys()|list }}', '{{ event["name"]}}');">Test</button>
+                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget_id }}', '{{ event["name"]}}');">Test</button>
                           <!-- request? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
