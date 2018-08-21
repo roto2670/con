@@ -45,7 +45,8 @@ def _build_product_info(product_id):
       'firmware': {},
       'total_firmware': 0,
       'avg_battery': 0,
-      'name_list': []
+      'name_list': [],
+      'model': {}
   }
   if gadget_list:
     _tmp_user = []
@@ -53,12 +54,14 @@ def _build_product_info(product_id):
     _tmp_total_firmware = 0
     _tmp_battery = 0
     _tmp_name_list = []
+    _tmp_model_dict = {}
     _info['total_gadgets'] = len(gadget_list)
     for gadget in gadget_list:
       if gadget['status']:
         _info['online'] += 1
       else:
         _info['offline'] += 1
+
       if gadget['firmware_version']:
         if gadget['firmware_version'] in _tmp_firmware:
           _tmp_firmware[gadget['firmware_version']] += 1
@@ -66,8 +69,15 @@ def _build_product_info(product_id):
         else:
           _tmp_firmware[gadget['firmware_version']] = 1
           _tmp_total_firmware += 1
+
       if gadget['user_id'] and gadget['user_id'] not in _tmp_user:
         _tmp_user.append(gadget['user_id'])
+
+      if gadget['model_name']:
+        if gadget['model_name'] in _tmp_model_dict:
+          _tmp_model_dict[gadget['model_name']] += 1
+        else:
+          _tmp_model_dict[gadget['model_name']] = 1
       _tmp_battery += gadget.get('battery', 0)
       _tmp_name_list.append(gadget['name'])
 
@@ -77,6 +87,7 @@ def _build_product_info(product_id):
     _info['created_time'] = time.time()
     _info['avg_battery'] = int((_tmp_battery / len(gadget_list)))
     _info['name_list'] = _tmp_name_list
+    _info['model'] = _tmp_model_dict
     return _info
   else:
     return _info

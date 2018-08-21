@@ -85,7 +85,7 @@ def get_gadget_list(product_id):
       _test_data = [
           {"id": "b405b03cc357d3cc18076a4d3735b292", "mac": "f2d63434da93",
            "name": "mibs(f2d6)", "kind": "mibs", "firmware_version": "1.1.9",
-           "model_number": None, "model_name": None, "sdk_version": "0.1",
+           "model_number": 512, "model_name": 512, "sdk_version": "0.1",
            "hub_id": "f1bac4169156cd1f29da073c51de33d5",
            "account_id": "dbb0cf4a18a37f79f13126e4407f1d75",
            "user_id": "d3e4022166cf428218f87aa8a1759aee", "status": 1,

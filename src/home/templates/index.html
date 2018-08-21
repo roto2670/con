@@ -130,10 +130,42 @@
 
     </div>
 
+    <div class="row">
+
+        <div class="col-md-4 col-sm-4 col-xs-12">
+            <div class="x_panel tile fixed_height_320">
+              <div class="x_title">
+                <h2>Model</h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <h4>Model Usage across name</h4>
+                {% for key, value in infos['model'].items() %}
+                  <div class="widget_summary">
+                    <div class="w_left w_25">
+                      <span>{{ key }}</span>
+                    </div>
+                    <div class="w_center w_55">
+                      <div class="progress">
+                        <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{ ((value / infos['total_gadgets']) * 100)|int }}"
+                           aria-valuemin="0" aria-valuemax="100" style="width: {{ ((value / infos['total_gadgets']) * 100)|int }}%;">
+                          <span class="sr-only">{{ value }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="w_right w_20">
+                      <span>{{ value }}</span>
+                    </div>
+                    <div class="clearfix"></div>
+                  </div>
+                {% endfor %}
+
+              </div>
+            </div>
+          </div>
 
       <!--
 
-    <div class="row">
         <div class="col-md-4 col-sm-4 col-xs-12">
             <div class="x_panel tile fixed_height_320">
               <div class="x_title">
@@ -149,8 +181,8 @@
               </div>
             </div>
           </div>
-    </div>
       -->
+    </div>
 
   </div>
 {% endblock content %}
