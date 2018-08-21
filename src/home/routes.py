@@ -101,12 +101,15 @@ def _get_product_info(product_id):
     old_time = DASHBOARD_CACHE[product_id]['created_time']
     r_time = time.time() - old_time
     if r_time >= REFRESH_TIME:
+      logging.debug("# Refresh product info. : %s", product_id)
       ret = _build_product_info(product_id)
       DASHBOARD_CACHE['product_id'] = ret
       return ret
     else:
+      logging.debug("# Already product info. : %s", product_id)
       return DASHBOARD_CACHE['product_id']
   else:
+    logging.debug("# New product info. : %s", product_id)
     ret = _build_product_info(product_id)
     DASHBOARD_CACHE['product_id'] = ret
     return ret
