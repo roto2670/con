@@ -139,7 +139,6 @@ def _get_endpoint_info(product_id):
     DATA_CACHE['time'] = time.time()
     DATA_CACHE['data'] = ret
 
-  product_id = 'mibp'
   if product_id in DATA_CACHE['data']:
     ret = DATA_CACHE['data'][product_id]
     if product_id == 'mibp':
