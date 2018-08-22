@@ -74,9 +74,9 @@
                               <td>{{ firmware.version }}</td>
                               {% if firmware.model.product_stage.stage == 0 %}
                                 <td>Release</td>
-                              {% else if firmware.model.product_stage.stage == 1 %}
+                              {% elif firmware.model.product_stage.stage == 1 %}
                                 <td>Pre Release</td>
-                              {% else if firmware.model.product_stage.stage == 2 %}
+                              {% elif firmware.model.product_stage.stage == 2 %}
                                 <td>Dev</td>
                               {% else %}
                                 <td>Archive</td>
