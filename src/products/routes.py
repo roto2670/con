@@ -210,6 +210,7 @@ def change_tester_level(product_id, tester_id, level):
                                int(level))
     if ret:
       tester.level = level
+      db.session.commit()
       return redirect('products/' + product_id + '/tester')
     else:
       logging.warn("Failed to change tester level. Id : %s, ret : %s",
@@ -261,7 +262,7 @@ def confirm_mail():
   if invite:
     in_apis.update_invite(key, organization_id)
     tester_info = apis.get_user(invite.email)
-    tester_authorized = tester_info['user']['authorized']
+    tester_authorized = tester_info['user']['authorized'] if tester_info else False
     # TODO:
     ret = apis.register_tester(organization_id, invite.product_id, invite.email,
                                 models.STAGE_PRE_RELEASE)
@@ -327,7 +328,7 @@ def upload_firmware(product_id, model_id):
     upload_file = request.files['file']
     content = upload_file.read()
     model = in_apis.get_model(model_id)
-    version = model.product_stage.endpoint.version
+    version = model.product_stage.endpoint.version + "." + str(len(model.firmware_list))
     ret_json = cmds.get_hex_to_json(content)
     ret = apis.register_firmware(product_id, version, model.code, ret_json)
     if ret:

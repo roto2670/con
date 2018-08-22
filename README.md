@@ -48,3 +48,10 @@
 ### https://github.com/klokantech/flask-firebase
 ### https://cloud.google.com/sql/docs/mysql/connect-external-app#python
 ### https://github.com/GoogleCloudPlatform/getting-started-python/blob/504b3d550b551502cfe96f32542c31b232135eff/2-structured-data/config.py
+
+
+# WordCloud
+
+### https://github.com/d3/d3
+### https://github.com/jasondavies/d3-cloud
+### https://github.com/wvengen/d3-wordcloud

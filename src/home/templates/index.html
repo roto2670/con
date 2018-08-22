@@ -33,7 +33,7 @@
 
     <br />
 
-    <div class="row">
+    <div class="row">  <!-- Row 1-->
 
       <div class="col-md-4 col-sm-4 col-xs-12">
         <div class="x_panel tile fixed_height_320">
@@ -128,66 +128,186 @@
         </div>
       </div>
 
-    </div>
+    </div>  <!-- End ROW 1 -->
 
-    <div class="row">
 
-        <div class="col-md-4 col-sm-4 col-xs-12">
-            <div class="x_panel tile fixed_height_320">
-              <div class="x_title">
-                <h2>Model</h2>
+    <div class="row"> <!-- Row 2 -->
+
+      <div class="col-md-4 col-sm-4 col-xs-12">
+        <div class="x_panel tile fixed_height_320">
+          <div class="x_title">
+            <h2>Model</h2>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <h4>Model Usage across name</h4>
+            {% for key, value in infos['model'].items() %}
+              <div class="widget_summary">
+                <div class="w_left w_25">
+                  <span>{{ key }}</span>
+                </div>
+                <div class="w_center w_55">
+                  <div class="progress">
+                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{ ((value / infos['total_gadgets']) * 100)|int }}"
+                        aria-valuemin="0" aria-valuemax="100" style="width: {{ ((value / infos['total_gadgets']) * 100)|int }}%;">
+                      <span class="sr-only">{{ value }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="w_right w_20">
+                  <span>{{ value }}</span>
+                </div>
                 <div class="clearfix"></div>
               </div>
-              <div class="x_content">
-                <h4>Model Usage across name</h4>
-                {% for key, value in infos['model'].items() %}
-                  <div class="widget_summary">
-                    <div class="w_left w_25">
-                      <span>{{ key }}</span>
-                    </div>
-                    <div class="w_center w_55">
-                      <div class="progress">
-                        <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{ ((value / infos['total_gadgets']) * 100)|int }}"
-                           aria-valuemin="0" aria-valuemax="100" style="width: {{ ((value / infos['total_gadgets']) * 100)|int }}%;">
-                          <span class="sr-only">{{ value }}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="w_right w_20">
-                      <span>{{ value }}</span>
-                    </div>
-                    <div class="clearfix"></div>
-                  </div>
-                {% endfor %}
+            {% endfor %}
 
-              </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-4 col-xs-12">
+        <div class="x_panel tile fixed_height_320">
+          <div class="x_title">
+            <h2>Name</h2>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div id="wordcloud" class="dashboard-widget-content">
             </div>
           </div>
+        </div>
+      </div>
 
       <!--
-      -->
-
-        <div class="col-md-4 col-sm-4 col-xs-12">
-            <div class="x_panel tile fixed_height_320">
-              <div class="x_title">
-                <h2>Name</h2>
-                <div class="clearfix"></div>
-              </div>
-              <div class="x_content">
-                <div id="wordcloud" class="dashboard-widget-content">
-                </div>
-                <!--
-
-                <div class="dashboard-widget-content">
-                  <div class="center-margin center-align">
-                      <canvas width="250" height="140" id="word-cloud" class="" style="width: 140px;height: 140px;"></canvas>
-                  </div>
-                </div>
-                -->
-              </div>
+      <div class="col-md-4 col-sm-4 col-xs-12">
+        <div class="x_panel tile fixed_height_320">
+          <div class="x_title">
+            <h2>Performace Endpoint</h2>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div class="w_center w_66">
+              <canvas id="performance1" class="performance1" height="200" width="200" style="margin: 15px 10px 10px 0"></canvas>
             </div>
           </div>
-    </div>
+        </div>
+      </div>
+      -->
+
+    </div> <!-- End Row 2-->
+
+
+    <div class="row"> <!-- Row 3
+
+        <div class="col-md-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Transaction Summary <small>Weekly progress</small></h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="col-md-9 col-sm-12 col-xs-12">
+                <div class="demo-container" style="height:280px">
+                  <div id="chart_plot_02" class="demo-placeholder"></div>
+                </div>
+                <div class="tiles">
+                  <div class="col-md-4 tile">
+                    <span>Total Sessions</span>
+                    <h2>231,809</h2>
+                    <span class="sparkline11 graph" style="height: 160px;">
+                         <canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
+                    </span>
+                  </div>
+                  <div class="col-md-4 tile">
+                    <span>Total Revenue</span>
+                    <h2>$231,809</h2>
+                    <span class="sparkline22 graph" style="height: 160px;">
+                          <canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
+                    </span>
+                  </div>
+                  <div class="col-md-4 tile">
+                    <span>Total Sessions</span>
+                    <h2>231,809</h2>
+                    <span class="sparkline11 graph" style="height: 160px;">
+                           <canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
+                    </span>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="col-md-3 col-sm-12 col-xs-12">
+                <div>
+                  <div class="x_title">
+                    <h2>Top Profiles</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <ul class="list-unstyled top_profiles scroll-view">
+                    <li class="media event">
+                      <a class="pull-left border-aero profile_thumb">
+                        <i class="fa fa-user aero"></i>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#">Ms. Mary Jane</a>
+                        <p><strong>$2300. </strong> Agent Avarage Sales </p>
+                        <p> <small>12 Sales Today</small>
+                        </p>
+                      </div>
+                    </li>
+                    <li class="media event">
+                      <a class="pull-left border-green profile_thumb">
+                        <i class="fa fa-user green"></i>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#">Ms. Mary Jane</a>
+                        <p><strong>$2300. </strong> Agent Avarage Sales </p>
+                        <p> <small>12 Sales Today</small>
+                        </p>
+                      </div>
+                    </li>
+                    <li class="media event">
+                      <a class="pull-left border-blue profile_thumb">
+                        <i class="fa fa-user blue"></i>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#">Ms. Mary Jane</a>
+                        <p><strong>$2300. </strong> Agent Avarage Sales </p>
+                        <p> <small>12 Sales Today</small>
+                        </p>
+                      </div>
+                    </li>
+                    <li class="media event">
+                      <a class="pull-left border-aero profile_thumb">
+                        <i class="fa fa-user aero"></i>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#">Ms. Mary Jane</a>
+                        <p><strong>$2300. </strong> Agent Avarage Sales </p>
+                        <p> <small>12 Sales Today</small>
+                        </p>
+                      </div>
+                    </li>
+                    <li class="media event">
+                      <a class="pull-left border-green profile_thumb">
+                        <i class="fa fa-user green"></i>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#">Ms. Mary Jane</a>
+                        <p><strong>$2300. </strong> Agent Avarage Sales </p>
+                        <p> <small>12 Sales Today</small>
+                        </p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+     -->
+
+    </div>  <!-- End Row 3 -->
 
   </div>
 {% endblock content %}
@@ -290,6 +410,49 @@
         .start();
     }
     nameCloud('{{ infos["name_list"]|safe }}');
+
+    function performanceEndpoint(dataList) {
+      var data = {
+        labels: ["press", "push", "pull", "toggle"],
+        datasets: [{
+            label: 'gadget',
+            backgroundColor: "#26B99A",
+            data: [5.1, 1.2, 3.2, 2.8]
+          }, {
+            label: 'web',
+            backgroundColor: "#03586A",
+            data: [4.1, 5.6, 2.5, 4.8]
+          }, {
+            label: 'hub',
+            backgroundColor: "#0358aa",
+            data: [1.1, 1.6, 1.5, 1.8]
+          }, {
+            label: 'cloud',
+            backgroundColor: "#aa586A",
+            data: [4.1, 5.6, 2.5, 4.8]
+
+        }]
+      };
+      var ctx = document.getElementById("performance1");
+        var options = {
+          scales: {
+            xAxes: [{
+                stacked: true
+            }],
+            yAxes: [{
+                stacked: true
+            }]
+        }
+        }
+
+        var performance1 = new Chart(ctx, {
+          type: 'horizontalBar',
+          data: data,
+          options: options
+        });
+
+    }
+    performanceEndpoint([]);
 
   </script>
 

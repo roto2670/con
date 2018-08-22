@@ -72,7 +72,15 @@
                           {% for firmware in firmware_list %}
                             <tr>
                               <td>{{ firmware.version }}</td>
-                              <td>{{ firmware.model.product_stage.stage }}</td>
+                              {% if firmware.model.product_stage.stage == 0 %}
+                                <td>Release</td>
+                              {% else if firmware.model.product_stage.stage == 0 %}
+                                <td>Pre Release</td>
+                              {% else if firmware.model.product_stage.stage == 0 %}
+                                <td>Dev</td>
+                              {% else %}
+                                <td>Archive</td>
+                              {% endif %}
                               <td>{{ firmware.last_updated_user }}</td>
                               <td>{{ firmware.last_updated_time }}</td>
                             </tr>

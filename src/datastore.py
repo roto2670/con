@@ -108,7 +108,7 @@ def _get_cloud_service():
 # {{{ datastore
 
 
-TOP_KEY = '_ds'
+TOP_KEY = '_e'
 
 
 def search(kind, namespace, parent_name=None, filters=None,
