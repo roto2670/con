@@ -412,14 +412,13 @@
     function performanceEndpoint(dataDict) {
       var _data = JSON.parse(dataDict);
       var data = {
-        //labels: ["press", "push"],
         labels: _data.ep,
         datasets: [{
-            label: 'r1',
+            label: 'Cloud',
             backgroundColor: "#33a46A",
             data: _data.r1
           }, {
-            label: 'r2',
+            label: 'Gadget-Hub',
             backgroundColor: "#ff8a1a",
             data: _data.r2
         }]
