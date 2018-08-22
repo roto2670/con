@@ -178,11 +178,10 @@
         </div>
       </div>
 
-      <!--
       <div class="col-md-4 col-sm-4 col-xs-12">
         <div class="x_panel tile fixed_height_320">
           <div class="x_title">
-            <h2>Performace Endpoint</h2>
+            <h2>Performance Endpoint</h2>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -192,7 +191,6 @@
           </div>
         </div>
       </div>
-      -->
 
     </div> <!-- End Row 2-->
 
@@ -411,26 +409,19 @@
     }
     nameCloud('{{ infos["name_list"]|safe }}');
 
-    function performanceEndpoint(dataList) {
+    function performanceEndpoint(dataDict) {
+      var _data = JSON.parse(dataDict);
       var data = {
-        labels: ["press", "push", "pull", "toggle"],
+        //labels: ["press", "push"],
+        labels: _data.ep,
         datasets: [{
-            label: 'gadget',
-            backgroundColor: "#26B99A",
-            data: [5.1, 1.2, 3.2, 2.8]
+            label: 'r1',
+            backgroundColor: "#33a46A",
+            data: _data.r1
           }, {
-            label: 'web',
-            backgroundColor: "#03586A",
-            data: [4.1, 5.6, 2.5, 4.8]
-          }, {
-            label: 'hub',
-            backgroundColor: "#0358aa",
-            data: [1.1, 1.6, 1.5, 1.8]
-          }, {
-            label: 'cloud',
-            backgroundColor: "#aa586A",
-            data: [4.1, 5.6, 2.5, 4.8]
-
+            label: 'r2',
+            backgroundColor: "#ff8a1a",
+            data: _data.r2
         }]
       };
       var ctx = document.getElementById("performance1");
@@ -452,7 +443,7 @@
         });
 
     }
-    performanceEndpoint([]);
+    performanceEndpoint('{{ ep_infos|safe }}');
 
   </script>
 

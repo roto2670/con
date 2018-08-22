@@ -9,6 +9,7 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import os
 import time
 import json
 import logging
@@ -17,6 +18,7 @@ from flask import render_template
 from flask_login import login_required, current_user
 
 import apis
+import cmds
 import base.routes
 from home import blueprint
 
@@ -31,6 +33,7 @@ from home import blueprint
 }
 """
 DASHBOARD_CACHE = {}
+DATA_CACHE = {}  # {'time': '', 'data': ''}
 REFRESH_TIME = 3600  # 1H
 
 
@@ -100,7 +103,7 @@ def _get_product_info(product_id):
   if product_id in DASHBOARD_CACHE:
     old_time = DASHBOARD_CACHE[product_id]['created_time']
     r_time = time.time() - old_time
-    if r_time >= REFRESH_TIME:
+    if int(r_time) >= REFRESH_TIME:
       logging.debug("# Refresh product info. : %s", product_id)
       ret = _build_product_info(product_id)
       DASHBOARD_CACHE[product_id] = ret
@@ -115,6 +118,59 @@ def _get_product_info(product_id):
     return ret
 
 
+def _get_data():
+  path = os.path.join(cmds.get_res_path(), 'data', 'result.json')
+  with open(path, 'r') as f:
+    ret = f.read()
+  return json.loads(ret)
+
+
+def _get_endpoint_info(product_id):
+  # {ep : [press, push], r1 : [1, 2], r2 : [3, 4]}
+  if DATA_CACHE:
+    st_time = DATA_CACHE['time']
+    rt_time = time.time() - st_time
+    if int(rt_time) >= 3600:
+      ret = _get_data()
+      DATA_CACHE['time'] = time.time()
+      DATA_CACHE['data'] = ret
+  else:
+    ret = _get_data()
+    DATA_CACHE['time'] = time.time()
+    DATA_CACHE['data'] = ret
+
+  product_id = 'mibp'
+  if product_id in DATA_CACHE['data']:
+    ret = DATA_CACHE['data'][product_id]
+    if product_id == 'mibp':
+      allow_key = ['press', 'release', 'push']
+      r = {'ep': [], 'r1': [], 'r2': []}
+      for key, value in ret.items():
+        if key in allow_key:
+          r['ep'].append(key)
+          r['r1'].append(value['r_1'])
+          r['r2'].append(value['r_2'])
+    elif product_id == 'mibs':
+      allow_key = ['get_measure']
+      r = {'ep': [], 'r1': [], 'r2': []}
+      for key, value in ret.items():
+        if key in allow_key:
+          r['ep'].append(key)
+          r['r1'].append(value['r_1'])
+          r['r2'].append(value['r_2'])
+    else:
+      allow_key = ['clear_pin', 'set_pin']
+      r = {'ep': [], 'r1': [], 'r2': []}
+      for key, value in ret.items():
+        if key in allow_key:
+          r['ep'].append(key)
+          r['r1'].append(value['r_1'])
+          r['r2'].append(value['r_2'])
+    return json.dumps(r)
+  else:
+    return json.dumps({})
+
+
 @blueprint.route('/index')
 @login_required
 def index():
@@ -125,7 +181,8 @@ def index():
       current_product = product_list[-1]
       base.routes.set_current_product(current_product)
   infos = _get_product_info(current_product.id)
-  return render_template('index.html', infos=infos)
+  ep_infos = _get_endpoint_info(current_product.id)
+  return render_template('index.html', infos=infos, ep_infos=ep_infos)
 
 
 @blueprint.route('/<template>')
