@@ -150,7 +150,7 @@ def _get_endpoint_info(product_id):
           r['r1'].append(value['r_1'])
           r['r2'].append(value['r_2'])
     elif product_id == 'mibs':
-      allow_key = ['get_measure', 'get_history']
+      allow_key = ['get_measure', 'get_history', 'chemical_settings', 'noise_setting']
       r = {'ep': [], 'r1': [], 'r2': []}
       for key, value in ret.items():
         if key in allow_key:
