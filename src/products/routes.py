@@ -328,15 +328,23 @@ def upload_firmware(product_id, model_id):
     upload_file = request.files['file']
     content = upload_file.read()
     model = in_apis.get_model(model_id)
-    version = model.product_stage.endpoint.version + "." + str(len(model.firmware_list))
+    firmware_version = model.product_stage.endpoint.version + "." + \
+        str(len(model.firmware_list))
     ret_json = cmds.get_hex_to_json(content)
-    ret = apis.register_firmware(product_id, version, model.code, ret_json)
+    ret = apis.register_firmware(product_id, model.code, firmware_version, ret_json)
     if ret:
-      firmware = in_apis.create_firmware(version, current_user.email, ret,
-                                         model.id)
-      return redirect('products/' + product_id + '/model/' + model_id)
+      ret_stage = apis.update_product_stage(product_id, state,
+                                            {model.code: firmware_version},
+                                            models.STAGE_DEV)
+      if ret_stage:
+        firmware = in_apis.create_firmware(firmware_version, current_user.email,
+                                           ret, model.id)
+        return redirect('products/' + product_id + '/model/' + model_id)
+      else:
+        logging.warn("Raise update stage error. model : %s", model_id)
+        abort(500)
     else:
-      logging.warn("Raise error. model : %s", model_id)
+      logging.warn("Raise upload firmware error. model : %s", model_id)
       abort(500)
 
 

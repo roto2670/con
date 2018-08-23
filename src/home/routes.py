@@ -14,11 +14,12 @@ import time
 import json
 import logging
 
-from flask import render_template
+from flask import render_template, redirect
 from flask_login import login_required, current_user
 
 import apis
 import cmds
+import in_apis
 import base.routes
 from home import blueprint
 
@@ -179,8 +180,16 @@ def index():
     if product_list:
       current_product = product_list[-1]
       base.routes.set_current_product(current_product)
-  infos = _get_product_info(current_product.id)
-  ep_infos = _get_endpoint_info(current_product.id)
+  return redirect("/home/" + current_product.id)
+
+
+@blueprint.route('/<product_id>')
+@login_required
+def product_index(product_id):
+  product = in_apis.get_product(product_id)
+  base.routes.set_current_product(product)
+  infos = _get_product_info(product_id)
+  ep_infos = _get_endpoint_info(product_id)
   return render_template('index.html', infos=infos, ep_infos=ep_infos)
 
 

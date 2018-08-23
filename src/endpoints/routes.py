@@ -122,28 +122,17 @@ def upload_header_file(product_id):
       return redirect('endpoints/' + product_id + '/specifications')
     ret = apis.register_specifications(product_id, json_content['version'],
                                        decode_content)
-    model_number_list = []
-    for model in product_dev_stage.model_list:
-      model_number_list.append(model.code)
     if ret:
-      ret_stage = apis.update_product_stage(product_id, product_dev_stage,
-                                            model_number_list,
-                                            json_content['version'],
-                                            models.STAGE_DEV)
-      if ret_stage:
-        if product_dev_stage.endpoint:
-          in_apis.update_specifications(product_dev_stage.endpoint.id,
-                                        current_user.email, json_content['version'],
-                                        decode_content)
-        else:
-          in_apis.create_specifications(json_content['version'], decode_content,
-                                        current_user.email,
-                                        current_user.organization_id,
-                                        product_dev_stage.id)
-        return redirect('endpoints/' + product_id + '/specifications')
+      if product_dev_stage.endpoint:
+        in_apis.update_specifications(product_dev_stage.endpoint.id,
+                                      current_user.email, json_content['version'],
+                                      decode_content)
       else:
-        logging.warn("Failed to update dev stage.")
-        abort(500)
+        in_apis.create_specifications(json_content['version'], decode_content,
+                                      current_user.email,
+                                      current_user.organization_id,
+                                      product_dev_stage.id)
+      return redirect('endpoints/' + product_id + '/specifications')
     else:
       logging.warn("Failed to register specifications.")
       abort(500)

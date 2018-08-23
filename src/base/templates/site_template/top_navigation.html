@@ -18,7 +18,7 @@
               </button>
               <ul class="dropdown-menu" role="menu">
                 {% for product in product_list %}
-                  <li><a href="/products/{{ product.id }}/general">{{ product.id }}</a></li>
+                  <li><a href="/home/{{ product.id }}">{{ product.id }}</a></li>
                 {% endfor %}
                 {% if product_list %}
                   <li class="divider"></li>

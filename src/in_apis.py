@@ -45,6 +45,7 @@ def create_product(product_name, product_obj):
                                stage=models.STAGE_DEV,
                                created_time=datetime.datetime.utcnow(),
                                last_updated_time=datetime.datetime.utcnow(),
+                               last_updated_user=current_user.email,
                                product_id=product.id)
   db.session.add(product_stage)
   db.session.commit()
@@ -122,6 +123,20 @@ def get_model_by_code(code, product_id):
 def get_model_list(product_id):
   dev_stage = get_product_stage_by_dev(product_id)
   model = Model.query.filter_by(product_stage_id=dev_stage.id).all()
+  return model
+
+
+def get_dev_stage_model_list_order_by_created(product_id):
+  dev_stage = get_product_stage_by_dev(product_id)
+  model = Model.query.filter_by(product_stage_id=dev_stage.id).\
+      order_by('created_time desc').all()
+  return model
+
+
+def get_pre_release_stage_model_list_order_by_created(product_id):
+  pre_release_stage = get_product_stage_by_pre_release(product_id)
+  model = Model.query.filter_by(product_stage_id=pre_release_stage.id).\
+      order_by('created_time desc').all()
   return model
 
 
@@ -421,11 +436,14 @@ def _delete_before_pre_release(product_id):
 
 def pre_release(product_id):
   dev = get_product_stage_by_dev(product_id)
-  model_number_list = []
-  for model in dev.model_list:
-    model_number_list.append(model.code)
-  prd_ret = apis.update_product_stage(product_id, dev, model_number_list,
-                                      dev.endpoint.version,
+  dev_models = get_dev_stage_model_list_order_by_created(product_id)
+  models_dict = {}
+  for model in dev_models:
+    if model.firmware_list:
+      models_dict[model.code] = model.firmware_list[0].version
+    else:
+      raise Exception("Fail to Pre Release. Can not find Firmware.")
+  prd_ret = apis.update_product_stage(product_id, dev, models_dict,
                                       models.STAGE_PRE_RELEASE)
   if prd_ret:
     _delete_before_pre_release(product_id)
@@ -437,6 +455,7 @@ def pre_release(product_id):
     dev.stage = models.STAGE_PRE_RELEASE
     dev.created_time = datetime.datetime.utcnow()
     dev.last_updated_time = datetime.datetime.utcnow()
+    dev.last_updated_user = current_user.email
 
     make_transient(ep)
     ep.id = uuid.uuid4().hex
@@ -474,22 +493,26 @@ def pre_release(product_id):
 
 def release(product_id):
   _pre_release = get_product_stage_by_pre_release(product_id)
-  model_number_list = []
-  for model in _pre_release.model_list:
-    model_number_list.append(model.code)
-  prd_ret = apis.update_product_stage(product_id, _pre_release,
-                                      model_number_list,
-                                      _pre_release.endpoint.version,
+  pre_release_models = get_pre_release_stage_model_list_order_by_created(product_id)
+  models_dict = {}
+  for model in pre_release_models:
+    if model.firmware_list:
+      models_dict[model.code] = model.firmware_list[0].version
+    else:
+      raise Exception("Fail to Release. Can not find Firmware.")
+  prd_ret = apis.update_product_stage(product_id, _pre_release, models_dict,
                                       models.STAGE_RELEASE)
   if prd_ret:
     _release = get_product_stage_by_release(product_id)
     if _release:
       _release.stage = models.STAGE_ARCHIVE
       _release.last_updated_time = datetime.datetime.utcnow()
+      _release.last_updated_user = current_user.email
       db.session.commit()
 
     _pre_release.stage = models.STAGE_RELEASE
     _pre_release.last_updated_time = datetime.datetime.utcnow()
+    _pre_release.last_updated_user = current_user.email
     db.session.commit()
     return True
   else:

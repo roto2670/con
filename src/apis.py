@@ -292,13 +292,12 @@ def update_about_hook(product_id, stage, hook_url=None, hook_client_key=None):
     return None
 
 
-def update_product_stage(product_id, product_stage, model_number_list,
-                         version, stage):
-  url = BASE_URL + 'products/' + product_id + "/" + version + "/stages/" + str(stage)
+def update_product_stage(product_id, product_stage, model_number_dict, stage):
+  url = BASE_URL + 'products/' + product_id + "/stages/" + str(stage)
   # TODO: headers
   headers = {}
   data = {
-      "model_numbers": model_number_list,
+      "models": model_number_dict,
       "hook_url": product_stage.hook_url,
       "hook_client_key": product_stage.hook_client_key
   }
@@ -420,9 +419,9 @@ def get_org(organization_id):
 # {{{ firmware
 
 
-def register_firmware(product_id, version, model_number, firmware_binary):
+def register_firmware(product_id, model_number, firmware_version, firmware_binary):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.x8fr9nhc0l1f
-  url = BASE_URL + 'products/' + product_id + '/' + version + '/firmware/' + str(model_number)
+  url = BASE_URL + 'products/' + product_id + '/models/' + str(model_number) + "/firmwares/" + firmware_version
   # TODO: headers
   headers = {
       "Content-Type": "application/octet-stream"
