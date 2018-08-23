@@ -329,7 +329,7 @@ def upload_firmware(product_id, model_id):
     content = upload_file.read()
     model = in_apis.get_model(model_id)
     firmware_version = model.product_stage.endpoint.version + "." + \
-        str(len(model.firmware_list))
+        str(len(model.firmware_list) + 1)
     ret_json = cmds.get_hex_to_json(content)
     ret = apis.register_firmware(product_id, model.code, firmware_version, ret_json)
     if ret:
