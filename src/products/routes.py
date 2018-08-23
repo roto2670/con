@@ -333,9 +333,17 @@ def upload_firmware(product_id, model_id):
     ret_json = cmds.get_hex_to_json(content)
     ret = apis.register_firmware(product_id, model.code, firmware_version, ret_json)
     if ret:
-      ret_stage = apis.update_product_stage(product_id, state,
+      if state == models.STAGE_RELEASE:
+        stage_info = in_apis.get_product_stage_by_release(product_id)
+      elif state == models.STAGE_PRE_RELEASE:
+        stage_info = in_apis.get_product_stage_by_pre_release(product_id)
+      elif state == models.STAGE_DEV:
+        stage_info = in_apis.get_product_stage_by_dev(product_id)
+      else state == models.STAGE_ARCHIVE:
+        stage_info = in_apis.get_product_stage_by_archive(product_id)
+      ret_stage = apis.update_product_stage(product_id, stage_info,
                                             {model.code: firmware_version},
-                                            models.STAGE_DEV)
+                                            state)
       if ret_stage:
         firmware = in_apis.create_firmware(firmware_version, current_user.email,
                                            ret, model.id)
