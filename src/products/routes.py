@@ -339,7 +339,7 @@ def upload_firmware(product_id, model_id):
         stage_info = in_apis.get_product_stage_by_pre_release(product_id)
       elif state == models.STAGE_DEV:
         stage_info = in_apis.get_product_stage_by_dev(product_id)
-      else state == models.STAGE_ARCHIVE:
+      else:
         stage_info = in_apis.get_product_stage_by_archive(product_id)
       ret_stage = apis.update_product_stage(product_id, stage_info,
                                             {model.code: firmware_version},
