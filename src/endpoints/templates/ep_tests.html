@@ -67,9 +67,9 @@
                         <select class="form-control" id="gadget" name="gadget" onchange="this.form.submit()">
                           {% for key, value in gadget_dict.items() %}
                             {% if gadget and key in gadget %}
-                              <option id="{{ key }}" selected>{{ value }}</option>
+                              <option id="{{ key }}" value="{{ key }}" selected>{{ value }}</option>
                             {% else %}
-                              <option id="{{ key }}">{{ value }}</option>
+                              <option id="{{ key }}" value="{{ key }}">{{ value }}</option>
                             {% endif %}
                           {% endfor %}
                         </select>
