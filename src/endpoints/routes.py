@@ -177,7 +177,8 @@ def test_call(product_id, gadget, endpoint_name):
   for req in request_list:
     if endpoint_name == req['name']:
       for param in req['params']:
-        args.append(param['default'])
+        if 'default' in param:
+          args.append(param['default'])
 
   data = {
       "key": product.key,
