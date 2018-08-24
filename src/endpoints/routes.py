@@ -102,8 +102,9 @@ def tests(product_id):
     gadget = None
     if request.form['gadget'] in gadget_dict:
       gadget = {request.form['gadget'] : gadget_dict[request.form['gadget']]}
+      gadget_id = request.form['gadget']
     return render_template('ep_tests.html', specification_list=specification_list,
-                           gadget_dict=gadget_dict, gadget=gadget,
+                           gadget_dict=gadget_dict, gadget=gadget, gadget_id=gadget_id,
                            selected=selected, content=content)
 
 
