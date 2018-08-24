@@ -19,7 +19,7 @@
         var jsonData = JSON.parse(data);
         document.getElementById("resp" + endpointName + "status").innerHTML = "Status : " + jsonData.status;
         document.getElementById("resp" + endpointName + "time").innerHTML = "Time : " + jsonData.time;
-        document.getElementById("resp" + endpointName + "ret").innerHTML = jsonData.ret;
+        document.getElementById("resp" + endpointName + "ret").innerHTML = JSON.stringify(jsonData.ret);
       });
     }
   </script>
