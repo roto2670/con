@@ -424,8 +424,8 @@ def create_firmware(version, ep_version, model_code, user_email, url_path,
   return firmware
 
 
-def get_firmware_list_order_by_version(ep_version, model_number):
-  firmware_list = Firmware.query.filter_by(ep_version=ep_version, model_number=model_number).\
+def get_firmware_list_order_by_version(ep_version, model_code):
+  firmware_list = Firmware.query.filter_by(ep_version=ep_version, model_code=model_code).\
       order_by('version desc').all()
   return firmware_list
 
