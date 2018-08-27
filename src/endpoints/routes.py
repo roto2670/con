@@ -142,14 +142,21 @@ def upload_header_file(product_id):
     return redirect('endpoints/' + product_id + '/specifications')
 
 
+def _get_build_number(version):
+  _, _, build_number = version.split(".")
+  return int(build_number) + 1
+
+
 @blueprint.route('/<product_id>/<specification_id>/<model_id>/download', methods=['GET'])
 @login_required
 def download_header_file(product_id, specification_id, model_id):
   content = in_apis.get_specifications(specification_id)
   model = in_apis.get_model(model_id)
-  build_number = 0
-  if model.firmware_list:
-    build_number = len(model.firmware_list) + 1
+  firmware_list = in_apis.get_firmware_list_order_by_version(content.version, model.code)
+  if firmware_list:
+    build_number = _get_build_number(firmware_list[0].version)
+  else:
+    build_number = 0
 
   try:
     # TODO: Handle build number when upper 255

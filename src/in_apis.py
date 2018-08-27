@@ -408,9 +408,12 @@ def delete_tester(id):
 # {{{ Firmware
 
 
-def create_firmware(version, user_email, url_path, model_id):
+def create_firmware(version, ep_version, model_code, user_email, url_path,
+                    model_id):
   firmware = Firmware(id=uuid.uuid4().hex,
                       version=version,
+                      ep_version=ep_version,
+                      model_code=model_code,
                       path=url_path,
                       created_time=datetime.datetime.utcnow(),
                       last_updated_time=datetime.datetime.utcnow(),
@@ -419,6 +422,12 @@ def create_firmware(version, user_email, url_path, model_id):
   db.session.add(firmware)
   db.session.commit()
   return firmware
+
+
+def get_firmware_list_order_by_version(ep_version, model_number):
+  firmware_list = Firmware.query.filter_by(ep_version=ep_version, model_number=model_number).\
+      order_by('version desc').all()
+  return firmware_list
 
 
 # }}}

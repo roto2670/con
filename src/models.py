@@ -274,6 +274,8 @@ class Firmware(db.Model):
 
   id = Column(String(75), primary_key=True)
   version = Column(String(75))
+  ep_version = Column(String(75))
+  model_code = Column(Integer)
   path = Column(String(225))
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)

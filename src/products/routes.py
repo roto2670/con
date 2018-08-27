@@ -301,6 +301,11 @@ def model_info(product_id, model_id):
   return render_template('model.html', model=model, firmware_list=model.firmware_list)
 
 
+def _get_build_number(version):
+  _, _, build_number = version.split(".")
+  return int(build_number) + 1
+
+
 @blueprint.route('/<product_id>/model/<model_id>/firmware', methods=['GET', 'POST'])
 @login_required
 def upload_firmware(product_id, model_id):
@@ -328,8 +333,15 @@ def upload_firmware(product_id, model_id):
     upload_file = request.files['file']
     content = upload_file.read()
     model = in_apis.get_model(model_id)
+    firmware_list = \
+        in_apis.get_firmware_list_order_by_version(model.product_stage.endpoint.version,
+                                                   model.code)
+    if firmware_list:
+      build_number = _get_build_number(firmware_list[0].version)
+    else:
+      build_number = 0
     firmware_version = model.product_stage.endpoint.version + "." + \
-        str(len(model.firmware_list) + 1)
+        str(build_number)
     ret_json = cmds.get_hex_to_json(content)
     ret = apis.register_firmware(product_id, model.code, firmware_version, ret_json)
     if ret:
@@ -345,7 +357,9 @@ def upload_firmware(product_id, model_id):
                                             {model.code: firmware_version},
                                             state)
       if ret_stage:
-        firmware = in_apis.create_firmware(firmware_version, current_user.email,
+        firmware = in_apis.create_firmware(firmware_version,
+                                           model.product_stage.endpoint.version,
+                                           model.code, current_user.email,
                                            ret, model.id)
         return redirect('products/' + product_id + '/model/' + model_id)
       else:
