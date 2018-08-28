@@ -17,6 +17,7 @@ from flask import abort, render_template, redirect, request, Response
 from flask_login import login_required, current_user
 
 import apis
+import common
 import builder
 import in_apis
 import models
@@ -108,6 +109,31 @@ def tests(product_id):
                            selected=selected, content=content)
 
 
+def _check_validate(product_id, json_content):
+  error_title = "Upload Error"
+  if json_content['product'] != product_id:
+    msg = "Product name not matched in Specifications. Must be Product name equals product code."
+    logging.warn(msg)
+    common.set_error_message(error_title, msg)
+    return False
+
+  _requests = json_content['requests']
+  for req in _requests:
+    if req['name'].lower().startswith('mib'):
+      msg = "Invalid request name. Request name cannot start with the mib."
+      logging.warn(msg)
+      common.set_error_message(error_title, msg)
+      return False
+  _events = json_content['events']
+  for event in _events:
+    if event['name'].lower().startswith('mib'):
+      msg = "Invalid event name. Event name cannot start with the mib."
+      logging.warn(msg)
+      common.set_error_message(error_title, msg)
+      return False
+  return True
+
+
 @blueprint.route('/<product_id>/upload', methods=['POST'])
 @login_required
 def upload_header_file(product_id):
@@ -119,7 +145,8 @@ def upload_header_file(product_id):
   try:
     decode_content = content.decode()
     json_content = json.loads(decode_content)
-    if json_content['product'] != product_id:
+    _validate = _check_validate(product_id, json_content)
+    if not _validate:
       return redirect('endpoints/' + product_id + '/specifications')
     ret = apis.register_specifications(product_id, json_content['version'],
                                        decode_content)
@@ -133,6 +160,9 @@ def upload_header_file(product_id):
                                       current_user.email,
                                       current_user.organization_id,
                                       product_dev_stage.id)
+      title = "Success Upload"
+      msg = "Success upload for specifications. Product : {}, version : {}".format(json_content['product'], json_content['version'])
+      common.set_info_message(title, msg)
       return redirect('endpoints/' + product_id + '/specifications')
     else:
       logging.warn("Failed to register specifications.")

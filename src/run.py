@@ -22,6 +22,7 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 import apis
+import common
 import base.routes
 from base import db, auth, login_manager
 
@@ -34,6 +35,7 @@ def register_extensions(app):
   login_manager.init_app(app)
   # custom
   app.context_processor(base.routes.about_product)
+  app.context_processor(common.get_message)
 
 
 def register_blueprints(app):

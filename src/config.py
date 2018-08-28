@@ -15,7 +15,7 @@ import apis
 
 
 class Config(object):
-  SECRET_KEY = 'key'
+  SECRET_KEY = 'skfksrltnf1'
   if apis.IS_DEV:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'  # SQLITE
     #SQLALCHEMY_DATABASE_URI = 'mysql://root:sksmswkd1@127.0.0.1:3306/console?charset=utf8'  # LOCAL MySQL

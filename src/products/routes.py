@@ -23,6 +23,7 @@ from flask_login import login_required, current_user
 import apis
 import cmds
 import mail
+import common
 import models
 import in_apis
 import base.routes
@@ -46,16 +47,16 @@ def create():
 
     code = request.form['code']
     if re.compile(r'\W|\d').findall(code):
-      error_msg = {"title": "Invalid Code",
-                   "msg": "Only lowercase letters can be entered. Special characters, spacing can not be entered."}
-      return render_template("prd_create.html", referrer=referrer,
-                             error_msg=error_msg)
+      title = "Invalid Code"
+      msg = "Only lowercase letters can be entered. Special characters, spacing can not be entered."
+      common.set_error_message(title, msg)
+      return render_template("prd_create.html", referrer=referrer)
     has_product = in_apis.get_product(code)
     if has_product:
-      error_msg = {"title": "Exists Product",
-                   "msg": "The product with that code already exists. Please enter a different code."}
-      return render_template("prd_create.html", referrer=referrer,
-                             error_msg=error_msg)
+      title = "Exists Product"
+      msg = "The product with that code already exists. Please enter a different code."
+      common.set_error_message(title, msg)
+      return render_template("prd_create.html", referrer=referrer)
     else:
       ret = apis.create_product(code, current_user.organization_id)
       if ret:
@@ -95,16 +96,16 @@ def create_model(product_id):
       code = len(_model_list) + 1
 
     if code < 0 or code > 65535:
-      error_msg = {"title": "Max model",
-                   "msg": "Max model"}
-      return render_template("prd_create.html", referrer=referrer,
-                             error_msg=error_msg)
+      title = "Max model"
+      msg = "Max model"
+      common.set_error_message(title, msg)
+      return render_template("prd_create.html", referrer=referrer)
     has_model = in_apis.get_model_by_code(code, product_id)
     if has_model:
-      error_msg = {"title": "Exists Model",
-                   "msg": "The model with that code already exists. Please enter a different code."}
-      return render_template("prd_create.html", referrer=referrer,
-                             error_msg=error_msg)
+      title = "Exists Model"
+      msg = "The model with that code already exists. Please enter a different code."
+      common.set_error_message(title, msg)
+      return render_template("prd_create.html", referrer=referrer)
     else:
       ret = apis.create_model(product_id, code, name)
       if ret:

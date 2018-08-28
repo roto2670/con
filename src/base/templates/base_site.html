@@ -11,7 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
       {% endblock meta %}
 
-      <title>MicroBot Console | {% block title %}{% endblock %}</title>
+      <title>MiB Console | {% block title %}{% endblock %}</title>
 
       {% block stylesheets %}
         <!-- Bootstrap -->
@@ -39,6 +39,33 @@
   </head>
 
   <body class="{% block body_class %}nav-md {% endblock body_class %}">
+    <!-- Notification Message (jslee,180828) -->
+    {% if error_msg %}
+      <script>
+        onload = function() {
+          new PNotify({
+            title: '{{ error_msg.title }}',
+            text: '{{ error_msg.msg }}',
+            type: 'error',
+            hide: true,
+            styling: 'bootstrap3'
+        });
+        }
+      </script>
+    {% elif info_msg %}
+      <script>
+        onload = function() {
+          new PNotify({
+            title: '{{ info_msg.title }}',
+            text: '{{ info_msg.msg }}',
+            type: 'info',
+            hide: true,
+            styling: 'bootstrap3'
+        });
+        }
+      </script>
+    {% endif %}
+
     {% block body %}
       <div class="container body">
         <div class="main_container">

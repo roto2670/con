@@ -15,11 +15,11 @@ import uuid
 import logging
 
 from flask import abort, render_template, request, redirect, url_for
-from flask_login import login_required
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 import apis
 import cmds
+import common
 import in_apis
 import models
 import mail
@@ -65,8 +65,10 @@ def create():
     is_org = in_apis.get_organization_by_name(name.lower())
     if is_org:
       # TODO: change message
-      error_msg = {"title": "Exists Name", "msg": "Exists name"}
-      return render_template("create.html", error_msg=error_msg)
+      title = "Exists Name"
+      msg = "Exists name"
+      common.set_error_message(title, msg)
+      return render_template("create.html")
     else:
       ret = apis.create_org(owner_email)
       if ret:

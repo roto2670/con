@@ -4,19 +4,7 @@
 {% block title %} Organization {% endblock title %}
 
 {% block content %}
-  {% if error_msg %}
-    <script>
-      onload = function() {
-        new PNotify({
-          title: '{{ error_msg.title }}',
-          text: '{{ error_msg.msg }}',
-          type: 'error',
-          hide: true,
-          styling: 'bootstrap3'
-        });
-      }
-    </script>
-  {% else %}
+  {% if not error_msg %}
     <script>
       onload = function() {
         $('.bs-example-modal-lg').modal('show');
