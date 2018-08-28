@@ -1,59 +1,59 @@
 {
   "endpoints": {
       "upload" : {
-          "success_title": "Success Upload",
-          "success_message": "Success upload for specifications. Product : {}, Version : {}",
-          "fail_title": "Error Upload",
-          "fail_message_not_equal_product": "Product name not matched in Specifications. Must be Product name equals product code.",
-          "fail_message_request_start_mib": "Invalid request name. Request name cannot start with the mib.",
-          "fail_message_event_start_mib": "Invalid event name. Event name cannot start with the mib."
+          "success_title": "Upload successful",
+          "success_message": "The Specification has successfully been uploaded. Product: {}, Version: {}",
+          "fail_title": "Upload error",
+          "fail_message_not_equal_product": "Product name does not match the Specification. The name must be equal to the product code.",
+          "fail_message_request_start_mib": "Invalid name. Request names cannot start with mib.",
+          "fail_message_event_start_mib": "Invalid name. Event names cannot start with mib."
       }
   },
   "organization": {
       "create": {
           "organization": {
               "modal_title": "Welcome to MiB Console",
-              "modal_sub_title": "Welcome to Mib Console",
-              "modal_message": "You can be part of an organization by creating an organization or receiving an invitation from an organization that is already created.",
-              "modal_ok": "Ok",
-              "fail_exists_organization_title": "Exists organization name",
-              "fail_exists_organization_message": "Exists organization name"
+              "modal_sub_title": "Welcome to MiB Console",
+              "modal_message": "You can create a new organization or join one by accepting an invite.",
+              "modal_ok": "OK",
+              "fail_exists_organization_title": "Organization name exists",
+              "fail_exists_organization_message": "Please use a different name. An organization with the same name already exists."
           }
       },
       "delete": {
           "organization": {
               "delete_message": "Are you sure you want to delete it?",
               "delete_cancel": "Cancel",
-              "delete_ok": "Ok"
+              "delete_ok": "OK"
           }
       },
       "member": {
-          "mail_title" : "Invite to {} member",
-          "mail_message": "Invite you to {} member. If you accept the invitation, you can develop it as a member of {} in MicroBot Console."
+          "mail_title" : "Invite to {}",
+          "mail_message": "Invite you to {}. If you accept the invitation, you can become a member of {}."
       }
   },
   "products": {
       "create": {
           "product": {
-              "invalid_code_title": "Invalid Code",
-              "invalid_code_message": "Only lowercase letters can be entered. Special characters, spacing can not be entered.",
-              "exists_product_title": "Exists Product",
-              "exists_product_message": "The product with that code already exists. Please enter a different code."
+              "invalid_code_title": "Invalid product code",
+              "invalid_code_message": "Only lowercase letters are accepted. Special characters including spaces can not be entered.",
+              "exists_product_title": "Product code exists",
+              "exists_product_message": "Product code must be unique. Please enter a different code."
           },
           "model": {
-              "usage_full_title": "Usage Full",
-              "usage_full_message": "The model is in full use. Please Create new product.",
-              "exists_model_title": "Exists Model",
-              "exists_model_message": "The model with that code already exists. Please enter a different code."
+              "usage_full_title": "Cannot create a new model",
+              "usage_full_message": "You cannot create more models. Please create a new product.",
+              "exists_model_title": "Invalid model code",
+              "exists_model_message": "Model code must be unique in a product. Please enter a different code."
           }
       },
       "tester": {
-          "mail_title": "Invite to {} tester",
-          "mail_message": "Invite you to {} tester. If you accept the invitation,<br> your Gadget can be used for testing.",
+          "mail_title": "Invite to {} as a tester",
+          "mail_message": "Invite you to {} for testing. If you accept the invitation,<br> you can test the gadget under development.",
           "tester_success_title": "Success",
-          "tester_success_message": "You have completed your tester accepted",
+          "tester_success_message": "You have succesfully joined as a tester",
           "tester_need_to_ftl_title": "Success",
-          "tester_need_to_ftl_message": "You have completed your tester accepted. But you need to FTL"
+          "tester_need_to_ftl_message": "You have succesfully joined as a tester, but you need to register your email in the app during the FTL process."
       }
   }
 }
