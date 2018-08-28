@@ -42,11 +42,17 @@ def default_route():
       if _release_list:
         for _release in _release_list:
           release_list.append(_release.id)
+    msg = {
+        "delete": common.get_msg("organization.delete.organization.delete_message"),
+        "delete_ok": common.get_msg("organization.delete.organization.delete_ok"),
+        "delete_cancel": common.get_msg("organization.delete.organization.delete_cancel")
+    }
     return render_template("organization.html", org=org,
                            noti_key_list=noti_key_list, user_list=user_list,
                            product_list=product_list,
                            invite_list=invite_list,
-                           release_list=release_list)
+                           release_list=release_list,
+                           msg=msg)
   else:
     return redirect("/organization/create")
 
@@ -58,15 +64,20 @@ def create():
     if current_user.organization_id:
       return redirect('/organization')
     else:
-      return render_template("create.html")
+      modal = {
+        "title": common.get_msg("organization.create.organization.modal_title"),
+        "sub_title": common.get_msg("organization.create.organization.modal_sub_title"),
+        "message": common.get_msg("organization.create.organization.modal_message"),
+        "ok": common.get_msg("organization.create.organization.modal_ok")
+      }
+      return render_template("create.html", modal=modal)
   else:
     name = request.form['name']
     owner_email = current_user.email
     is_org = in_apis.get_organization_by_name(name.lower())
     if is_org:
-      # TODO: change message
-      title = "Exists Name"
-      msg = "Exists name"
+      title = common.get_msg("organization.create.organization.fail_exists_organization_title")
+      msg = common.get_msg("organization.create.organization.fail_exists_organization_message")
       common.set_error_message(title, msg)
       return render_template("create.html")
     else:
@@ -120,8 +131,10 @@ def send_invite():
   auth_url = request.host_url + 'organization/confirm?key=' + key + \
       '&o=' + current_user.organization_id
   org = in_apis.get_organization(current_user.organization_id)
-  title = "Invite to {} member".format(org.original_name)
-  msg = "Invite you to {} member. If you accept the invitation, you can develop it as a member of {} in MicroBot Console.".format(org.original_name, org.original_name)
+  title = common.get_msg("organization.member.mail_title")
+  title = title.format(org.original_name)
+  msg = common.get_msg("organization.member.mail_message")
+  msg = msg.format(org.original_name, org.original_name)
   content = content.format(auth_url=auth_url, title=title, msg=msg)
   try:
     mail.send(email_addr, title, content)

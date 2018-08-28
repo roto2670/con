@@ -47,14 +47,14 @@ def create():
 
     code = request.form['code']
     if re.compile(r'\W|\d').findall(code):
-      title = "Invalid Code"
-      msg = "Only lowercase letters can be entered. Special characters, spacing can not be entered."
+      title = common.get_msg("products.create.product.invalid_code_title")
+      msg = common.get_msg("products.create.product.invalid_code_message")
       common.set_error_message(title, msg)
       return render_template("prd_create.html", referrer=referrer)
     has_product = in_apis.get_product(code)
     if has_product:
-      title = "Exists Product"
-      msg = "The product with that code already exists. Please enter a different code."
+      title = common.get_msg("products.create.product.exists_product_title")
+      msg = common.get_msg("products.create.product.exists_product_message")
       common.set_error_message(title, msg)
       return render_template("prd_create.html", referrer=referrer)
     else:
@@ -96,14 +96,14 @@ def create_model(product_id):
       code = len(_model_list) + 1
 
     if code < 0 or code > 65535:
-      title = "Max model"
-      msg = "Max model"
+      title = common.get_msg("products.create.model.usage_full_title")
+      msg = common.get_msg("products.create.model.usage_full_message")
       common.set_error_message(title, msg)
       return render_template("prd_create.html", referrer=referrer)
     has_model = in_apis.get_model_by_code(code, product_id)
     if has_model:
-      title = "Exists Model"
-      msg = "The model with that code already exists. Please enter a different code."
+      title = common.get_msg("products.create.model.exists_model_title")
+      msg = common.get_msg("products.create.model.exists_model_message")
       common.set_error_message(title, msg)
       return render_template("prd_create.html", referrer=referrer)
     else:
@@ -190,8 +190,10 @@ def _send_invite(email_addr, product_id):
   auth_url = request.host_url + 'products/confirm?key=' + key + '&o=' + \
       current_user.organization_id
   _product = in_apis.get_product(product_id)
-  title = "Invite to {} tester".format(_product.name)
-  msg = "Invite you to {} tester. If you accept the invitation,<br> your Gadget can be used for testing.".format(_product.name)
+  title = common.get_msg("products.tester.mail_title")
+  title = title.format(_product.name)
+  msg =  common.get_msg("products.tester.mail_message")
+  msg =  msg.format(_product.name)
   content = content.format(auth_url=auth_url, title=title, msg=msg)
   try:
     mail.send(email_addr, title, content)

@@ -60,11 +60,11 @@
                                 <div>
                                   <form id="delete" method="post" action="/organization/delete">
                                     <div class="modal-body">
-                                      <h4>You need to delete?</h4>
+                                      <h4>{{ msg['delete'] }}</h4>
                                     </div>
                                     <div class="modal-footer">
-                                      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                      <button type="submit" class="btn btn-danger">Delete</button>
+                                      <button type="button" class="btn btn-default" data-dismiss="modal">{{ msg['delete_ok'] }}</button>
+                                      <button type="submit" class="btn btn-danger">{{ msg['delete_cancel'] }}</button>
                                     </div>
                                   </form>
                                 </div>

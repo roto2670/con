@@ -9,8 +9,10 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-
+import os
+import cmds
 from flask import session
+from util import Settings
 
 
 def _get_error_message():
@@ -37,3 +39,28 @@ def set_info_message(title, message):
 
 def get_message():
   return dict(error_msg=_get_error_message(), info_msg=_get_info_message())
+
+
+FILE_NAME = "message.{}"
+I18N_PATH = os.path.join(cmds.get_res_path(), "i18n")
+LOCALES_DICT = {}
+
+EN_US = '''en-us'''
+
+
+def _init_en_us():
+  return Settings([os.path.join(I18N_PATH, FILE_NAME.format(EN_US))])
+
+
+def get_msg(key, locale=None):
+  locale = locale or ""
+  locales = LOCALES_DICT.get(locale.lower(), {})
+  if not locales:
+    locales = LOCALES_DICT.get(EN_US)
+  settings = locales()
+  ret = settings.get(key)
+  return ret
+
+
+def start():
+  LOCALES_DICT[EN_US] = _init_en_us

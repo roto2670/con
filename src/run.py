@@ -90,6 +90,7 @@ def create_app():
   register_extensions(app)
   register_blueprints(app)
   configure_database(app)
+  common.start()
   return app
 
 

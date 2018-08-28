@@ -1,0 +1,59 @@
+{
+  "endpoints": {
+      "upload" : {
+          "success_title": "Success Upload",
+          "success_message": "Success upload for specifications. Product : {}, Version : {}",
+          "fail_title": "Error Upload",
+          "fail_message_not_equal_product": "Product name not matched in Specifications. Must be Product name equals product code.",
+          "fail_message_request_start_mib": "Invalid request name. Request name cannot start with the mib.",
+          "fail_message_event_start_mib": "Invalid event name. Event name cannot start with the mib."
+      }
+  },
+  "organization": {
+      "create": {
+          "organization": {
+              "modal_title": "Welcome to MiB Console",
+              "modal_sub_title": "Welcome to Mib Console",
+              "modal_message": "You can be part of an organization by creating an organization or receiving an invitation from an organization that is already created.",
+              "modal_ok": "Ok",
+              "fail_exists_organization_title": "Exists organization name",
+              "fail_exists_organization_message": "Exists organization name"
+          }
+      },
+      "delete": {
+          "organization": {
+              "delete_message": "Are you sure you want to delete it?",
+              "delete_cancel": "Cancel",
+              "delete_ok": "Ok"
+          }
+      },
+      "member": {
+          "mail_title" : "Invite to {} member",
+          "mail_message": "Invite you to {} member. If you accept the invitation, you can develop it as a member of {} in MicroBot Console."
+      }
+  },
+  "products": {
+      "create": {
+          "product": {
+              "invalid_code_title": "Invalid Code",
+              "invalid_code_message": "Only lowercase letters can be entered. Special characters, spacing can not be entered.",
+              "exists_product_title": "Exists Product",
+              "exists_product_message": "The product with that code already exists. Please enter a different code."
+          },
+          "model": {
+              "usage_full_title": "Usage Full",
+              "usage_full_message": "The model is in full use. Please Create new product.",
+              "exists_model_title": "Exists Model",
+              "exists_model_message": "The model with that code already exists. Please enter a different code."
+          }
+      },
+      "tester": {
+          "mail_title": "Invite to {} tester",
+          "mail_message": "Invite you to {} tester. If you accept the invitation,<br> your Gadget can be used for testing.",
+          "tester_success_title": "Success",
+          "tester_success_message": "You have completed your tester accepted",
+          "tester_need_to_ftl_title": "Success",
+          "tester_need_to_ftl_message": "You have completed your tester accepted. But you need to FTL"
+      }
+  }
+}

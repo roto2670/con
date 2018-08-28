@@ -110,9 +110,9 @@ def tests(product_id):
 
 
 def _check_validate(product_id, json_content):
-  error_title = "Upload Error"
+  error_title = common.get_msg("endpoints.upload.fail_title")
   if json_content['product'] != product_id:
-    msg = "Product name not matched in Specifications. Must be Product name equals product code."
+    msg = common.get_msg("endpoints.upload.fail_message_not_equal_product")
     logging.warn(msg)
     common.set_error_message(error_title, msg)
     return False
@@ -120,14 +120,14 @@ def _check_validate(product_id, json_content):
   _requests = json_content['requests']
   for req in _requests:
     if req['name'].lower().startswith('mib'):
-      msg = "Invalid request name. Request name cannot start with the mib."
+      msg = common.get_msg("endpoints.upload.fail_message_request_start_mib")
       logging.warn(msg)
       common.set_error_message(error_title, msg)
       return False
   _events = json_content['events']
   for event in _events:
     if event['name'].lower().startswith('mib'):
-      msg = "Invalid event name. Event name cannot start with the mib."
+      msg = common.get_msg("endpoints.upload.fail_message_event_start_mib")
       logging.warn(msg)
       common.set_error_message(error_title, msg)
       return False
@@ -160,8 +160,9 @@ def upload_header_file(product_id):
                                       current_user.email,
                                       current_user.organization_id,
                                       product_dev_stage.id)
-      title = "Success Upload"
-      msg = "Success upload for specifications. Product : {}, version : {}".format(json_content['product'], json_content['version'])
+      title = common.get_msg("endpoints.upload.success_title")
+      msg = common.get_msg("endpoints.upload.success_message")
+      msg.format(json_content['product'], json_content['version'])
       common.set_info_message(title, msg)
       return redirect('endpoints/' + product_id + '/specifications')
     else:

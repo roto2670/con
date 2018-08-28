@@ -19,6 +19,7 @@ from flask import render_template, redirect, request, url_for
 from flask import send_from_directory
 from flask_login import current_user, login_required, login_user, logout_user
 
+import common
 import in_apis
 from base import blueprint
 from base import db, login_manager, auth
@@ -45,14 +46,20 @@ def route_file(file_name):
 
 @blueprint.route('/welcome')
 def welcome():
-  # TODO : Tester
-  return render_template('welcome.html')
+  msg = {
+      "title": common.get_msg("products.tester.tester_need_to_ftl_title"),
+      "message": common.get_msg("products.tester.tester_need_to_ftl_message")
+  }
+  return render_template('welcome.html', msg=msg)
 
 
 @blueprint.route('/nowelcome')
 def welcome_no_ftl():
-  # TODO : Tester
-  return render_template('welcome_noftl.html')
+  msg = {
+      "title": common.get_msg("products.tester.tester_success_title"),
+      "message": common.get_msg("products.tester.tester_success_message")
+  }
+  return render_template('welcome_noftl.html', msg=msg)
 
 
 @blueprint.route('/<template>')
