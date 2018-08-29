@@ -13,3 +13,4 @@ intelhex
 PyMySql
 google-cloud-datastore
 pyOpenSSL
+gevent
