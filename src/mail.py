@@ -38,7 +38,7 @@ def send(to_addr, subject, data, content_type=None, attachment=None):
   try:
     content_type = content_type or 'text/html'
     from_addr = 'noreply@microbot.is'
-    from_name = 'MicroBot Console'
+    from_name = 'MiB Console'
     from_email = Email(from_addr, from_name)
     to_email = Email(to_addr)
     content = Content(content_type, data)
