@@ -57,13 +57,38 @@ def specifications(product_id):
                            model_list=model_list)
 
 
+@blueprint.route('/<product_id>/specifications/<specification_id>', methods=['GET'])
+def view_specifications(product_id, specification_id):
+  _set_product(product_id)
+  specification = in_apis.get_specifications(specification_id)
+  content = json.loads(specification.specifications)
+  return render_template('ep_view_specification.html',
+                         specification=specification,
+                         content=content)
+
+
+@blueprint.route('/<product_id>/specifications/<specification_id>/download', methods=['GET'])
+@login_required
+def download_specification_file(product_id, specification_id):
+  content = in_apis.get_specifications(specification_id)
+  try:
+    file_name = "{}.json".format(product_id)
+    file_content = content.specifications
+    return Response(file_content, mimetype='application/json',
+                    headers={'Content-Disposition':'attachment;filename={}'.format(file_name)})
+  except:
+    logging.exception("Raise error while specification file.")
+    abort(500)
+
+
 def _build_gadget_dict(gadgets):
   gadget_dict = {}
   for _gadget in gadgets:
     if _gadget['stage'] == models.STAGE_DEV:
       for __gadget in _gadget['gadgets']:
-        display = "{} ({})".format(__gadget['name'], _gadget['email'])
-        gadget_dict[__gadget['id']] = display
+        if __gadget['status'] == 1:
+          display = "{} ({})".format(__gadget['name'], _gadget['email'])
+          gadget_dict[__gadget['id']] = display
   return gadget_dict
 
 

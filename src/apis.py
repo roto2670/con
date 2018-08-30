@@ -59,7 +59,19 @@ def get_gadget_list_by_tester(product_id):
                    'id': 'testgadget_id',
                    'mac': 'testgadget_mac',
                    'name': 'testgadget_name',
-                   'kind': 'testgadget_kind'
+                   'kind': 'testgadget_kind',
+                   'status': 0
+               }
+           ]},
+          {'email': 'tester@example.com',
+           'stage': 2,
+           'gadgets': [
+               {
+                   'id': 'testgadget_id_2',
+                   'mac': 'testgadget_mac_2',
+                   'name': 'testgadget_name_2',
+                   'kind': 'testgadget_kind_2',
+                   'status': 1
                }
            ]}
       ]

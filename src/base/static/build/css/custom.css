@@ -4302,6 +4302,10 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     margin-left: 10em
 }
 
+.right-align {
+    text-align: right
+}
+
 /** jslee custom. json viewer **/
 @media (max-height: 1100px) {
     .json-height {
