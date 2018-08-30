@@ -39,7 +39,7 @@
                         <td><a href="/products/{{ current_product.id }}/model/{{ model.id }}">{{ model.name }}</a></td>
                         <td>{{ model.firmware_list|length }}</td>
                         {% if model.firmware_list %}
-                          <td>{{ model.firmware_list[-1] }}</td>
+                          <td>{{ model.firmware_list[-1].version }}</td>
                         {% else %}
                           <td>None</td>
                         {% endif %}
