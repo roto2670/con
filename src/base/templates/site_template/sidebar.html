@@ -15,7 +15,7 @@
         {% if current_product %}
           <li><a href="/"><i class="fa fa-area-chart"></i>Dashboard</a></li>
           <!-- Product -->
-          <li><a><i class="fa fa-keyboard-o"></i> Product <span class="fa fa-chevron-down"></span></a>
+          <li><a><i class="fa fa-list"></i> Product <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
                 <li><a href="/products/{{ current_product.id }}/general">General</a></li>
                 <li><a href="/products/{{ current_product.id }}/model">Model</a></li>
@@ -24,24 +24,25 @@
             </ul>
           </li>
           <!-- Endpoints -->
-          <li><a><i class="fa fa-gears"></i> Endpoints <span class="fa fa-chevron-down"></span></a>
+          <li><a><i class="fa fa-tasks"></i> Endpoints <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
                 <li><a href="/endpoints/{{ current_product.id }}/specifications">Specifications</a></li>
                 <li><a href="/endpoints/{{ current_product.id }}/tests">Tests</a></li>
             </ul>
           </li>
-          <li><a><i class="fa fa-gears"></i> Release <span class="fa fa-chevron-down"></span></a>
+          <li><a><i class="fa fa-sliders"></i> Release <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
                 <li><a href="/release/{{ current_product.id }}/list">Release</a></li>
             </ul>
           </li>
+          <li><a href="/doc"><i class="fa fa-file-text-o"></i> Document </a>
         {% endif %}
       </ul>
     </div>
   </div>
   <!-- /sidebar menu -->
 
-  <!-- /menu footer buttons -->
+  <!-- /menu footer buttons
   <div class="sidebar-footer hidden-small">
     <a data-toggle="tooltip" data-placement="top" title="Organization" href="/organization">
       <span class="fa fa-users" aria-hidden="true"></span>
@@ -56,5 +57,6 @@
       <span class="fa fa-sign-out" aria-hidden="true"></span>
     </a>
   </div>
+   -->
   <!-- /menu footer buttons -->
 </div>
