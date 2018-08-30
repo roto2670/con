@@ -26,7 +26,6 @@
                     <tr>
                       <th>Name</th>
                       <th>Count</th>
-                      <th>Last Version</th>
                       <th>Update time</th>
                       <th>Update user</th>
                       <th>Delete</th>
@@ -38,11 +37,6 @@
                       <tr>
                         <td><a href="/products/{{ current_product.id }}/model/{{ model.id }}">{{ model.name }}</a></td>
                         <td>{{ model.firmware_list|length }}</td>
-                        {% if model.firmware_list %}
-                          <td>{{ model.firmware_list[-1].version }}</td>
-                        {% else %}
-                          <td>None</td>
-                        {% endif %}
                         <td>{{ model.last_updated_time }}</td>
                         <td>{{ model.last_updated_user }}</td>
                         {% if current_user.level == 0 and not release_list %}
