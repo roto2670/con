@@ -220,7 +220,8 @@ def _create_noti_key(noti_key):
 
 def create_ios_noti_key(name, key, state):
   # name = bundle_id, key = password
-  noti_key = NotiKey(typ=models.IOS,
+  noti_key = NotiKey(id=uuid.uuid4().hex,
+                     typ=models.IOS,
                      name=name,
                      key=key,
                      is_dev=state,
@@ -233,7 +234,8 @@ def create_ios_noti_key(name, key, state):
 
 def create_android_noti_key(name, key):
   # name = package_name, key = key
-  noti_key = NotiKey(typ=models.ANDROID,
+  noti_key = NotiKey(id=uuid.uuid4().hex,
+                     typ=models.ANDROID,
                      name=name,
                      key=key,
                      created_time=datetime.datetime.utcnow(),
