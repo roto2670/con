@@ -110,15 +110,27 @@ def register_noti_key(platform):
       state = int(request.form['state'])
       upload_file = request.files['file']
       content = upload_file.read()
-      cmds.send_noti_key(current_user.organization_id, bundle_id, password,
-                         content, state)
-      in_apis.create_ios_noti_key(bundle_id, password, state)
-      return redirect('organization')
+      ret = cmds.send_noti_key(current_user.organization_id, bundle_id, password,
+                               content, state)
+      if ret:
+        in_apis.create_ios_noti_key(bundle_id, password, state)
+        return redirect('organization')
+      else:
+        logging.warn("Fail to ios register noti key. org : %s, id : %s, pw : %s, state : %s",
+                     current_user.organization_id, bundle_id, password, state)
+        abort(500)
     else:
       package_name = request.form['packageName']
       key = request.form['key']
-      in_apis.create_android_noti_key(package_name, key)
-      return redirect('organization')
+      ret = apis.update_android_key(current_user.organization_id, package_name,
+                                    key)
+      if ret:
+        in_apis.create_android_noti_key(package_name, key)
+        return redirect('organization')
+      else:
+        logging.warn("Fail to register android noti key. org : %s, name : %s, key : %s",
+                     current_user.organization_id, package_name, key)
+        abort(500)
 
 
 @blueprint.route('/invite', methods=['POST'])

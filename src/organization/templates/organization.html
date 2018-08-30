@@ -83,16 +83,23 @@
                         <thead>
                           <tr>
                             <th>Platform</th>
+                            <th>Bundle ID</th>
                             <th>Last Updated</th>
                             <th>Last Updated User</th>
                           </tr>
                         </thead>
 
                         <tbody>
-                          {% for org in orgs %}
+                          {% for noti_key in noti_key_list %}
                             <tr>
-                              <td>{{ org.name }}</td>
-                              <td>{{ org.created_time }}</td>
+                              {% if noti_key.typ == 0 %}
+                                <td>IOS</td>
+                              {% else %}
+                                <td>ANDROID</td>
+                              {% endif %}
+                              <td>{{ noti_key.name }}</td>
+                              <td>{{ noti_key.last_updated_time }}</td>
+                              <td>{{ noti_key.last_updated_user }}</td>
                               <td></td>
                             </tr>
                           {% endfor %}
