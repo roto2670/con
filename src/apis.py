@@ -118,12 +118,10 @@ def get_gadget_list(product_id):
 def update_android_key(organization_id, kind, secret):
   # kind : package name
   # secret : key
-  url = BASE_URL + 'developers/' + organization_id + '/key'
+  url = BASE_URL + 'developers/' + organization_id + '/keys/' + kind + "/android"
   headers = {}
   data = {
-      "kind": kind,
-      "platform": "android",
-      "secret": secret,
+      "secret": secret
   }
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(data))
@@ -141,11 +139,9 @@ def update_android_key(organization_id, kind, secret):
 def update_ios_key(organization_id, kind, cert, secret, is_dev):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.2q2o6bhvcg6
   # kind : bundle_id
-  url = BASE_URL + 'developers/' + organization_id + '/key'
+  url = BASE_URL + 'developers/' + organization_id + '/keys/' + kind + "/ios"
   headers = {}
   data = {
-      "kind": kind,
-      "platform": "ios",
       "cert": cert,
       "secret": secret,
       "stage": is_dev

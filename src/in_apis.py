@@ -218,6 +218,19 @@ def _create_noti_key(noti_key):
   db.session.commit()
 
 
+def get_ios_noti_key(organization_id, typ, name, key, is_dev):
+  noti_key = NotiKey.query.filter_by(organization_id=organization_id,
+                                     typ=typ, name=name, key=key,
+                                     is_dev=is_dev).one_or_none()
+  return noti_key
+
+
+def get_android_noti_key(organization_id, typ, name, key):
+  noti_key = NotiKey.query.filter_by(organization_id=organization_id,
+                                     typ=typ, name=name, key=key).one_or_none()
+  return noti_key
+
+
 def create_ios_noti_key(name, key, state):
   # name = bundle_id, key = password
   noti_key = NotiKey(id=uuid.uuid4().hex,
@@ -243,6 +256,12 @@ def create_android_noti_key(name, key):
                      last_updated_user=current_user.email,
                      organization_id=current_user.organization_id)
   _create_noti_key(noti_key)
+
+
+def update_noti_key(noti_key):
+  noti_key.last_updated_time = datetime.datetime.utcnow()
+  noti_key.last_updated_user = current_user.email
+  db.session.commit()
 
 
 def get_noti_key_list(organization_id):

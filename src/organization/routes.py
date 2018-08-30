@@ -113,7 +113,13 @@ def register_noti_key(platform):
       ret = cmds.send_noti_key(current_user.organization_id, bundle_id, password,
                                content, state)
       if ret:
-        in_apis.create_ios_noti_key(bundle_id, password, state)
+        noti_key = in_apis.get_ios_noti_key(current_user.organization_id,
+                                            models.IOS, bundle_id, password,
+                                            state)
+        if noti_key:
+          in_apis.update_noti_key(noti_key)
+        else:
+          in_apis.create_ios_noti_key(bundle_id, password, state)
         return redirect('organization')
       else:
         logging.warn("Fail to ios register noti key. org : %s, id : %s, pw : %s, state : %s",
@@ -125,7 +131,12 @@ def register_noti_key(platform):
       ret = apis.update_android_key(current_user.organization_id, package_name,
                                     key)
       if ret:
-        in_apis.create_android_noti_key(package_name, key)
+        noti_key = in_apis.get_android_noti_key(current_user.organization_id,
+                                                models.ANDROID, package_name, key)
+        if noti_key:
+          in_apis.update_noti_key(noti_key)
+        else:
+          in_apis.create_android_noti_key(package_name, key)
         return redirect('organization')
       else:
         logging.warn("Fail to register android noti key. org : %s, name : %s, key : %s",
