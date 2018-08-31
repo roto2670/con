@@ -106,6 +106,11 @@ STAGE_PRE_RELEASE = 1
 STAGE_DEV = 2
 STAGE_ARCHIVE = 3
 
+# TYPE
+PRD_TYPE_BLE = 0
+PRD_TYPE_WEB = 1
+
+
 class Product(db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   __tablename__ = 'product'
@@ -115,6 +120,7 @@ class Product(db.Model):
   developer_id = Column(String(75))
   key = Column(String(75))
   name = Column(String(75))
+  typ = Column(Integer)
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   organization_id = Column(String(75), ForeignKey('organization.id'))
@@ -165,6 +171,11 @@ class ProductStage(db.Model):
     return self.id
 
 
+# TYPE
+MODEL_TYPE_NRF_51 = 0
+MODEL_TYPE_NRF_52 = 1
+
+
 class Model(db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   __tablename__ = 'model'
@@ -172,6 +183,7 @@ class Model(db.Model):
   id = Column(String(75), primary_key=True)
   code = Column(Integer)
   name = Column(String(75))
+  typ = Column(Integer)
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))

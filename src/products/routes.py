@@ -60,7 +60,9 @@ def create():
     else:
       ret = apis.create_product(code, current_user.organization_id)
       if ret:
-        product = in_apis.create_product(request.form['name'], ret)
+        # TODO: Product type
+        product = in_apis.create_product(request.form['name'], ret,
+                                         models.PRD_TYPE_BLE)
         org = in_apis.get_organization(current_user.organization_id)
         if org:
           product_list = json.loads(org.products)
@@ -74,14 +76,27 @@ def create():
         abort(500)
 
 
+def _get_type_dict(product):
+  if product.typ == models.PRD_TYPE_BLE:
+    typ_dict = {
+        models.MODEL_TYPE_NRF_51 : "NRF51",
+        models.MODEL_TYPE_NRF_52 : "NRF52"
+    }
+    return typ_dict
+  else:
+    return {}
+
+
 @blueprint.route('/<product_id>/model/create', methods=['GET', 'POST'])
 @login_required
 def create_model(product_id):
   if request.method == "GET":
     _set_product(product_id)
+    product = in_apis.get_product(product_id)
+    typ_dict = _get_type_dict(product)
     parse_ret = urllib.parse.urlparse(request.referrer)
     referrer = parse_ret.path if parse_ret else "/"
-    return render_template("model_create.html", referrer=referrer)
+    return render_template("model_create.html", referrer=referrer, typ_dict=typ_dict)
   else:
     parse_ret = urllib.parse.urlparse(request.referrer)
     referrer = parse_ret.path if parse_ret else "/"
@@ -90,6 +105,7 @@ def create_model(product_id):
       referrer = "/products/" + product_id + "/model"
 
     name = request.form['name']
+    model_type = request.form['type']
     code = 0
     _model_list = in_apis.get_model_list(product_id)
     if _model_list:
@@ -110,7 +126,7 @@ def create_model(product_id):
       ret = apis.create_model(product_id, code, name)
       if ret:
         product_stage = in_apis.get_product_stage_by_dev(product_id)
-        in_apis.create_model(name, code, product_stage.id, current_user.email)
+        in_apis.create_model(name, code, model_type, product_stage.id, current_user.email)
         return redirect('products/' + product_id + '/general')
       else:
         abort(500)
@@ -266,6 +282,7 @@ def confirm_mail():
     in_apis.update_invite(key, organization_id)
     tester_info = apis.get_user(invite.email)
     tester_authorized = tester_info['user']['authorized'] if tester_info else False
+    logging.debug("Tester info : %s", tester_info)
     # TODO:
     ret = apis.register_tester(organization_id, invite.product_id, invite.email,
                                 models.STAGE_PRE_RELEASE)
@@ -292,8 +309,10 @@ def model_list(product_id):
   release_list = []
   if release_product:
     release_list = release_product.model_list
+  product = in_apis.get_product(product_id)
+  typ_dict = _get_type_dict(product)
   return render_template('model_list.html', model_list=dev_product.model_list,
-                         release_list=release_list)
+                         release_list=release_list, typ_dict=typ_dict)
 
 
 @blueprint.route('/<product_id>/model/<model_id>', methods=['GET'])

@@ -27,13 +27,14 @@ from models import Invite, Tester, Firmware
 # {{{ Product
 
 
-def create_product(product_name, product_obj):
+def create_product(product_name, product_obj, product_type):
   # product_obj : response from microbot cloud
   product = Product(id=product_obj['id'],
                     code=product_obj['id'],
                     developer_id=product_obj['developer_id'],
                     key=product_obj['key'],
                     name=product_name,
+                    typ=product_type,
                     created_time=datetime.datetime.utcnow(),
                     last_updated_time=datetime.datetime.utcnow(),
                     organization_id=product_obj['developer_id'])
@@ -97,10 +98,11 @@ def delete_product(id):
     db.session.commit()
 
 
-def create_model(model_name, model_code, product_stage_id, user_email):
+def create_model(model_name, model_code, model_type, product_stage_id, user_email):
   model = Model(id=uuid.uuid4().hex,
                 code=model_code,
                 name=model_name,
+                typ=model_type,
                 created_time=datetime.datetime.utcnow(),
                 last_updated_time=datetime.datetime.utcnow(),
                 last_updated_user=user_email,
