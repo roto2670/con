@@ -106,7 +106,7 @@ if  __name__ == '__main__':
   else:
     cur_path = os.path.dirname(os.path.abspath(__file__))
     ssl_path = os.path.join(cur_path, 'ssl')
-    ssl_crt = os.path.join(ssl_path, 'console_microbot_is.crt')
-    ssl_key = os.path.join(ssl_path, 'console_microbot_is.key')
+    ssl_crt = os.path.join(ssl_path, 'mib_io.crt')
+    ssl_key = os.path.join(ssl_path, 'mib_io.key')
     _app.run(host='127.0.0.1', port=5000, ssl_context=(ssl_crt, ssl_key))
 

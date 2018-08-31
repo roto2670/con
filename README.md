@@ -26,7 +26,7 @@
 
 
 # Using gunicorn
-    gunicorn -w 3 --certfile ssl/console_microbot_is.crt --keyfile ssl/console_microbot_is.key -b 127.0.0.1:5000 run:__app
+    gunicorn -w 3 --certfile ssl/mib_io.crt --keyfile ssl/mib_io.key -b 127.0.0.1:5000 run:__app
 
 
 # Using MySQL for Google Cloud SQL
@@ -39,7 +39,7 @@
     cd console/cloud_sql
     nohup ./cloud_sql_proxy -instances=protacloud:us-west1:console=tcp:3306 -credential_file=console_db.json
     cd src
-    nohup gunicorn -w 3 -k gevent --certfile ssl/console_microbot_is.crt --keyfile ssl/console_microbot_is.key -b 127.0.0.1:5000 run:__app
+    nohup gunicorn -w 3 -k gevent --certfile ssl/mib_io.crt --keyfile ssl/mib_io.key -b 127.0.0.1:5000 run:__app
 
 
 # Reference
