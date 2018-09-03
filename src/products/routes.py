@@ -17,6 +17,7 @@ import logging
 import datetime
 import urllib.parse
 
+from flask import send_from_directory
 from flask import abort, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 
@@ -390,6 +391,18 @@ def upload_firmware(product_id, model_id):
     else:
       logging.warn("Raise upload firmware error. model : %s", model_id)
       abort(500)
+
+
+@blueprint.route('/<product_id>/model/<model_id>/firmware/<model_type>/download', methods=['GET', 'POST'])
+def download_software(product_id, model_id, model_type):
+  if int(model_type) == models.MODEL_TYPE_NRF_51:
+    path = os.path.join(cmds.get_res_path(), 'firmware', 'nrf51')
+    file_name = "nrf51.zip"
+  else:
+    # NRF 52
+    path = os.path.join(cmds.get_res_path(), 'firmware', 'nrf52')
+    file_name = "nrf52.zip"
+  return send_from_directory(directory=path, filename=file_name, as_attachment=True)
 
 
 def _set_product(product_id):

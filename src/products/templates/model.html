@@ -27,10 +27,8 @@
                   </li>
                   <li role="presentation" class=""><a href="#tab_content2" role="tab" id="firmware-tab" data-toggle="tab" aria-expanded="false">Firmware</a>
                   </li>
-                  <!--
                   <li role="presentation" class=""><a href="#tab_content3" role="tab" id="program-tab" data-toggle="tab" aria-expanded="false">Program</a>
                   </li>
-                  -->
                 </ul>
 
                 <div id="myTabContent" class="tab-content">
@@ -98,30 +96,27 @@
                     </div>
                   </div>  <!-- firmware-tab -->
 
-                    <!--
                   <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="program-tab">
                     <div class="x_content">
                       <table id="datatable" class="table table-striped table-bordered">
                         <thead>
                           <tr>
                             <th>Name</th>
-                            <th>Version</th>
-                            <th>Size</th>
-                            <th>Updated time</th>
-                            <th>Updated user</th>
+                            <th>Content</th>
                             <th>Download</th>
                           </tr>
                         </thead>
 
                         <tbody>
                           <tr>
-                            <td>Test</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>Provide By Naran</td>
+                            {% if model.typ == 0 %}
+                              <td>NRF51</td>
+                            {% else %}
+                              <td>NRF52</td>
+                            {% endif %}
+                            <td>Soft device, Boot loader</td>
                             <td class="center-align">
-                              <a href="#">
+                              <a href="/products/{{ current_product.id }}/model/{{ model.id }}/firmware/{{ model.typ }}/download">
                                 <i class="fa fa-cloud-download"></i>
                               </a>
                             </td>
@@ -129,8 +124,7 @@
                         </tbody>
                       </table>
                     </div>
-                  </div>
-                       program-tab -->
+                  </div>  <!-- program-tab -->
 
                 </div>
               </div>
