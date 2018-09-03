@@ -4,6 +4,37 @@
 {% block title %} Products {% endblock title %}
 
 {% block content %}
+  {% if modal %}
+    <script>
+      onload = function() {
+        $('.bs-example-modal-lg').modal('show');
+      }
+    </script>
+  {% endif %}
+
+  <!-- modal -->
+  <div class="modal bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="false">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">{{ modal['title'] }}</h4>
+      </div>
+      <div class="modal-body">
+        <h4>{{ modal['sub_title'] }}</h4>
+        <p>{{ modal['message'] }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">{{ modal['ok'] }}</button>
+      </div>
+
+    </div>
+  </div>
+  </div>
+  <!-- end modal -->
+
   <div class="right_col" role="main">
     <div class="">
 
@@ -24,7 +55,7 @@
                   <label class="control-label col-md-3 col-sm-3 col-xs-12" for="code">Code <span class="required">*</span>
                   </label>
                   <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" id="code" name="code" required="required" maxlength="10"
+                    <input type="text" id="code" name="code" required="required" maxlength="10" onkeyup="this.value=this.value.replace(/[^a-zA-Z]/g,'');"
                         class="form-control col-md-7 col-xs-12 only-eng only-lower">
                   </div>
                 </div>
@@ -32,7 +63,8 @@
                   <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Name <span class="required">*</span>
                   </label>
                   <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" id="name" name="name" required="required" class="form-control col-md-7 col-xs-12">
+                    <input type="text" id="name" name="name" required="required" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g,'');"
+                      class="form-control col-md-7 col-xs-12">
                   </div>
                 </div>
 

@@ -38,7 +38,13 @@
               "invalid_code_title": "Invalid product code",
               "invalid_code_message": "Only lowercase letters are accepted. Special characters including spaces can not be entered.",
               "exists_product_title": "Product code exists",
-              "exists_product_message": "Product code must be unique. Please enter a different code."
+              "exists_product_message": "Product code must be unique. Please enter a different code.",
+              "first": {
+                  "title": "Create your product",
+                  "sub_title": "Create your product",
+                  "message": "Please specify the product name and code. The code is the name that is visible during the bare scan. Code can only contain lowercase letters, but must be less than 10 characters.",
+                  "ok": "OK"
+              }
           },
           "model": {
               "usage_full_title": "Cannot create a new model",

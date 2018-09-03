@@ -159,7 +159,7 @@
                           </tbody>
                         </table>
 
-                        {% if dev_list[0].endpoint.version and dev_list[0].model_list %}
+                        {% if allow_pre_release %}
                           <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Pre Release</button>
                         {% else %}
                           <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm" disabled>Pre Release</button>

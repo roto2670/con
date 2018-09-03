@@ -36,9 +36,16 @@ from products import blueprint
 @login_required
 def create():
   if request.method == "GET":
+    modal = {}
+    product_list = in_apis.get_product_list(current_user.organization_id)
+    if not product_list:
+      modal['title'] = common.get_msg("products.create.product.first.title")
+      modal['sub_title'] = common.get_msg("products.create.product.first.sub_title")
+      modal['message'] = common.get_msg("products.create.product.first.message")
+      modal['ok'] = common.get_msg("products.create.product.first.ok")
     parse_ret = urllib.parse.urlparse(request.referrer)
     referrer = parse_ret.path if parse_ret else "/"
-    return render_template("prd_create.html", referrer=referrer)
+    return render_template("prd_create.html", referrer=referrer, modal=modal)
   else:
     parse_ret = urllib.parse.urlparse(request.referrer)
     referrer = parse_ret.path if parse_ret else "/"
