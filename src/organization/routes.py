@@ -14,8 +14,8 @@ import json
 import uuid
 import logging
 
-from flask import abort, render_template, request, redirect, url_for
-from flask_login import current_user, login_required
+from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
+from flask_login import current_user, login_required  # noqa : pylint: disable=import-error
 
 import apis
 import cmds
@@ -65,10 +65,10 @@ def create():
       return redirect('/organization')
     else:
       modal = {
-        "title": common.get_msg("organization.create.organization.modal_title"),
-        "sub_title": common.get_msg("organization.create.organization.modal_sub_title"),
-        "message": common.get_msg("organization.create.organization.modal_message"),
-        "ok": common.get_msg("organization.create.organization.modal_ok")
+          "title": common.get_msg("organization.create.organization.modal_title"),
+          "sub_title": common.get_msg("organization.create.organization.modal_sub_title"),
+          "message": common.get_msg("organization.create.organization.modal_message"),
+          "ok": common.get_msg("organization.create.organization.modal_ok")
       }
       return render_template("create.html", modal=modal)
   else:
@@ -83,7 +83,7 @@ def create():
     else:
       ret = apis.create_org(owner_email)
       if ret:
-        org = in_apis.create_organization(owner_email, name, ret)
+        in_apis.create_organization(owner_email, name, ret)
         user = in_apis.get_user_by_email(owner_email)
         if user:
           user.organization_id = ret['id']
@@ -122,8 +122,9 @@ def register_noti_key(platform):
           in_apis.create_ios_noti_key(bundle_id, password, state)
         return redirect('organization')
       else:
-        logging.warn("Fail to ios register noti key. org : %s, id : %s, pw : %s, state : %s",
-                     current_user.organization_id, bundle_id, password, state)
+        logging.warning(
+            "Fail to ios register noti key. org : %s, id : %s, pw : %s, state : %s",
+            current_user.organization_id, bundle_id, password, state)
         abort(500)
     else:
       package_name = request.form['packageName']
@@ -139,8 +140,9 @@ def register_noti_key(platform):
           in_apis.create_android_noti_key(package_name, key)
         return redirect('organization')
       else:
-        logging.warn("Fail to register android noti key. org : %s, name : %s, key : %s",
-                     current_user.organization_id, package_name, key)
+        logging.warning(
+            "Fail to register android noti key. org : %s, name : %s, key : %s",
+            current_user.organization_id, package_name, key)
         abort(500)
 
 
@@ -148,8 +150,8 @@ def register_noti_key(platform):
 @login_required
 def send_invite():
   email_addr = request.form['email']
-  with open(os.path.join(cmds.get_res_path(), 'invite.html'), 'r') as f:
-    content = f.read()
+  with open(os.path.join(cmds.get_res_path(), 'invite.html'), 'r') as _f:
+    content = _f.read()
   key = uuid.uuid4().hex
   auth_url = request.host_url + 'organization/confirm?key=' + key + \
       '&o=' + current_user.organization_id

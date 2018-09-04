@@ -11,7 +11,7 @@
 
 import os
 import cmds
-from flask import session
+from flask import session  # noqa : pylint: disable=import-error
 from util import Settings
 
 

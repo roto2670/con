@@ -23,17 +23,17 @@ PROTACLOUD_CREDENTIALS_DATA = '''{"type": "service_account", "project_id": "prot
 
 def _init_credential():
   if G_ENV_VALUE not in os.environ or G_ENV_GRPC not in os.environ:
-    f = tempfile.NamedTemporaryFile(mode='w', delete=False)
-    f.write(PROTACLOUD_CREDENTIALS_DATA)
-    f.close()
-    os.environ[G_ENV_VALUE] = f.name
+    _f = tempfile.NamedTemporaryFile(mode='w', delete=False)
+    _f.write(PROTACLOUD_CREDENTIALS_DATA)
+    _f.close()
+    os.environ[G_ENV_VALUE] = _f.name
     os.environ[G_ENV_GRPC] = 'true'
 
 
 _init_credential()
 
 
-import google.cloud.datastore  # NOQA
+import google.cloud.datastore  # noqa : pylint: disable=import-error
 
 
 DEFAULT_KIND = '''default'''
@@ -135,6 +135,6 @@ def search(kind, namespace, parent_name=None, filters=None,
                        filters, orders, limit)
     return ret_v
   except Exception:
-    logging.warn(
+    logging.warning(
         "Raise error while search data. Key: %s, Namespace: %s, Filters : %s",
         parent_name, namespace, filters, exc_info=True)

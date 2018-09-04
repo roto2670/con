@@ -11,10 +11,10 @@
 
 
 # 3rd party
-from flask_login import UserMixin
-from sqlalchemy import ForeignKey
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
-from sqlalchemy.orm import relationship, backref
+from flask_login import UserMixin  # noqa : pylint: disable=import-error
+from sqlalchemy import ForeignKey  # noqa : pylint: disable=import-error
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text  # noqa : pylint: disable=import-error
+from sqlalchemy.orm import relationship  # noqa : pylint: disable=import-error
 
 # self
 from base import db, login_manager
@@ -55,8 +55,8 @@ class User(UserMixin, db.Model):
 
 
 @login_manager.user_loader
-def user_loader(id):
-  return User.query.get(id)
+def user_loader(_id):
+  return User.query.get(_id)
 
 
 class Permission(db.Model):
@@ -97,7 +97,7 @@ class Organization(db.Model):
       setattr(self, property, value)
 
   def __repr__(self):
-      return self.name
+    return self.name
 
 
 # stage

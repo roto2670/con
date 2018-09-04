@@ -13,8 +13,8 @@ import json
 import uuid
 import datetime
 
-from flask_login import current_user
-from sqlalchemy.orm.session import make_transient
+from flask_login import current_user  # noqa : pylint: disable=import-error
+from sqlalchemy.orm.session import make_transient  # noqa : pylint: disable=import-error
 
 import apis
 import models
@@ -91,8 +91,8 @@ def get_product_stage_by_archive(product_id):
   return product_stage
 
 
-def delete_product(id):
-  product = get_product(id)
+def delete_product(_id):
+  product = get_product(_id)
   if product:
     db.session.delete(product)
     db.session.commit()
@@ -111,8 +111,8 @@ def create_model(model_name, model_code, model_type, product_stage_id, user_emai
   db.session.commit()
 
 
-def get_model(id):
-  model = Model.query.filter_by(id=id).one_or_none()
+def get_model(_id):
+  model = Model.query.filter_by(id=_id).one_or_none()
   return model
 
 
@@ -142,8 +142,8 @@ def get_pre_release_stage_model_list_order_by_created(product_id):
   return model
 
 
-def delete_model(id):
-  model = get_model(id)
+def delete_model(_id):
+  model = get_model(_id)
   if model:
     db.session.delete(model)
     db.session.commit()
@@ -288,8 +288,8 @@ def create_specifications(version, specifications, user_email, organization_id,
   db.session.commit()
 
 
-def update_specifications(id, user_email, version, specifications):
-  specification = get_specifications(id)
+def update_specifications(_id, user_email, version, specifications):
+  specification = get_specifications(_id)
   specification.version = version
   specification.last_updated_time = datetime.datetime.utcnow()
   specification.last_updated_user = user_email
@@ -297,8 +297,8 @@ def update_specifications(id, user_email, version, specifications):
   db.session.commit()
 
 
-def get_specifications(id):
-  specifications = Endpoint.query.filter_by(id=id).one_or_none()
+def get_specifications(_id):
+  specifications = Endpoint.query.filter_by(id=_id).one_or_none()
   return specifications
 
 
@@ -369,12 +369,12 @@ def delete_invite(invite_id):
 
 
 def delete_invite_by_product(product_id):
-  ret = Invite.query.filter_by(product_id=product_id).delete()
+  Invite.query.filter_by(product_id=product_id).delete()
   db.session.commit()
 
 
 def delete_invite_by_organization(organization_id):
-  ret = Invite.query.filter_by(organization_id=organization_id).delete()
+  Invite.query.filter_by(organization_id=organization_id).delete()
   db.session.commit()
 
 
@@ -395,15 +395,15 @@ def create_tester(email, organization_id, product_id, authorized, stage):
   db.session.commit()
 
 
-def update_tester_to_authorized(id):
-  tester = Tester.query.filter_by(id=id).one_or_none()
+def update_tester_to_authorized(_id):
+  tester = Tester.query.filter_by(id=_id).one_or_none()
   if tester:
     tester.authorized = True
     db.session.commit()
 
 
-def get_tester(id, product_id):
-  tester = Tester.query.filter_by(id=id, product_id=product_id).one_or_none()
+def get_tester(_id, product_id):
+  tester = Tester.query.filter_by(id=_id, product_id=product_id).one_or_none()
   return tester
 
 
@@ -418,8 +418,8 @@ def get_tester_list(product_id, organization_id):
   return tester_list
 
 
-def delete_tester(id):
-  tester = Tester.query.filter_by(id=id).one_or_none()
+def delete_tester(_id):
+  tester = Tester.query.filter_by(id=_id).one_or_none()
   if tester:
     db.session.delete(tester)
     db.session.commit()
@@ -461,7 +461,7 @@ def get_firmware_list_order_by_version(ep_version, model_code):
 
 def _delete_before_pre_release(product_id):
   _pre_release = get_product_stage_by_pre_release(product_id)
-  if pre_release:
+  if _pre_release:
     db.session.delete(_pre_release)
     db.session.commit()
 
@@ -479,7 +479,7 @@ def pre_release(product_id):
                                       models.STAGE_PRE_RELEASE)
   if prd_ret:
     _delete_before_pre_release(product_id)
-    ep = get_specifications(dev.endpoint.id)
+    _ep = get_specifications(dev.endpoint.id)
     model_list = dev.model_list
 
     make_transient(dev)
@@ -489,12 +489,12 @@ def pre_release(product_id):
     dev.last_updated_time = datetime.datetime.utcnow()
     dev.last_updated_user = current_user.email
 
-    make_transient(ep)
-    ep.id = uuid.uuid4().hex
-    ep.created_time = datetime.datetime.utcnow()
-    ep.last_updated_time = datetime.datetime.utcnow()
-    ep.last_updated_user = current_user.email
-    ep.product_stage_id = dev.id
+    make_transient(_ep)
+    _ep.id = uuid.uuid4().hex
+    _ep.created_time = datetime.datetime.utcnow()
+    _ep.last_updated_time = datetime.datetime.utcnow()
+    _ep.last_updated_user = current_user.email
+    _ep.product_stage_id = dev.id
 
     for model in model_list:
       firmware_list = model.firmware_list
@@ -515,7 +515,7 @@ def pre_release(product_id):
         db.session.add(firmware)
       db.session.add(model)
 
-    db.session.add(ep)
+    db.session.add(_ep)
     db.session.add(dev)
     db.session.commit()
     return True

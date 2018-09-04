@@ -1,13 +1,15 @@
-import jwt
-import requests
 
-from cryptography.x509 import load_pem_x509_certificate
-from cryptography.hazmat.backends import default_backend
-from flask import Blueprint, abort, redirect, request, render_template, url_for
-from threading import Lock
 from time import monotonic
+from threading import Lock
 from urllib.parse import urlparse
-from werkzeug.http import parse_cache_control_header
+
+import jwt  # noqa : pylint: disable=import-error
+import requests  # noqa : pylint: disable=import-error
+
+from cryptography.x509 import load_pem_x509_certificate  # noqa : pylint: disable=import-error
+from cryptography.hazmat.backends import default_backend  # noqa : pylint: disable=import-error
+from flask import Blueprint, abort, redirect, request, render_template, url_for  # noqa : pylint: disable=import-error
+from werkzeug.http import parse_cache_control_header  # noqa : pylint: disable=import-error
 
 
 blueprint = Blueprint(
@@ -21,7 +23,7 @@ blueprint = Blueprint(
 
 class FirebaseAuth:
 
-  KEYCHAIN_URL = 'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com'  # noqa
+  KEYCHAIN_URL = 'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com'  # noqa : pylint: disable=line-too-long
   PROVIDER_CLASSES = {
       'email': 'EmailAuthProvider',
       'facebook': 'FacebookAuthProvider',
@@ -100,13 +102,13 @@ class FirebaseAuth:
     return redirect(self.verify_redirection())
 
   def verify_redirection(self):
-    next = request.args.get('next') or request.url_root
+    _next = request.args.get('next') or request.url_root
     if not self.debug:
-      next_domain = urlparse(next).hostname.split('.')[-2:]
+      next_domain = urlparse(_next).hostname.split('.')[-2:]
       this_domain = urlparse(request.url).hostname.split('.')[-2:]
       if next_domain != this_domain:
         abort(400)
-    return next
+    return _next
 
   def refresh_keys(self):
     now = monotonic()

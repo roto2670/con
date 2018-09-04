@@ -11,8 +11,8 @@
 
 import datetime
 
-from flask import current_app, redirect, render_template, request, url_for
-from flask_login import current_user
+from flask import current_app, redirect, render_template, request, url_for  # noqa : pylint: disable=import-error
+from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import in_apis
 from base import db

@@ -31,6 +31,7 @@ class Config(object):
     LOG_PATH = os.path.join(os.path.expanduser('~'), 'log', 'console.log')
   LOG_BACKUP_COUNT = 10
   LOG_MAX_BYTES = 10485760
+  TOKEN = 'token'
 
 
 class ProductionConfig(Config):

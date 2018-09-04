@@ -10,21 +10,19 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import sys
-
 import os
 import logging
 import logging.handlers
-from config import DebugConfig, ProductionConfig
 from importlib import import_module
 
-from flask import Flask
-from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
+
+from flask import Flask  # noqa : pylint: disable=import-error
 
 import apis
 import common
 import base.routes
 from base import db, auth, login_manager
+from config import DebugConfig, ProductionConfig
 
 sys.dont_write_bytecode = True
 
@@ -86,6 +84,7 @@ def create_app():
     app.config.from_object(DebugConfig)
   else:
     app.config.from_object(ProductionConfig)
+  apis.init(app)
   configure_logs(app)
   register_extensions(app)
   register_blueprints(app)
@@ -109,4 +108,3 @@ if  __name__ == '__main__':
     ssl_crt = os.path.join(ssl_path, 'mib_io.crt')
     ssl_key = os.path.join(ssl_path, 'mib_io.key')
     _app.run(host='127.0.0.1', port=5000, ssl_context=(ssl_crt, ssl_key))
-

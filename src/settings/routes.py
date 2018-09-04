@@ -10,8 +10,8 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 
-from flask import render_template
-from flask_login import login_required
+from flask import render_template  # noqa : pylint: disable=import-error
+from flask_login import login_required  # noqa : pylint: disable=import-error
 
 from settings import blueprint
 

@@ -15,14 +15,13 @@
 
 # default
 import logging
-from hashlib import md5
 
 # thirdparty
-import sendgrid
-from sendgrid.helpers.mail import Mail
-from sendgrid.helpers.mail import Email
-from sendgrid.helpers.mail import Content
-from sendgrid.helpers.mail import Attachment
+import sendgrid  # noqa : pylint: disable=import-error
+from sendgrid.helpers.mail import Mail  # noqa : pylint: disable=import-error
+from sendgrid.helpers.mail import Email  # noqa : pylint: disable=import-error
+from sendgrid.helpers.mail import Content  # noqa : pylint: disable=import-error
+from sendgrid.helpers.mail import Attachment  # noqa : pylint: disable=import-error
 
 
 SG_API_KEY = 'SG.Iit8M_G8R9GBiRBknKi7fw.'\
@@ -55,8 +54,8 @@ def send(to_addr, subject, data, content_type=None, attachment=None):
     logging.debug("send mail status : %s", res.status_code)
     return True
   except Exception:
-    logging.warn("Failed to send mail. to: %s, subject: %s",
-                 to_addr, subject, exc_info=True)
+    logging.warning("Failed to send mail. to: %s, subject: %s",
+                    to_addr, subject, exc_info=True)
     raise
 
 

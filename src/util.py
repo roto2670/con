@@ -35,24 +35,23 @@ class Settings(object):
 
     for path in paths:
       if os.path.exists(path):
-        with open(path, 'r') as f:
+        with open(path, 'r') as _f:
           try:
-            config = json.load(f)
+            config = json.load(_f)
             self._update_value(config)
           except:
             logging.exception("Occured error while loading a config.")
-            with open(path, 'r') as rf:
-              logging.warn("path: %s\ncontents:\n%s", path, rf.read())
-            pass
+            with open(path, 'r') as _rf:
+              logging.warning("path: %s\ncontents:\n%s", path, _rf.read())
     self._generate_symbol()
 
-  def _merge_dict(self, a, b):
-    if isinstance(b, dict) and isinstance(a, dict):
-      a_and_b = a.viewkeys() & b.viewkeys()
-      every_key = a.viewkeys() | b.viewkeys()
-      return {k: self._merge_dict(a[k], b[k]) if k in a_and_b else deepcopy(
-          a[k] if k in a else b[k]) for k in every_key}
-    return deepcopy(b)
+  def _merge_dict(self, _a, _b):
+    if isinstance(_b, dict) and isinstance(_a, dict):
+      a_and_b = _a.viewkeys() & _b.viewkeys()
+      every_key = _a.viewkeys() | _b.viewkeys()
+      return {k: self._merge_dict(_a[k], _b[k]) if k in a_and_b else deepcopy(
+          _a[k] if k in _a else _b[k]) for k in every_key}
+    return deepcopy(_b)
 
   def _update_value(self, config):
     if not self._config:
@@ -68,8 +67,8 @@ class Settings(object):
       key = '.'.join([parent_key, sub_key])
       key = key[1:] if key.startswith('.') else key
       if isinstance(value, dict):
-        for k, v in value.items():
-          values.append((key, k, v))
+        for _k, _v in value.items():
+          values.append((key, _k, _v))
       self._config_symbol[key] = value
 
   def _parse_key(self, key):
@@ -78,13 +77,9 @@ class Settings(object):
     return key.split('.')
 
   def to_string(self):
-    """
-    """
     return json.dumps(self._config)
 
   def to_dict(self):
-    """
-    """
     return self._config
 
   def get(self, key, default=None):
@@ -154,10 +149,10 @@ class Settings(object):
       level = 0
       config = self._config
       for k in keys:
-        v = config[k] if k in config else None
-        if not isinstance(v, dict):
+        _v = config[k] if k in config else None
+        if not isinstance(_v, dict):
           break
-        config = v
+        config = _v
         level += 1
       parent_key = '.'.join(keys[:level])
       p_k = keys[level]
@@ -177,8 +172,8 @@ class Settings(object):
 
     :param dictionary items:
     """
-    for k, v in items.items():
-      self.set(k, v)
+    for _k, _v in items.items():
+      self.set(_k, _v)
 
   def __iter__(self):
     for key in self._config_symbol.keys():
@@ -221,10 +216,10 @@ class Settings(object):
     self._read(self._paths)
 
   def _write(self, path):
-    d = os.path.dirname(path)
-    os.path.exists(d) or os.makedirs(d)
-    with open(path, 'w') as f:
-      json.dump(self._config, f)
+    _d = os.path.dirname(path)
+    os.path.exists(_d) or os.makedirs(_d)
+    with open(path, 'w') as _f:
+      json.dump(self._config, _f)
 
   def flush(self, path=None):
     """Flushes the current settings value to the given path.

@@ -17,9 +17,9 @@ import logging
 import datetime
 import urllib.parse
 
-from flask import send_from_directory
-from flask import abort, render_template, request, redirect, url_for
-from flask_login import login_required, current_user
+from flask import send_from_directory  # noqa : pylint: disable=import-error
+from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
+from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
 
 import apis
 import cmds
@@ -208,16 +208,16 @@ def tester(product_id):
 
 
 def _send_invite(email_addr, product_id):
-  with open(os.path.join(cmds.get_res_path(), 'tester_invite.html'), 'r') as f:
-    content = f.read()
+  with open(os.path.join(cmds.get_res_path(), 'tester_invite.html'), 'r') as _f:
+    content = _f.read()
   key = uuid.uuid4().hex
   auth_url = request.host_url + 'products/confirm?key=' + key + '&o=' + \
       current_user.organization_id
   _product = in_apis.get_product(product_id)
   title = common.get_msg("products.tester.mail_title")
   title = title.format(_product.name)
-  msg =  common.get_msg("products.tester.mail_message")
-  msg =  msg.format(_product.name)
+  msg = common.get_msg("products.tester.mail_message")
+  msg = msg.format(_product.name)
   content = content.format(auth_url=auth_url, title=title, msg=msg)
   try:
     mail.send(email_addr, title, content)
@@ -231,20 +231,20 @@ def _send_invite(email_addr, product_id):
 @blueprint.route('/<product_id>/tester/<tester_id>/change/<level>')
 @login_required
 def change_tester_level(product_id, tester_id, level):
-  tester = in_apis.get_tester(tester_id, product_id)
-  if tester:
-    ret = apis.register_tester(tester.organization_id, product_id, tester.email,
+  _tester = in_apis.get_tester(tester_id, product_id)
+  if _tester:
+    ret = apis.register_tester(_tester.organization_id, product_id, _tester.email,
                                int(level))
     if ret:
-      tester.level = level
+      _tester.level = level
       db.session.commit()
       return redirect('products/' + product_id + '/tester')
     else:
-      logging.warn("Failed to change tester level. Id : %s, ret : %s",
-                   tester_id, ret)
+      logging.warning("Failed to change tester level. Id : %s, ret : %s",
+                      tester_id, ret)
       return redirect('products/' + product_id + '/tester')
   else:
-    logging.warn("Can not find tester. Id : %s", tester_id)
+    logging.warning("Can not find tester. Id : %s", tester_id)
     return redirect('products/' + product_id + '/tester')
 
 
@@ -252,25 +252,25 @@ def change_tester_level(product_id, tester_id, level):
 @blueprint.route('/<product_id>/tester/<tester_id>/delete')
 @login_required
 def remove_tester(product_id, tester_id):
-  tester = in_apis.get_tester(tester_id, product_id)
-  if tester:
-    ret = apis.delete_tester(tester.organization_id, product_id, tester.email)
+  _tester = in_apis.get_tester(tester_id, product_id)
+  if _tester:
+    ret = apis.delete_tester(_tester.organization_id, product_id, _tester.email)
     if ret:
       in_apis.delete_tester(tester_id)
     else:
-      logging.warn("Failed to delete tester. Tester : %s", tester.email)
+      logging.warning("Failed to delete tester. Tester : %s", _tester.email)
   return redirect('products/' + product_id + '/tester')
 
 
 @blueprint.route('/<product_id>/tester/<tester_id>/refresh')
 @login_required
 def check_authorized(product_id, tester_id):
-  tester = in_apis.get_tester(tester_id, product_id)
-  if tester:
-    tester_info = apis.get_user(tester.email)
+  _tester = in_apis.get_tester(tester_id, product_id)
+  if _tester:
+    tester_info = apis.get_user(_tester.email)
     tester_authorized = tester_info['user']['authorized']
     if tester_authorized:
-      in_apis.update_tester_to_authorized(tester.id)
+      in_apis.update_tester_to_authorized(_tester.id)
   return redirect('products/' + product_id + '/tester')
 
 
@@ -293,7 +293,7 @@ def confirm_mail():
     logging.debug("Tester info : %s", tester_info)
     # TODO:
     ret = apis.register_tester(organization_id, invite.product_id, invite.email,
-                                models.STAGE_PRE_RELEASE)
+                               models.STAGE_PRE_RELEASE)
     if ret:
       in_apis.create_tester(invite.email, invite.organization_id,
                             invite.product_id, tester_authorized,
@@ -387,20 +387,21 @@ def upload_firmware(product_id, model_id):
                                             {model.code: firmware_version},
                                             state)
       if ret_stage:
-        firmware = in_apis.create_firmware(firmware_version,
-                                           model.product_stage.endpoint.version,
-                                           model.code, current_user.email,
-                                           ret, model.id)
+        in_apis.create_firmware(firmware_version,
+                                model.product_stage.endpoint.version,
+                                model.code, current_user.email,
+                                ret, model.id)
         return redirect('products/' + product_id + '/model/' + model_id)
       else:
-        logging.warn("Raise update stage error. model : %s", model_id)
+        logging.warning("Raise update stage error. model : %s", model_id)
         abort(500)
     else:
-      logging.warn("Raise upload firmware error. model : %s", model_id)
+      logging.warning("Raise upload firmware error. model : %s", model_id)
       abort(500)
 
 
-@blueprint.route('/<product_id>/model/<model_id>/firmware/<model_type>/download', methods=['GET', 'POST'])
+@blueprint.route('/<product_id>/model/<model_id>/firmware/<model_type>/download',
+                 methods=['GET', 'POST'])
 def download_software(product_id, model_id, model_type):
   if int(model_type) == models.MODEL_TYPE_NRF_51:
     path = os.path.join(cmds.get_res_path(), 'firmware', 'nrf51')

@@ -13,8 +13,8 @@ import json
 import time
 import logging
 
-from flask import abort, render_template, redirect, request, Response
-from flask_login import login_required, current_user
+from flask import abort, render_template, redirect, request, Response  # noqa : pylint: disable=import-error
+from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
 
 import apis
 import common
@@ -138,7 +138,7 @@ def _check_validate(product_id, json_content):
   error_title = common.get_msg("endpoints.upload.fail_title")
   if json_content['product'] != product_id:
     msg = common.get_msg("endpoints.upload.fail_message_not_equal_product")
-    logging.warn(msg)
+    logging.warning(msg)
     common.set_error_message(error_title, msg)
     return False
 
@@ -146,14 +146,14 @@ def _check_validate(product_id, json_content):
   for req in _requests:
     if req['name'].lower().startswith('mib'):
       msg = common.get_msg("endpoints.upload.fail_message_request_start_mib")
-      logging.warn(msg)
+      logging.warning(msg)
       common.set_error_message(error_title, msg)
       return False
   _events = json_content['events']
   for event in _events:
     if event['name'].lower().startswith('mib'):
       msg = common.get_msg("endpoints.upload.fail_message_event_start_mib")
-      logging.warn(msg)
+      logging.warning(msg)
       common.set_error_message(error_title, msg)
       return False
   return True
@@ -191,7 +191,7 @@ def upload_header_file(product_id):
       common.set_info_message(title, msg)
       return redirect('endpoints/' + product_id + '/specifications')
     else:
-      logging.warn("Failed to register specifications.")
+      logging.warning("Failed to register specifications.")
       abort(500)
   except:
     logging.exception("Raise error while upload header file.")
@@ -229,7 +229,7 @@ def download_header_file(product_id, specification_id, model_id):
 @login_required
 def test_call(product_id, gadget, endpoint_name):
   logging.info("Test call. %s", endpoint_name)
-  product =  in_apis.get_product(product_id)
+  product = in_apis.get_product(product_id)
   dev_stage = in_apis.get_product_stage_by_dev(product_id)
   specification = json.loads(dev_stage.endpoint.specifications)
 

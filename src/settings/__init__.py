@@ -9,7 +9,9 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-from flask import Blueprint
+
+from flask import Blueprint  # noqa : pylint: disable=import-error
+
 
 blueprint = Blueprint(
     'settings_blueprint',

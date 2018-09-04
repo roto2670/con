@@ -9,9 +9,9 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-from flask import Blueprint
-from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
+from flask import Blueprint  # noqa : pylint: disable=import-error
+from flask_login import LoginManager  # noqa : pylint: disable=import-error
+from flask_sqlalchemy import SQLAlchemy  # noqa : pylint: disable=import-error
 
 from login import FirebaseAuth
 

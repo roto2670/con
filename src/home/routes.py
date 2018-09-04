@@ -14,8 +14,8 @@ import time
 import json
 import logging
 
-from flask import render_template, redirect
-from flask_login import login_required, current_user
+from flask import render_template, redirect  # noqa : pylint: disable=import-error
+from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
 
 import apis
 import cmds
@@ -32,7 +32,7 @@ from home import blueprint
         'online': '', 'offline': ''
     }
 }
-"""
+"""  # noqa : pylint: disable=pointless-string-statement
 DASHBOARD_CACHE = {}
 DATA_CACHE = {}  # {'time': '', 'data': ''}
 REFRESH_TIME = 3600  # 1H
@@ -121,8 +121,8 @@ def _get_product_info(product_id):
 
 def _get_data():
   path = os.path.join(cmds.get_res_path(), 'data', 'result.json')
-  with open(path, 'r') as f:
-    ret = f.read()
+  with open(path, 'r') as _f:
+    ret = _f.read()
   return json.loads(ret)
 
 
@@ -144,29 +144,29 @@ def _get_endpoint_info(product_id):
     ret = DATA_CACHE['data'][product_id]
     if product_id == 'mibp':
       allow_key = ['press', 'release', 'push']
-      r = {'ep': [], 'r1': [], 'r2': []}
+      _r = {'ep': [], 'r1': [], 'r2': []}
       for key, value in ret.items():
         if key in allow_key:
-          r['ep'].append(key)
-          r['r1'].append(value['r_1'])
-          r['r2'].append(value['r_2'])
+          _r['ep'].append(key)
+          _r['r1'].append(value['r_1'])
+          _r['r2'].append(value['r_2'])
     elif product_id == 'mibs':
       allow_key = ['get_measure', 'get_history', 'chemical_setting', 'noise_setting']
-      r = {'ep': [], 'r1': [], 'r2': []}
+      _r = {'ep': [], 'r1': [], 'r2': []}
       for key, value in ret.items():
         if key in allow_key:
-          r['ep'].append(key)
-          r['r1'].append(value['r_1'])
-          r['r2'].append(value['r_2'])
+          _r['ep'].append(key)
+          _r['r1'].append(value['r_1'])
+          _r['r2'].append(value['r_2'])
     else:
       allow_key = ['clear_pin', 'set_pin']
-      r = {'ep': [], 'r1': [], 'r2': []}
+      _r = {'ep': [], 'r1': [], 'r2': []}
       for key, value in ret.items():
         if key in allow_key:
-          r['ep'].append(key)
-          r['r1'].append(value['r_1'])
-          r['r2'].append(value['r_2'])
-    return json.dumps(r)
+          _r['ep'].append(key)
+          _r['r1'].append(value['r_1'])
+          _r['r2'].append(value['r_2'])
+    return json.dumps(_r)
   else:
     return json.dumps({})
 

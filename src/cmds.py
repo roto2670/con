@@ -15,16 +15,16 @@ import logging
 import tempfile
 import subprocess
 
-from OpenSSL import crypto
-from intelhex import IntelHex
+from OpenSSL import crypto  # noqa : pylint: disable=import-error
+from intelhex import IntelHex  # noqa : pylint: disable=import-error
 
 import apis
 
 
 def _generate_private_key(p12, key_path):
   private_key = crypto.dump_privatekey(crypto.FILETYPE_PEM, p12.get_privatekey())
-  with open(key_path, 'wb') as f:
-    f.write(private_key)
+  with open(key_path, 'wb') as _f:
+    _f.write(private_key)
 
 
 def _get_certificate(p12):
@@ -34,9 +34,9 @@ def _get_certificate(p12):
 def _get_secret_key(private_key_path, secret_key_path):
   cmd = "openssl rsa -in {} -out {}".format(private_key_path, secret_key_path)
   try:
-    ret = subprocess.check_call(cmd, shell=True)
-    with open(secret_key_path, 'rb') as f:
-      secret_key = f.read()
+    subprocess.check_call(cmd, shell=True)
+    with open(secret_key_path, 'rb') as _f:
+      secret_key = _f.read()
     return secret_key
   except:
     logging.exception("Raise error while generate secret key.")
@@ -54,7 +54,7 @@ def _generate_noti_key(content, password):
   return cert.decode(), secret_key.decode()
 
 
-def send_noti_key(organization_id, bundle_id, password , content, is_dev):
+def send_noti_key(organization_id, bundle_id, password, content, is_dev):
   cert, secret_key = _generate_noti_key(content, password)
   ret = apis.update_ios_key(organization_id, bundle_id, cert, secret_key,
                             is_dev)
@@ -68,11 +68,10 @@ def get_res_path():
 
 def get_hex_to_json(hex_content):
   tmp_file = tempfile.mkstemp()[1]
-  json_tempfile = tempfile.mkstemp()[1]
-  with open(tmp_file, 'wb') as f:
-    f.write(hex_content)
-  ih = IntelHex(tmp_file)
-  bin_array = ih.tobinarray()
+  with open(tmp_file, 'wb') as _f:
+    _f.write(hex_content)
+  _ih = IntelHex(tmp_file)
+  bin_array = _ih.tobinarray()
   bin_list = bin_array.tolist()
   ret_json = json.dumps(bin_list)
   os.remove(tmp_file)
