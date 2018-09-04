@@ -171,7 +171,8 @@
                               <form id="invite" method="post" action="/organization/invite">
                                 <div class="modal-body">
                                   <h4>Email Address</h4>
-                                  <input type="email" id="email" name="email" required="required">
+                                  <input type="email" id="email" name="email" required="required"
+                                      placeHolder="member@email.com" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9_@.+\s]/g,'');">
                                 </div>
                                 <div class="modal-footer">
                                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

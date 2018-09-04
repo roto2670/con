@@ -68,7 +68,7 @@
                     <label class="control-label col-md-0" for="newTesterEmail">
                     </label>
                     <div class="col-md-12">
-                      <input type="text" placeHolder="tester@email.com" id="newTesterEmail"
+                      <input type="email" placeHolder="tester@email.com" id="newTesterEmail" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9_@.+\s]/g,'');"
                           name="newTesterEmail" required="required" class="form-control col-md-6 col-xs-6">
                     </div>
                   </div>

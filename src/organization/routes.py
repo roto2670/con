@@ -13,6 +13,7 @@ import os
 import json
 import uuid
 import logging
+import datetime
 
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user, login_required  # noqa : pylint: disable=import-error
@@ -84,7 +85,7 @@ def create():
       ret = apis.create_org(owner_email)
       if ret:
         in_apis.create_organization(owner_email, name, ret)
-        user = in_apis.get_user_by_email(owner_email)
+        user = in_apis.get_user(current_user.id)
         if user:
           user.organization_id = ret['id']
           user.level = models.OWNER
@@ -150,23 +151,33 @@ def register_noti_key(platform):
 @login_required
 def send_invite():
   email_addr = request.form['email']
-  with open(os.path.join(cmds.get_res_path(), 'invite.html'), 'r') as _f:
-    content = _f.read()
-  key = uuid.uuid4().hex
-  auth_url = request.host_url + 'organization/confirm?key=' + key + \
-      '&o=' + current_user.organization_id
-  org = in_apis.get_organization(current_user.organization_id)
-  title = common.get_msg("organization.member.mail_title")
-  title = title.format(org.original_name)
-  msg = common.get_msg("organization.member.mail_message")
-  msg = msg.format(org.original_name, org.original_name)
-  content = content.format(auth_url=auth_url, title=title, msg=msg)
-  try:
-    mail.send(email_addr, title, content)
-    in_apis.create_invite(email_addr, key, current_user.email,
-                          current_user.organization_id)
-  except:
-    logging.exception("Raise error")
+  _user = in_apis.get_user_by_email(email_addr, current_user.organization_id)
+  if not _user:
+    with open(os.path.join(cmds.get_res_path(), 'invite.html'), 'r') as _f:
+      content = _f.read()
+    key = uuid.uuid4().hex
+    auth_url = request.host_url + 'organization/confirm?key=' + key + \
+        '&o=' + current_user.organization_id
+    org = in_apis.get_organization(current_user.organization_id)
+    title = common.get_msg("organization.member.mail_title")
+    title = title.format(org.original_name)
+    msg = common.get_msg("organization.member.mail_message")
+    msg = msg.format(org.original_name, org.original_name)
+    content = content.format(auth_url=auth_url, title=title, msg=msg)
+    try:
+      mail.send(email_addr, title, content)
+      _invite = in_apis.get_invite_by_member(email_addr,
+                                             current_user.organization_id)
+      if _invite:
+        _t = datetime.datetime.utcnow() - _invite.invited_time
+        if _t.seconds >= 86400:
+          in_apis.update_invite_by_key(key, _invite)
+      else:
+        in_apis.create_invite(email_addr, key, current_user.email,
+                              current_user.organization_id)
+    except:
+      logging.exception("Raise error")
+      abort(500)
   return redirect('organization')
 
 

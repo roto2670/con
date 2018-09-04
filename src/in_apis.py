@@ -199,8 +199,8 @@ def get_user(user_id):
   return user
 
 
-def get_user_by_email(email):
-  user = User.query.filter_by(email=email).one_or_none()
+def get_user_by_email(email, organization_id):
+  user = User.query.filter_by(email=email, organization_id=organization_id).one_or_none()
   return user
 
 
@@ -339,10 +339,23 @@ def get_invite_by_email(email):
   return invite
 
 
+def get_invite_by_member(email, organization_id):
+  invite = Invite.query.filter_by(level=models.MEMBER, email=email, accepted=0,
+                                  organization_id=organization_id).one_or_none()
+  return invite
+
+
 def get_invite_list(organization_id):
   invite_list = Invite.query.filter_by(organization_id=organization_id,
                                        accepted=0).all()
   return invite_list
+
+
+def get_invite_by_product_id(product_id, email, organization_id):
+  invite = Invite.query.filter_by(level=models.TESTER, email=email,
+                                  product_id=product_id, accepted=0,
+                                  organization_id=organization_id).one_or_none()
+  return invite
 
 
 def get_invite_list_by_tester(product_id, organization_id):
@@ -360,9 +373,14 @@ def update_invite(key, organization_id):
     db.session.commit()
 
 
+def update_invite_by_key(key, invite):
+  invite.key = key
+  db.invited_time = datetime.datetime.utcnow()
+  db.session.commit()
+
+
 def delete_invite(invite_id):
   invite = Invite.query.filter_by(id=invite_id).one_or_none()
-  #TODO:
   if invite:
     db.session.delete(invite)
     db.session.commit()

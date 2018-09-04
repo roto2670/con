@@ -221,9 +221,16 @@ def _send_invite(email_addr, product_id):
   content = content.format(auth_url=auth_url, title=title, msg=msg)
   try:
     mail.send(email_addr, title, content)
-    in_apis.create_invite(email_addr, key, current_user.email,
-                          current_user.organization_id, level=models.TESTER,
-                          product_id=product_id)
+    _invite = in_apis.get_invite_by_product_id(product_id, email_addr,
+                                               current_user.organization_id)
+    if _invite:
+      _t = datetime.datetime.utcnow() - _invite.invited_time
+      if _t.seconds >= 86400:
+        in_apis.update_invite_by_key(key, _invite)
+    else:
+      in_apis.create_invite(email_addr, key, current_user.email,
+                            current_user.organization_id, level=models.TESTER,
+                            product_id=product_id)
   except:
     logging.exception("Raise error")
 
