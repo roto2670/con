@@ -75,5 +75,4 @@ def get_hex_to_json(hex_content):
   bin_list = bin_array.tolist()
   ret_json = json.dumps(bin_list)
   os.remove(tmp_file)
-  logging.debug("hex to json : %s", ret_json)
   return ret_json
