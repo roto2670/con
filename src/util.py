@@ -235,3 +235,8 @@ class Settings(object):
           break
         except:
           logging.exception("Failed to flush the settings.")
+
+
+def get_res_path():
+  path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'res')
+  return  path

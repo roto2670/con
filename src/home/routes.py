@@ -18,7 +18,7 @@ from flask import render_template, redirect  # noqa : pylint: disable=import-err
 from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
 
 import apis
-import cmds
+import util
 import in_apis
 import base.routes
 from home import blueprint
@@ -120,7 +120,7 @@ def _get_product_info(product_id):
 
 
 def _get_data():
-  path = os.path.join(cmds.get_res_path(), 'data', 'result.json')
+  path = os.path.join(util.get_res_path(), 'data', 'result.json')
   with open(path, 'r') as _f:
     ret = _f.read()
   return json.loads(ret)
