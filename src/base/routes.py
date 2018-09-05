@@ -15,7 +15,6 @@ import uuid
 import datetime
 
 from flask import render_template, redirect, request, url_for  # noqa : pylint: disable=import-error
-from flask import send_from_directory  # noqa : pylint: disable=import-error
 from flask_login import current_user, login_required, login_user, logout_user  # noqa : pylint: disable=import-error
 
 import common
@@ -23,9 +22,6 @@ import in_apis
 from base import blueprint
 from base import db, login_manager, auth
 from models import User, Permission
-
-
-BASE = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static', 'doc')
 
 
 @blueprint.route('/')
@@ -36,11 +32,6 @@ def route_default():
 @blueprint.route('/doc')
 def route_doc():
   return render_template('doc.html')
-
-
-@blueprint.route('/file/<file_name>')
-def route_file(file_name):
-  return send_from_directory(directory=BASE, filename=file_name)
 
 
 @blueprint.route('/welcome')

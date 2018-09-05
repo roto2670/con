@@ -166,7 +166,7 @@ def upload_header_file(product_id):
   upload_file = request.files['file']
   content = upload_file.read()
   # TODO: Check format?? Or send to cloud server
-  logging.info("Upload file content : %s", content)
+  logging.info("Upload file content : %s", len(content))
   try:
     decode_content = content.decode()
     json_content = json.loads(decode_content)
