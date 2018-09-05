@@ -111,7 +111,7 @@ def production_sign_in(token):
     permission = Permission(id=uuid.uuid4().hex,
                             permission='777',
                             user_id=user.id)
-  db.session.add(permission)
+    db.session.add(permission)
   db.session.commit()
   login_user(user)
   return redirect(url_for('base_blueprint.route_default'))
