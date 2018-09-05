@@ -83,7 +83,6 @@ def route_errors(error):
 
 DEFAULT_PHOTO_URL = '''/static/images/user.png'''
 
-
 @auth.production_loader
 def production_sign_in(token):
   # https://firebase.google.com/docs/auth/admin/verify-id-tokens?hl=ko
@@ -108,9 +107,10 @@ def production_sign_in(token):
     users.append(token['email'])
     org.users = json.dumps(users)
   db.session.commit()
-  permission = Permission(id=uuid.uuid4().hex,
-                          permission='777',
-                          user_id=user.id)
+  if not user.permission:
+    permission = Permission(id=uuid.uuid4().hex,
+                            permission='777',
+                            user_id=user.id)
   db.session.add(permission)
   db.session.commit()
   login_user(user)
