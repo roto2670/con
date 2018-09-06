@@ -84,7 +84,7 @@
                                 <td>{{ pre_release.model_list|length }}</td>
                                 <td>{{ pre_release.hook_url }}</td>
                                 <td>{{ pre_release.hook_client_key }}</td>
-                                <td></td>
+                                <td>{{ pre_release.last_updated_user }}</td>
                                 <td>{{ pre_release.last_updated_time }}</td>
                               </tr>
                             {% endfor %}
@@ -152,7 +152,7 @@
                                 <td>{{ dev.model_list|length }}</td>
                                 <td>{{ dev.hook_url }}</td>
                                 <td>{{ dev.hook_client_key }}</td>
-                                <td></td>
+                                <td>{{ dev.last_updated_user }}</td>
                                 <td>{{ dev.last_updated_time }}</td>
                               </tr>
                             {% endfor %}
