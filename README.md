@@ -43,16 +43,22 @@
     nohup gunicorn -w 3 -k gevent --certfile ssl/mib_io.crt --keyfile ssl/mib_io.key -b 127.0.0.1:5000 run:__app
 
 
+# Structure![](res/cs_struct_180906.png)
+
+
+# DataBase![](res/cs_db_180906.png)
+
+
 # Reference
 
-### https://github.com/afourmy/flask-gentelella
-### https://github.com/klokantech/flask-firebase
-### https://cloud.google.com/sql/docs/mysql/connect-external-app#python
-### https://github.com/GoogleCloudPlatform/getting-started-python/blob/504b3d550b551502cfe96f32542c31b232135eff/2-structured-data/config.py
+#### https://github.com/afourmy/flask-gentelella
+#### https://github.com/klokantech/flask-firebase
+#### https://cloud.google.com/sql/docs/mysql/connect-external-app#python
+#### https://github.com/GoogleCloudPlatform/getting-started-python/blob/504b3d550b551502cfe96f32542c31b232135eff/2-structured-data/config.py
 
 
 # WordCloud
 
-### https://github.com/d3/d3
-### https://github.com/jasondavies/d3-cloud
-### https://github.com/wvengen/d3-wordcloud
+#### https://github.com/d3/d3
+#### https://github.com/jasondavies/d3-cloud
+#### https://github.com/wvengen/d3-wordcloud

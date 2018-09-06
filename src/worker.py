@@ -22,7 +22,7 @@ from celery import Celery  # noqa : pylint: disable=import-error
 
 
 BACKEND = '''rpc://'''
-BROKER = '''pyamqp://console:skfksrltnf1@localhost:5672/'''
+BROKER = '''pyamqp://console:skfksxpzm1@localhost:5672/'''
 
 
 def init():
