@@ -10,7 +10,7 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import os
-import cmds
+import util
 from flask import session  # noqa : pylint: disable=import-error
 from util import Settings
 
@@ -42,7 +42,7 @@ def get_message():
 
 
 FILE_NAME = "message.{}"
-I18N_PATH = os.path.join(cmds.get_res_path(), "i18n")
+I18N_PATH = os.path.join(util.get_res_path(), "i18n")
 LOCALES_DICT = {}
 
 EN_US = '''en-us'''

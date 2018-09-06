@@ -18,7 +18,21 @@ import subprocess
 from OpenSSL import crypto  # noqa : pylint: disable=import-error
 from intelhex import IntelHex  # noqa : pylint: disable=import-error
 
-import apis
+from celery import Celery  # noqa : pylint: disable=import-error
+
+
+BACKEND = '''rpc://'''
+BROKER = '''pyamqp://console:skfksrltnf1@localhost:5672/'''
+
+
+def init():
+  backend = BACKEND
+  broker = BROKER
+  _worker = Celery('worker', backend=backend, broker=broker)
+  return _worker
+
+
+worker = init()
 
 
 def _generate_private_key(p12, key_path):
@@ -54,18 +68,13 @@ def _generate_noti_key(content, password):
   return cert.decode(), secret_key.decode()
 
 
-def send_noti_key(organization_id, bundle_id, password, content, is_dev):
+@worker.task()
+def get_about_noti_key(password, content):
   cert, secret_key = _generate_noti_key(content, password)
-  ret = apis.update_ios_key(organization_id, bundle_id, cert, secret_key,
-                            is_dev)
-  return ret
+  return (cert, secret_key)
 
 
-def get_res_path():
-  path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'res')
-  return  path
-
-
+@worker.task()
 def get_hex_to_json(hex_content):
   tmp_file = tempfile.mkstemp()[1]
   with open(tmp_file, 'wb') as _f:

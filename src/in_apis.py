@@ -471,6 +471,13 @@ def get_firmware_list_order_by_version(ep_version, model_code):
   return firmware_list
 
 
+def get_firmware_lasted(model_id):
+  firmware_list = Firmware.query.filter_by(model_id=model_id).\
+      order_by('version desc').all()
+  return firmware_list[0]
+
+
+
 # }}}
 
 
@@ -490,7 +497,8 @@ def pre_release(product_id):
   models_dict = {}
   for model in dev_models:
     if model.firmware_list:
-      models_dict[model.code] = model.firmware_list[0].version
+      latested_firmware = get_firmware_lasted(model.id)
+      models_dict[model.code] = latested_firmware.version
     else:
       raise Exception("Fail to Pre Release. Can not find Firmware.")
   prd_ret = apis.update_product_stage(product_id, dev, models_dict,
@@ -547,7 +555,8 @@ def release(product_id):
   models_dict = {}
   for model in pre_release_models:
     if model.firmware_list:
-      models_dict[model.code] = model.firmware_list[0].version
+      latested_firmware = get_firmware_lasted(model.id)
+      models_dict[model.code] = latested_firmware.version
     else:
       raise Exception("Fail to Release. Can not find Firmware.")
   prd_ret = apis.update_product_stage(product_id, _pre_release, models_dict,

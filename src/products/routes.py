@@ -13,6 +13,7 @@ import os
 import re
 import json
 import uuid
+import worker
 import logging
 import datetime
 import urllib.parse
@@ -22,7 +23,7 @@ from flask import abort, render_template, request, redirect, url_for  # noqa : p
 from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
 
 import apis
-import cmds
+import util
 import mail
 import common
 import models
@@ -208,7 +209,7 @@ def tester(product_id):
 
 
 def _send_invite(email_addr, product_id):
-  with open(os.path.join(cmds.get_res_path(), 'tester_invite.html'), 'r') as _f:
+  with open(os.path.join(util.get_res_path(), 'tester_invite.html'), 'r') as _f:
     content = _f.read()
   key = uuid.uuid4().hex
   auth_url = request.host_url + 'products/confirm?key=' + key + '&o=' + \
@@ -379,7 +380,8 @@ def upload_firmware(product_id, model_id):
       build_number = 0
     firmware_version = model.product_stage.endpoint.version + "." + \
         str(build_number)
-    ret_json = cmds.get_hex_to_json(content)
+    ret = worker.get_hex_to_json.delay(content)
+    ret_json = ret.get()
     ret = apis.register_firmware(product_id, model.code, firmware_version, ret_json)
     if ret:
       if state == models.STAGE_RELEASE:
@@ -411,11 +413,11 @@ def upload_firmware(product_id, model_id):
                  methods=['GET', 'POST'])
 def download_software(product_id, model_id, model_type):
   if int(model_type) == models.MODEL_TYPE_NRF_51:
-    path = os.path.join(cmds.get_res_path(), 'firmware', 'nrf51')
+    path = os.path.join(util.get_res_path(), 'firmware', 'nrf51')
     file_name = "nrf51.zip"
   else:
     # NRF 52
-    path = os.path.join(cmds.get_res_path(), 'firmware', 'nrf52')
+    path = os.path.join(util.get_res_path(), 'firmware', 'nrf52')
     file_name = "nrf52.zip"
   return send_from_directory(directory=path, filename=file_name, as_attachment=True)
 
