@@ -187,7 +187,7 @@ def upload_header_file(product_id):
                                       product_dev_stage.id)
       title = common.get_msg("endpoints.upload.success_title")
       msg = common.get_msg("endpoints.upload.success_message")
-      msg.format(json_content['product'], json_content['version'])
+      msg = msg.format(json_content['product'], json_content['version'])
       common.set_info_message(title, msg)
       return redirect('endpoints/' + product_id + '/specifications')
     else:
