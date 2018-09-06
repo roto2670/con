@@ -17,20 +17,12 @@
 import logging
 
 # thirdparty
-import sendgrid  # noqa : pylint: disable=import-error
 from sendgrid.helpers.mail import Mail  # noqa : pylint: disable=import-error
 from sendgrid.helpers.mail import Email  # noqa : pylint: disable=import-error
 from sendgrid.helpers.mail import Content  # noqa : pylint: disable=import-error
 from sendgrid.helpers.mail import Attachment  # noqa : pylint: disable=import-error
 
-
-SG_API_KEY = 'SG.Iit8M_G8R9GBiRBknKi7fw.'\
-          '-qGUCtHKXjZplV89FHYScAVG9u5crHlsCIopTQxg5aM'
-
-
-def _send_mail(request_body):
-  sendgrid_client = sendgrid.SendGridAPIClient(apikey=SG_API_KEY)
-  return sendgrid_client.client.mail.send.post(request_body=request_body)
+import worker
 
 
 def send(to_addr, subject, data, content_type=None, attachment=None):
@@ -50,8 +42,8 @@ def send(to_addr, subject, data, content_type=None, attachment=None):
           logging.info("Invalid type. Type : %s", type(attach))
     elif not isinstance(attachment, list):
       logging.info("Attachment is not list. Attachment : %r", attachment)
-    res = _send_mail(_mail.get())
-    logging.debug("send mail status : %s", res.status_code)
+    resp = worker.send_mail(_mail.get())
+    logging.debug("send mail status : %s", resp.status_code)
     return True
   except Exception:
     logging.warning("Failed to send mail. to: %s, subject: %s",

@@ -13,7 +13,6 @@ import os
 import re
 import json
 import uuid
-import worker
 import logging
 import datetime
 import urllib.parse
@@ -27,6 +26,7 @@ import util
 import mail
 import common
 import models
+import worker
 import in_apis
 import base.routes
 from base import db
@@ -209,7 +209,7 @@ def tester(product_id):
 
 
 def _send_invite(email_addr, product_id):
-  with open(os.path.join(util.get_res_path(), 'tester_invite.html'), 'r') as _f:
+  with open(util.get_mail_form_path('tester_invite.html'), 'r') as _f:
     content = _f.read()
   key = uuid.uuid4().hex
   auth_url = request.host_url + 'products/confirm?key=' + key + '&o=' + \
@@ -380,8 +380,7 @@ def upload_firmware(product_id, model_id):
       build_number = 0
     firmware_version = model.product_stage.endpoint.version + "." + \
         str(build_number)
-    ret = worker.get_hex_to_json.delay(content)
-    ret_json = ret.get()
+    ret_json = worker.get_hex_to_json(content)
     ret = apis.register_firmware(product_id, model.code, firmware_version, ret_json)
     if ret:
       if state == models.STAGE_RELEASE:
@@ -400,6 +399,7 @@ def upload_firmware(product_id, model_id):
                                 model.product_stage.endpoint.version,
                                 model.code, current_user.email,
                                 ret, model.id)
+        _send_about_test_user(product_id, model.name, firmware_version, state)
         return redirect('products/' + product_id + '/model/' + model_id)
       else:
         logging.warning("Raise update stage error. model : %s", model_id)
@@ -407,6 +407,28 @@ def upload_firmware(product_id, model_id):
     else:
       logging.warning("Raise upload firmware error. model : %s", model_id)
       abort(500)
+
+
+def _send_about_test_user(product_id, model_name, firmware_version, state):
+  with open(util.get_mail_form_path('firmware_upload.html'), 'r') as _f:
+    content = _f.read()
+  _product = in_apis.get_product(product_id)
+  title = common.get_msg("products.tester.mail_title")
+  title = title.format(_product.name, model_name, firmware_version)
+  msg = common.get_msg("products.tester.mail_message")
+  msg = msg.format(_product.name, model_name, firmware_version)
+  content = content.format(title=title, msg=msg)
+  tester_list = in_apis.get_send_tester_list(product_id,
+                                             current_user.organization_id,
+                                             state)
+  for _tester in tester_list:
+    try:
+      mail.send(_tester.email, title, content)
+    except:
+      logging.warning(
+          "Failed to send firemware upload email. Tester : %s, product : %s, model : %s, version : %s",
+          _tester.email, product_id, model_name, firmware_version, exc_info=True)
+
 
 
 @blueprint.route('/<product_id>/model/<model_id>/firmware/<model_type>/download',

@@ -15,20 +15,15 @@ import logging
 import tempfile
 import subprocess
 
+import sendgrid  # noqa : pylint: disable=import-error
 from OpenSSL import crypto  # noqa : pylint: disable=import-error
 from intelhex import IntelHex  # noqa : pylint: disable=import-error
-
 from celery import Celery  # noqa : pylint: disable=import-error
 
 
-BACKEND = '''rpc://'''
-BROKER = '''pyamqp://console:skfksxpzm1@localhost:5672/'''
-
-
 def init():
-  backend = BACKEND
-  broker = BROKER
-  _worker = Celery('worker', backend=backend, broker=broker)
+  _worker = Celery('worker', backend='rpc://',
+                   broker='pyamqp://console:skfksxpzm1@localhost:5672/')
   return _worker
 
 
@@ -69,13 +64,19 @@ def _generate_noti_key(content, password):
 
 
 @worker.task()
-def get_about_noti_key(password, content):
+def _get_about_noti_key(password, content):
   cert, secret_key = _generate_noti_key(content, password)
   return (cert, secret_key)
 
 
+def get_about_noti_key(password, content):
+  ret = _get_about_noti_key.delay(password, content)
+  cert, secret_key = ret.get()
+  return (cert, secret_key)
+
+
 @worker.task()
-def get_hex_to_json(hex_content):
+def _get_hex_to_json(hex_content):
   tmp_file = tempfile.mkstemp()[1]
   with open(tmp_file, 'wb') as _f:
     _f.write(hex_content)
@@ -85,3 +86,25 @@ def get_hex_to_json(hex_content):
   ret_json = json.dumps(bin_list)
   os.remove(tmp_file)
   return ret_json
+
+
+def get_hex_to_json(hex_content):
+  ret = _get_hex_to_json.delay(hex_content)
+  ret_json = ret.get()
+  return ret_json
+
+
+SG_API_KEY = 'SG.Iit8M_G8R9GBiRBknKi7fw.'\
+          '-qGUCtHKXjZplV89FHYScAVG9u5crHlsCIopTQxg5aM'
+
+
+@worker.task()
+def _send_mail(request_body):
+  sendgrid_client = sendgrid.SendGridAPIClient(apikey=SG_API_KEY)
+  return sendgrid_client.client.mail.send.post(request_body=request_body)
+
+
+def send_mail(request_body):
+  ret = _send_mail.delay(request_body)
+  resp = ret.get()
+  return resp

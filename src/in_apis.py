@@ -436,6 +436,13 @@ def get_tester_list(product_id, organization_id):
   return tester_list
 
 
+def get_send_tester_list(product_id, organization_id, level):
+  tester_list = Tester.query.filter_by(product_id=product_id, level=level,
+                                       organization_id=organization_id,
+                                       authorized=True).all()
+  return tester_list
+
+
 def delete_tester(_id):
   tester = Tester.query.filter_by(id=_id).one_or_none()
   if tester:

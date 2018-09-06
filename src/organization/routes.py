@@ -9,7 +9,6 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-import os
 import json
 import uuid
 import logging
@@ -112,8 +111,7 @@ def register_noti_key(platform):
       state = int(request.form['state'])
       upload_file = request.files['file']
       content = upload_file.read()
-      ret = worker.get_about_noti_key.delay(password, content)
-      cert, secret_key = ret.get()
+      cert, secret_key = worker.get_about_noti_key(password, content)
       ret = apis.update_ios_key(current_user.organization_id, bundle_id,
                                 cert, secret_key, state)
       if ret:
@@ -156,7 +154,7 @@ def send_invite():
   email_addr = request.form['email']
   _user = in_apis.get_user_by_email(email_addr, current_user.organization_id)
   if not _user:
-    with open(os.path.join(util.get_res_path(), 'invite.html'), 'r') as _f:
+    with open(util.get_mail_form_path('invite.html'), 'r') as _f:
       content = _f.read()
     key = uuid.uuid4().hex
     auth_url = request.host_url + 'organization/confirm?key=' + key + \
