@@ -133,22 +133,22 @@ def unauthorized_handler():
   return render_template('errors/page_403.html'), 403
 
 
-@blueprint.errorhandler(400)
+@blueprint.app_errorhandler(400)
 def bad_request(error):
   return render_template('errors/page_400.html'), 400
 
 
-@blueprint.errorhandler(403)
+@blueprint.app_errorhandler(403)
 def access_forbidden(error):
   return render_template('errors/page_403.html'), 403
 
 
-@blueprint.errorhandler(404)
+@blueprint.app_errorhandler(404)
 def not_found_error(error):
   return render_template('errors/page_404.html'), 404
 
 
-@blueprint.errorhandler(500)
+@blueprint.app_errorhandler(500)
 def internal_error(error):
   return render_template('errors/page_500.html'), 500
 
