@@ -427,9 +427,9 @@ def _send_about_test_user(product_id, model_name, firmware_version, state):
   with open(util.get_mail_form_path('firmware_upload.html'), 'r') as _f:
     content = _f.read()
   _product = in_apis.get_product(product_id)
-  title = common.get_msg("products.tester.mail_title")
+  title = common.get_msg("products.firmware.mail.upload_title")
   title = title.format(_product.name, model_name, firmware_version)
-  msg = common.get_msg("products.tester.mail_message")
+  msg = common.get_msg("products.firmware.mail.upload_message")
   msg = msg.format(_product.name, model_name, firmware_version)
   content = content.format(title=title, msg=msg)
   tester_list = in_apis.get_send_tester_list(product_id,

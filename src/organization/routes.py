@@ -24,6 +24,7 @@ import in_apis
 import models
 import mail
 import util
+import base.routes
 from base import db
 from organization import blueprint
 
@@ -192,14 +193,18 @@ def confirm_mail():
     if current_user.is_anonymous:
       return redirect(url_for('login_blueprint.login'))
     else:
-      user = in_apis.get_user(current_user.id)
-      user.organization_id = organization_id
-      org = in_apis.get_organization(organization_id)
-      users = json.loads(org.users)
-      users.append(user.email)
-      org.users = json.dumps(users)
-      db.session.commit()
-      return redirect(url_for('home_blueprint.index'))
+      if invite.email == current_user.email:
+        user = in_apis.get_user(current_user.id)
+        user.organization_id = organization_id
+        org = in_apis.get_organization(organization_id)
+        users = json.loads(org.users)
+        users.append(user.email)
+        org.users = json.dumps(users)
+        db.session.commit()
+        return redirect(url_for('home_blueprint.index'))
+      else:
+        base.routes.logout()
+        return redirect(url_for('login_blueprint.login'))
   else:
     abort(400)
 

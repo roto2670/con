@@ -101,11 +101,11 @@ SG_API_KEY = 'SG.Iit8M_G8R9GBiRBknKi7fw.'\
 def _send_mail(request_body):
   sendgrid_client = sendgrid.SendGridAPIClient(apikey=SG_API_KEY)
   _resp = sendgrid_client.client.mail.send.post(request_body=request_body)
-  resp = {
-      "status_code": _resp.status_code,
-      "headers": _resp.headers,
-      "body": _resp.body
-  }
+  logging.debug("code : %s, header : %s, body : %s", _resp.status_code,
+                _resp.headers, _resp.body)
+  logging.debug("resp : %s", _resp)
+  logging.debug("resp : %s", dir(_resp))
+  resp = {}
   return json.dumps(resp)
 
 
