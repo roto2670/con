@@ -56,6 +56,7 @@ def create():
       referrer = "/home/index"
 
     code = request.form['code']
+    name = request.form['name']
     if re.compile(r'\W|\d').findall(code):
       title = common.get_msg("products.create.product.invalid_code_title")
       msg = common.get_msg("products.create.product.invalid_code_message")
@@ -71,8 +72,7 @@ def create():
       ret = apis.create_product(code, current_user.organization_id)
       if ret:
         # TODO: Product type
-        product = in_apis.create_product(request.form['name'], ret,
-                                         models.PRD_TYPE_BLE)
+        product = in_apis.create_product(name, ret, models.PRD_TYPE_BLE)
         org = in_apis.get_organization(current_user.organization_id)
         if org:
           product_list = json.loads(org.products)
@@ -83,6 +83,8 @@ def create():
         _set_product(product.id)
         return redirect('products/' + ret['id'] + '/model/create')
       else:
+        logging.waring("Fail to create product. Name : %sCode : %s, User : %s",
+                       name, code, current_user.email)
         abort(500)
 
 
@@ -139,6 +141,8 @@ def create_model(product_id):
         in_apis.create_model(name, code, model_type, product_stage.id, current_user.email)
         return redirect('products/' + product_id + '/general')
       else:
+        logging.waring("Fail to create model. Name : %s, Type : %s, user : %s",
+                       name, model_type, current_user.email)
         abort(500)
 
 
@@ -177,8 +181,8 @@ def authentication(product_id):
 def hook(product_id):
   hook_url = request.form['hookUrl']
   hook_client_key = request.form['hookClientKey']
-  ret = apis.update_about_hook(product_id, models.STAGE_DEV, hook_url, hook_client_key)
-
+  ret = apis.update_about_hook(product_id, models.STAGE_DEV, hook_url,
+                               hook_client_key)
   if ret:
     dev = in_apis.get_product_stage_by_dev(product_id)
     dev.hook_url = hook_url
@@ -186,6 +190,8 @@ def hook(product_id):
     db.session.commit()
     return redirect('products/' + product_id + '/authentication')
   else:
+    logging.waring("Fail to update hook. Url : %s, Key : %s, Product : %s, User : %s",
+                   hook_url, hook_client_key, product_id, current_user.email)
     abort(500)
 
 
@@ -312,8 +318,12 @@ def confirm_mail():
       else:
         return redirect(url_for('base_blueprint.welcome_no_ftl'))
     else:
+      logging.waring("Fail to register test. Org : %s, Product : %s, email : %s",
+                     invite.organization_id, invite.product_id, invite.email)
       abort(500)
   else:
+    logging.waring("Can not find invite. Key : %s, org : %s",
+                   key, organization_id)
     abort(400)
 
 
@@ -410,16 +420,18 @@ def upload_firmware(product_id, model_id):
           _send_about_test_user(product_id, model.name, firmware_version, state)
           return redirect('products/' + product_id + '/model/' + model_id)
         else:
-          logging.warning("Raise update stage error. model : %s", model_id)
+          logging.warning("Raise update stage error. Product : %s, model : %s, name : %s, user : %s",
+                          product_id, model_id, model.name, current_user.email)
           abort(500)
       else:
-        logging.warning("Raise upload firmware error. model : %s", model_id)
+        logging.warning("Raise upload firmware error. Product : %s, model : %s, name : %s, user : %s",
+                        product_id, model_id, model.name, current_user.email)
         abort(500)
     except Exception:
       if os.path.exists(tf_path):
         os.remove(tf_path)
-      logging.exception("Raise error while upload firmware. Product : %s, model : %s",
-                        product_id, model.name)
+      logging.exception("Raise error while upload firmware. Product : %s, model : %s, user : %s",
+                        product_id, model.name, current_user.email)
       abort(500)
 
 
@@ -440,8 +452,9 @@ def _send_about_test_user(product_id, model_name, firmware_version, state):
       mail.send(_tester.email, title, content)
     except:
       logging.warning(
-          "Failed to send firemware upload email. Tester : %s, product : %s, model : %s, version : %s",
-          _tester.email, product_id, model_name, firmware_version, exc_info=True)
+          "Failed to send firemware upload email. Tester : %s, product : %s, model : %s, version : %s, Sender : %s",
+          _tester.email, product_id, model_name, firmware_version,
+          current_user.email, exc_info=True)
 
 
 

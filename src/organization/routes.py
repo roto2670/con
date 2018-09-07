@@ -93,6 +93,8 @@ def create():
           db.session.commit()
         return redirect('/products/create')
       else:
+        logging.waring("Fail to create org. Name : %s, user : %s",
+                       name, current_user.email)
         abort(500)
 
 
@@ -126,8 +128,9 @@ def register_noti_key(platform):
         return redirect('organization')
       else:
         logging.warning(
-            "Fail to ios register noti key. org : %s, id : %s, pw : %s, state : %s",
-            current_user.organization_id, bundle_id, password, state)
+            "Fail to ios register noti key. org : %s, id : %s, pw : %s, state : %s, user : %s",
+            current_user.organization_id, bundle_id, password, state,
+            current_user.email)
         abort(500)
     else:
       package_name = request.form['packageName']
@@ -144,8 +147,8 @@ def register_noti_key(platform):
         return redirect('organization')
       else:
         logging.warning(
-            "Fail to register android noti key. org : %s, name : %s, key : %s",
-            current_user.organization_id, package_name, key)
+            "Fail to register android noti key. org : %s, name : %s, key : %s, user : %s",
+            current_user.organization_id, package_name, key, current_user.email)
         abort(500)
 
 
@@ -178,7 +181,8 @@ def send_invite():
         in_apis.create_invite(email_addr, key, current_user.email,
                               current_user.organization_id)
     except:
-      logging.exception("Raise error")
+      logging.exception("Raise error. to : %s, sender : %s, org : %s",
+                        email_addr, current_user.email, org.original_name)
       abort(500)
   return redirect('organization')
 
@@ -206,6 +210,8 @@ def confirm_mail():
         base.routes.logout()
         return redirect(url_for('login_blueprint.login'))
   else:
+    logging.waring("Fail to confirm to mail. key : %s, org : %s",
+                   key, organization_id)
     abort(400)
 
 
@@ -216,7 +222,8 @@ def delete_invite(invite_id):
     in_apis.delete_invite(invite_id)
     return redirect('organization')
   except:
-    logging.exception("Raise error while delete invite. Id : %s", invite_id)
+    logging.exception("Raise error while delete invite. Id : %s, user : %s",
+                      invite_id, current_user.email)
     abort(500)
 
 
@@ -230,8 +237,8 @@ def delete_organization():
       in_apis.delete_organization(organization_id)
       return redirect('/')
     except:
-      logging.exception("Raise error while delete organization. Id : %s",
-                        current_user.organization_id)
+      logging.exception("Raise error while delete organization. Id : %s, user : %s",
+                        current_user.organization_id, current_user.email)
       abort(500)
   else:
     return redirect('/')

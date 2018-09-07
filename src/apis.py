@@ -468,6 +468,10 @@ def register_tester(organization_id, product_id, tester_email, stage):
       if resp.ok:
         value = resp.json()
         return value['v']
+      elif resp.status_code == 403:
+        logging.debug("Status 403. %s user not FTL.", tester_email)
+        value = resp.json()
+        return value['v']
       else:
         logging.warning("Regsiter tester Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)

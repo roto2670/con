@@ -77,7 +77,8 @@ def download_specification_file(product_id, specification_id):
     return Response(file_content, mimetype='application/json',
                     headers={'Content-Disposition':'attachment;filename={}'.format(file_name)})
   except:
-    logging.exception("Raise error while specification file.")
+    logging.exception("Raise error while specification file. Prd : %s, sp : %s, user : %s",
+                      product_id, specification_id, current_user.email)
     abort(500)
 
 
@@ -191,7 +192,8 @@ def upload_header_file(product_id):
       common.set_info_message(title, msg)
       return redirect('endpoints/' + product_id + '/specifications')
     else:
-      logging.warning("Failed to register specifications.")
+      logging.warning("Failed to register specifications. Prd : %s, user : %s",
+                      product_id, current_user.email)
       abort(500)
   except:
     logging.exception("Raise error while upload header file.")
@@ -221,7 +223,8 @@ def download_header_file(product_id, specification_id, model_id):
     return Response(_header, mimetype='text/x-c',
                     headers={'Content-Disposition':'attachment;filename=gadget.h'})
   except:
-    logging.exception("Raise error while download header file.")
+    logging.exception("Raise error while download header file., Prd : %s, sp : %s, model : %s, user : %s",
+                      product_id, specification_id, model.name, current_user.email)
     abort(500)
 
 
