@@ -298,7 +298,7 @@ def confirm_mail():
   if invite:
     in_apis.update_invite(key, organization_id)
     tester_info = apis.get_user(invite.email)
-    tester_authorized = tester_info['user']['authorized'] if tester_info else False
+    tester_authorized = tester_info['user']['authorized'] if tester_info and tester_info['user'] else False
     logging.debug("Tester info : %s", tester_info)
     # TODO:
     ret = apis.register_tester(organization_id, invite.product_id, invite.email,
