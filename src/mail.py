@@ -43,7 +43,7 @@ def send(to_addr, subject, data, content_type=None, attachment=None):
     elif not isinstance(attachment, list):
       logging.info("Attachment is not list. Attachment : %r", attachment)
     resp = worker.send_mail(_mail.get())
-    logging.debug("send mail status : %s", resp.status_code)
+    logging.debug("send mail status : %s", resp)
     return True
   except Exception:
     logging.warning("Failed to send mail. to: %s, subject: %s",
