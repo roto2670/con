@@ -14,6 +14,8 @@
       <title>MiB Console | {% block title %}{% endblock %}</title>
 
       {% block stylesheets %}
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <!-- Bootstrap -->
         <link href="{{ url_for('static', filename='vendors/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
         <!-- Font Awesome -->
