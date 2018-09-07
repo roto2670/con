@@ -18,6 +18,7 @@ from flask import render_template, redirect, request, url_for  # noqa : pylint: 
 from flask_login import current_user, login_required, login_user, logout_user  # noqa : pylint: disable=import-error
 
 import common
+import models
 import in_apis
 from base import blueprint
 from base import db, login_manager, auth
@@ -90,6 +91,7 @@ def production_sign_in(token):
   user.created_time = datetime.datetime.utcnow()
   user.last_access_time = datetime.datetime.utcnow()
   user.ip_address = request.remote_addr
+  user.level = models.MEMBER
   invite = in_apis.get_invite_by_email(token['email'])
   if not user.organization_id and invite:
     user.organization_id = invite.organization_id
