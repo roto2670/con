@@ -51,12 +51,12 @@
               "usage_full_message": "You cannot create more models. Please create a new product.",
               "exists_model_title": "Invalid model code",
               "exists_model_message": "Model code must be unique in a product. Please enter a different code."
-          },
-          "firmware": {
-              "mail": {
-                  "upload_title": "{} {} {} for now available to test",
-                  "upload_message": "{} {} {} for firmware is ready to test. To test this firmware, open MicroBot app and Upgrade."
-              }
+          }
+      },
+      "firmware": {
+          "mail": {
+              "upload_title": "{} {} {} for now available to test",
+              "upload_message": "{} {} {} for firmware is ready to test. To test this firmware, open MicroBot app and Upgrade."
           }
       },
       "tester": {

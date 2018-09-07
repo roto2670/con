@@ -76,22 +76,21 @@ def get_about_noti_key(password, content):
 
 
 @worker.task()
-def _get_hex_to_json(hex_content):
-  tmp_file = tempfile.mkstemp()[1]
-  with open(tmp_file, 'wb') as _f:
-    _f.write(hex_content)
-  _ih = IntelHex(tmp_file)
+def _get_hex_to_json(file_path):
+  _ih = IntelHex(file_path)
   bin_array = _ih.tobinarray()
   bin_list = bin_array.tolist()
   ret_json = json.dumps(bin_list)
-  os.remove(tmp_file)
   return ret_json
 
 
-def get_hex_to_json(hex_content):
-  ret = _get_hex_to_json.delay(hex_content)
-  ret_json = ret.get()
-  return ret_json
+def get_hex_to_json(file_path):
+  try:
+    ret = _get_hex_to_json.delay(file_path)
+    ret_json = ret.get()
+    return ret_json
+  except Exception:
+    logging.exception("Raise error while convert firmware.")
 
 
 SG_API_KEY = 'SG.Iit8M_G8R9GBiRBknKi7fw.'\
@@ -101,10 +100,16 @@ SG_API_KEY = 'SG.Iit8M_G8R9GBiRBknKi7fw.'\
 @worker.task()
 def _send_mail(request_body):
   sendgrid_client = sendgrid.SendGridAPIClient(apikey=SG_API_KEY)
-  return sendgrid_client.client.mail.send.post(request_body=request_body)
+  _resp = sendgrid_client.client.mail.send.post(request_body=request_body)
+  resp = {
+      "status_code": _resp.status_code,
+      "headers": _resp.headers,
+      "body": _resp.body
+  }
+  return json.dumps(resp)
 
 
 def send_mail(request_body):
   ret = _send_mail.delay(request_body)
   resp = ret.get()
-  return resp
+  return json.loads(resp)

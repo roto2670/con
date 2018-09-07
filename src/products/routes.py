@@ -15,6 +15,7 @@ import json
 import uuid
 import logging
 import datetime
+import tempfile
 import urllib.parse
 
 from flask import send_from_directory  # noqa : pylint: disable=import-error
@@ -370,6 +371,10 @@ def upload_firmware(product_id, model_id):
     state = int(request.form['state'])
     upload_file = request.files['file']
     content = upload_file.read()
+    tf_path = tempfile.mkstemp()[1]
+    with open(tf_path, 'wb') as _f:
+      _f.write(content)
+
     model = in_apis.get_model(model_id)
     firmware_list = \
         in_apis.get_firmware_list_order_by_version(model.product_stage.endpoint.version,
@@ -380,32 +385,41 @@ def upload_firmware(product_id, model_id):
       build_number = 0
     firmware_version = model.product_stage.endpoint.version + "." + \
         str(build_number)
-    ret_json = worker.get_hex_to_json(content)
-    ret = apis.register_firmware(product_id, model.code, firmware_version, ret_json)
-    if ret:
-      if state == models.STAGE_RELEASE:
-        stage_info = in_apis.get_product_stage_by_release(product_id)
-      elif state == models.STAGE_PRE_RELEASE:
-        stage_info = in_apis.get_product_stage_by_pre_release(product_id)
-      elif state == models.STAGE_DEV:
-        stage_info = in_apis.get_product_stage_by_dev(product_id)
+    try:
+      ret_json = worker.get_hex_to_json(tf_path)
+      os.remove(tf_path)
+      ret = apis.register_firmware(product_id, model.code, firmware_version,
+                                   ret_json)
+      if ret:
+        if state == models.STAGE_RELEASE:
+          stage_info = in_apis.get_product_stage_by_release(product_id)
+        elif state == models.STAGE_PRE_RELEASE:
+          stage_info = in_apis.get_product_stage_by_pre_release(product_id)
+        elif state == models.STAGE_DEV:
+          stage_info = in_apis.get_product_stage_by_dev(product_id)
+        else:
+          stage_info = in_apis.get_product_stage_by_archive(product_id)
+        ret_stage = apis.update_product_stage(product_id, stage_info,
+                                              {model.code: firmware_version},
+                                              state)
+        if ret_stage:
+          in_apis.create_firmware(firmware_version,
+                                  model.product_stage.endpoint.version,
+                                  model.code, current_user.email,
+                                  ret, model.id)
+          _send_about_test_user(product_id, model.name, firmware_version, state)
+          return redirect('products/' + product_id + '/model/' + model_id)
+        else:
+          logging.warning("Raise update stage error. model : %s", model_id)
+          abort(500)
       else:
-        stage_info = in_apis.get_product_stage_by_archive(product_id)
-      ret_stage = apis.update_product_stage(product_id, stage_info,
-                                            {model.code: firmware_version},
-                                            state)
-      if ret_stage:
-        in_apis.create_firmware(firmware_version,
-                                model.product_stage.endpoint.version,
-                                model.code, current_user.email,
-                                ret, model.id)
-        _send_about_test_user(product_id, model.name, firmware_version, state)
-        return redirect('products/' + product_id + '/model/' + model_id)
-      else:
-        logging.warning("Raise update stage error. model : %s", model_id)
+        logging.warning("Raise upload firmware error. model : %s", model_id)
         abort(500)
-    else:
-      logging.warning("Raise upload firmware error. model : %s", model_id)
+    except Exception:
+      if os.path.exists(tf_path):
+        os.remove(tf_path)
+      logging.exception("Raise error while upload firmware. Product : %s, model : %s",
+                        product_id, model.name)
       abort(500)
 
 
