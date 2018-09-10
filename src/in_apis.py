@@ -124,8 +124,11 @@ def get_model_by_code(code, product_id):
 
 def get_prelease_model_by_code(code, product_id):
   pre_stage = get_product_stage_by_pre_release(product_id)
-  model = Model.query.filter_by(code=code, product_stage_id=pre_stage.id).one_or_none()
-  return model
+  if pre_stage:
+    model = Model.query.filter_by(code=code, product_stage_id=pre_stage.id).one_or_none()
+    return model
+  else:
+    return None
 
 
 def get_model_list(product_id):
