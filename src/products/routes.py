@@ -348,7 +348,7 @@ def model_info(product_id, model_id):
   _set_product(product_id)
   model = in_apis.get_model(model_id)
   pre_model = in_apis.get_prelease_model_by_code(model.code, product_id)
-  firmware_list = model.firemware_list
+  firmware_list = model.firmware_list
   firmware_list += pre_model.firmware_list
   return render_template('model.html', model=model, firmware_list=firmware_list)
 
