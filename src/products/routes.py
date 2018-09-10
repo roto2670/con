@@ -351,8 +351,9 @@ def model_info(product_id, model_id):
   firmware_list = []
   for _firm in model.firmware_list:
     firmware_list.append(_firm)
-  for _firm in pre_model.firmware_list:
-    firmware_list.append(_firm)
+  if pre_model:
+    for _firm in pre_model.firmware_list:
+      firmware_list.append(_firm)
   return render_template('model.html', model=model, firmware_list=firmware_list)
 
 
