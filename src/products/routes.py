@@ -405,6 +405,10 @@ def upload_firmware(product_id, model_id):
     try:
       ret_json = worker.get_hex_to_json(tf_path)
       os.remove(tf_path)
+      if not ret_json:
+        logging.warning("Result json is None. Json : %s", ret_json)
+        abort(500)
+
       ret = apis.register_firmware(product_id, model.code, firmware_version,
                                    ret_json)
       if ret:

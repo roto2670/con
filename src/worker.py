@@ -22,7 +22,7 @@ from celery import Celery  # noqa : pylint: disable=import-error
 
 
 def init():
-  _worker = Celery('worker', backend='rpc://',
+  _worker = Celery('worker', backend='amqp',
                    broker='pyamqp://console:skfksxpzm1@localhost:5672/')
   return _worker
 
@@ -87,6 +87,8 @@ def _get_hex_to_json(file_path):
 def get_hex_to_json(file_path):
   try:
     ret = _get_hex_to_json.delay(file_path)
+    logging.debug("# ret type :%s", type(ret))
+    logging.debug("# status : %s", ret.ready())
     ret_json = ret.get()
     return ret_json
   except Exception:
@@ -110,6 +112,7 @@ def _send_mail(request_body):
 
 
 def send_mail(request_body):
-  ret = _send_mail.delay(request_body)
-  resp = ret.get()
+  #ret = _send_mail.delay(request_body)
+  #resp = ret.get()
+  resp = {}
   return json.loads(resp)
