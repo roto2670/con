@@ -412,10 +412,14 @@ def upload_firmware(product_id, model_id):
       ret = apis.register_firmware(product_id, model.code, firmware_version,
                                    ret_json)
       if ret:
+        _model_id = model.id
         if state == models.STAGE_RELEASE:
           stage_info = in_apis.get_product_stage_by_release(product_id)
         elif state == models.STAGE_PRE_RELEASE:
           stage_info = in_apis.get_product_stage_by_pre_release(product_id)
+          for _m in stage_info.model_list:
+            if _m.code == model.code:
+              _model_id = _m.id
         elif state == models.STAGE_DEV:
           stage_info = in_apis.get_product_stage_by_dev(product_id)
         else:
@@ -427,7 +431,7 @@ def upload_firmware(product_id, model_id):
           in_apis.create_firmware(firmware_version,
                                   model.product_stage.endpoint.version,
                                   model.code, current_user.email,
-                                  ret, model.id)
+                                  ret, _model_id)
           _send_about_test_user(product_id, model.name, firmware_version, state)
           return redirect('products/' + product_id + '/model/' + model_id)
         else:
