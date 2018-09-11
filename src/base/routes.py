@@ -89,7 +89,7 @@ def production_sign_in(token):
   user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
   user.created_time = datetime.datetime.utcnow()
   user.last_access_time = datetime.datetime.utcnow()
-  user.ip_address = request.remote_addr
+  user.ip_address = request.headers.get('X-Real-IP', request.remote_addr)
   user.level = models.MEMBER
   invite = in_apis.get_invite_by_email(token['email'])
   if not user.organization_id and invite:

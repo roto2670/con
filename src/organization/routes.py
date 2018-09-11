@@ -93,8 +93,8 @@ def create():
           db.session.commit()
         return redirect('/products/create')
       else:
-        logging.waring("Fail to create org. Name : %s, user : %s",
-                       name, current_user.email)
+        logging.warning("Fail to create org. Name : %s, user : %s",
+                        name, current_user.email)
         abort(500)
 
 
@@ -210,8 +210,8 @@ def confirm_mail():
         base.routes.logout()
         return redirect(url_for('login_blueprint.login'))
   else:
-    logging.waring("Fail to confirm to mail. key : %s, org : %s",
-                   key, organization_id)
+    logging.warning("Fail to confirm to mail. key : %s, org : %s",
+                    key, organization_id)
     abort(400)
 
 

@@ -26,7 +26,7 @@ def login():
   else:
     user = in_apis.get_user(current_user.id)
     user.last_access_time = datetime.datetime.utcnow()
-    user.ip_address = request.remote_addr
+    user.ip_address = request.headers.get('X-Real-IP', request.remote_addr)
     db.session.commit()
     if not current_user.organization_id:
       return redirect(url_for('organization_blueprint.create'))

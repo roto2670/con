@@ -83,8 +83,8 @@ def create():
         _set_product(product.id)
         return redirect('products/' + ret['id'] + '/model/create')
       else:
-        logging.waring("Fail to create product. Name : %sCode : %s, User : %s",
-                       name, code, current_user.email)
+        logging.warning("Fail to create product. Name : %sCode : %s, User : %s",
+                        name, code, current_user.email)
         abort(500)
 
 
@@ -141,8 +141,8 @@ def create_model(product_id):
         in_apis.create_model(name, code, model_type, product_stage.id, current_user.email)
         return redirect('products/' + product_id + '/general')
       else:
-        logging.waring("Fail to create model. Name : %s, Type : %s, user : %s",
-                       name, model_type, current_user.email)
+        logging.warning("Fail to create model. Name : %s, Type : %s, user : %s",
+                        name, model_type, current_user.email)
         abort(500)
 
 
@@ -190,8 +190,8 @@ def hook(product_id):
     db.session.commit()
     return redirect('products/' + product_id + '/authentication')
   else:
-    logging.waring("Fail to update hook. Url : %s, Key : %s, Product : %s, User : %s",
-                   hook_url, hook_client_key, product_id, current_user.email)
+    logging.warning("Fail to update hook. Url : %s, Key : %s, Product : %s, User : %s",
+                    hook_url, hook_client_key, product_id, current_user.email)
     abort(500)
 
 
@@ -318,12 +318,12 @@ def confirm_mail():
       else:
         return redirect(url_for('base_blueprint.welcome_no_ftl'))
     else:
-      logging.waring("Fail to register test. Org : %s, Product : %s, email : %s",
-                     invite.organization_id, invite.product_id, invite.email)
+      logging.warning("Fail to register test. Org : %s, Product : %s, email : %s",
+                      invite.organization_id, invite.product_id, invite.email)
       abort(500)
   else:
-    logging.waring("Can not find invite. Key : %s, org : %s",
-                   key, organization_id)
+    logging.warning("Can not find invite. Key : %s, org : %s",
+                    key, organization_id)
     abort(400)
 
 
