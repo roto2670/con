@@ -180,6 +180,8 @@ def index():
     if product_list:
       current_product = product_list[-1]
       base.routes.set_current_product(current_product)
+    else:
+      return redirect("/products/create")
   return redirect("/home/" + current_product.id)
 
 

@@ -81,7 +81,7 @@ def create():
       title = common.get_msg("organization.create.organization.fail_exists_organization_title")
       msg = common.get_msg("organization.create.organization.fail_exists_organization_message")
       common.set_error_message(title, msg)
-      return render_template("create.html")
+      return redirect('/organization/create')
     else:
       ret = apis.create_org(owner_email)
       if ret:
