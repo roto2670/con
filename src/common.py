@@ -22,15 +22,15 @@ def _get_error_message():
   return error_message
 
 
-def set_error_message(title, message):
-  session['error_message'] = {"title": title, "msg": message}
-
-
 def _get_info_message():
   info_message = session.get('info_message', {})
   if info_message:
     del session['info_message']
   return info_message
+
+
+def set_error_message(title, message):
+  session['error_message'] = {"title": title, "msg": message}
 
 
 def set_info_message(title, message):

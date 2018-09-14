@@ -22,6 +22,7 @@ from sendgrid.helpers.mail import Email  # noqa : pylint: disable=import-error
 from sendgrid.helpers.mail import Content  # noqa : pylint: disable=import-error
 from sendgrid.helpers.mail import Attachment  # noqa : pylint: disable=import-error
 
+# self
 import worker
 
 
