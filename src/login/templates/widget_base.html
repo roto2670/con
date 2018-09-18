@@ -8,6 +8,7 @@
     {% block scripts %}
     {% endblock %}
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.css" />
+    <link type="text/css" rel="stylesheet" href="/static/build/css/custom-auth.css">
     {% block styles %}
     {% endblock %}
     {% if firebase_auth.api_key %}
@@ -47,7 +48,18 @@
   <body>
     {% block header %}
     {% endblock %}
-      <div id="firebaseui-auth-container"></div>
+      <div id="firebaseui-auth-container" class="auth-content">
+        <div class="header-container">
+          <div class="logo-container">
+            <img src="/static/images/logo--mib_console-color.svg" />
+          </div>
+
+          <div class="messege-container">
+            <strong>Hi there!</strong>
+            <p>You can run the console through the login below.</p>
+          </div>
+        </div>
+      </div>
       {# TODO: Default text explaining that you sign up by signing in. #}
     {% block footer %}
     {% endblock %}
