@@ -173,7 +173,9 @@ def authentication(product_id):
   _set_product(product_id)
   tokens = json.loads(current_user.organization.tokens)
   token = tokens['access'] if 'access' in tokens else None
-  return render_template('prd_authentication.html', token=token)
+  dev = in_apis.get_product_stage_by_dev(product_id)
+  return render_template('prd_authentication.html', token=token,
+                         hook_url=dev.hook_url, hook_client_key=dev.hook_client_key)
 
 
 @blueprint.route('/<product_id>/hook', methods=['POST'])
