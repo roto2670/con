@@ -40,10 +40,9 @@ def default_route():
     invite_list = in_apis.get_invite_list(current_user.organization_id)
     release_list = []
     for product in product_list:
-      _release_list = in_apis.get_product_stage_by_release(product.id)
-      if _release_list:
-        for _release in _release_list:
-          release_list.append(_release.id)
+      _release = in_apis.get_product_stage_by_release(product.id)
+      if _release:
+        release_list.append(_release.id)
     msg = {
         "delete": common.get_msg("organization.delete.organization.delete_message"),
         "delete_ok": common.get_msg("organization.delete.organization.delete_ok"),
