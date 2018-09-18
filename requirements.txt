@@ -7,7 +7,6 @@ gunicorn
 PyJWT
 requests
 cryptography
-mysqlclient
 sendgrid
 intelhex
 PyMySql
@@ -15,3 +14,4 @@ google-cloud-datastore
 pyOpenSSL
 gevent
 celery
+mysqlclient

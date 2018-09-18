@@ -8,9 +8,9 @@
         <div class="btn-group">
             {% if current_user.organization_id %}
               {% if current_product %}
-                <button type="button" class="btn btn-primary product-title">{{ current_product.id }}</button>
+                <button type="button" class="btn btn-primary product-title text-left">{{ current_product.id }}</button>
               {% else %}
-                <button type="button" class="btn btn-primary product-title">Products</button>
+                <button type="button" class="btn btn-primary product-title text-left">Products</button>
               {% endif %}
               <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                 <span class="caret"></span>
