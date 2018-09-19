@@ -71,7 +71,7 @@
                         </thead>
 
                         <tbody>
-                          {% for firmware in firmware_list|sort(attribute='version', reverse=True) %}
+                          {% for firmware in firmware_list %}
                             <tr>
                               <td>{{ firmware.version }}</td>
                               {% if firmware.model.product_stage.stage == 0 %}
