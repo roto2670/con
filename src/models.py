@@ -195,7 +195,7 @@ class Model(db.Model):
   product_stage_id = Column(String(75), ForeignKey('product_stage.id'))
   firmware_list = relationship("Firmware", backref='model',
                                cascade="all, delete",
-                               order_by="desc(Firmware.last_updated_time)")
+                               order_by="desc(Firmware.version)")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
