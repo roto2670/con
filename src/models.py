@@ -83,7 +83,9 @@ class Organization(db.Model):
   last_updated_time = Column(DateTime)
 
   user_list = relationship("User", backref='organization', cascade="all, delete")
-  product_list = relationship("Product", backref='organization', cascade="all, delete")
+  product_list = relationship("Product", backref='organization',
+                              cascade="all, delete",
+                              order_by="desc(Product.last_updated_time)")
   noti_key = relationship("NotiKey", backref='organization', cascade="all, delete")
 
   def __init__(self, **kwargs):
@@ -154,8 +156,11 @@ class ProductStage(db.Model):
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   product_id = Column(String(75), ForeignKey('product.id'))
-  model_list = relationship("Model", backref='product_stage', cascade="all, delete")
-  endpoint = relationship('Endpoint', uselist=False, backref='product_stage', cascade="all, delete")
+  model_list = relationship("Model", backref='product_stage',
+                            cascade="all, delete",
+                            order_by="desc(Model.last_updated_time)")
+  endpoint = relationship('Endpoint', uselist=False, backref='product_stage',
+                          cascade="all, delete")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -188,7 +193,9 @@ class Model(db.Model):
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   product_stage_id = Column(String(75), ForeignKey('product_stage.id'))
-  firmware_list = relationship("Firmware", backref='model', cascade="all, delete")
+  firmware_list = relationship("Firmware", backref='model',
+                               cascade="all, delete",
+                               order_by="desc(Firmware.last_updated_time)")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
