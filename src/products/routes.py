@@ -417,6 +417,9 @@ def upload_firmware(product_id, model_id):
         _model_id = model.id
         if state == models.STAGE_RELEASE:
           stage_info = in_apis.get_product_stage_by_release(product_id)
+          for _m in stage_info.model_list:
+            if _m.code == model.code:
+              _model_id = _m.id
         elif state == models.STAGE_PRE_RELEASE:
           stage_info = in_apis.get_product_stage_by_pre_release(product_id)
           for _m in stage_info.model_list:

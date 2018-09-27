@@ -51,7 +51,9 @@ def _get_secret_key(private_key_path, secret_key_path):
     logging.exception("Raise error while generate secret key.")
 
 
-def _generate_noti_key(content, password):
+def _generate_noti_key(file_path, password):
+  with open(file_path, 'rb') as _f:
+    content = _f.read()
   p12 = crypto.load_pkcs12(content, password)
   tmp_private_key_path = tempfile.mkstemp()[1]
   tmp_secret_key_path = tempfile.mkstemp()[1]
@@ -64,13 +66,13 @@ def _generate_noti_key(content, password):
 
 
 @worker.task()
-def _get_about_noti_key(password, content):
-  cert, secret_key = _generate_noti_key(content, password)
+def _get_about_noti_key(password, file_path):
+  cert, secret_key = _generate_noti_key(file_path, password)
   return (cert, secret_key)
 
 
-def get_about_noti_key(password, content):
-  ret = _get_about_noti_key.delay(password, content)
+def get_about_noti_key(password, file_path):
+  ret = _get_about_noti_key.delay(password, file_path)
   cert, secret_key = ret.get()
   return (cert, secret_key)
 

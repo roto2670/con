@@ -9,10 +9,12 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import os
 import json
 import uuid
 import logging
 import datetime
+import tempfile
 
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user, login_required  # noqa : pylint: disable=import-error
@@ -113,7 +115,10 @@ def register_noti_key(platform):
       state = int(request.form['state'])
       upload_file = request.files['file']
       content = upload_file.read()
-      cert, secret_key = worker.get_about_noti_key(password, content)
+      temp_file = tempfile.mkstemp()[1]
+      with open(temp_file, 'wb') as _f:
+        _f.write(content)
+      cert, secret_key = worker.get_about_noti_key(password, temp_file)
       ret = apis.update_ios_key(current_user.organization_id, bundle_id,
                                 cert, secret_key, state)
       if ret:
@@ -124,12 +129,16 @@ def register_noti_key(platform):
           in_apis.update_noti_key(noti_key)
         else:
           in_apis.create_ios_noti_key(bundle_id, password, state)
+        if os.path.exists(temp_file):
+          os.remove(temp_file)
         return redirect('organization')
       else:
         logging.warning(
             "Fail to ios register noti key. org : %s, id : %s, pw : %s, state : %s, user : %s",
             current_user.organization_id, bundle_id, password, state,
             current_user.email)
+        if os.path.exists(temp_file):
+          os.remove(temp_file)
         abort(500)
     else:
       package_name = request.form['packageName']

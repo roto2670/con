@@ -483,7 +483,7 @@ def create_firmware(version, ep_version, model_code, user_email, url_path,
 
 def get_firmware_list_order_by_version(ep_version, model_code):
   firmware_list = Firmware.query.filter_by(ep_version=ep_version, model_code=model_code).\
-      order_by('version desc').all()
+      order_by('last_updated_time desc').all()
   return firmware_list
 
 
@@ -546,15 +546,15 @@ def pre_release(product_id):
       model.last_updated_time = datetime.datetime.utcnow()
       model.last_updated_user = current_user.email
       model.product_stage_id = dev.id
-      for firmware in firmware_list:
-        make_transient(firmware)
-        firmware.id = uuid.uuid4().hex
-        firmware.created_time = datetime.datetime.utcnow()
-        firmware.last_updated_time = datetime.datetime.utcnow()
-        firmware.last_updated_user = current_user.email
-        firmware.model_id = model.id
-
-        db.session.add(firmware)
+      latest_firmware = firmware_list[0] if firmware_list else None
+      if latest_firmware:
+        make_transient(latest_firmware)
+        latest_firmware.id = uuid.uuid4().hex
+        latest_firmware.created_time = datetime.datetime.utcnow()
+        latest_firmware.last_updated_time = datetime.datetime.utcnow()
+        latest_firmware.last_updated_user = current_user.email
+        latest_firmware.model_id = model.id
+        db.session.add(latest_firmware)
       db.session.add(model)
 
     db.session.add(_ep)
