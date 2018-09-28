@@ -35,14 +35,23 @@ def get_user(email_addr):
   url = BASE_URL + 'users'
   params = {"email": email_addr}
   try:
-    resp = requests.get(url, headers=HEADERS, params=params)
-    if resp.ok:
-      value = resp.json()
-      return value['v']
+    if IS_DEV:
+      _test_data = {
+          'user': {},
+          'accounts': [],
+          'hubs': [],
+          'gadgets': [],
+      }
+      return _test_data
     else:
-      logging.warning("Get User Response. Code : %s, Text : %s",
-                      resp.status_code, resp.text)
-      return None
+      resp = requests.get(url, headers=HEADERS, params=params)
+      if resp.ok:
+        value = resp.json()
+        return value['v']
+      else:
+        logging.warning("Get User Response. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return None
   except:
     logging.exception("Raise error.")
     return None
@@ -139,14 +148,18 @@ def update_android_key(organization_id, kind, secret):
       "secret": secret
   }
   try:
-    resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
-    if resp.ok:
-      value = resp.json()
-      return value['v']
+    if IS_DEV:
+      _test_data = True
+      return _test_data
     else:
-      logging.warning("Register android key Response. Code : %s, Text : %s",
-                      resp.status_code, resp.text)
-      return None
+      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      if resp.ok:
+        value = resp.json()
+        return value['v']
+      else:
+        logging.warning("Register android key Response. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return None
   except:
     logging.exception("Raise error.")
     return None
@@ -162,14 +175,18 @@ def update_ios_key(organization_id, kind, cert, secret, is_dev):
       "stage": is_dev
   }
   try:
-    resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
-    if resp.ok:
-      value = resp.json()
-      return value['v']
+    if IS_DEV:
+      _test_data = True
+      return _test_data
     else:
-      logging.warning("Register android key Response. Code : %s, Text : %s",
-                      resp.status_code, resp.text)
-      return None
+      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      if resp.ok:
+        value = resp.json()
+        return value['v']
+      else:
+        logging.warning("Register android key Response. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return None
   except:
     logging.exception("Raise error")
     return None
@@ -281,7 +298,10 @@ def update_about_hook(product_id, stage, hook_url=None, hook_client_key=None):
       "hook_client_key": hook_client_key
   }
 
-  if data:
+  if IS_DEV:
+    _test_data = True
+    return _test_data
+  else:
     try:
       resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
       if resp.ok:
@@ -294,8 +314,6 @@ def update_about_hook(product_id, stage, hook_url=None, hook_client_key=None):
     except:
       logging.exception("Raise error.")
       return None
-  else:
-    return None
 
 
 def update_product_stage(product_id, product_stage, model_number_dict, stage):
