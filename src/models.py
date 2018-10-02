@@ -241,7 +241,7 @@ class NotiKey(db.Model):
   id = Column(Integer, primary_key=True)
   typ = Column(Integer)
   name = Column(String(75)) # ios : bundle_id, android : package_name
-  key = Column(String(75))  # ios : password, android : key
+  key = Column(String(225))  # ios : password, android : key
   is_dev = Column(Integer)  # only ios, 0->production, 1->dev
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
