@@ -3,8 +3,6 @@
 
 {% block title %} Release {% endblock title %}
 
-
-
 {% block content %}
   <div class="right_col" role="main">
     <div class="">
@@ -92,21 +90,21 @@
                         </table>
 
                         {% if pre_release_list %}
-                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Release</button>
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".release-modal">Release</button>
                         {% else %}
-                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm" disabled>Release</button>
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".release-modal" disabled>Release</button>
                         {% endif %}
-                        <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal fade release-modal" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog modal-sm">
                               <div class="modal-content">
 
                                 <div class="modal-header">
                                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
                                   </button>
-                                  <h4 class="modal-title" id="preRelease">Release</h4>
+                                  <h4 class="modal-title" id="release">Release</h4>
                                 </div>
                                 <div>
-                                  <form id="preRelease" method="post" action="/release/{{ current_product.id }}/release">
+                                  <form id="release" method="post" action="/release/{{ current_product.id }}/release">
                                     <div class="modal-body">
                                       <h4>Release ok?</h4>
                                     </div>
@@ -160,11 +158,11 @@
                         </table>
 
                         {% if allow_pre_release %}
-                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Pre Release</button>
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".pre-release-modal">Pre Release</button>
                         {% else %}
-                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm" disabled>Pre Release</button>
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".pre-release-modal" disabled>Pre Release</button>
                         {% endif %}
-                        <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal fade pre-release-modal" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog modal-sm">
                               <div class="modal-content">
 
