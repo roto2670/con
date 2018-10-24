@@ -39,7 +39,7 @@
                         <td><a href="/products/{{ current_product.id }}/model/{{ model.id }}">{{ model.name }}</a></td>
                         <td>{{ model.firmware_list|length }}</td>
                         <td>{{ typ_dict[model.typ] }}</td>
-                        <td>{{ model.last_updated_time | datetimefilter }}</td>
+                        <td>{{ model.last_updated_time | datetimeFilter }}</td>
                         <td>{{ model.last_updated_user }}</td>
                         <!-- TODO: Remove model {% if current_user.level == 0 and not release_list %}
                           <td><a href="/products/{{ current_product.id }}/model/{{ model.id }}/delete"><i class="fa fa-remove"></i></a></td>
