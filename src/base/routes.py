@@ -222,8 +222,7 @@ def get_timezone():
 
 
 def datetime_filter(value):
-  #tz_info = get_timezone()
-  tz_info = 'UTC'
+  tz_info = get_timezone()
   _value = pytz.timezone(tz_info).localize(value)
   _timestamp = time.mktime(_value.timetuple())
   _timestamp += _value.utcoffset().seconds
