@@ -15,10 +15,13 @@ import os
 
 class Config(object):
   SECRET_KEY = 'skfksrltnf1'
-  SQLALCHEMY_DATABASE_URI = 'mysql://root:sksmswkd1@127.0.0.1:3306/mib_console?charset=utf8'  # LOCAL MySQL
+  #SQLALCHEMY_DATABASE_URI = 'mysql://root:sksmswkd1@127.0.0.1:3306/mib_console?charset=utf8'  # LOCAL MySQL
+  SQLALCHEMY_DATABASE_URI = 'mysql://console:skfksxpzm1@127.0.0.1:3307/mib_console?charset=utf8'  # Cloud MySQL
   SQLALCHEMY_BINDS = {
-      "old": 'mysql://root:sksmswkd1@127.0.0.1:3306/console?charset=utf8',
-      "new": 'mysql://root:sksmswkd1@127.0.0.1:3306/mib_console?charset=utf8'
+      #"old": 'mysql://root:sksmswkd1@127.0.0.1:3306/console?charset=utf8',  # Local MySql
+      "old": 'mysql://console:skfksxpzm1@127.0.0.1:3307/console?charset=utf8',  # Cloud MySql
+      "new": 'mysql://console:skfksxpzm1@127.0.0.1:3307/mib_console?charset=utf8'  # Cloud MySql
+      #"new": 'mysql://root:sksmswkd1@127.0.0.1:3306/mib_console?charset=utf8'  # Local MySql
   }
   SQLALCHEMY_TRACK_MODIFICATIONS = False
   FIREBASE_API_KEY = 'AIzaSyANO3vuNoPC1eQjqsIJeZzGZhl1gWAPbro'

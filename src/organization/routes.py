@@ -182,7 +182,7 @@ def send_invite():
       _invite = in_apis.get_invite_by_member(email_addr,
                                              current_user.organization_id)
       if _invite:
-        _t = datetime.datetime.utcnow() - _invite.invited_time
+        _t = in_apis.get_datetime() - _invite.invited_time
         if _t.seconds >= 86400:
           in_apis.update_invite_by_key(key, _invite)
       else:

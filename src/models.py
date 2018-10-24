@@ -23,7 +23,6 @@ from base import db, login_manager
 class _Organization(db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   __tablename__ = '_organization'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   users = Column(Text)  # list, 테스트가 가능한 모든 유저
@@ -36,11 +35,11 @@ class _Organization(db.Model):
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
 
-  user_list = relationship("_User", backref='_organization', cascade="all, delete")
-  product_list = relationship("_Product", backref='_organization',
+  user_list = relationship("_User", backref='organization', cascade="all, delete")
+  product_list = relationship("_Product", backref='organization',
                               cascade="all, delete",
                               order_by="desc(_Product.last_updated_time)")
-  noti_key = relationship("_NotiKey", backref='_organization', cascade="all, delete")
+  noti_key = relationship("_NotiKey", backref='organization', cascade="all, delete")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -60,7 +59,6 @@ TESTER = 2
 class _User(UserMixin, db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   __tablename__ = '_user'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   email = Column(String(75), unique=True, nullable=False)
@@ -76,7 +74,7 @@ class _User(UserMixin, db.Model):
 
   organization_id = Column(String(75), ForeignKey('_organization.id'))
 
-  permission = relationship('_Permission', uselist=False, backref='_user')
+  permission = relationship('_Permission', uselist=False, backref='user')
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -90,12 +88,11 @@ class _User(UserMixin, db.Model):
 
 @login_manager.user_loader
 def user_loader(_id):
-  return User.query.get(_id)
+  return _User.query.get(_id)
 
 
 class _Permission(db.Model):
   __tablename__ = '_permission'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   permission = Column(String(15))
@@ -121,7 +118,6 @@ IOS = 0
 class _NotiKey(db.Model):
 
   __tablename__ = '_notikey'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   typ = Column(Integer)
@@ -144,7 +140,6 @@ class _NotiKey(db.Model):
 STAGE_RELEASE = 0
 STAGE_PRE_RELEASE = 1
 STAGE_DEV = 2
-STAGE_ARCHIVE = 3
 
 # TYPE
 PRD_TYPE_BLE = 0
@@ -154,7 +149,6 @@ PRD_TYPE_WEB = 1
 class _Product(db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   __tablename__ = '_product'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   code = Column(String(75))
@@ -166,12 +160,12 @@ class _Product(db.Model):
   last_updated_time = Column(DateTime)
   organization_id = Column(String(75), ForeignKey('_organization.id'))
 
-  model_list = relationship('_Model', backref='_product', cascade="all, delete",
+  model_list = relationship('_Model', backref='product', cascade="all, delete",
                             order_by="desc(_Model.last_updated_time)")
-  endpoint = relationship('_Endpoint', backref='_product', cascade="all, delete",
-                          order_by="desc(_Endpoint.last_updated_time)")
-  tester_list = relationship('_Tester', backref='_product', cascade="all, delete")
-  history_list = relationship('_History', backref='_product', cascade="all, delete",
+  endpoint_list = relationship('_Endpoint', backref='product', cascade="all, delete",
+                               order_by="desc(_Endpoint.last_updated_time)")
+  tester_list = relationship('_Tester', backref='product', cascade="all, delete")
+  history_list = relationship('_History', backref='product', cascade="all, delete",
                               order_by="desc(_History.last_updated_time)")
 
   def __init__(self, **kwargs):
@@ -187,7 +181,6 @@ class _Product(db.Model):
 class _Endpoint(db.Model):
 
   __tablename__ = '_endpoint'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   version = Column(String(75))
@@ -206,7 +199,6 @@ TESTER_DEV = 2
 class _Tester(db.Model):
 
   __tablename__ = '_tester'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   email = Column(String(75))
@@ -219,7 +211,6 @@ class _Tester(db.Model):
 class _History(db.Model):
 
   __tablename__ = '_history'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   model_id = Column(String(75))
@@ -249,7 +240,6 @@ MODEL_TYPE_NRF_52 = 1
 class _Model(db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   __tablename__ = '_model'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   code = Column(Integer)
@@ -259,7 +249,7 @@ class _Model(db.Model):
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   product_id = Column(String(75), ForeignKey('_product.id'))
-  firmware_list = relationship("_Firmware", backref='_model',
+  firmware_list = relationship("_Firmware", backref='model',
                                cascade="all, delete",
                                order_by="desc(_Firmware.version)")
 
@@ -282,7 +272,6 @@ FIRMWARE_ARCHIVE = 3
 class _Firmware(db.Model):
 
   __tablename__ = '_firmware'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   version = Column(String(75))
@@ -293,7 +282,7 @@ class _Firmware(db.Model):
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
-  is_remove = Column(Boolean, default=False)
+  is_removed = Column(Boolean, default=False)
   model_id = Column(String(75), ForeignKey('_model.id'))
 
   def __init__(self, **kwargs):
@@ -306,18 +295,18 @@ class _Firmware(db.Model):
 class _ProductStage(db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   __tablename__ = '_product_stage'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   hook_url = Column(String(120))
   hook_client_key = Column(String(120))
   stage = Column(Integer)
-  mode_id = Column(String(75))
-  firmware_id = Column(String(75))
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   product_id = Column(String(75), ForeignKey('_product.id'))
+  stage_info_list = relationship("_StageInfo", backref='product_stage',
+                                 cascade="all, delete",
+                                 order_by="desc(_StageInfo.created_time)")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -329,10 +318,27 @@ class _ProductStage(db.Model):
     return self.id
 
 
-class _Invite(db.Model):
+class _StageInfo(db.Model):
+  __tablename__ = '_stage_info'
 
+  id = Column(String(75), primary_key=True)
+  model_id = Column(String(75))
+  endpoint_id = Column(String(75))
+  firmware_id = Column(String(75))
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  product_stage_id = Column(String(75), ForeignKey('_product_stage.id'))
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        value = value[0]
+      setattr(self, property, value)
+
+
+class _Invite(db.Model):
   __tablename__ = '_invite'
-  __bind_key__ = 'new'
 
   id = Column(String(75), primary_key=True)
   email = Column(String(75))

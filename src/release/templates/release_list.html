@@ -29,8 +29,9 @@
                           <thead>
                             <tr>
                               <th>Name</th>
-                              <th>Version</th>
-                              <th>Model Number</th>
+                              <th>Endpoint</th>
+                              <th>Model</th>
+                              <th>Firmware</th>
                               <th>Hook Url</th>
                               <th>Hook Client Key</th>
                               <th>Updated User</th>
@@ -38,17 +39,20 @@
                             </tr>
                           </thead>
                           <tbody>
-                            {% for release in release_list %}
-                              <tr>
-                                <td>{{ release.product.name }}</td>
-                                <td>{{ release.endpoint.version }}</td>
-                                <td>{{ release.model_list|length }}</td>
-                                <td>{{ release.hook_url }}</td>
-                                <td>{{ release.hook_client_key }}</td>
-                                <td>{{ release.last_updated_user }}</td>
-                                <td>{{ release.last_updated_time }}</td>
-                              </tr>
-                            {% endfor %}
+                            {% if release_stage %}
+                              {% for release in release_stage.stage_info_list %}
+                                <tr>
+                                  <td>{{ release_stage.product.name }}</td>
+                                  <td>{{ release.endpoint.version }}</td>
+                                  <td>{{ release.model.name }}</td>
+                                  <td>{{ release.firmware.version }}</td>
+                                  <td>{{ release_stage.hook_url }}</td>
+                                  <td>{{ release_stage.hook_client_key }}</td>
+                                  <td>{{ release_stage.last_updated_user }}</td>
+                                  <td>{{ release_stage.last_updated_time }}</td>
+                                </tr>
+                              {% endfor %}
+                            {% endif %}
                           </tbody>
                         </table>
                       </div>
@@ -66,8 +70,9 @@
                           <thead>
                             <tr>
                               <th>Name</th>
-                              <th>Version</th>
-                              <th>Model Number</th>
+                              <th>Endpoint</th>
+                              <th>Model</th>
+                              <th>Firmware</th>
                               <th>Hook Url</th>
                               <th>Hook Client Key</th>
                               <th>Updated User</th>
@@ -75,21 +80,24 @@
                             </tr>
                           </thead>
                           <tbody>
-                            {% for pre_release in pre_release_list %}
-                              <tr>
-                                <td>{{ pre_release.product.name }}</td>
-                                <td>{{ pre_release.endpoint.version }}</td>
-                                <td>{{ pre_release.model_list|length }}</td>
-                                <td>{{ pre_release.hook_url }}</td>
-                                <td>{{ pre_release.hook_client_key }}</td>
-                                <td>{{ pre_release.last_updated_user }}</td>
-                                <td>{{ pre_release.last_updated_time }}</td>
-                              </tr>
-                            {% endfor %}
+                            {% if pre_stage %}
+                              {% for pre in pre_stage.stage_info_list %}
+                                <tr>
+                                  <td>{{ pre_stage.product.name }}</td>
+                                  <td>{{ pre.endpoint.version }}</td>
+                                  <td>{{ pre.model.name }}</td>
+                                  <td>{{ pre.firmware.version }}</td>
+                                  <td>{{ pre_stage.hook_url }}</td>
+                                  <td>{{ pre_stage.hook_client_key }}</td>
+                                  <td>{{ pre_stage.last_updated_user }}</td>
+                                  <td>{{ pre_stage.last_updated_time }}</td>
+                                </tr>
+                              {% endfor %}
+                            {% endif %}
                           </tbody>
                         </table>
 
-                        {% if pre_release_list %}
+                        {% if allow_release %}
                           <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".release-modal">Release</button>
                         {% else %}
                           <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".release-modal" disabled>Release</button>
@@ -134,8 +142,9 @@
                           <thead>
                             <tr>
                               <th>Name</th>
-                              <th>Version</th>
-                              <th>Model Number</th>
+                              <th>Endpoint</th>
+                              <th>Model</th>
+                              <th>Firmware</th>
                               <th>Hook Url</th>
                               <th>Hook Client Key</th>
                               <th>Updated User</th>
@@ -143,17 +152,20 @@
                             </tr>
                           </thead>
                           <tbody>
-                            {% for dev in dev_list %}
-                              <tr>
-                                <td>{{ dev.product.name }}</td>
-                                <td>{{ dev.endpoint.version }}</td>
-                                <td>{{ dev.model_list|length }}</td>
-                                <td>{{ dev.hook_url }}</td>
-                                <td>{{ dev.hook_client_key }}</td>
-                                <td>{{ dev.last_updated_user }}</td>
-                                <td>{{ dev.last_updated_time }}</td>
-                              </tr>
-                            {% endfor %}
+                            {% if dev_stage %}
+                              {% for dev in dev_stage.stage_info_list %}
+                                <tr>
+                                  <td>{{ dev_stage.product.name }}</td>
+                                  <td>{{ dev.endpoint.version }}</td>
+                                  <td>{{ dev.model.name }}</td>
+                                  <td>{{ dev.firmware.version }}</td>
+                                  <td>{{ dev_stage.hook_url }}</td>
+                                  <td>{{ dev_stage.hook_client_key }}</td>
+                                  <td>{{ dev_stage.last_updated_user }}</td>
+                                  <td>{{ dev_stage.last_updated_time }}</td>
+                                </tr>
+                              {% endfor %}
+                            {% endif %}
                           </tbody>
                         </table>
 
@@ -202,8 +214,9 @@
                             <thead>
                               <tr>
                                 <th>Name</th>
-                                <th>Version</th>
-                                <th>Model Number</th>
+                                <th>Endpoint</th>
+                                <th>Model</th>
+                                <th>Firmware</th>
                                 <th>Hook Url</th>
                                 <th>Hook Client Key</th>
                                 <th>Updated User</th>
@@ -211,15 +224,16 @@
                               </tr>
                             </thead>
                             <tbody>
-                              {% for archive in archive_list %}
+                              {% for history in history_list %}
                                 <tr>
-                                  <td>{{ archive.product.name }}</td>
-                                  <td>{{ archive.endpoint.version }}</td>
-                                  <td>{{ archive.model_list|length }}</td>
-                                  <td>{{ archive.hook_url }}</td>
-                                  <td>{{ archive.hook_client_key }}</td>
-                                  <td></td>
-                                  <td>{{ archive.last_updated_time }}</td>
+                                  <td>{{ history.product.name }}</td>
+                                  <td>{{ history.endpoint.version }}</td>
+                                  <td>{{ history.model.name }}</td>
+                                  <td>{{ history.firmware.version }}</td>
+                                  <td>{{ history.hook_url }}</td>
+                                  <td>{{ history.hook_client_key }}</td>
+                                  <td>{{ history.last_updated_user }}</td>
+                                  <td>{{ history.last_updated_time }}</td>
                                 </tr>
                               {% endfor %}
                             </tbody>

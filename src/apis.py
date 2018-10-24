@@ -465,6 +465,29 @@ def register_firmware(product_id, model_number, firmware_version, firmware_binar
     logging.exception("Raise error.")
     return None
 
+
+def delete_firmware(product_id, model_number, firmware_version):
+  url = BASE_URL + 'products/' + product_id + '/models/' + str(model_number) \
+      + "/firmwares/" + firmware_version
+  try:
+    if IS_DEV:
+      return True
+    else:
+      resp = requests.delete(url)
+      if resp.ok:
+        value = resp.json()
+        return value['v']
+      else:
+        logging.warning("Delete firmware Response. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return None
+  except:
+    logging.exception("Raise error while delete firmware. P: %s, M: %s, F: %s",
+                      product_id, model_number, firmware_version)
+    return None
+
+
+
 # }}}
 
 

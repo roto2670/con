@@ -21,7 +21,8 @@ import models
 import in_apis
 from base import blueprint
 from base import db, login_manager, auth
-from models import User, Permission
+from models import _User as User
+from models import _Permission as Permission
 
 
 @blueprint.route('/')
@@ -87,8 +88,8 @@ def production_sign_in(token):
   user.email_verified = token['email_verified']
   user.sign_in_provider = token['firebase']['sign_in_provider']
   user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
-  user.created_time = datetime.datetime.utcnow()
-  user.last_access_time = datetime.datetime.utcnow()
+  user.created_time = in_apis.get_datetime()
+  user.last_access_time = in_apis.get_datetime()
   user.ip_address = request.headers.get('X-Real-IP', request.remote_addr)
   user.level = models.MEMBER
   invite = in_apis.get_invite_by_email(token['email'])
@@ -186,3 +187,43 @@ def _get_current_product():
 def about_product():
   return dict(current_product=_get_current_product(),
               product_list=_get_product_list())
+
+
+
+## Jinja template
+
+import time
+import pytz
+import logging
+import worker
+
+#TODO:
+CUR_TIMEZONE = {}  # {user_id : {'tz': timezone, 'last_access': timestamp}}
+
+
+def set_timezone(ip_addr):
+  #ipinfo = worker.get_timezone(ip_addr)
+  #if ip_addr == "127.0.0.1":
+  #  return None
+  pass
+
+
+def get_timezone():
+  if current_user.id not in CUR_TIMEZONE:
+    set_timezone(request.remote_addr)
+  elif (time.time() - CUR_TIMEZONE[current_user.id]['last_access']) > 3600:
+    set_timezone(request.remote_addr)
+  if current_user.id in CUR_TIMEZONE and 'tz' in CUR_TIMEZONE[current_user.id]:
+    return CUR_TIMEZONE[current_user.id]['tz']
+  else:
+    return 'UTC'
+
+
+def datetime_filter(value):
+  #tz_info = get_timezone()
+  tz_info = 'UTC'
+  _value = pytz.timezone(tz_info).localize(value)
+  _timestamp = time.mktime(_value.timetuple())
+  _timestamp += _value.utcoffset().seconds
+  _new_time = datetime.datetime.fromtimestamp(_timestamp)
+  return _new_time

@@ -11,17 +11,33 @@
 
 import json
 import uuid
+import logging
 import datetime
 
+import pytz
 from flask_login import current_user  # noqa : pylint: disable=import-error
 from sqlalchemy.orm.session import make_transient  # noqa : pylint: disable=import-error
+from sqlalchemy import desc
 
 import apis
 import models
 from base import db
-from models import Product, ProductStage, Model
-from models import Endpoint, NotiKey, Organization, User
-from models import Invite, Tester, Firmware
+from models import _Product as Product
+from models import _ProductStage as ProductStage
+from models import _StageInfo as StageInfo
+from models import _Model as Model
+from models import _Endpoint as Endpoint
+from models import _NotiKey as NotiKey
+from models import _Organization as Organization
+from models import _User as User
+from models import _Invite as Invite
+from models import _Tester as Tester
+from models import _Firmware as Firmware
+from models import _History as History
+
+
+def get_datetime():
+  return datetime.datetime.now(pytz.timezone('UTC'))
 
 
 # {{{ Product
@@ -35,8 +51,8 @@ def create_product(product_name, product_obj, product_type):
                     key=product_obj['key'],
                     name=product_name,
                     typ=product_type,
-                    created_time=datetime.datetime.utcnow(),
-                    last_updated_time=datetime.datetime.utcnow(),
+                    created_time=get_datetime(),
+                    last_updated_time=get_datetime(),
                     organization_id=product_obj['developer_id'])
   db.session.add(product)
   db.session.commit()
@@ -44,18 +60,32 @@ def create_product(product_name, product_obj, product_type):
                                hook_url="",
                                hook_client_key="",
                                stage=models.STAGE_DEV,
-                               created_time=datetime.datetime.utcnow(),
-                               last_updated_time=datetime.datetime.utcnow(),
+                               created_time=get_datetime(),
+                               last_updated_time=get_datetime(),
                                last_updated_user=current_user.email,
                                product_id=product.id)
   db.session.add(product_stage)
   db.session.commit()
+  create_product_stage_by_dev(product.id)
   return product
 
 
 def get_product(product_id):
   product = Product.query.filter_by(id=product_id).one_or_none()
   return product
+
+
+def create_product_stage_by_dev(product_id):
+  product_stage = ProductStage(id=uuid.uuid4().hex,
+                               hook_url="",
+                               hook_client_key="",
+                               stage=models.DEV_STATE,
+                               created_time=get_datetime(),
+                               last_updated_time=get_datetime(),
+                               last_updated_user=current_user.email,
+                               product_id=product_id)
+  db.session.add(product_stage)
+  db.session.commit()
 
 
 def get_product_list(developer_id):
@@ -84,11 +114,55 @@ def get_product_stage_by_pre_release(product_id):
   return product_stage
 
 
-def get_product_stage_by_archive(product_id):
-  product_stage = ProductStage.query.filter_by(product_id=product_id,
-                                               stage=models.STAGE_ARCHIVE).\
-      all()
-  return product_stage
+def remove_product_stage(product_stage_id):
+  product_stage = ProductStage.query.filter_by(id=product_stage_id).one_or_none()
+  if product_stage:
+    db.session.delete(product_stage)
+    db.session.commit()
+
+
+def create_stage_info(product_stage_id, model_id):
+  stage_info = StageInfo(id=uuid.uuid4().hex,
+                         model_id=model_id,
+                         endpoint_id="",
+                         firmware_id="",
+                         created_time=get_datetime(),
+                         last_updated_time=get_datetime(),
+                         last_updated_user=current_user.email,
+                         product_stage_id=product_stage_id)
+  db.session.add(stage_info)
+  db.session.commit()
+
+
+def get_dev_stage_info_by_model(model_id, product_stage_id):
+  stage_info = StageInfo.query.\
+      filter_by(model_id=model_id, product_stage_id=product_stage_id).one_or_none()
+  return stage_info
+
+
+def update_stage_info_by_dev_about_firmware(product_id, model_id, firmware_id):
+  dev_stage = get_product_stage_by_dev(product_id)
+  stage_info = get_dev_stage_info_by_model(model_id, dev_stage.id)
+  if stage_info:
+    stage_info.firmware_id = firmware_id
+    stage_info.last_updated_time = get_datetime()
+    stage_info.last_updated_user = current_user.email
+    db.session.commit()
+
+
+def update_stage_info_by_dev_about_endpoint(product_id, endpoint_id):
+  dev_stage = get_product_stage_by_dev(product_id)
+  for stage_info in dev_stage.stage_info_list:
+    stage_info.endpoint_id = endpoint_id
+    stage_info.last_updated_time = get_datetime()
+    stage_info.last_updated_user = current_user.email
+    db.session.commit()
+
+
+def get_history_list(product_id):
+  history_list = History.query.filter_by(product_id=product_id).\
+      order_by(desc(History.created_time)).all()
+  return history_list
 
 
 def delete_product(_id):
@@ -98,17 +172,19 @@ def delete_product(_id):
     db.session.commit()
 
 
-def create_model(model_name, model_code, model_type, product_stage_id, user_email):
+def create_model(model_name, model_code, model_type, product_id, user_email):
   model = Model(id=uuid.uuid4().hex,
                 code=model_code,
                 name=model_name,
                 typ=model_type,
-                created_time=datetime.datetime.utcnow(),
-                last_updated_time=datetime.datetime.utcnow(),
+                created_time=get_datetime(),
+                last_updated_time=get_datetime(),
                 last_updated_user=user_email,
-                product_stage_id=product_stage_id)
+                product_id=product_id)
   db.session.add(model)
   db.session.commit()
+  dev_stage = get_product_stage_by_dev(product_id)
+  create_stage_info(dev_stage.id, model.id)
 
 
 def get_model(_id):
@@ -117,37 +193,12 @@ def get_model(_id):
 
 
 def get_model_by_code(code, product_id):
-  dev_stage = get_product_stage_by_dev(product_id)
-  model = Model.query.filter_by(code=code, product_stage_id=dev_stage.id).one_or_none()
+  model = Model.query.filter_by(code=code, product_id=product_id).one_or_none()
   return model
-
-
-def get_prelease_model_by_code(code, product_id):
-  pre_stage = get_product_stage_by_pre_release(product_id)
-  if pre_stage:
-    model = Model.query.filter_by(code=code, product_stage_id=pre_stage.id).one_or_none()
-    return model
-  else:
-    return None
 
 
 def get_model_list(product_id):
-  dev_stage = get_product_stage_by_dev(product_id)
-  model = Model.query.filter_by(product_stage_id=dev_stage.id).all()
-  return model
-
-
-def get_dev_stage_model_list_order_by_created(product_id):
-  dev_stage = get_product_stage_by_dev(product_id)
-  model = Model.query.filter_by(product_stage_id=dev_stage.id).\
-      order_by('created_time desc').all()
-  return model
-
-
-def get_pre_release_stage_model_list_order_by_created(product_id):
-  pre_release_stage = get_product_stage_by_pre_release(product_id)
-  model = Model.query.filter_by(product_stage_id=pre_release_stage.id).\
-      order_by('created_time desc').all()
+  model = Model.query.filter_by(product_id=product_id).all()
   return model
 
 
@@ -173,8 +224,8 @@ def create_organization(owner_email, organization_name, ret):
                      kinds=json.dumps(ret['kinds']),
                      name=organization_name.lower(),
                      original_name=organization_name,
-                     created_time=datetime.datetime.utcnow(),
-                     last_updated_time=datetime.datetime.utcnow())
+                     created_time=get_datetime(),
+                     last_updated_time=get_datetime())
   db.session.add(org)
   db.session.commit()
   return org
@@ -249,8 +300,8 @@ def create_ios_noti_key(name, key, state):
                      name=name,
                      key=key,
                      is_dev=state,
-                     created_time=datetime.datetime.utcnow(),
-                     last_updated_time=datetime.datetime.utcnow(),
+                     created_time=get_datetime(),
+                     last_updated_time=get_datetime(),
                      last_updated_user=current_user.email,
                      organization_id=current_user.organization_id)
   _create_noti_key(noti_key)
@@ -262,15 +313,15 @@ def create_android_noti_key(name, key):
                      typ=models.ANDROID,
                      name=name,
                      key=key,
-                     created_time=datetime.datetime.utcnow(),
-                     last_updated_time=datetime.datetime.utcnow(),
+                     created_time=get_datetime(),
+                     last_updated_time=get_datetime(),
                      last_updated_user=current_user.email,
                      organization_id=current_user.organization_id)
   _create_noti_key(noti_key)
 
 
 def update_noti_key(noti_key):
-  noti_key.last_updated_time = datetime.datetime.utcnow()
+  noti_key.last_updated_time = get_datetime()
   noti_key.last_updated_user = current_user.email
   db.session.commit()
 
@@ -284,26 +335,29 @@ def get_noti_key_list(organization_id):
 
 
 def create_specifications(version, specifications, user_email, organization_id,
-                          product_stage_id):
+                          product_id):
   specification = Endpoint(id=uuid.uuid4().hex,
                            version=version,
                            specifications=specifications,
-                           created_time=datetime.datetime.utcnow(),
-                           last_updated_time=datetime.datetime.utcnow(),
+                           created_time=get_datetime(),
+                           last_updated_time=get_datetime(),
                            last_updated_user=user_email,
                            organization_id=organization_id,
-                           product_stage_id=product_stage_id)
+                           product_id=product_id)
   db.session.add(specification)
   db.session.commit()
+  update_stage_info_by_dev_about_endpoint(product_id, specification.id)
 
 
 def update_specifications(_id, user_email, version, specifications):
   specification = get_specifications(_id)
   specification.version = version
-  specification.last_updated_time = datetime.datetime.utcnow()
+  specification.last_updated_time = get_datetime()
   specification.last_updated_user = user_email
   specification.specifications = specifications
   db.session.commit()
+  update_stage_info_by_dev_about_endpoint(specification.product_id,
+                                          specification.id)
 
 
 def get_specifications(_id):
@@ -314,6 +368,12 @@ def get_specifications(_id):
 def get_specifications_list(product_id):
   specifications_list = Endpoint.query.filter_by(product_id=product_id).all()
   return specifications_list
+
+
+def get_specifications_by_version(product_id, version):
+  specifications = Endpoint.query.filter_by(product_id=product_id,
+                                            version=version).one_or_none()
+  return specifications
 
 
 # }}}
@@ -330,7 +390,7 @@ def create_invite(email_addr, key, user_email, organization_id, level=None,
                   product_id=product_id if product_id else "",
                   key=key,
                   level=level if level else models.MEMBER,
-                  invited_time=datetime.datetime.utcnow(),
+                  invited_time=get_datetime(),
                   invited_user=user_email,
                   accepted=0)
   db.session.add(invite)
@@ -378,13 +438,13 @@ def update_invite(key, organization_id):
   invite = get_invite(key, organization_id)
   if invite:
     invite.accepted = 1
-    invite.accepted_time = datetime.datetime.utcnow()
+    invite.accepted_time = get_datetime()
     db.session.commit()
 
 
 def update_invite_by_key(key, invite):
   invite.key = key
-  db.invited_time = datetime.datetime.utcnow()
+  db.invited_time = get_datetime()
   db.session.commit()
 
 
@@ -440,8 +500,9 @@ def get_tester_by_email(email_addr, product_id):
 
 
 def get_tester_list(product_id, organization_id):
-  tester_list = Tester.query.filter_by(product_id=product_id,
-                                       organization_id=organization_id).all()
+  tester_list = Tester.query.\
+      filter_by(product_id=product_id, organization_id=organization_id).\
+      order_by('level').all()
   return tester_list
 
 
@@ -465,33 +526,40 @@ def delete_tester(_id):
 # {{{ Firmware
 
 
-def create_firmware(version, ep_version, model_code, user_email, url_path,
+def create_firmware(version, ep_version, model_code, user_email, json_path,
                     model_id):
   firmware = Firmware(id=uuid.uuid4().hex,
                       version=version,
                       ep_version=ep_version,
                       model_code=model_code,
-                      path=url_path,
-                      created_time=datetime.datetime.utcnow(),
-                      last_updated_time=datetime.datetime.utcnow(),
+                      hex_path="",
+                      json_path=json_path,
+                      created_time=get_datetime(),
+                      last_updated_time=get_datetime(),
                       last_updated_user=user_email,
+                      is_removed=False,
                       model_id=model_id)
   db.session.add(firmware)
   db.session.commit()
   return firmware
 
 
+def get_firmware(_id):
+  firmware = Firmware.query.filter_by(id=_id).one_or_none()
+  return firmware
+
+
 def get_firmware_list_order_by_version(ep_version, model_code):
   firmware_list = Firmware.query.filter_by(ep_version=ep_version, model_code=model_code).\
-      order_by('last_updated_time desc').all()
+      order_by(desc(Firmware.last_updated_time)).all()
   return firmware_list
 
 
-def get_firmware_lasted(model_id):
-  firmware_list = Firmware.query.filter_by(model_id=model_id).\
-      order_by('version desc').all()
-  return firmware_list[0]
-
+def delete_firmware(firmware_id):
+  firmware = get_firmware(firmware_id)
+  if firmware:
+    firmware.is_removed = True
+    db.session.commit()
 
 
 # }}}
@@ -509,56 +577,57 @@ def _delete_before_pre_release(product_id):
 
 def pre_release(product_id):
   dev = get_product_stage_by_dev(product_id)
-  dev_models = get_dev_stage_model_list_order_by_created(product_id)
   models_dict = {}
-  for model in dev_models:
-    if model.firmware_list:
-      latested_firmware = get_firmware_lasted(model.id)
-      models_dict[model.code] = latested_firmware.version
-    else:
-      raise Exception("Fail to Pre Release. Can not find Firmware.")
+  try:
+    for _info in dev.stage_info_list:
+      _model = get_model(_info.model_id)
+      _firmware = get_firmware(_info.firmware_id)
+      models_dict[_model.code] = _firmware.version
+  except:
+    logging.exception("Fail to Release.")
+    raise Exception("Fail to Release.")
   prd_ret = apis.update_product_stage(product_id, dev, models_dict,
                                       models.STAGE_PRE_RELEASE)
   if prd_ret:
-    _delete_before_pre_release(product_id)
-    _ep = get_specifications(dev.endpoint.id)
-    model_list = dev.model_list
+    _pre_release = get_product_stage_by_pre_release(product_id)
+    # TODO: Is there a need?
+    # if _pre_release:
+    #   for _stage_info in _pre_release.stage_info_list:
+    #     history = History(id=uuid.uuid4().hex,
+    #                       model_id=_stage_info.model_id,
+    #                       firmware_id=_stage_info.firmware_id,
+    #                       endpoint_id=_stage_info.endpoint_id,
+    #                       hook_url=_pre_release.hook_url,
+    #                       hook_client_key=_pre_release.hook_client_key,
+    #                       stage=_pre_release.stage,
+    #                       created_time=get_datetime(),
+    #                       last_updated_time=get_datetime(),
+    #                       last_updated_user=current_user.email,
+    #                       product_id=product_id)
+    #     db.session.add(history)
+    #   db.session.commit()
+    remove_product_stage(_pre_release.id)
 
-    make_transient(dev)
-    dev.id = uuid.uuid4().hex
-    dev.stage = models.STAGE_PRE_RELEASE
-    dev.created_time = datetime.datetime.utcnow()
-    dev.last_updated_time = datetime.datetime.utcnow()
-    dev.last_updated_user = current_user.email
-
-    make_transient(_ep)
-    _ep.id = uuid.uuid4().hex
-    _ep.created_time = datetime.datetime.utcnow()
-    _ep.last_updated_time = datetime.datetime.utcnow()
-    _ep.last_updated_user = current_user.email
-    _ep.product_stage_id = dev.id
-
-    for model in model_list:
-      firmware_list = model.firmware_list
-      make_transient(model)
-      model.id = uuid.uuid4().hex
-      model.created_time = datetime.datetime.utcnow()
-      model.last_updated_time = datetime.datetime.utcnow()
-      model.last_updated_user = current_user.email
-      model.product_stage_id = dev.id
-      latest_firmware = firmware_list[0] if firmware_list else None
-      if latest_firmware:
-        make_transient(latest_firmware)
-        latest_firmware.id = uuid.uuid4().hex
-        latest_firmware.created_time = datetime.datetime.utcnow()
-        latest_firmware.last_updated_time = datetime.datetime.utcnow()
-        latest_firmware.last_updated_user = current_user.email
-        latest_firmware.model_id = model.id
-        db.session.add(latest_firmware)
-      db.session.add(model)
-
-    db.session.add(_ep)
-    db.session.add(dev)
+    new_pre_release_id = uuid.uuid4().hex
+    new_pre_release = ProductStage(id=new_pre_release_id,
+                                   hook_url=dev.hook_url,
+                                   hook_client_key=dev.hook_client_key,
+                                   stage=models.STAGE_PRE_RELEASE,
+                                   created_time=get_datetime(),
+                                   last_updated_time=get_datetime(),
+                                   last_updated_user=current_user.email,
+                                   product_id=product_id)
+    db.session.add(new_pre_release)
+    for _info in dev.stage_info_list:
+      stage_info = StageInfo(id=uuid.uuid4().hex,
+                             model_id=_info.model_id,
+                             endpoint_id=_info.endpoint_id,
+                             firmware_id=_info.firmware_id,
+                             created_time=get_datetime(),
+                             last_updated_time=get_datetime(),
+                             last_updated_user=current_user.email,
+                             product_stage_id=new_pre_release_id)
+      db.session.add(stage_info)
     db.session.commit()
     return True
   else:
@@ -567,27 +636,56 @@ def pre_release(product_id):
 
 def release(product_id):
   _pre_release = get_product_stage_by_pre_release(product_id)
-  pre_release_models = get_pre_release_stage_model_list_order_by_created(product_id)
   models_dict = {}
-  for model in pre_release_models:
-    if model.firmware_list:
-      latested_firmware = get_firmware_lasted(model.id)
-      models_dict[model.code] = latested_firmware.version
-    else:
-      raise Exception("Fail to Release. Can not find Firmware.")
+  try:
+    for _info in _pre_release.stage_info_list:
+      _model = get_model(_info.model_id)
+      _firmware = get_firmware(_info.firmware_id)
+      models_dict[_model.code] = _firmware.version
+  except:
+    logging.exception("Fail to Release.")
+    raise Exception("Fail to Release.")
   prd_ret = apis.update_product_stage(product_id, _pre_release, models_dict,
                                       models.STAGE_RELEASE)
   if prd_ret:
     _release = get_product_stage_by_release(product_id)
     if _release:
-      _release.stage = models.STAGE_ARCHIVE
-      _release.last_updated_time = datetime.datetime.utcnow()
-      _release.last_updated_user = current_user.email
+      for _stage_info in _release.stage_info_list:
+        history = History(id=uuid.uuid4().hex,
+                          model_id=_stage_info.model_id,
+                          firmware_id=_stage_info.firmware_id,
+                          endpoint_id=_stage_info.endpoint_id,
+                          hook_url=_release.hook_url,
+                          hook_client_key=_release.hook_client_key,
+                          stage=_release.stage,
+                          created_time=get_datetime(),
+                          last_updated_time=get_datetime(),
+                          last_updated_user=current_user.email,
+                          product_id=product_id)
+        db.session.add(history)
       db.session.commit()
 
-    _pre_release.stage = models.STAGE_RELEASE
-    _pre_release.last_updated_time = datetime.datetime.utcnow()
-    _pre_release.last_updated_user = current_user.email
+    remove_product_stage(_release.id)
+    new_release_id = uuid.uuid4().hex
+    new_release = ProductStage(id=new_release_id,
+                               hook_url=_pre_release.hook_url,
+                               hook_client_key=_pre_release.hook_client_key,
+                               stage=models.STAGE_RELEASE,
+                               created_time=get_datetime(),
+                               last_updated_time=get_datetime(),
+                               last_updated_user=current_user.email,
+                               product_id=product_id)
+    db.session.add(new_release)
+    for _info in _pre_release.stage_info_list:
+      stage_info = StageInfo(id=uuid.uuid4().hex,
+                             model_id=_info.model_id,
+                             endpoint_id=_info.endpoint_id,
+                             firmware_id=_info.firmware_id,
+                             created_time=get_datetime(),
+                             last_updated_time=get_datetime(),
+                             last_updated_user=current_user.email,
+                             product_stage_id=new_release_id)
+      db.session.add(stage_info)
     db.session.commit()
     return True
   else:

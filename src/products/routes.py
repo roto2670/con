@@ -78,7 +78,7 @@ def create():
           product_list = json.loads(org.products)
           product_list.append(ret['id'])
           org.products = json.dumps(product_list)
-          org.last_updated_time = datetime.datetime.utcnow()
+          org.last_updated_time = in_apis.get_datetime()
           db.session.commit()
         _set_product(product.id)
         return redirect('products/' + ret['id'] + '/model/create')
@@ -137,8 +137,7 @@ def create_model(product_id):
     else:
       ret = apis.create_model(product_id, code, name)
       if ret:
-        product_stage = in_apis.get_product_stage_by_dev(product_id)
-        in_apis.create_model(name, code, model_type, product_stage.id, current_user.email)
+        in_apis.create_model(name, code, model_type, product_id, current_user.email)
         return redirect('products/' + product_id + '/general')
       else:
         logging.warning("Fail to create model. Name : %s, Type : %s, user : %s",
@@ -234,7 +233,7 @@ def _send_invite(email_addr, product_id):
     _invite = in_apis.get_invite_by_product_id(product_id, email_addr,
                                                current_user.organization_id)
     if _invite:
-      _t = datetime.datetime.utcnow() - _invite.invited_time
+      _t = in_apis.get_datetime() - _invite.invited_time
       if _t.seconds >= 86400:
         in_apis.update_invite_by_key(key, _invite)
     else:
@@ -333,15 +332,11 @@ def confirm_mail():
 @login_required
 def model_list(product_id):
   _set_product(product_id)
-  dev_product = in_apis.get_product_stage_by_dev(product_id)
-  release_product = in_apis.get_product_stage_by_release(product_id)
-  release_list = []
-  if release_product:
-    release_list = release_product.model_list
+  _product = in_apis.get_product(product_id)
   product = in_apis.get_product(product_id)
   typ_dict = _get_type_dict(product)
-  return render_template('model_list.html', model_list=dev_product.model_list,
-                         release_list=release_list, typ_dict=typ_dict)
+  return render_template('model_list.html', model_list=product.model_list,
+                         typ_dict=typ_dict)
 
 
 @blueprint.route('/<product_id>/model/<model_id>', methods=['GET'])
@@ -349,45 +344,57 @@ def model_list(product_id):
 def model_info(product_id, model_id):
   _set_product(product_id)
   model = in_apis.get_model(model_id)
-  pre_model = in_apis.get_prelease_model_by_code(model.code, product_id)
-  firmware_list = []
-  for _firm in model.firmware_list:
-    firmware_list.append(_firm)
-  if pre_model:
-    for _firm in pre_model.firmware_list:
-      firmware_list.append(_firm)
-  return render_template('model.html', model=model, firmware_list=firmware_list)
+  dev = in_apis.get_product_stage_by_dev(product_id)
+  dev_id = ""
+  if dev:
+    for info in dev.stage_info_list:
+      if info.model_id == model_id:
+        dev_id = info.firmware_id
+  pre = in_apis.get_product_stage_by_pre_release(product_id)
+  pre_id = ""
+  if pre:
+    for info in pre.stage_info_list:
+      if info.model_id == model_id:
+        pre_id = info.firmware_id
+  release = in_apis.get_product_stage_by_release(product_id)
+  release_id = ""
+  if release:
+    for info in release.stage_info_list:
+      if info.model_id == model_id:
+        release_id = info.firmware_id
+  return render_template('model.html', model=model,
+                         firmware_list=model.firmware_list,
+                         dev_id=dev_id, pre_id=pre_id, release_id=release_id )
 
 
 def _get_build_number(version):
   _, _, build_number = version.split(".")
-  return int(build_number) + 1
+  return str(int(build_number) + 1)
+
+
+def _get_will_use_firmware_version(product_id, model_id):
+  dev_stage = in_apis.get_product_stage_by_dev(product_id)
+  stage_info = in_apis.get_dev_stage_info_by_model(model_id, dev_stage.id)
+  ep = in_apis.get_specifications(stage_info.endpoint_id)
+  if stage_info.firmware_id:
+    _firmware = in_apis.get_firmware(stage_info.firmware_id)
+    version = ep.version + "." + _get_build_number(_firmware.version)
+  else:
+    version = ep.version + "." + str(0)
+  return version
 
 
 @blueprint.route('/<product_id>/model/<model_id>/firmware', methods=['GET', 'POST'])
 @login_required
 def upload_firmware(product_id, model_id):
   referrer = "/products/" + product_id + "/model/" + model_id
+  firmware_version = _get_will_use_firmware_version(product_id, model_id)
   if request.method == "GET":
     _set_product(product_id)
     model = in_apis.get_model(model_id)
-    allow_stage_list = [models.STAGE_DEV]
-    pre_release = in_apis.get_product_stage_by_pre_release(product_id)
-    release = in_apis.get_product_stage_by_release(product_id)
-    if pre_release:
-      for pre_release_model in pre_release.model_list:
-        if model.code == pre_release_model.code:
-          allow_stage_list.append(models.STAGE_PRE_RELEASE)
-          break
-    if release:
-      for release_model in release.model_list:
-        if model.code == release_model.code:
-          allow_stage_list.append(models.STAGE_RELEASE)
-          break
     return render_template('register_firmware.html', referrer=referrer,
-                           allow_stage_list=allow_stage_list, model=model)
+                           model=model, firmware_version=firmware_version)
   else:
-    state = int(request.form['state'])
     upload_file = request.files['file']
     content = upload_file.read()
     tf_path = tempfile.mkstemp()[1]
@@ -395,15 +402,6 @@ def upload_firmware(product_id, model_id):
       _f.write(content)
 
     model = in_apis.get_model(model_id)
-    firmware_list = \
-        in_apis.get_firmware_list_order_by_version(model.product_stage.endpoint.version,
-                                                   model.code)
-    if firmware_list:
-      build_number = _get_build_number(firmware_list[0].version)
-    else:
-      build_number = 0
-    firmware_version = model.product_stage.endpoint.version + "." + \
-        str(build_number)
     try:
       ret_json = worker.get_hex_to_json(tf_path)
       os.remove(tf_path)
@@ -414,34 +412,28 @@ def upload_firmware(product_id, model_id):
       ret = apis.register_firmware(product_id, model.code, firmware_version,
                                    ret_json)
       if ret:
-        _model_id = model.id
-        if state == models.STAGE_RELEASE:
-          stage_info = in_apis.get_product_stage_by_release(product_id)
-          for _m in stage_info.model_list:
-            if _m.code == model.code:
-              _model_id = _m.id
-        elif state == models.STAGE_PRE_RELEASE:
-          stage_info = in_apis.get_product_stage_by_pre_release(product_id)
-          for _m in stage_info.model_list:
-            if _m.code == model.code:
-              _model_id = _m.id
-        elif state == models.STAGE_DEV:
-          stage_info = in_apis.get_product_stage_by_dev(product_id)
-        else:
-          stage_info = in_apis.get_product_stage_by_archive(product_id)
-        ret_stage = apis.update_product_stage(product_id, stage_info,
-                                              {model.code: firmware_version},
-                                              state)
-        if ret_stage:
-          in_apis.create_firmware(firmware_version,
-                                  model.product_stage.endpoint.version,
-                                  model.code, current_user.email,
-                                  ret, _model_id)
-          _send_about_test_user(product_id, model.name, firmware_version, state)
+        _dev_stage = in_apis.get_product_stage_by_dev(product_id)
+        _stage_info = in_apis.get_dev_stage_info_by_model(model_id, _dev_stage.id)
+        _ep = in_apis.get_specifications(_stage_info.endpoint_id)
+        _firmware = in_apis.create_firmware(firmware_version,
+                                            _ep.version,
+                                            model.code, current_user.email,
+                                            ret, model_id)
+        _dev = in_apis.get_product_stage_by_dev(product_id)
+        models_dict = {}
+        for _info in _dev.stage_info_list:
+          _model = in_apis.get_model(_info.model_id)
+          models_dict[_model.code] = firmware_version
+        _ret = apis.update_product_stage(product_id, _dev, models_dict,
+                                         models.STAGE_DEV)
+        if _ret:
+          in_apis.update_stage_info_by_dev_about_firmware(product_id, model_id,
+                                                          _firmware.id)
+          # TODO: send email
+          # _send_about_test_user(product_id, model.name, firmware_version, state)
           return redirect('products/' + product_id + '/model/' + model_id)
         else:
-          logging.warning("Raise update stage error. Product : %s, model : %s, name : %s, user : %s",
-                          product_id, model_id, model.name, current_user.email)
+          logging.warning("Failed to update stage while upload firmware.")
           abort(500)
       else:
         logging.warning("Raise upload firmware error. Product : %s, model : %s, name : %s, user : %s",
@@ -453,6 +445,21 @@ def upload_firmware(product_id, model_id):
       logging.exception("Raise error while upload firmware. Product : %s, model : %s, user : %s",
                         product_id, model.name, current_user.email)
       abort(500)
+
+
+@blueprint.route('/<product_id>/model/<model_id>/firmware/<firmware_id>')
+@login_required
+def delete_firmware(product_id, model_id, firmware_id):
+  _firmware = in_apis.get_firmware(firmware_id)
+  _model = in_apis.get_model(model_id)
+  if _firmware:
+    ret = apis.delete_firmware(product_id, _model.code, _firmware.version)
+    if ret:
+      in_apis.delete_firmware(firmware_id)
+    else:
+      logging.warning("Failed to delete firmware. P: %s, M: %s, F: %s",
+                      product_id, _model.name, _firmware.version)
+  return redirect('products/' + product_id + '/model/' + model_id)
 
 
 def _send_about_test_user(product_id, model_name, firmware_version, state):

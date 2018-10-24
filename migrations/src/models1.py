@@ -90,7 +90,7 @@ class _User(UserMixin, db.Model):
 
 @login_manager.user_loader
 def user_loader(_id):
-  return User.query.get(_id)
+  return _User.query.get(_id)
 
 
 class _Permission(db.Model):
@@ -293,7 +293,7 @@ class _Firmware(db.Model):
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
-  is_remove = Column(Boolean, default=False)
+  is_removed = Column(Boolean, default=False)
   model_id = Column(String(75), ForeignKey('_model.id'))
 
   def __init__(self, **kwargs):
@@ -312,12 +312,13 @@ class _ProductStage(db.Model):
   hook_url = Column(String(120))
   hook_client_key = Column(String(120))
   stage = Column(Integer)
-  mode_id = Column(String(75))
-  firmware_id = Column(String(75))
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   product_id = Column(String(75), ForeignKey('_product.id'))
+  stage_info_list = relationship("_StageInfo", backref='_product_stage',
+                                 cascade="all, delete",
+                                 order_by="desc(_StageInfo.created_time)")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -327,6 +328,26 @@ class _ProductStage(db.Model):
 
   def __repr__(self):
     return self.id
+
+
+class _StageInfo(db.Model):
+  __tablename__ = '_stage_info'
+  __bind_key__ = 'new'
+
+  id = Column(String(75), primary_key=True)
+  model_id = Column(String(75))
+  endpoint_id = Column(String(75))
+  firmware_id = Column(String(75))
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  product_stage_id = Column(String(75), ForeignKey('_product_stage.id'))
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        value = value[0]
+      setattr(self, property, value)
 
 
 class _Invite(db.Model):
