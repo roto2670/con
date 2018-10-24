@@ -10,14 +10,18 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import json
+import time
 import uuid
+import logging
 import datetime
 
+import pytz
 from flask import render_template, redirect, request, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user, login_required, login_user, logout_user  # noqa : pylint: disable=import-error
 
 import common
 import models
+import worker
 import in_apis
 from base import blueprint
 from base import db, login_manager, auth
@@ -189,29 +193,27 @@ def about_product():
               product_list=_get_product_list())
 
 
-
 ## Jinja template
 
-import time
-import pytz
-import logging
-import worker
 
-#TODO:
 CUR_TIMEZONE = {}  # {user_id : {'tz': timezone, 'last_access': timestamp}}
 
 
 def set_timezone(ip_addr):
-  #ipinfo = worker.get_timezone(ip_addr)
-  #if ip_addr == "127.0.0.1":
-  #  return None
-  pass
+  if ip_addr != "127.0.0.1":
+    ipinfo = worker.get_timezone(ip_addr)
+    if 'country' in ipinfo:
+      country_code = ipinfo['country']
+      _tz = pytz.country_timezones[country_code]
+      if _tz:
+        CUR_TIMEZONE[current_user.id] = {'tz': _tz[0], 'last_access' : time.time()}
+        logging.info("%s user set timezone : %s", current_user.email, _tz)
 
 
 def get_timezone():
   if current_user.id not in CUR_TIMEZONE:
     set_timezone(request.remote_addr)
-  elif (time.time() - CUR_TIMEZONE[current_user.id]['last_access']) > 3600:
+  elif (time.time() - CUR_TIMEZONE[current_user.id]['last_access']) > 7200:
     set_timezone(request.remote_addr)
   if current_user.id in CUR_TIMEZONE and 'tz' in CUR_TIMEZONE[current_user.id]:
     return CUR_TIMEZONE[current_user.id]['tz']

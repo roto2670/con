@@ -14,7 +14,7 @@ import time
 import json
 import logging
 
-from flask import render_template, redirect  # noqa : pylint: disable=import-error
+from flask import render_template, request, redirect  # noqa : pylint: disable=import-error
 from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
 
 import apis
@@ -192,6 +192,7 @@ def product_index(product_id):
   base.routes.set_current_product(product)
   infos = _get_product_info(product_id)
   ep_infos = _get_endpoint_info(product_id)
+  in_apis.update_user_by_ip(current_user.id, request.remote_addr)
   return render_template('index.html', infos=infos, ep_infos=ep_infos)
 
 

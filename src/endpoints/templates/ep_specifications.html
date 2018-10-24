@@ -101,7 +101,7 @@
                                             {{ specification.version }}
                                           </a>
                                         </td>
-                                        <td>{{ specification.last_updated_time }}</td>
+                                        <td>{{ specification.last_updated_time | datetimeFilter }}</td>
                                         <td>{{ specification.last_updated_user }}</td>
                                         <td class="center-align">
                                           <a href="/endpoints/{{ current_product.id }}/specifications/{{ specification.id }}/download">

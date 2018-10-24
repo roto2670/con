@@ -91,7 +91,7 @@
                                   </td>
                                 {% endif %}
                               <td>{{ firmware.last_updated_user }}</td>
-                              <td>{{ firmware.last_updated_time }}</td>
+                              <td>{{ firmware.last_updated_time | datetimeFilter}}</td>
                               {% if not firmware.is_removed %}
                                 {% if dev_id == firmware.id or pre_id == firmware.id or release_id == firmware.id %}
                                   <td></td>

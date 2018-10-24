@@ -269,6 +269,13 @@ def get_user_list(organization_id):
   return user_list
 
 
+def update_user_by_ip(user_id, ip_addr):
+  user = User.query.filter_by(id=user_id).one_or_none()
+  user.ip_address = ip_addr
+  user.last_access_time = get_datetime()
+  db.session.commit()
+
+
 # }}}
 
 
