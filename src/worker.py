@@ -131,7 +131,7 @@ def _get_timezone(ip_addr):
   """
   url = IPINFO_URL.format(ip=ip_addr)
   resp = requests.get(url)
-  if resp.OK:
+  if resp.ok:
     return resp.text
   else:
     return json.dumps({})
