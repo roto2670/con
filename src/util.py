@@ -253,4 +253,4 @@ def get_ip_addr(request):
   elif 'X-Forwarded-For' in request.headers:
     return request.headers['X-Forwarded-For']
   else:
-    return request.ip_addr
+    return request.remote_addr

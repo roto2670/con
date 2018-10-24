@@ -23,42 +23,14 @@
 
               <div class="" role="tabpanel" data-example-id="togglable-tabs">
                 <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
-                  <li role="presentation" class="active"><a href="#tab_content1" id="general-tab" role="tab" data-toggle="tab" aria-expanded="true">General</a>
-                  </li>
-                  <li role="presentation" class=""><a href="#tab_content2" role="tab" id="firmware-tab" data-toggle="tab" aria-expanded="false">Firmware</a>
+                  <li role="presentation" class="active"><a href="#tab_content2" role="tab" id="firmware-tab" data-toggle="tab" aria-expanded="false">Firmware</a>
                   </li>
                   <li role="presentation" class=""><a href="#tab_content3" role="tab" id="program-tab" data-toggle="tab" aria-expanded="false">Program</a>
                   </li>
                 </ul>
 
                 <div id="myTabContent" class="tab-content">
-                  <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="general-tab">
-                    <div class="col-md-7">
-                      <h3>Code</h3>
-                      <div class="form-group">
-                        <label class="control-label col-md-0" for="modelCode">
-                        </label>
-                        <div class="col-md-12">
-                          <input type="text" value="{{ model.code }}" id="modelCode" name="modelCode"
-                              class="form-control col-md-6 col-xs-6" readonly>
-                        </div>
-                      </div>
-
-                      <br>
-
-                      <h3>Name</h3>
-                      <div class="form-group">
-                        <label class="control-label col-md-0" for="modelName">
-                        </label>
-                        <div class="col-md-12">
-                          <input type="text" value="{{ model.name }}" id="modelName" name="modelName"
-                              class="form-control col-md-6 col-xs-6" readonly>
-                        </div>
-                      </div>
-                    </div>
-                  </div>  <!-- end general-tab -->
-
-                  <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="firmware-tab">
+                  <div role="tabpanel" class="tab-pane fade active in" id="tab_content2" aria-labelledby="firmware-tab">
                     <div class="x_content">
                       <table id="datatable" class="table table-striped table-bordered">
                         <thead>
