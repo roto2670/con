@@ -14,6 +14,7 @@ import datetime
 from flask import current_app, redirect, render_template, request, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
+import util
 import in_apis
 from base import db
 from login import blueprint
@@ -26,7 +27,7 @@ def login():
   else:
     user = in_apis.get_user(current_user.id)
     user.last_access_time = in_apis.get_datetime()
-    user.ip_address = request.headers.get('X-Real-IP', request.remote_addr)
+    user.ip_address = request.headers.get('X-Real-IP', util.get_ip_addr(request))
     db.session.commit()
     if not current_user.organization_id:
       return redirect(url_for('organization_blueprint.create'))

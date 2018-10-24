@@ -245,3 +245,12 @@ def get_res_path():
 def get_mail_form_path(file_name):
   path = os.path.join(get_res_path(), 'mailform', file_name)
   return path
+
+
+def get_ip_addr(request):
+  if 'X-Real-Ip' in request.headers:
+    return request.headers['X-Real-Ip']
+  elif 'X-Forwarded-For' in request.headers:
+    return request.headers['X-Forwarded-For']
+  else:
+    return request.ip_addr
