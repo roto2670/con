@@ -25,7 +25,7 @@ def login():
     return current_app.extensions['firebase_auth'].login()
   else:
     user = in_apis.get_user(current_user.id)
-    user.last_access_time = datetime.datetime.utcnow()
+    user.last_access_time = in_apis.get_datetime()
     user.ip_address = request.headers.get('X-Real-IP', request.remote_addr)
     db.session.commit()
     if not current_user.organization_id:

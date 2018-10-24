@@ -33,13 +33,13 @@
                         {% if tester.level == 1 %}
                           <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/change/2">
                             <button type="button" class="close">
-                              <span class=""><small>[Change dev]</small></span>
+                              <span class=""><small>[Change to dev]</small></span>
                             </button>
                           </a>
                         {% else %}
                           <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/change/1">
                             <button type="button" class="close">
-                              <span class=""><small>[Change PreRelease]</small></span>
+                              <span class=""><small>[Change to PreRelease]</small></span>
                             </button>
                           </a>
                         {% endif %}

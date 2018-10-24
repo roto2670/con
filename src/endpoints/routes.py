@@ -29,20 +29,16 @@ from endpoints import blueprint
 @login_required
 def specifications(product_id):
   _set_product(product_id)
-  product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
-  model_list = product_dev_stage.model_list
-  specification_list = []
-  if product_dev_stage.endpoint:
-    specification_list.append(in_apis.get_specifications(product_dev_stage.endpoint.id))
+  _product = in_apis.get_product(product_id)
+  model_list = _product.model_list
+  specification_list = _product.endpoint_list
   if request.method == "GET":
     if specification_list:
-      specification = specification_list[-1]
+      specification = specification_list[0]
       content = json.loads(specification.specifications)
     else:
       specification = None
       content = {}
-    product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
-    model_list = product_dev_stage.model_list
     return render_template('ep_specifications.html',
                            specification_list=specification_list,
                            selected=specification, content=content,
@@ -101,13 +97,11 @@ def tests(product_id):
   gadgets = apis.get_gadget_list_by_tester(product_id)
   if gadgets:
     gadget_dict = _build_gadget_dict(gadgets)
-  product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
-  specification_list = []
-  if product_dev_stage.endpoint:
-    specification_list.append(in_apis.get_specifications(product_dev_stage.endpoint.id))
+  _product = in_apis.get_product(product_id)
+  specification_list = _product.endpoint_list
   if request.method == "GET":
     if specification_list:
-      selected = specification_list[-1]
+      selected = specification_list[0]
       content = json.loads(selected.specifications)
     else:
       selected = None
@@ -163,7 +157,7 @@ def _check_validate(product_id, json_content):
 @blueprint.route('/<product_id>/upload', methods=['POST'])
 @login_required
 def upload_header_file(product_id):
-  product_dev_stage = in_apis.get_product_stage_by_dev(product_id)
+  _product = in_apis.get_product(product_id)
   upload_file = request.files['file']
   content = upload_file.read()
   # TODO: Check format?? Or send to cloud server
@@ -177,15 +171,16 @@ def upload_header_file(product_id):
     ret = apis.register_specifications(product_id, json_content['version'],
                                        decode_content)
     if ret:
-      if product_dev_stage.endpoint:
-        in_apis.update_specifications(product_dev_stage.endpoint.id,
-                                      current_user.email, json_content['version'],
-                                      decode_content)
+      _version = json_content['version']
+      _specifications = in_apis.get_specifications_by_version(product_id, _version)
+      if _specifications:
+        in_apis.update_specifications(_specifications.id, current_user.email,
+                                      json_content['version'], decode_content)
       else:
         in_apis.create_specifications(json_content['version'], decode_content,
                                       current_user.email,
                                       current_user.organization_id,
-                                      product_dev_stage.id)
+                                      product_id)
       title = common.get_msg("endpoints.upload.success_title")
       msg = common.get_msg("endpoints.upload.success_message")
       msg = msg.format(json_content['product'], json_content['version'])
@@ -228,13 +223,13 @@ def download_header_file(product_id, specification_id, model_id):
     abort(500)
 
 
-@blueprint.route('/<product_id>/testcall/<gadget>/<endpoint_name>', methods=['POST'])
+@blueprint.route('/<product_id>/testcall/<gadget>/<endpoint_name>/<version>', methods=['POST'])
 @login_required
-def test_call(product_id, gadget, endpoint_name):
+def test_call(product_id, gadget, endpoint_name, version):
   logging.info("Test call. %s", endpoint_name)
-  product = in_apis.get_product(product_id)
-  dev_stage = in_apis.get_product_stage_by_dev(product_id)
-  specification = json.loads(dev_stage.endpoint.specifications)
+  _product = in_apis.get_product(product_id)
+  _specifications = in_apis.get_specifications_by_version(product_id, version)
+  specification = json.loads(_specifications.specifications)
 
   args = []
   kwargs = {}
@@ -247,7 +242,7 @@ def test_call(product_id, gadget, endpoint_name):
           args.append(param['default'])
 
   data = {
-      "key": product.key,
+      "key": _product.key,
       "args": args,
       "kwargs": kwargs
   }

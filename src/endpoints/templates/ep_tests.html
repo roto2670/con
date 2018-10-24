@@ -12,9 +12,9 @@
       document.getElementById("resp" + endpointName + "ret").innerHTML = "";
     }
 
-    function testCall(productId, gadget, endpointName) {
+    function testCall(productId, gadget, endpointName, version) {
       clear(endpointName);
-      jQuery.post("/endpoints/" + productId + "/testcall/" + gadget + "/" + endpointName, "{}")
+      jQuery.post("/endpoints/" + productId + "/testcall/" + gadget + "/" + endpointName + "/" + version, "{}")
       .done(function(data){
         var jsonData = JSON.parse(data);
         document.getElementById("resp" + endpointName + "status").innerHTML = "Status : " + jsonData.status;
@@ -94,10 +94,11 @@
                       </a>
                       <div id="r{{ request['name'] }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                         <div class="panel-body">
-                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget_id }}', '{{ request["name"]}}');">Test</button>
+                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget_id }}', '{{ request["name"]}}', '{{ selected.version }}');">Test</button>
                           <!-- request? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
+                              <!--Rest : https://a.prota.space/v1/gadgets/{{ gadget_id }}/endpoints/{{request['name']}}-->
                               <h3>Request</h3>
                                 name : {{ request['name'] }}<br>
                                 timeout : {{ request['timeout'] }}<br>
@@ -127,7 +128,7 @@
                       <div id="e{{ event['name'] }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                         <div class="panel-body">
                           <!--
-                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget_id }}', '{{ event["name"]}}');">Test</button>
+                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget_id }}', '{{ event["name"]}}', '{{ selected.version }}');">Test</button>
                           -->
                           <!-- request? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">

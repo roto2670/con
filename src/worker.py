@@ -15,6 +15,7 @@ import logging
 import tempfile
 import subprocess
 
+import requests
 import sendgrid  # noqa : pylint: disable=import-error
 from OpenSSL import crypto  # noqa : pylint: disable=import-error
 from intelhex import IntelHex  # noqa : pylint: disable=import-error
@@ -113,5 +114,30 @@ def _send_mail(request_body):
 
 def send_mail(request_body):
   ret = _send_mail.delay(request_body)
+  resp = ret.get()
+  return json.loads(resp)
+
+
+# TIMEZONE
+IPINFO_URL = '''https://ipinfo.io/{ip}?token=e7239ad4a056a0'''
+
+
+@worker.task()
+def _get_timezone(ip_addr):
+  """
+'{\n  "ip": "157.49.215.57",\n  "city": "Bengaluru",\n
+ "region": "Karnataka",\n  "country": "IN",\n  "loc": "12.9833,77.5833",\n
+  "postal": "560001",\n  "org": "AS55836 Reliance Jio Infocomm Limited"\n}'
+  """
+  url = IPINFO_URL.format(ip=ip_addr)
+  resp = requests.get(url)
+  if resp.OK:
+    return resp.text
+  else:
+    return json.dumps({})
+
+
+def get_timezone(ip_addr):
+  ret = _get_timezone.delay(ip_addr)
   resp = ret.get()
   return json.loads(resp)

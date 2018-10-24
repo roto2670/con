@@ -10,44 +10,31 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import sys
-import os
 import logging
 import logging.handlers
 from importlib import import_module
 
 
 from flask import Flask  # noqa : pylint: disable=import-error
+from flask_login import LoginManager  # noqa : pylint: disable=import-error
+from flask_sqlalchemy import SQLAlchemy  # noqa : pylint: disable=import-error
 
-import apis
-import common
 import base.routes
-from base import db, auth, login_manager
+from base import db, login_manager
 from config import DebugConfig, ProductionConfig
+import migrations
 
 sys.dont_write_bytecode = True
 
 
 def register_extensions(app):
   db.init_app(app)
-  auth.init_app(app)
   login_manager.init_app(app)
-  # custom
-  app.context_processor(base.routes.about_product)
-  app.context_processor(common.get_message)
-  # jinja
-  app.jinja_env.filters['datetimefilter'] = base.routes.datetime_filter
 
 
 def register_blueprints(app):
   blueprints = [
-      'base',
-      'home',
-      'organization',
-      'products',
-      'endpoints',
-      'settings',
-      'release',
-      'login'
+      'base'
   ]
   for blueprint in blueprints:
     module = import_module('{}.routes'.format(blueprint))
@@ -58,6 +45,8 @@ def configure_database(app):
   @app.before_first_request
   def initialize_database():
     db.create_all()
+    db.create_all(bind='old')
+    db.create_all(bind=['new'])
 
   @app.teardown_request
   def shutdown_session(exception=None):
@@ -82,31 +71,17 @@ def configure_logs(app):
 
 def create_app():
   app = Flask(__name__, static_folder='base/static')
-  if apis.IS_DEV:
-    app.config.from_object(DebugConfig)
-  else:
-    app.config.from_object(ProductionConfig)
-  apis.init(app)
+  app.config.from_object(DebugConfig)
   configure_logs(app)
   register_extensions(app)
   register_blueprints(app)
   configure_database(app)
-  common.start()
+  migrations.set(app)
   return app
-
-
-if not apis.IS_DEV:
-  # gunicorn
-  __app = create_app()
 
 
 if  __name__ == '__main__':
   _app = create_app()
-  if apis.IS_DEV:
-    _app.run(host='127.0.0.1', port=16000)
-  else:
-    cur_path = os.path.dirname(os.path.abspath(__file__))
-    ssl_path = os.path.join(cur_path, 'ssl')
-    ssl_crt = os.path.join(ssl_path, 'mib_io.crt')
-    ssl_key = os.path.join(ssl_path, 'mib_io.key')
-    _app.run(host='127.0.0.1', port=5000, ssl_context=(ssl_crt, ssl_key))
+  import models
+  import models1
+  _app.run(host='127.0.0.1', port=16000)

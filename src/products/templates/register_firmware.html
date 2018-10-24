@@ -1,6 +1,6 @@
 {% extends "base_site.html" %}
 
-{% block title %} Register IOS {% endblock title %}
+{% block title %} Register Firmware {% endblock title %}
 
 {% block content %}
   <div class="right_col" role="main">
@@ -11,7 +11,7 @@
           <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>Register IOS </h2>
+                  <h2>Register Firmware </h2>
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
@@ -20,31 +20,8 @@
                       class="form-horizontal form-label-left" enctype="multipart/form-data">
 
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="dev">State <span class="required">*</span>
-                      </label>
-                      <div class="btn-group col-md-6 col-sm-6 col-xs-12" data-toggle="buttons">
-                        {% for allow in allow_stage_list %}
-                          {% if allow == 0 %}
-                            <label class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
-                              <input type="radio" name="state" value="{{ allow }}" required="required" id="state"
-                                  class="form-control col-md-7 col-xs-12">
-                              Release
-                            </label>
-                          {% elif allow == 1 %}
-                            <label class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
-                              <input type="radio" name="state" value="{{ allow }}" required="required" id="state"
-                                  class="form-control col-md-7 col-xs-12">
-                              Pre Release
-                            </label>
-                          {% else %}
-                            <label class="btn btn-default active" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
-                              <input type="radio" name="state" value="{{ allow }}" required="required" id="state"
-                                  class="form-control col-md-7 col-xs-12" checked>
-                              Dev
-                            </label>
-                          {% endif %}
-                        {% endfor %}
-                      </div>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" fork="dev">Version </label>
+                      {{ firmware_version }}
                     </div>
 
                     <div class="item form-group">
