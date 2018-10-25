@@ -4,11 +4,6 @@
 
 {% block stylesheets %}
   {{ super() }}
-  <link href="{{ url_for('static', filename='vendors/datatables.net-bs/css/dataTables.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css') }}" rel="stylesheet">
 {% endblock stylesheets %}
 
 {% block content %}
@@ -21,7 +16,7 @@
           <div class="x_panel">
             <div class="x_content">
 
-                <table id="datatable" class="table table-striped table-bordered">
+                <table class="table table-striped projects">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -29,25 +24,22 @@
                       <th>Type</th>
                       <th>Update time</th>
                       <th>Update user</th>
-                      <!-- <th>Delete</th> -->
+                      <th>Edit</th>
                     </tr>
                   </thead>
-
                   <tbody>
-                    {% for model in model_list %}
-                      <tr>
-                        <td><a href="/products/{{ current_product.id }}/model/{{ model.id }}">{{ model.name }}</a></td>
-                        <td>{{ model.firmware_list|length }}</td>
-                        <td>{{ typ_dict[model.typ] }}</td>
-                        <td>{{ model.last_updated_time | datetimeFilter }}</td>
-                        <td>{{ model.last_updated_user }}</td>
-                        <!-- TODO: Remove model {% if current_user.level == 0 and not release_list %}
-                          <td><a href="/products/{{ current_product.id }}/model/{{ model.id }}/delete"><i class="fa fa-remove"></i></a></td>
-                        {% else %}
-                          <td></td>
-                        {% endif %} -->
-                      </tr>
-                    {% endfor %}
+                  {% for model in model_list %}
+                    <tr>
+                      <td>{{ model.name }}</td>
+                      <td>{{ model.firmware_list|length }}</td>
+                      <td>{{ typ_dict[model.typ] }}</td>
+                      <td>{{ model.last_updated_time | datetimeFilter }}</td>
+                      <td>{{ model.last_updated_user }}</td>
+                        <td>
+                          <a href="/products/{{ current_product.id }}/model/{{ model.id }}" class="btn btn-primary btn-xs"><i class="fa fa-folder"></i> View </a>
+                        </td>
+                    </tr>
+                  {% endfor %}
                   </tbody>
                 </table>
 
@@ -68,20 +60,4 @@
 
 {% block javascripts %}
   {{ super() }}
-  <!-- Datatables -->
-  <script src="{{ url_for('static', filename='vendors/datatables.net/js/jquery.dataTables.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/buttons.flash.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-keytable/js/dataTables.keyTable.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-scroller/js/dataTables.scroller.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/jszip/dist/jszip.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/pdfmake/build/pdfmake.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/pdfmake/build/vfs_fonts.js') }}"></script>
 {% endblock javascripts %}

@@ -189,38 +189,43 @@
                   </div>  <!-- members-tab -->
 
                   <div role="tabpanel" class="tab-pane fade" id="tab_content4" aria-labelledby="products-tab">
-                      <div class="x_content">
-                        <table id="datatable" class="table table-striped table-bordered">
-                          <thead>
-                            <tr>
-                              <th>Code</th>
-                              <th>Name</th>
-                              <th>Last Updated</th>
-                              <th>Delete</th>
-                            </tr>
-                          </thead>
-
-                          <tbody>
-                            {% for product in product_list %}
-                              <tr>
-                                <td>
-                                  <a href="/products/{{ product.id }}/general">
-                                    {{ product.id }}
-                                  </a>
-                                </td>
-                                <td>{{ product.name }}</td>
-                                <td>{{ product.last_updated_time | datetimeFilter }}</td>
-                                {% if current_user.level == 0 and product.id not in release_list %}
-                                  <td><a href="/products/{{ product.id }}/delete"><i class="fa fa-remove"></i></a></td>
-                                {% else %}
-                                  <td></td>
-                                {% endif %}
-                              </tr>
-                            {% endfor %}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>  <!-- products-tab -->
+                    <table class="table table-striped projects">
+                      <thead>
+                        <tr>
+                          <th style="width: 25%">Product Name</th>
+                          <th style="width: 25%">Product ID</th>
+                          <th style="width: 25%">Last Updated</th>
+                          <th style="width: 25%">Edit</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for product in product_list %}
+                        <tr>
+                          <td>
+                            <a>{{ product.name }}</a>
+                            <br />
+                            <small>Created {{ product.created_time | datetimeFilter }}</small>
+                          </td>
+                          <td>
+                            <a>{{ product.id }}</a>
+                          </td>
+                          <td>
+                            <a>{{ product.last_updated_time | datetimeFilter }}</a>
+                          </td>
+                          <td>
+                            <a href="/home/{{ product.id }}" class="btn btn-primary btn-xs"><i class="fa fa-folder"></i> View </a>
+                            <a href="/products/{{ product.id }}/general" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Edit </a>
+                            <!--  TODO: remove menu
+                            {% if current_user.level == 0 and product.id not in release_list %}
+                              <a href="#" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Delete </a>
+                            {% endif %}
+                            -->
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>  <!-- products-tab -->
 
                 </div>
               </div>
