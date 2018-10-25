@@ -1,15 +1,23 @@
-
 {% extends "base_site.html" %}
 
 {% block title %} Tests {% endblock title %}
 
 {% block javascripts %}
-  {{ super() }}
   <script>
     function clear(endpointName) {
       document.getElementById("resp" + endpointName + "status").innerHTML = "";
       document.getElementById("resp" + endpointName + "time").innerHTML = "";
       document.getElementById("resp" + endpointName + "ret").innerHTML = "";
+    }
+
+    function copyToClipboardByText(text) {
+      var tmp = document.createElement("textarea");
+      document.body.appendChild(tmp);
+      tmp.value = text;
+      tmp.select();
+      document.execCommand('copy');
+      document.body.removeChild(tmp);
+      alert("Copied to clipboard of REST URL");
     }
 
     function testCall(productId, gadget, endpointName, version) {
@@ -23,6 +31,7 @@
       });
     }
   </script>
+  {{ super() }}
 {% endblock javascripts %}
 
 {% block content %}
@@ -94,7 +103,12 @@
                       </a>
                       <div id="r{{ request['name'] }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                         <div class="panel-body">
-                          <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget_id }}', '{{ request["name"]}}', '{{ selected.version }}');">Test</button>
+                          <div style="text-align: right">
+                            <button class="btn btn-default" onclick="copyToClipboardByText('https://a.prota.space/v1/gadget/{{ gadget_id }}/endpoints/{{ request.name }}')">
+                              REST URL
+                            </button>
+                            <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget_id }}', '{{ request.name }}', '{{ selected.version }}')">Test</button>
+                          </div>
                           <!-- request? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">

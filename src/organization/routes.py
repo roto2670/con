@@ -13,7 +13,6 @@ import os
 import json
 import uuid
 import logging
-import datetime
 import tempfile
 
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
@@ -223,7 +222,7 @@ def confirm_mail():
     abort(400)
 
 
-@blueprint.route('/invite/<invite_id>')
+@blueprint.route('/invite/delete/<invite_id>')
 @login_required
 def delete_invite(invite_id):
   try:

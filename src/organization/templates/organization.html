@@ -4,11 +4,6 @@
 
 {% block stylesheets %}
   {{ super() }}
-  <link href="{{ url_for('static', filename='vendors/datatables.net-bs/css/dataTables.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css') }}" rel="stylesheet">
 {% endblock stylesheets %}
 
 {% block content %}
@@ -79,7 +74,7 @@
 
                   <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="noti-tab">
                     <div class="x_content">
-                      <table id="datatable" class="table table-striped table-bordered">
+                      <table class="table table-striped projects">
                         <thead>
                           <tr>
                             <th>Platform</th>
@@ -88,7 +83,6 @@
                             <th>Last Updated User</th>
                           </tr>
                         </thead>
-
                         <tbody>
                           {% for noti_key in noti_key_list %}
                             <tr>
@@ -105,30 +99,35 @@
                         </tbody>
                       </table>
                     </div>
-                    <a href="/organization/register/ios"><button class="btn btn-primary" type="button">Register IOS</button></a>
-                    <a href="/organization/register/android"><button class="btn btn-primary" type="button">Register Android</button></a>
+                    <div style="text-align: right">
+                      <a href="/organization/register/ios"><button class="btn btn-primary" type="button">Register IOS</button></a>
+                      <a href="/organization/register/android"><button class="btn btn-primary" type="button">Register Android</button></a>
+                    </div>
                   </div>  <!-- noti-tab -->
 
                   <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="members-tab">
                     <div class="x_content">
-                      <table id="datatable" class="table table-striped table-bordered">
-                        <thead>
-                          <tr>
-                            <th>Email</th>
-                            <th>Level</th>
-                            <th>Delete</th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          {% for user in user_list %}
+                      <table class="table table-striped projects">
+                          <thead>
                             <tr>
+                                <th style="width:10%"></th>
+                                <th>Email</th>
+                                <th>Level</th>
+                                <th>last_access</th>
+                                <th>Delete</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                              {% for user in user_list %}
+                            <tr>
+                              <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
                               <td>{{ user.email }}</td>
                               {% if user.level == 0 %}
                                 <td>Owner</td>
                               {% else %}
                                 <td>Member</td>
                               {% endif %}
+                              <td>{{ user.last_access_time | datetimeFilter }}</td>
                               {% if user.level == 0 %}
                                 <td></td>
                               {% else %}
@@ -143,21 +142,27 @@
                           {% for invite in invite_list %}
                             {% if invite.accepted == 0 %}
                               <tr>
+                                <td></td>
                                 <td>{{ invite.email }}</td>
                                 <td>Invited</td>
+                                <td></td>
                                 {% if current_user.level == 0 %}
-                                  <td><a href="/organization/invite/{{ invite.id }}"><i class="fa fa-remove"></i></a></td>
+                                  <td>
+                                    <a href="/organization/invite/delete/{{ invite.id }}" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i> Delete </a>
+                                  </td>
                                 {% else %}
                                   <td></td>
                                 {% endif %}
                               </tr>
                             {% endif %}
                           {% endfor %}
-                        </tbody>
-                      </table>
+                          </tbody>
+                        </table>
                     </div>
 
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Invite</button>
+                    <div style="text-align: right">
+                      <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Invite</button>
+                    </div>
                     <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
                         <div class="modal-dialog modal-sm">
                           <div class="modal-content">
@@ -184,8 +189,6 @@
                           </div>
                         </div>
                     </div>
-
-
                   </div>  <!-- members-tab -->
 
                   <div role="tabpanel" class="tab-pane fade" id="tab_content4" aria-labelledby="products-tab">
@@ -243,20 +246,4 @@
 
 {% block javascripts %}
   {{ super() }}
-  <!-- Datatables -->
-  <script src="{{ url_for('static', filename='vendors/datatables.net/js/jquery.dataTables.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/buttons.flash.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-keytable/js/dataTables.keyTable.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-scroller/js/dataTables.scroller.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/jszip/dist/jszip.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/pdfmake/build/pdfmake.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/pdfmake/build/vfs_fonts.js') }}"></script>
 {% endblock javascripts %}

@@ -97,11 +97,13 @@
                           </tbody>
                         </table>
 
-                        {% if allow_release %}
-                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".release-modal">Release</button>
-                        {% else %}
-                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".release-modal" disabled>Release</button>
-                        {% endif %}
+                        <div style="text-align: right">
+                          {% if allow_release %}
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".release-modal">Release</button>
+                          {% else %}
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".release-modal" disabled>Release</button>
+                          {% endif %}
+                        </div>
                         <div class="modal fade release-modal" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog modal-sm">
                               <div class="modal-content">
@@ -169,11 +171,13 @@
                           </tbody>
                         </table>
 
-                        {% if allow_pre_release %}
-                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".pre-release-modal">Pre Release</button>
-                        {% else %}
-                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".pre-release-modal" disabled>Pre Release</button>
-                        {% endif %}
+                        <div style="text-align: right">
+                          {% if allow_pre_release %}
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".pre-release-modal">Pre Release</button>
+                          {% else %}
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".pre-release-modal" disabled>Pre Release</button>
+                          {% endif %}
+                        </div>
                         <div class="modal fade pre-release-modal" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog modal-sm">
                               <div class="modal-content">

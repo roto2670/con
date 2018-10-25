@@ -5,11 +5,6 @@
 
 {% block stylesheets %}
   {{ super() }}
-  <link href="{{ url_for('static', filename='vendors/datatables.net-bs/css/dataTables.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css') }}" rel="stylesheet">
 {% endblock stylesheets %}
 
 {% block javascripts %}
@@ -32,23 +27,6 @@
       }
     }
   </script>
-
-  <!-- Datatables -->
-  <script src="{{ url_for('static', filename='vendors/datatables.net/js/jquery.dataTables.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/buttons.flash.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-keytable/js/dataTables.keyTable.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/datatables.net-scroller/js/dataTables.scroller.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/jszip/dist/jszip.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/pdfmake/build/pdfmake.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendors/pdfmake/build/vfs_fonts.js') }}"></script>
 {% endblock javascripts %}
 
 {% block content %}
@@ -81,38 +59,34 @@
                         <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="specification-tab">
                           <div class="x_content">
                             <div class="">
-
-
-                              <table id="datatable" class="table table-striped table-bordered">
+                                <table class="table table-striped projects">
                                   <thead>
                                     <tr>
                                       <th>Version</th>
-                                      <th>Updated time</th>
                                       <th>Updated user</th>
-                                      <th></th>
+                                      <th>Updated time</th>
+                                      <th>Edit</th>
                                     </tr>
                                   </thead>
-
                                   <tbody>
                                     {% for specification in specification_list %}
                                       <tr>
                                         <td>
-                                          <a href="/endpoints/{{ current_product.id }}/specifications/{{ specification.id }}">
-                                            {{ specification.version }}
-                                          </a>
+                                          {{ specification.version }}
                                         </td>
-                                        <td>{{ specification.last_updated_time | datetimeFilter }}</td>
                                         <td>{{ specification.last_updated_user }}</td>
-                                        <td class="center-align">
-                                          <a href="/endpoints/{{ current_product.id }}/specifications/{{ specification.id }}/download">
-                                            <i class="fa fa-cloud-download"></i>
-                                          </a>
+                                        <td>{{ specification.last_updated_time | datetimeFilter }}</td>
+                                        <td>
+                                              <a href="/endpoints/{{ current_product.id }}/specifications/{{ specification.id }}" class="btn btn-info btn-xs"><i class="fa fa-file-text-o"></i> View </a>
+                                              <a href="/endpoints/{{ current_product.id }}/specifications/{{ specification.id }}/download" class="btn btn-primary btn-xs"><i class="fa fa-cloud-download"></i> Json </a>
+                                              <!-- TODO: Handle specifications version
+                                              <a href="/endpoints/{{ current_product.id }}/tests" class="btn btn-success btn-xs"><i class="fa fa-check-square-o"></i> Test </a>
+                                              -->
                                         </td>
                                       </tr>
                                     {% endfor %}
                                   </tbody>
                                 </table>
-
                             </div>
 
                             <br>
