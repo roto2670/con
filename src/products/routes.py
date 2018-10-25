@@ -447,7 +447,7 @@ def upload_firmware(product_id, model_id):
       abort(500)
 
 
-@blueprint.route('/<product_id>/model/<model_id>/firmware/<firmware_id>')
+@blueprint.route('/<product_id>/model/<model_id>/firmware/<firmware_id>', methods=['POST'])
 @login_required
 def delete_firmware(product_id, model_id, firmware_id):
   _firmware = in_apis.get_firmware(firmware_id)
