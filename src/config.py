@@ -17,9 +17,9 @@ import apis
 class Config(object):
   SECRET_KEY = 'skfksrltnf1'
   if apis.IS_DEV:
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'  # SQLITE
+    #SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'  # SQLITE
     #SQLALCHEMY_DATABASE_URI = 'mysql://root:sksmswkd1@127.0.0.1:3306/console?charset=utf8'  # LOCAL MySQL Old
-    #SQLALCHEMY_DATABASE_URI = 'mysql://root:sksmswkd1@127.0.0.1:3306/mib_console?charset=utf8'  # LOCAL MySQL New
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:sksmswkd1@127.0.0.1:3306/mib_console?charset=utf8'  # LOCAL MySQL New
   else:
     SQLALCHEMY_DATABASE_URI = '''mysql+pymysql://console:skfksxpzm1@localhost:3306/mib_console'''  # Google Cloud SQL
   SQLALCHEMY_TRACK_MODIFICATIONS = False

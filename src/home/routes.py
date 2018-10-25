@@ -13,6 +13,7 @@ import os
 import time
 import json
 import logging
+import collections
 
 from flask import render_template, request, redirect  # noqa : pylint: disable=import-error
 from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
@@ -89,7 +90,9 @@ def _build_product_info(product_id):
       _tmp_name_list.append(_name_value)
 
     _info['total_users'] = len(_tmp_user)
-    _info['firmware'] = _tmp_firmware
+    _tmp_od_firmware = collections.OrderedDict(sorted(_tmp_firmware.items(),
+                                                      reverse=True))
+    _info['firmware'] = _tmp_od_firmware
     _info['total_firmware'] = _tmp_total_firmware
     _info['created_time'] = time.time()
     _info['avg_battery'] = int((_tmp_battery / len(gadget_list)))

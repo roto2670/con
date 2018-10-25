@@ -4306,6 +4306,14 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     text-align: right
 }
 
+.dashboard-overflow-y {
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+}
+
+::-webkit-scrollbar {
+    display: none !important;
+}
 
 /* keyser custom */
 .site_title img {
