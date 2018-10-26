@@ -16,6 +16,7 @@ import logging
 import datetime
 
 import pytz
+from country_list import countries_for_language
 from flask import render_template, redirect, request, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user, login_required, login_user, logout_user  # noqa : pylint: disable=import-error
 
@@ -229,3 +230,15 @@ def datetime_filter(value):
   _timestamp += _value.utcoffset().seconds
   _new_time = datetime.datetime.fromtimestamp(_timestamp)
   return _new_time
+
+
+COUNTRY_CODES = {}  # {"code": "name", ..}
+
+def get_country_name(code):
+  if not COUNTRY_CODES:
+    for _code, _name in countries_for_language('en'):
+      COUNTRY_CODES[_code] = _name
+  if code.upper() in COUNTRY_CODES:
+    return COUNTRY_CODES[code.upper()] + " ({})".format(code.upper())
+  else:
+    return code.upper()

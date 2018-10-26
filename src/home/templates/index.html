@@ -322,7 +322,7 @@
                       <tbody>
                         {% for key, value in infos.locale.items() %}
                           <tr>
-                            <td>{{ key|upper }}</td>
+                            <td>{{ key|getCountryName }}</td>
                             <td class="fs15 fw700 text-right">{{ value }}</td>
                           </tr>
                         {% endfor %}
