@@ -307,6 +307,35 @@
 
     </div>  <!-- End Row 3 -->
 
+    <div class="row"> <!-- Row 4 -->
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>User Location</h2>
+                <div class="clearfix"></div>
+              </div>
+
+              <div class="x_content">
+                <div class="dashboard-widget-content">
+                  <div class="col-md-4 hidden-small">
+                    <table class="countries_list">
+                      <tbody>
+                        {% for key, value in infos.locale.items() %}
+                          <tr>
+                            <td>{{ key|upper }}</td>
+                            <td class="fs15 fw700 text-right">{{ value }}</td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div id="world-map-gdp" class="col-md-8 col-sm-12 col-xs-12" style="height:320px;"></div>
+                </div>
+              </div>
+          </div>
+        </div>
+    </div> <!-- End Row 4 -->
+
   </div>
 {% endblock content %}
 
@@ -444,6 +473,38 @@
     }
     performanceEndpoint('{{ ep_infos|safe }}');
 
+	function init_JQVmap(data){
+		if(typeof (jQuery.fn.vectorMap) === 'undefined'){ return; }
+			if ($('#world-map-gdp').length ){
+				$('#world-map-gdp').vectorMap({
+					map: 'world_en',
+          backgroundColor: "",
+          color: '#f4f3f0',
+          borderColor: '#ADB2B5',
+          borderWidth: 1,
+          borderOpacity: 0,
+          hoverColor: '#536A7F',
+					hoverOpacity: 0,
+					selectedColor: '#536A7F',
+          enableZoom: true,
+          showTooltip: true,
+          multiSelectRegion: false,
+          values: data,
+          normalizeFunction: 'linear',
+					scaleColors: ['#b6d6ff', '#005ace', '#14a4bc', '#2c7582'],
+          normalizeFunction: 'polynomial',
+          onLabelShow(event, label, code) {
+            var value = data[code];
+            if (value !== null && value !== undefined && value !== "") {
+              label.append(" (" + data[code] + ")");
+            } else {
+              label.append(" (" + 0 + ")");
+            }
+          }
+				});
+			}
+  };
+  init_JQVmap({{ infos['locale']|safe }});
   </script>
 
 {% endblock javascripts %}

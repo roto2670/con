@@ -52,7 +52,8 @@ def _build_product_info(product_id):
       'total_firmware': 0,
       'avg_battery': 0,
       'name_list': [],
-      'model': {}
+      'model': {},
+      'locale': {}
   }
   if gadget_list:
     _tmp_user = []
@@ -61,6 +62,7 @@ def _build_product_info(product_id):
     _tmp_battery = 0
     _tmp_name_list = []
     _tmp_model_dict = {}
+    _tmp_locale_dict = {}
     _info['total_gadgets'] = len(gadget_list)
     for gadget in gadget_list:
       if gadget['status']:
@@ -89,6 +91,13 @@ def _build_product_info(product_id):
       _name_value = {'text': gadget['name'], 'size': 2}
       _tmp_name_list.append(_name_value)
 
+      if 'locale' in gadget and gadget['locale']:
+        _locale = gadget['locale'].lower()
+        if _locale in _tmp_locale_dict:
+          _tmp_locale_dict[_locale] += 1
+        else:
+          _tmp_locale_dict[_locale] = 1
+
     _info['total_users'] = len(_tmp_user)
     _tmp_od_firmware = collections.OrderedDict(sorted(_tmp_firmware.items(),
                                                       reverse=True))
@@ -98,6 +107,7 @@ def _build_product_info(product_id):
     _info['avg_battery'] = int((_tmp_battery / len(gadget_list)))
     _info['name_list'] = json.dumps(_tmp_name_list)
     _info['model'] = _tmp_model_dict
+    _info['locale'] = _tmp_locale_dict
     return _info
   else:
     return _info
