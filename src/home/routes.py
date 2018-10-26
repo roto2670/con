@@ -93,10 +93,11 @@ def _build_product_info(product_id):
 
       if 'locale' in gadget and gadget['locale']:
         _locale = gadget['locale'].lower()
-        if _locale in _tmp_locale_dict:
-          _tmp_locale_dict[_locale] += 1
-        else:
-          _tmp_locale_dict[_locale] = 1
+        if _locale != 'locale':
+          if _locale in _tmp_locale_dict:
+            _tmp_locale_dict[_locale] += 1
+          else:
+            _tmp_locale_dict[_locale] = 1
 
     _info['total_users'] = len(_tmp_user)
     _tmp_od_firmware = collections.OrderedDict(sorted(_tmp_firmware.items(),
