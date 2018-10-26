@@ -429,15 +429,6 @@
     }
     averageBattery('{{ infos["avg_battery"] }}');
 
-    function nameCloud(nameList) {
-      d3.wordcloud()
-        .size([300,200])
-        .selector('#wordcloud')
-        .words(JSON.parse(nameList))
-        .start();
-    }
-    nameCloud('{{ infos["name_list"]|safe }}');
-
     function performanceEndpoint(dataDict) {
       var _data = JSON.parse(dataDict);
       var data = {
@@ -505,6 +496,16 @@
 			}
   };
   init_JQVmap({{ infos['locale']|safe }});
+
+  function nameCloud(nameList) {
+    d3.wordcloud()
+      .size([300,200])
+      .selector('#wordcloud')
+      .words(JSON.parse(nameList))
+      .start();
+  }
+  nameCloud('{{ infos["name_list"]|safe }}');
+
   </script>
 
 {% endblock javascripts %}
