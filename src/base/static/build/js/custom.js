@@ -2541,7 +2541,7 @@ if (typeof NProgress != 'undefined') {
 				}();
 
 				$('#datatable').dataTable({
-					'order': [[ 1, 'desc' ]]
+					'order': [[ 0, 'desc' ]]
 				});
 
 				$('#datatable-keytable').DataTable({
