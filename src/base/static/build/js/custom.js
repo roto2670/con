@@ -2540,7 +2540,9 @@ if (typeof NProgress != 'undefined') {
 				  };
 				}();
 
-				$('#datatable').dataTable();
+				$('#datatable').dataTable({
+					'order': [[ 1, 'desc' ]]
+				});
 
 				$('#datatable-keytable').DataTable({
 				  keys: true
@@ -2563,7 +2565,7 @@ if (typeof NProgress != 'undefined') {
 				var $datatable = $('#datatable-checkbox');
 
 				$datatable.dataTable({
-				  'order': [[ 1, 'desc' ]],
+				  'order': [[ 1, 'asc' ]],
 				  'columnDefs': [
 					{ orderable: false, targets: [0] }
 				  ]
