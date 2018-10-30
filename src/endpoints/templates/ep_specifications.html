@@ -15,15 +15,12 @@
       document.getElementById("jsonField").innerHTML = JSON.stringify(jsonData, undefined, 4);
     }
 
-    function onDownload(productId) {
-      var specification = document.getElementById('specification2');
+    function headerDownload(productId, specificationId) {
       var model = document.getElementById('model');
-      if (specification.value === null || specification.value === "") {
-        alert("Please selected specification.");
-      } else if (model.value === null || model.value === "") {
+      if (model.value === null || model.value === "") {
         alert("Please selected model.");
       } else {
-        window.location.href = "/endpoints/" + productId + "/" + specification.value + "/" + model.value + "/download";
+        window.location.href = "/endpoints/" + productId + "/" + specificationId + "/" + model.value + "/download";
       }
     }
   </script>
@@ -38,132 +35,89 @@
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="x_panel">
 
-
             <div class="x_title">
               <h2> Specifications </h2>
               <div class="clearfix"></div>
             </div>
 
             <div class="x_content">
-              <div class="col-md-9 col-sm-9 col-xs-12">
+              <div class="col-md-12 col-sm-12 col-xs-12">
 
-                  <div class="" role="tabpanel" data-example-id="togglable-tabs">
-                      <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
-                        <li role="presentation" class="active"><a href="#tab_content1" id="specification-tab" role="tab" data-toggle="tab" aria-expanded="true">Specification</a>
-                        </li>
-                        <li role="presentation" class=""><a href="#tab_content2" role="tab" id="headerFile-tab" data-toggle="tab" aria-expanded="false">Header File</a>
-                        </li>
-                      </ul>
+                <table class="table table-striped projects">
+                  <thead>
+                    <tr>
+                      <th>Version</th>
+                      <th>Updated user</th>
+                      <th>Updated time</th>
+                      <th>Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for specification in specification_list %}
+                      <tr>
+                        <td>
+                          {{ specification.version }}
+                        </td>
+                        <td>{{ specification.last_updated_user }}</td>
+                        <td>{{ specification.last_updated_time | datetimeFilter }}</td>
+                        <td>
 
-                      <div id="myTabContent" class="tab-content">
-                        <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="specification-tab">
-                          <div class="x_content">
-                            <div class="">
-                                <table class="table table-striped projects">
-                                  <thead>
-                                    <tr>
-                                      <th>Version</th>
-                                      <th>Updated user</th>
-                                      <th>Updated time</th>
-                                      <th>Edit</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {% for specification in specification_list %}
-                                      <tr>
-                                        <td>
-                                          {{ specification.version }}
-                                        </td>
-                                        <td>{{ specification.last_updated_user }}</td>
-                                        <td>{{ specification.last_updated_time | datetimeFilter }}</td>
-                                        <td>
-                                              <a href="/endpoints/{{ current_product.id }}/specifications/{{ specification.id }}" class="btn btn-info btn-xs"><i class="fa fa-file-text-o"></i> View </a>
-                                              <a href="/endpoints/{{ current_product.id }}/specifications/{{ specification.id }}/download" class="btn btn-primary btn-xs"><i class="fa fa-cloud-download"></i> Json </a>
-                                              <!-- TODO: Handle specifications version
-                                              <a href="/endpoints/{{ current_product.id }}/tests" class="btn btn-success btn-xs"><i class="fa fa-check-square-o"></i> Test </a>
-                                              -->
-                                        </td>
-                                      </tr>
-                                    {% endfor %}
-                                  </tbody>
-                                </table>
-                            </div>
+                          <a href="/endpoints/{{ current_product.id }}/specifications/{{ specification.id }}" class="btn btn-info btn-xs"><i class="fa fa-file-text-o"></i> View </a>
+                          <a href="/endpoints/{{ current_product.id }}/specifications/{{ specification.id }}/download" class="btn btn-primary btn-xs"><i class="fa fa-cloud-download"></i> Json </a>
+                          <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target=".header-modal-{{ specification.id }}"><i class="fa fa-cloud-download"></i> Header </button>
+                          <!-- TODO: Handle specifications version
+                          <a href="/endpoints/{{ current_product.id }}/tests" class="btn btn-success btn-xs"><i class="fa fa-check-square-o"></i> Test </a>
+                          -->
+                          <div class="modal fade header-modal-{{ specification.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-sm">
+                              <div class="modal-content">
 
-                            <br>
-
-                            <!-- Upload Button -->
-                            <form class="right-align" id="upload" action="/endpoints/{{ current_product.id }}/upload" method="POST" enctype="multipart/form-data">
-                              <label class="btn btn-default btn-file">Upload
-                                <input type="file" name="file" form="upload" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
-                              </label>
-                            </form>
-                          </div>
-                        </div>  <!-- end specification-tab -->
-
-                        <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="headerFile-tab">
-                          <div class="x_content">
-                            <div class="item form-group">
-                              <div class="form-horizontal form-label-left">
-                                <label class="control-label col-md-2" for="specification2">Version
-                                </label>
-                              </div>
-                              <div class="col-md-10">
-                                {% if specification_list %}
-                                  <select class="form-control" id="specification2" name="specification2">
-                                    {% for specification in specification_list %}
-                                      {% if selected and selected.version == specification.version %}
-                                        <option id="{{ specification.id }}" value="{{ specification.id }}" selected>
-                                          {{ specification.version }}
-                                        </option>
+                                <div class="modal-header">
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                                  </button>
+                                  <h4 class="modal-title" id="headerFile">Header File Download</h4>
+                                </div>
+                                <div>
+                                  <div class="modal-body">
+                                    <h4>Selected Model</h4>
+                                    <div>
+                                      {% if model_list %}
+                                        <select class="form-control" id="model" name="model">
+                                          {% for model in model_list %}
+                                            <option id="{{ model.id }}" value="{{ model.id }}" selected>{{ model.name }}</option>
+                                          {% endfor %}
+                                        </select>
                                       {% else %}
-                                        <option id="{{ specification.id }}" value="{{ specification.id }}">
-                                          {{ specification.version }}
-                                        </option>
+                                        <select class="form-control" id="model" name="model" disabled>
+                                          <option value="">Please create model</option>
+                                        </select>
                                       {% endif %}
-                                    {% endfor %}
-                                  </select>
-                                {% else %}
-                                  <select class="form-control" id="specification2" name="specification2" disabled>
-                                    <option value="">Please upload specifications file</option>
-                                  </select>
-                                {% endif %}
+                                    </div>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <button class="btn btn-primary" data-dismiss="modal" onclick="headerDownload('{{ current_product.id }}', '{{ specification.id}}');">Download</button>
+                                  </div>
+                                </div>
+
                               </div>
-                            </div>
-
-                            <br><br>
-
-                            <div class="item form-group">
-                              <div class="form-horizontal form-label-left">
-                                <label class="control-label col-md-2" for="model">Model
-                                </label>
-                              </div>
-                              <div class="col-md-10">
-                                {% if model_list %}
-                                  <select class="form-control" id="model" name="model">
-                                    {% for model in model_list %}
-                                      <option id="{{ model.id }}" value="{{ model.id }}" selected>{{ model.name }}</option>
-                                    {% endfor %}
-                                  </select>
-                                {% else %}
-                                  <select class="form-control" id="model" name="model" disabled>
-                                    <option value="">Please create model</option>
-                                  </select>
-                                {% endif %}
-                              </div>
-                            </div>
-
-                            <br><br>
-
-                            <!-- Download button -->
-                            <div class="right-align">
-                              <button class="btn btn-default right" onclick="onDownload('{{ current_product.id }}');">Download</button>
                             </div>
                           </div>
-                        </div>  <!-- headerFile-tab -->
 
-                      </div>
-                    </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
 
+                <br>
+
+                <!-- Upload Button -->
+                <form class="right-align" id="upload" action="/endpoints/{{ current_product.id }}/upload" method="POST" enctype="multipart/form-data">
+                  <label class="btn btn-default btn-file">Upload
+                    <input type="file" name="file" form="upload" accept="application/json" style="display: none;" onChange="this.form.submit();"/>
+                  </label>
+                </form>
 
               </div>
             </div><!-- End x_content -->
