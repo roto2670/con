@@ -1,5 +1,8 @@
 # MicroBot Console
 
+## Requirment
+    upper Python3.6
+
 # 1. Develop Installation
 
 ### 1. Setup virtual environment and Execute
