@@ -47,7 +47,8 @@ def send(to_addr, subject, data, content_type=None, attachment=None):
           logging.info("Invalid type. Type : %s", type(attach))
     elif not isinstance(attachment, list):
       logging.info("Attachment is not list. Attachment : %r", attachment)
-    resp = worker.send_mail(_mail.get())
+    #resp = worker.send_mail(_mail.get())
+    resp = worker.send_mail_test(_mail.get())
     logging.debug("send mail status : %s", resp)
     return True
   except Exception:
@@ -87,3 +88,16 @@ def send_about_test_user(product_id, model_name, firmware_version, state):
           "Failed to send firemware upload email. Tester : %s, product : %s, model : %s, version : %s, Sender : %s",
           _tester.email, product_id, model_name, firmware_version,
           current_user.email, exc_info=True)
+
+
+def send_about_verified(email_addr, auth_url):
+  with open(util.get_mail_form_path('verified.html'), 'r') as _f:
+    content = _f.read()
+  title = common.get_msg("organization.verified.mail_title")
+  msg = common.get_msg("organization.verified.mail_message")
+  content = content.format(title=title, msg=msg, auth_url=auth_url)
+  try:
+    send(email_addr, title, content)
+  except:
+    logging.warning("Fail to send verified email. Email : %s", email_addr,
+                    exc_info=True)

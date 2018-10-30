@@ -356,3 +356,20 @@ class _Invite(db.Model):
       if hasattr(value, '__iter__') and not isinstance(value, str):
         value = value[0]
       setattr(self, property, value)
+
+
+class _EmailAuth(db.Model):
+  __tablename__ = '_email_auth'
+
+  id = Column(String(75), primary_key=True)
+  email = Column(String(75))
+  key = Column(String(75))
+  user_id = Column(String(75))
+  sended_time = Column(DateTime)
+  accepted_time = Column(DateTime)
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        value = value[0]
+      setattr(self, property, value)

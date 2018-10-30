@@ -9,7 +9,6 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-import datetime
 
 from flask import current_app, redirect, render_template, request, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
@@ -29,10 +28,13 @@ def login():
     user.last_access_time = in_apis.get_datetime()
     user.ip_address = request.headers.get('X-Real-IP', util.get_ip_addr(request))
     db.session.commit()
-    if not current_user.organization_id:
-      return redirect(url_for('organization_blueprint.create'))
+    if current_user.email_verified:
+      if not current_user.organization_id:
+        return redirect(url_for('organization_blueprint.create'))
+      else:
+        return redirect(url_for('home_blueprint.index'))
     else:
-      return redirect(url_for('home_blueprint.index'))
+      return redirect(url_for('base_blueprint.route_verified'))
 
 
 @blueprint.route('/sign-in', methods={'POST'})
