@@ -256,6 +256,10 @@ def test_call(product_id, gadget, endpoint_name, version):
     logging.info("%s endpoint result : %s", endpoint_name, ret)
     if 'code' in ret:
       _code = ret['code']
+      # code
+      # 0 : success
+      # 1 : fail
+      # 124 : timeout
       if _code == 0:
         ret_data = {
             "status": "Success",
