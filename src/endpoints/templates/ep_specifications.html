@@ -10,17 +10,12 @@
 {% block javascripts %}
   {{ super() }}
   <script>
-    var jsonData = {{ content | tojson }};
-    if (jsonData !== null && !jQuery.isEmptyObject(jsonData)) {
-      document.getElementById("jsonField").innerHTML = JSON.stringify(jsonData, undefined, 4);
-    }
-
     function headerDownload(productId, specificationId) {
       var model = document.getElementById('model');
       if (model.value === null || model.value === "") {
         alert("Please selected model.");
       } else {
-        window.location.href = "/endpoints/" + productId + "/" + specificationId + "/" + model.value + "/download";
+        window.location.href = "/endpoints/" + productId + "/specification/" + specificationId + "/model/" + model.value + "/download";
       }
     }
   </script>
@@ -34,11 +29,6 @@
       <div class="row"><!-- start row -->
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="x_panel">
-
-            <div class="x_title">
-              <h2> Specifications </h2>
-              <div class="clearfix"></div>
-            </div>
 
             <div class="x_content">
               <div class="col-md-12 col-sm-12 col-xs-12">

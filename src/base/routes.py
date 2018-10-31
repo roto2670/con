@@ -198,7 +198,7 @@ def about_product():
 ## Jinja template
 
 
-CUR_TIMEZONE = {}  # {user_id : {'tz': timezone, 'last_access': timestamp}}
+CUR_TIMEZONE = {}  # {user_id : {'code': code, 'tz': timezone, 'last_access': timestamp}}
 
 
 def set_timezone(ip_addr):
@@ -208,7 +208,8 @@ def set_timezone(ip_addr):
       country_code = ipinfo['country']
       _tz = pytz.country_timezones[country_code]
       if _tz:
-        CUR_TIMEZONE[current_user.id] = {'tz': _tz[0], 'last_access' : time.time()}
+        CUR_TIMEZONE[current_user.id] = {'tz': _tz[0], 'code': country_code,
+                                         'last_access' : time.time()}
         logging.info("%s user set timezone : %s", current_user.email, _tz)
 
 

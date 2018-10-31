@@ -865,11 +865,14 @@ a:focus {
     color: #93A2B2;
     margin-bottom: 0 !important
 }
+/* toggle width change 70px to 30% (jslee. 181031)*/
 .toggle {
     float: left;
     margin: 0;
     padding-top: 16px;
-    width: 70px
+    width: 30%;
+    white-space: nowrap;
+    text-overflow: ellipsis
 }
 .toggle a {
     padding: 15px 15px 0;
@@ -1766,6 +1769,7 @@ span.right {
     padding: 0
 }
 a.user-profile {
+    background: #EDEDED;
     color: #5E6974 !important
 }
 .user-profile img {
@@ -4313,6 +4317,14 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 
 ::-webkit-scrollbar {
     display: none !important;
+}
+
+.product_menu {
+    float: left;
+    background: #EDEDED;
+    padding: 4px;
+    width: 100%;
+    position: relative
 }
 
 /* keyser custom */

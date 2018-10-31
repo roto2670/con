@@ -54,7 +54,8 @@
         });
         }
       </script>
-    {% elif info_msg %}
+    {% endif %}
+    {% if info_msg %}
       <script>
         onload = function() {
           new PNotify({
@@ -79,8 +80,11 @@
           {% endblock sidebar %}
 
           {% block top_navigation %}
+
             <div class="top_nav">
-              {% include "site_template/top_navigation.html" %}
+              {%with _title=self.title() %}
+                {% include "site_template/top_navigation.html" %}
+              {% endwith %}
             </div>
           {% endblock top_navigation %}
 

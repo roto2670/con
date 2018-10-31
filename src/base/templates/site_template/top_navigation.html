@@ -1,32 +1,32 @@
+<div class="product_menu">
+    <div class="btn-group">
+        {% if current_user.organization_id %}
+          {% if current_product %}
+            <button type="button" class="btn btn-primary product-title text-left">{{ current_product.id }}</button>
+          {% else %}
+            <button type="button" class="btn btn-primary product-title text-left">Products</button>
+          {% endif %}
+          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            {% for product in product_list %}
+              <li><a href="/home/{{ product.id }}">{{ product.id }}</a></li>
+            {% endfor %}
+            {% if product_list %}
+              <li class="divider"></li>
+            {% endif %}
+            <li><a href="/products/create">Create New Product</a>
+          </ul>
+        {% endif %}
+    </div>
+</div>
+
 <div class="nav_menu">
   <nav>
     <div class="nav toggle">
-      <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-    </div>
-
-    <div class="nav navbar-nav navbar-btn">
-        <div class="btn-group">
-            {% if current_user.organization_id %}
-              {% if current_product %}
-                <button type="button" class="btn btn-primary product-title text-left">{{ current_product.id }}</button>
-              {% else %}
-                <button type="button" class="btn btn-primary product-title text-left">Products</button>
-              {% endif %}
-              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                <span class="caret"></span>
-                <span class="sr-only">Toggle Dropdown</span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
-                {% for product in product_list %}
-                  <li><a href="/home/{{ product.id }}">{{ product.id }}</a></li>
-                {% endfor %}
-                {% if product_list %}
-                  <li class="divider"></li>
-                {% endif %}
-                <li><a href="/products/create">Create New Product</a>
-              </ul>
-            {% endif %}
-        </div>
+      <a id="menu_toggle"><i class="fa fa-bars">{{ _title }}</i></a>
     </div>
 
     <ul class="nav navbar-nav navbar-right">

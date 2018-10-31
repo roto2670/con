@@ -32,6 +32,7 @@ def specifications(product_id):
   _product = in_apis.get_product(product_id)
   model_list = _product.model_list
   specification_list = _product.endpoint_list
+
   if request.method == "GET":
     if specification_list:
       specification = specification_list[0]
@@ -200,7 +201,7 @@ def _get_build_number(version):
   return int(build_number) + 1
 
 
-@blueprint.route('/<product_id>/<specification_id>/<model_id>/download', methods=['GET'])
+@blueprint.route('/<product_id>/specification/<specification_id>/model/<model_id>/download', methods=['GET'])
 @login_required
 def download_header_file(product_id, specification_id, model_id):
   content = in_apis.get_specifications(specification_id)
