@@ -254,11 +254,26 @@ def test_call(product_id, gadget, endpoint_name, version):
     ret = apis.get_endpoint_result(gadget, task_id)
     end_time = time.time()
     logging.info("%s endpoint result : %s", endpoint_name, ret)
-    ret_data = {
-        "status": "Success",
-        "time": round(end_time - st_time, 3),
-        "ret": ret
-    }
+    if 'code' in ret:
+      _code = ret['code']
+      if _code == 0:
+        ret_data = {
+            "status": "Success",
+            "time": round(end_time - st_time, 3),
+            "ret": ret
+        }
+      else:
+        ret_data = {
+            "status": "Fail",
+            "time": round(end_time - st_time, 3),
+            "ret": ret
+        }
+    else:
+      ret_data = {
+          "status": "Fail",
+          "time": round(end_time - st_time, 3),
+          "ret": ret
+      }
   else:
     end_time = time.time()
     ret_data = {
