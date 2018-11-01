@@ -366,9 +366,13 @@ def model_info(product_id, model_id):
                          dev_id=dev_id, pre_id=pre_id, release_id=release_id )
 
 
-def _get_build_number(version):
-  _, _, build_number = version.split(".")
-  return str(int(build_number) + 1)
+def _get_build_number(ep_version, firmware_version):
+  major, minor, build_number = firmware_version.split(".")
+  _before_ep_version = ".".join([major, minor])
+  if ep_version == _before_ep_version:
+    return str(int(build_number) + 1)
+  else:
+    return "0"
 
 
 def _get_will_use_firmware_version(product_id, model_id):
@@ -377,9 +381,9 @@ def _get_will_use_firmware_version(product_id, model_id):
   ep = in_apis.get_specifications(stage_info.endpoint_id)
   if stage_info.firmware_id:
     _firmware = in_apis.get_firmware(stage_info.firmware_id)
-    version = ep.version + "." + _get_build_number(_firmware.version)
+    version = ep.version + "." + _get_build_number(ep.version, _firmware.version)
   else:
-    version = ep.version + "." + str(0)
+    version = ep.version + ".0"
   return version
 
 
