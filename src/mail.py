@@ -21,9 +21,13 @@ from sendgrid.helpers.mail import Mail  # noqa : pylint: disable=import-error
 from sendgrid.helpers.mail import Email  # noqa : pylint: disable=import-error
 from sendgrid.helpers.mail import Content  # noqa : pylint: disable=import-error
 from sendgrid.helpers.mail import Attachment  # noqa : pylint: disable=import-error
+from flask_login import current_user  # noqa : pylint: disable=import-error
 
 # self
+import util
+import common
 import worker
+import in_apis
 
 
 def send(to_addr, subject, data, content_type=None, attachment=None):
@@ -61,3 +65,25 @@ def build_attachment(filename, content_id, content,
   attachment.content = content
   attachment.disposition = disposition
   return attachment
+
+
+def send_about_test_user(product_id, model_name, firmware_version, state):
+  with open(util.get_mail_form_path('firmware_upload.html'), 'r') as _f:
+    content = _f.read()
+  _product = in_apis.get_product(product_id)
+  title = common.get_msg("products.firmware.mail.upload_title")
+  title = title.format(_product.name, model_name, firmware_version)
+  msg = common.get_msg("products.firmware.mail.upload_message")
+  msg = msg.format(_product.name, model_name, firmware_version)
+  content = content.format(title=title, msg=msg)
+  tester_list = in_apis.get_send_tester_list(product_id,
+                                             current_user.organization_id,
+                                             state)
+  for _tester in tester_list:
+    try:
+      send(_tester.email, title, content)
+    except:
+      logging.warning(
+          "Failed to send firemware upload email. Tester : %s, product : %s, model : %s, version : %s, Sender : %s",
+          _tester.email, product_id, model_name, firmware_version,
+          current_user.email, exc_info=True)

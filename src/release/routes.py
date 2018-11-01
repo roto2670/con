@@ -15,8 +15,8 @@ import logging
 from flask import render_template, redirect  # noqa : pylint: disable=import-error
 from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
 
-import in_apis
 import base
+import in_apis
 from release import blueprint
 
 

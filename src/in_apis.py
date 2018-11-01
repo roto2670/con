@@ -10,6 +10,7 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import json
+import mail
 import uuid
 import logging
 import datetime
@@ -584,12 +585,14 @@ def _delete_before_pre_release(product_id):
 
 def pre_release(product_id):
   dev = get_product_stage_by_dev(product_id)
-  models_dict = {}
+  models_dict = {}  # {model_code : firmware_version}
+  send_mail_info_dict = {}  # {model_name : firmware_version}
   try:
     for _info in dev.stage_info_list:
       _model = get_model(_info.model_id)
       _firmware = get_firmware(_info.firmware_id)
       models_dict[_model.code] = _firmware.version
+      send_mail_info_dict[_model.name] = _firmware.version
   except:
     logging.exception("Fail to Release.")
     raise Exception("Fail to Release.")
@@ -636,6 +639,9 @@ def pre_release(product_id):
                              product_stage_id=new_pre_release_id)
       db.session.add(stage_info)
     db.session.commit()
+    for model_name, firmware_version in send_mail_info_dict.items():
+      mail.send_about_test_user(product_id, model_name, firmware_version,
+                                models.TESTER_PRE_RELEASE)
     return True
   else:
     return False

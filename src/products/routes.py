@@ -14,7 +14,6 @@ import re
 import json
 import uuid
 import logging
-import datetime
 import tempfile
 import urllib.parse
 
@@ -429,8 +428,8 @@ def upload_firmware(product_id, model_id):
         if _ret:
           in_apis.update_stage_info_by_dev_about_firmware(product_id, model_id,
                                                           _firmware.id)
-          # TODO: send email
-          # _send_about_test_user(product_id, model.name, firmware_version, state)
+          mail.send_about_test_user(product_id, model.name, firmware_version,
+                                    models.TESTER_DEV)
           return redirect('products/' + product_id + '/model/' + model_id)
         else:
           logging.warning("Failed to update stage while upload firmware.")
@@ -460,29 +459,6 @@ def delete_firmware(product_id, model_id, firmware_id):
       logging.warning("Failed to delete firmware. P: %s, M: %s, F: %s",
                       product_id, _model.name, _firmware.version)
   return redirect('products/' + product_id + '/model/' + model_id)
-
-
-def _send_about_test_user(product_id, model_name, firmware_version, state):
-  with open(util.get_mail_form_path('firmware_upload.html'), 'r') as _f:
-    content = _f.read()
-  _product = in_apis.get_product(product_id)
-  title = common.get_msg("products.firmware.mail.upload_title")
-  title = title.format(_product.name, model_name, firmware_version)
-  msg = common.get_msg("products.firmware.mail.upload_message")
-  msg = msg.format(_product.name, model_name, firmware_version)
-  content = content.format(title=title, msg=msg)
-  tester_list = in_apis.get_send_tester_list(product_id,
-                                             current_user.organization_id,
-                                             state)
-  for _tester in tester_list:
-    try:
-      mail.send(_tester.email, title, content)
-    except:
-      logging.warning(
-          "Failed to send firemware upload email. Tester : %s, product : %s, model : %s, version : %s, Sender : %s",
-          _tester.email, product_id, model_name, firmware_version,
-          current_user.email, exc_info=True)
-
 
 
 @blueprint.route('/<product_id>/model/<model_id>/firmware/<model_type>/download',
