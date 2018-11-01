@@ -40,7 +40,7 @@
     {% endblock head %}
   </head>
 
-  <body class="{% block body_class %}nav-md {% endblock body_class %}">
+  <body class="{% block body_class %}nav-md {% endblock body_class %}" oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
     <!-- Notification Message (jslee,180828) -->
     {% if error_msg %}
       <script>
