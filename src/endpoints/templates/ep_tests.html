@@ -100,7 +100,7 @@
                       <div id="r{{ request['name'] }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                         <div class="panel-body">
                           <div style="text-align: right">
-                            <button class="btn btn-default" onclick="copyToClipboardByText('https://a.prota.space/v1/gadget/{{ gadget_id }}/endpoints/{{ request.name }}')">
+                            <button class="btn btn-default" onclick="copyToClipboardByText('http://api.mib.io/v1/gadget/{{ gadget_id }}/endpoints/{{ request.name }}')">
                               REST URL
                             </button>
                             <button class="btn btn-default" onclick="testCall('{{ current_product.id }}', '{{ gadget_id }}', '{{ request.name }}', '{{ selected.version }}')">Test</button>
@@ -108,7 +108,6 @@
                           <!-- request? -->
                           <div class="bs-example" data-example-id="simple-jumbotron">
                             <div class="jumbotron">
-                              <!--Rest : https://a.prota.space/v1/gadgets/{{ gadget_id }}/endpoints/{{request['name']}}-->
                               <h3>Request</h3>
                                 name : {{ request['name'] }}<br>
                                 timeout : {{ request['timeout'] }}<br>

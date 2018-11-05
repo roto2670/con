@@ -161,7 +161,7 @@ def internal_error(error):
 
 ## context processor
 
-
+import onboarding
 CUR_PRODUCT = {}  # {user_id : CUR_PRODUCT}
 
 
@@ -183,6 +183,8 @@ def set_current_product(cur_product):
 def _get_current_product():
   if current_user and current_user.is_authenticated:
     if current_user.id in CUR_PRODUCT:
+      _prd = CUR_PRODUCT[current_user.id]
+      onboarding.check_onboarding(current_user.organization_id, _prd.id)
       return CUR_PRODUCT[current_user.id]
     else:
       return None
