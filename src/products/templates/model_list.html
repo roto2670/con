@@ -36,7 +36,15 @@
                       <td>{{ model.last_updated_time | datetimeFilter }}</td>
                       <td>{{ model.last_updated_user }}</td>
                         <td>
-                          <a href="/products/{{ current_product.id }}/model/{{ model.id }}" class="btn btn-primary btn-xs"><i class="fa fa-folder"></i> View </a>
+                          <a href="/products/{{ current_product.id }}/model/{{ model.id }}" class="btn btn-info btn-xs"><i class="fa fa-folder"></i> Firmware </a>
+                            <!-- history
+                            <td>2018-09-07</td>
+                            <td>2018-10-18</td>
+                            <td>Soft device, Boot loader, NRF Lib, Example Project</td>
+                            -->
+                          <a href="/products/{{ current_product.id }}/model/{{ model.id }}/firmware/{{ model.typ }}/download" class="btn btn-primary btn-xs">
+                            <i class="fa fa-cloud-download"></i> Example
+                          </a>
                         </td>
                     </tr>
                   {% endfor %}
@@ -45,7 +53,7 @@
 
               <div style="text-align: right">
                 <a href="/products/{{ current_product.id }}/model/create">
-                  <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bs-example-modal-sm">create</button>
+                  <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bs-example-modal-sm">Create</button>
                 </a>
               </div>
 

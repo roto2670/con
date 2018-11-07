@@ -16,7 +16,7 @@ import requests  # noqa : pylint: disable=import-error
 
 
 IS_DEV = True
-BASE_URL = '''https://o3.prota.space/i/v1/'''
+BASE_URL = '''http://api.mib.io/i/v1/'''
 HEADERS = {}
 
 
@@ -183,6 +183,7 @@ def update_android_key(organization_id, kind, secret):
       resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
+        logging.info("Update android key. url : %s, data : %s", url, data)
         return value['v']
       else:
         logging.warning("Register android key Response. Code : %s, Text : %s",
@@ -210,6 +211,7 @@ def update_ios_key(organization_id, kind, cert, secret, is_dev):
       resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
+        logging.info("Update ios key. url : %s, data : %s", url, data)
         return value['v']
       else:
         logging.warning("Register android key Response. Code : %s, Text : %s",
@@ -334,6 +336,7 @@ def update_about_hook(product_id, stage, hook_url=None, hook_client_key=None):
       resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
+        logging.info("Update about hook. url : %s, data : %s", url, data)
         return value['v']
       else:
         logging.warning("Update about hook Response. Code : %s, Text : %s",
@@ -360,6 +363,7 @@ def update_product_stage(product_id, product_stage, model_number_dict, stage):
       resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
+        logging.info("Update product stage. url : %s, data : %s", url, data)
         return value['v']
       else:
         logging.warning("Update product stage Response. Code : %s, Text : %s",
@@ -484,6 +488,7 @@ def register_firmware(product_id, model_number, firmware_version, firmware_binar
       resp = requests.post(url, headers=headers, data=firmware_binary)
       if resp.ok:
         value = resp.json()
+        logging.info("Register firmware. url : %s", url)
         return value['v']
       else:
         logging.warning("Register firmware Response. Code : %s, Text : %s",
@@ -504,6 +509,7 @@ def delete_firmware(product_id, model_number, firmware_version):
       resp = requests.delete(url)
       if resp.ok:
         value = resp.json()
+        logging.info("Delete firmware. url : %s", url)
         return value['v']
       else:
         logging.warning("Delete firmware Response. Code : %s, Text : %s",
@@ -536,6 +542,7 @@ def register_tester(organization_id, product_id, tester_email, stage):
       resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
+        logging.info("Register tester.  url : %s, data : %s", url, data)
         return value['v']
       elif resp.status_code == 403:
         logging.debug("Status 403. %s user not FTL.", tester_email)
@@ -562,6 +569,7 @@ def delete_tester(organization_id, product_id, tester_email):
       resp = requests.delete(url, headers=HEADERS, params=params)
       if resp.ok:
         value = resp.json()
+        logging.info("Delete Tester. url : %s, param : %s", url, params)
         return value['v']
       else:
         logging.warning("Register tester Response. Code : %s, Text : %s",

@@ -28,6 +28,7 @@ import common
 import models
 import worker
 import in_apis
+import onboarding
 import base.routes
 from base import db
 from products import blueprint
@@ -475,6 +476,7 @@ def download_software(product_id, model_id, model_type):
     # NRF 52
     path = os.path.join(util.get_res_path(), 'firmware', 'nrf52')
     file_name = "nrf52.zip"
+  onboarding.set_download_file()
   return send_from_directory(directory=path, filename=file_name, as_attachment=True)
 
 

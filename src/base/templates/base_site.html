@@ -49,24 +49,41 @@
             title: '{{ error_msg.title }}',
             text: '{{ error_msg.msg }}',
             type: 'error',
+            icon: false,
             hide: true,
             styling: 'bootstrap3'
         });
         }
       </script>
-    {% endif %}
-    {% if info_msg %}
-      <script>
-        onload = function() {
-          new PNotify({
-            title: '{{ info_msg.title }}',
-            text: '{{ info_msg.msg }}',
-            type: 'info',
-            hide: true,
-            styling: 'bootstrap3'
-        });
-        }
-      </script>
+    {% else %}
+      {% if info_msg %}
+        <script>
+          onload = function() {
+            new PNotify({
+              title: '{{ info_msg.title }}',
+              text: '{{ info_msg.msg }}',
+              type: 'success',
+              hide: true,
+              icon: false,
+              styling: 'bootstrap3'
+          });
+          }
+        </script>
+      {% endif %}
+      {% if onboarding_msg %}
+        <script>
+          onload = function() {
+            new PNotify({
+              title: '{{ onboarding_msg.title }}',
+              text: '{{ onboarding_msg.msg }}',
+              type: 'info',
+              hide: true,
+              icon: false,
+              styling: 'bootstrap3'
+          });
+          }
+        </script>
+      {% endif %}
     {% endif %}
 
     {% block body %}

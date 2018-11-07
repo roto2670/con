@@ -21,47 +21,25 @@ import common
 import builder
 import in_apis
 import models
+import onboarding
 import base.routes
 from endpoints import blueprint
 
 
-@blueprint.route('/<product_id>/specifications', methods=['GET', 'POST'])
+@blueprint.route('/<product_id>/specifications', methods=['GET'])
 @login_required
 def specifications(product_id):
   _set_product(product_id)
   _product = in_apis.get_product(product_id)
   model_list = _product.model_list
   specification_list = _product.endpoint_list
+  spec_dict = {}
 
-  if request.method == "GET":
-    if specification_list:
-      specification = specification_list[0]
-      content = json.loads(specification.specifications)
-    else:
-      specification = None
-      content = {}
-    return render_template('ep_specifications.html',
-                           specification_list=specification_list,
-                           selected=specification, content=content,
-                           model_list=model_list)
-  else:
-    specification_id = request.form['specifications']
-    specification = in_apis.get_specifications(specification_id)
-    content = json.loads(specification.specifications)
-    return render_template('ep_specifications.html',
-                           specification_list=specification_list,
-                           selected=specification, content=content,
-                           model_list=model_list)
-
-
-@blueprint.route('/<product_id>/specifications/<specification_id>', methods=['GET'])
-def view_specifications(product_id, specification_id):
-  _set_product(product_id)
-  specification = in_apis.get_specifications(specification_id)
-  content = json.loads(specification.specifications)
-  return render_template('ep_view_specification.html',
-                         specification=specification,
-                         content=content)
+  for _spec in specification_list:
+    spec_dict[_spec.id] = json.loads(_spec.specifications)
+  return render_template('ep_specifications.html',
+                         specification_list=specification_list,
+                         model_list=model_list, spec_dict=spec_dict)
 
 
 @blueprint.route('/<product_id>/specifications/<specification_id>/download', methods=['GET'])
@@ -216,6 +194,7 @@ def download_header_file(product_id, specification_id, model_id):
     # TODO: Handle build number when upper 255
     h_builder = builder.MibEndpoints.build(json.loads(content.specifications))
     _header = h_builder.to_lib_body(model.code, build_number)
+    onboarding.set_header_file()
     return Response(_header, mimetype='text/x-c',
                     headers={'Content-Disposition':'attachment;filename=gadget.h'})
   except:
@@ -228,6 +207,7 @@ def download_header_file(product_id, specification_id, model_id):
 @login_required
 def test_call(product_id, gadget, endpoint_name, version):
   logging.info("Test call. %s", endpoint_name)
+  onboarding.set_test()
   _product = in_apis.get_product(product_id)
   _specifications = in_apis.get_specifications_by_version(product_id, version)
   specification = json.loads(_specifications.specifications)
