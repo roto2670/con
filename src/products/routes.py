@@ -19,7 +19,7 @@ import urllib.parse
 
 from flask import send_from_directory  # noqa : pylint: disable=import-error
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
-from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
+from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import apis
 import util
@@ -35,7 +35,7 @@ from products import blueprint
 
 
 @blueprint.route('/create', methods=['GET', 'POST'])
-@login_required
+@util.require_login
 def create():
   if request.method == "GET":
     modal = {}
@@ -100,7 +100,7 @@ def _get_type_dict(product):
 
 
 @blueprint.route('/<product_id>/model/create', methods=['GET', 'POST'])
-@login_required
+@util.require_login
 def create_model(product_id):
   if request.method == "GET":
     _set_product(product_id)
@@ -146,28 +146,28 @@ def create_model(product_id):
 
 
 @blueprint.route('/<product_id>/delete', methods=['GET', 'POST'])
-@login_required
+@util.require_login
 def delete_product(product_id):
   in_apis.delete_product(product_id)
   return redirect("/organization")
 
 
 @blueprint.route('/<product_id>/model/<model_id>/delete', methods=['GET', 'POST'])
-@login_required
+@util.require_login
 def delete_model(product_id, model_id):
   in_apis.delete_model(model_id)
   return redirect("/products/" + product_id + "/model")
 
 
 @blueprint.route('/<product_id>/general', methods=['GET'])
-@login_required
+@util.require_login
 def general(product_id):
   _set_product(product_id)
   return render_template('prd_general.html')
 
 
 @blueprint.route('/<product_id>/authentication', methods=['GET'])
-@login_required
+@util.require_login
 def authentication(product_id):
   _set_product(product_id)
   tokens = json.loads(current_user.organization.tokens)
@@ -178,7 +178,7 @@ def authentication(product_id):
 
 
 @blueprint.route('/<product_id>/hook', methods=['POST'])
-@login_required
+@util.require_login
 def hook(product_id):
   hook_url = request.form['hookUrl']
   hook_client_key = request.form['hookClientKey']
@@ -197,7 +197,7 @@ def hook(product_id):
 
 
 @blueprint.route('/<product_id>/tester', methods=['GET', 'POST'])
-@login_required
+@util.require_login
 def tester(product_id):
   _set_product(product_id)
   if request.method == "GET":
@@ -245,7 +245,7 @@ def _send_invite(email_addr, product_id):
 
 
 @blueprint.route('/<product_id>/tester/<tester_id>/change/<level>')
-@login_required
+@util.require_login
 def change_tester_level(product_id, tester_id, level):
   _tester = in_apis.get_tester(tester_id, product_id)
   if _tester:
@@ -266,7 +266,7 @@ def change_tester_level(product_id, tester_id, level):
 
 
 @blueprint.route('/<product_id>/tester/<tester_id>/delete')
-@login_required
+@util.require_login
 def remove_tester(product_id, tester_id):
   _tester = in_apis.get_tester(tester_id, product_id)
   if _tester:
@@ -279,7 +279,7 @@ def remove_tester(product_id, tester_id):
 
 
 @blueprint.route('/<product_id>/tester/<tester_id>/refresh')
-@login_required
+@util.require_login
 def check_authorized(product_id, tester_id):
   _tester = in_apis.get_tester(tester_id, product_id)
   if _tester:
@@ -291,7 +291,7 @@ def check_authorized(product_id, tester_id):
 
 
 @blueprint.route('/<product_id>/invite/tester/<invite_id>/delete')
-@login_required
+@util.require_login
 def remove_invite_tester(product_id, invite_id):
   in_apis.delete_invite(invite_id)
   return redirect('products/' + product_id + '/tester')
@@ -329,7 +329,7 @@ def confirm_mail():
 
 
 @blueprint.route('/<product_id>/model', methods=['GET'])
-@login_required
+@util.require_login
 def model_list(product_id):
   _set_product(product_id)
   _product = in_apis.get_product(product_id)
@@ -340,7 +340,7 @@ def model_list(product_id):
 
 
 @blueprint.route('/<product_id>/model/<model_id>', methods=['GET'])
-@login_required
+@util.require_login
 def model_info(product_id, model_id):
   _set_product(product_id)
   model = in_apis.get_model(model_id)
@@ -389,7 +389,7 @@ def _get_will_use_firmware_version(product_id, model_id):
 
 
 @blueprint.route('/<product_id>/model/<model_id>/firmware', methods=['GET', 'POST'])
-@login_required
+@util.require_login
 def upload_firmware(product_id, model_id):
   referrer = "/products/" + product_id + "/model/" + model_id
   firmware_version = _get_will_use_firmware_version(product_id, model_id)
@@ -452,7 +452,7 @@ def upload_firmware(product_id, model_id):
 
 
 @blueprint.route('/<product_id>/model/<model_id>/firmware/<firmware_id>', methods=['POST'])
-@login_required
+@util.require_login
 def delete_firmware(product_id, model_id, firmware_id):
   _firmware = in_apis.get_firmware(firmware_id)
   _model = in_apis.get_model(model_id)

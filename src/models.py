@@ -365,6 +365,7 @@ class _EmailAuth(db.Model):
   email = Column(String(75))
   key = Column(String(75))
   user_id = Column(String(75))
+  is_confirm = Column(Boolean, default=False, nullable=False)
   sended_time = Column(DateTime)
   accepted_time = Column(DateTime)
 

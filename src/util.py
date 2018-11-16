@@ -254,3 +254,25 @@ def get_ip_addr(request):
     return request.headers['X-Forwarded-For']
   else:
     return request.remote_addr
+
+
+from functools import wraps
+from flask import redirect, request, session, url_for
+from flask_login import current_user
+
+
+def require_login(f):
+  @wraps(f)
+  def check_email_auth(*args, **kwargs):
+    if current_user is None:
+      return redirect(url_for('login_blueprint.login', next=request.url))
+    elif current_user.is_anonymous:
+      return redirect(url_for('login_blueprint.login', next=request.url))
+    elif not current_user.is_authenticated:
+      return redirect(url_for('login_blueprint.login', next=request.url))
+    elif not current_user.email_verified:
+      return redirect(url_for('base_blueprint.route_verified'))
+    elif not session.get('_fresh', False):
+      return redirect(url_for('login_blueprint.login', next=request.url))
+    return f(*args, **kwargs)
+  return check_email_auth

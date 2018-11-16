@@ -18,7 +18,7 @@ import datetime
 import pytz
 from country_list import countries_for_language
 from flask import render_template, redirect, request, url_for  # noqa : pylint: disable=import-error
-from flask_login import current_user, login_required, login_user, logout_user  # noqa : pylint: disable=import-error
+from flask_login import current_user, login_user, logout_user  # noqa : pylint: disable=import-error
 
 import mail
 import util
@@ -53,22 +53,37 @@ def route_verified():
 
 @blueprint.route('/verified/send')
 def send_verified_email():
+  # TODO: two times called
+  has_email = in_apis.has_email(current_user.email)
+  if has_email:
+    in_apis.remove_email_auth(has_email.id)
   key = uuid.uuid4().hex
-  auth_url = request.host_url + 'verified/confirm?key=' + key + '&u=' + \
-      str(current_user.id)
+  auth_url = request.host_url + 'verified/confirm?key=' + key
   mail.send_about_verified(current_user.email, auth_url)
   in_apis.create_email_auth(current_user.email, key, current_user.id)
+
+
+def _is_confirm(email_auth):
+  if email_auth.user_id != current_user.id:
+    return False
+  if (time.time() - email_auth.sent_time) > 300: # 5 minute
+    return False
+  return True
 
 
 @blueprint.route('/verified/confirm')
 def confirm_verified_email():
   key = request.args['key']
-  user_id = request.args['u']
-  if in_apis.get_email_auth(current_user.email, key, current_user.id):
+  email_auth = in_apis.get_email_auth(current_user.email, key)
+  if email_auth and _is_confirm(email_auth):
+    in_apis.update_email_auth(email_auth.id)
     in_apis.update_user_by_confirm(current_user.id)
-    return redirect(url_for('login_blueprint.login'))  
+    return redirect(url_for('login_blueprint.login'))
   else:
-    return redirect(url_for('base_blueprint.route_verified'))  
+    logging.warning("%s user is not auth. Sent time : %s",
+                    email_auth.email, email_auth.sent_time)
+    in_apis.remove_email_auth(email_auth.id)
+    return redirect(url_for('base_blueprint.route_verified'))
 
 
 @blueprint.route('/welcome')
@@ -90,13 +105,13 @@ def welcome_no_ftl():
 
 
 @blueprint.route('/<template>')
-@login_required
+@util.require_login
 def route_template(template):
   return render_template(template + '.html')
 
 
 @blueprint.route('/fixed_<template>')
-@login_required
+@util.require_login
 def route_fixed_template(template):
   return render_template('fixed/fixed_{}.html'.format(template))
 
