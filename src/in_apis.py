@@ -35,6 +35,7 @@ from models import _Invite as Invite
 from models import _Tester as Tester
 from models import _Firmware as Firmware
 from models import _History as History
+from models import _EmailAuth as EmailAuth
 
 
 def get_datetime():
@@ -273,6 +274,13 @@ def get_user_list(organization_id):
 def update_user_by_ip(user_id, ip_addr):
   user = User.query.filter_by(id=user_id).one_or_none()
   user.ip_address = ip_addr
+  user.last_access_time = get_datetime()
+  db.session.commit()
+
+
+def update_user_by_confirm(user_id):
+  user = User.query.filter_by(id=user_id).one_or_none()
+  user.email_verified = True
   user.last_access_time = get_datetime()
   db.session.commit()
 
@@ -703,6 +711,29 @@ def release(product_id):
     return True
   else:
     return False
+
+
+# }}}
+
+
+# {{{ EmailAuth
+
+
+def create_email_auth(email, key, user_id):
+  email_auth = EmailAuth(id=uuid.uuid4().hex,
+                         email=email,
+                         key=key,
+                         user_id=user_id,
+                         sent_time=get_datetime(),
+                         accepted_time=get_datetime())
+  db.session.add(email_auth)
+  db.session.commit()
+
+
+def get_email_auth(email, key, user_id):
+  email_auth = EmailAuth.query.filter_by(email=email, key=key,
+                                         user_id=user_id).one_or_none()
+  return email_auth
 
 
 # }}}

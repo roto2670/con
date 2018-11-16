@@ -30,6 +30,10 @@
       "member": {
           "mail_title" : "Invite to {}",
           "mail_message": "Invite you to {}. If you accept the invitation, you can become a member of {}."
+      },
+      "verified": {
+          "mail_title": "MiB Console authentication",
+          "mail_message": "Please confirm authentication for continued use."
       }
   },
   "products": {

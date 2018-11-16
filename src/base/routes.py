@@ -20,6 +20,7 @@ from country_list import countries_for_language
 from flask import render_template, redirect, request, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user, login_required, login_user, logout_user  # noqa : pylint: disable=import-error
 
+import mail
 import util
 import common
 import models
@@ -39,6 +40,35 @@ def route_default():
 @blueprint.route('/doc')
 def route_doc():
   return render_template('doc.html')
+
+
+@blueprint.route('/verified')
+def route_verified():
+  if current_user.email_verified:
+    return redirect(url_for('login_blueprint.login'))
+  else:
+    send_verified_email()
+    return render_template('verified.html', user_email=current_user.email)
+
+
+@blueprint.route('/verified/send')
+def send_verified_email():
+  key = uuid.uuid4().hex
+  auth_url = request.host_url + 'verified/confirm?key=' + key + '&u=' + \
+      str(current_user.id)
+  mail.send_about_verified(current_user.email, auth_url)
+  in_apis.create_email_auth(current_user.email, key, current_user.id)
+
+
+@blueprint.route('/verified/confirm')
+def confirm_verified_email():
+  key = request.args['key']
+  user_id = request.args['u']
+  if in_apis.get_email_auth(current_user.email, key, current_user.id):
+    in_apis.update_user_by_confirm(current_user.id)
+    return redirect(url_for('login_blueprint.login'))  
+  else:
+    return redirect(url_for('base_blueprint.route_verified'))  
 
 
 @blueprint.route('/welcome')
