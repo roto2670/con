@@ -118,20 +118,6 @@ def send_mail(request_body):
   return json.loads(resp)
 
 
-def send_mail_test(request_body):
-  print("hi1")
-  sendgrid_client = sendgrid.SendGridAPIClient(apikey=SG_API_KEY)
-  print("hi2")
-  _resp = sendgrid_client.client.mail.send.post(request_body=request_body)
-  print("hi3")
-  logging.debug("code : %s, header : %s, body : %s", _resp.status_code,
-                _resp.headers, _resp.body)
-  logging.debug("resp : %s", _resp)
-  logging.debug("resp : %s", dir(_resp))
-  resp = {}
-  return json.dumps(resp)
-
-
 # TIMEZONE
 IPINFO_URL = '''https://ipinfo.io/{ip}?token=e7239ad4a056a0'''
 

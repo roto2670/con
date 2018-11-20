@@ -14,9 +14,10 @@ import time
 import logging
 
 from flask import abort, render_template, redirect, request, Response  # noqa : pylint: disable=import-error
-from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
+from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import apis
+import util
 import common
 import builder
 import in_apis
@@ -27,7 +28,7 @@ from endpoints import blueprint
 
 
 @blueprint.route('/<product_id>/specifications', methods=['GET'])
-@login_required
+@util.require_login
 def specifications(product_id):
   _set_product(product_id)
   _product = in_apis.get_product(product_id)
@@ -43,7 +44,7 @@ def specifications(product_id):
 
 
 @blueprint.route('/<product_id>/specifications/<specification_id>/download', methods=['GET'])
-@login_required
+@util.require_login
 def download_specification_file(product_id, specification_id):
   content = in_apis.get_specifications(specification_id)
   try:
@@ -69,7 +70,7 @@ def _build_gadget_dict(gadgets):
 
 
 @blueprint.route('/<product_id>/tests', methods=['GET', 'POST'])
-@login_required
+@util.require_login
 def tests(product_id):
   _set_product(product_id)
   gadget_dict = {}
@@ -134,7 +135,7 @@ def _check_validate(product_id, json_content):
 
 
 @blueprint.route('/<product_id>/upload', methods=['POST'])
-@login_required
+@util.require_login
 def upload_header_file(product_id):
   _product = in_apis.get_product(product_id)
   upload_file = request.files['file']
@@ -180,7 +181,7 @@ def _get_build_number(version):
 
 
 @blueprint.route('/<product_id>/specification/<specification_id>/model/<model_id>/download', methods=['GET'])
-@login_required
+@util.require_login
 def download_header_file(product_id, specification_id, model_id):
   content = in_apis.get_specifications(specification_id)
   model = in_apis.get_model(model_id)
@@ -204,7 +205,7 @@ def download_header_file(product_id, specification_id, model_id):
 
 
 @blueprint.route('/<product_id>/testcall/<gadget>/<endpoint_name>/<version>', methods=['POST'])
-@login_required
+@util.require_login
 def test_call(product_id, gadget, endpoint_name, version):
   logging.info("Test call. %s", endpoint_name)
   onboarding.set_test()

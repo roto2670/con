@@ -55,7 +55,6 @@ class FirebaseAuth:
     if self.api_key is None:
       return
     self.project_id = app.config['FIREBASE_PROJECT_ID']
-    self.auth_domain = app.config.get('FIREBASE_AUTH_DOMAIN')
     if self.auth_domain is None:
       self.auth_domain = '{}.firebaseapp.com'.format(self.project_id)
     provider_ids = []

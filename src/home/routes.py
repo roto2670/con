@@ -16,7 +16,7 @@ import logging
 import collections
 
 from flask import render_template, request, redirect  # noqa : pylint: disable=import-error
-from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
+from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import apis
 import util
@@ -186,7 +186,7 @@ def _get_endpoint_info(product_id):
 
 
 @blueprint.route('/index')
-@login_required
+@util.require_login
 def index():
   current_product = base.routes.about_product()['current_product']
   if not current_product:
@@ -200,7 +200,7 @@ def index():
 
 
 @blueprint.route('/<product_id>')
-@login_required
+@util.require_login
 def product_index(product_id):
   product = in_apis.get_product(product_id)
   base.routes.set_current_product(product)
@@ -211,6 +211,6 @@ def product_index(product_id):
 
 
 @blueprint.route('/<template>')
-@login_required
+@util.require_login
 def route_template(template):
   return render_template(template + '.html')

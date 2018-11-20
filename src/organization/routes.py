@@ -16,7 +16,7 @@ import logging
 import tempfile
 
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
-from flask_login import current_user, login_required  # noqa : pylint: disable=import-error
+from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import apis
 import common
@@ -32,7 +32,7 @@ from organization import blueprint
 
 
 @blueprint.route('/', methods=['GET'])
-@login_required
+@util.require_login
 def default_route():
   if current_user.organization_id:
     org = in_apis.get_organization(current_user.organization_id)
@@ -61,7 +61,7 @@ def default_route():
 
 
 @blueprint.route('/create', methods=['GET', 'POST'])
-@login_required
+@util.require_login
 def create():
   if request.method == "GET":
     if current_user.organization_id:
@@ -101,7 +101,7 @@ def create():
 
 
 @blueprint.route('/register/<platform>', methods=['GET', 'POST'])
-@login_required
+@util.require_login
 def register_noti_key(platform):
   referrer = "/organization"
   if request.method == "GET":
@@ -162,7 +162,7 @@ def register_noti_key(platform):
 
 
 @blueprint.route('/invite', methods=['POST'])
-@login_required
+@util.require_login
 def send_invite():
   email_addr = request.form['email']
   _user = in_apis.get_user_by_email(email_addr, current_user.organization_id)
@@ -225,7 +225,7 @@ def confirm_mail():
 
 
 @blueprint.route('/invite/delete/<invite_id>')
-@login_required
+@util.require_login
 def delete_invite(invite_id):
   try:
     in_apis.delete_invite(invite_id)
@@ -237,7 +237,7 @@ def delete_invite(invite_id):
 
 
 @blueprint.route('/delete', methods=['POST'])
-@login_required
+@util.require_login
 def delete_organization():
   if current_user.level == models.OWNER:
     try:

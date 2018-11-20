@@ -11,12 +11,12 @@
 
 
 from flask import render_template  # noqa : pylint: disable=import-error
-from flask_login import login_required  # noqa : pylint: disable=import-error
 
+import util
 from settings import blueprint
 
 
 @blueprint.route('/', methods=['GET'])
-@login_required
+@util.require_login
 def default_route():
   return render_template("settings.html")

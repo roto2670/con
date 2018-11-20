@@ -724,16 +724,36 @@ def create_email_auth(email, key, user_id):
                          email=email,
                          key=key,
                          user_id=user_id,
+                         is_confirm=False,
                          sent_time=get_datetime(),
                          accepted_time=get_datetime())
   db.session.add(email_auth)
   db.session.commit()
 
 
-def get_email_auth(email, key, user_id):
+def get_email_auth(email, key):
   email_auth = EmailAuth.query.filter_by(email=email, key=key,
-                                         user_id=user_id).one_or_none()
+                                         is_confirm=False).one_or_none()
   return email_auth
+
+
+def has_email(email):
+  email_auth = EmailAuth.query.filter_by(email=email, is_confirm=False).one_or_none()
+  return email_auth
+
+
+def update_email_auth(_id):
+  email_auth = EmailAuth.query.filter_by(id=id).one_or_none()
+  email_auth.is_confirm = True
+  email_auth.accepted_time = get_datetime
+  db.session.commit()
+
+
+def remove_email_auth(_id):
+  email_auth = EmailAuth.query.filter_by(id=_id).one_or_none()
+  if email_auth:
+    db.session.delete(email_auth)
+    db.session.commit()
 
 
 # }}}

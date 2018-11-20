@@ -13,9 +13,10 @@
 import logging
 
 from flask import render_template, redirect  # noqa : pylint: disable=import-error
-from flask_login import login_required, current_user  # noqa : pylint: disable=import-error
+from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import base
+import util
 import in_apis
 from release import blueprint
 
@@ -72,7 +73,7 @@ def _build_history_info(product_id, history_list):
 
 
 @blueprint.route('/<product_id>/list', methods=['GET'])
-@login_required
+@util.require_login
 def get_list(product_id):
   _set_product(product_id)
   dev_stage = None
@@ -100,7 +101,7 @@ def get_list(product_id):
 
 
 @blueprint.route('/<product_id>/pre_release', methods=['POST'])
-@login_required
+@util.require_login
 def pre_release(product_id):
   ret = in_apis.pre_release(product_id)
   logging.info("%s Pre Release ret : %s", product_id, ret)
@@ -108,7 +109,7 @@ def pre_release(product_id):
 
 
 @blueprint.route('/<product_id>/release', methods=['POST'])
-@login_required
+@util.require_login
 def release(product_id):
   ret = in_apis.release(product_id)
   logging.info("%s Release ret : %s", product_id, ret)

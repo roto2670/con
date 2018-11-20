@@ -99,15 +99,18 @@ def create_app():
 if not apis.IS_DEV:
   # gunicorn
   __app = create_app()
+  __app.debug = False
 
 
 if  __name__ == '__main__':
   _app = create_app()
   if apis.IS_DEV:
+    _app.debug = False
     _app.run(host='127.0.0.1', port=16000)
   else:
     cur_path = os.path.dirname(os.path.abspath(__file__))
     ssl_path = os.path.join(cur_path, 'ssl')
     ssl_crt = os.path.join(ssl_path, 'mib_io.crt')
     ssl_key = os.path.join(ssl_path, 'mib_io.key')
+    _app.debug = False
     _app.run(host='127.0.0.1', port=5000, ssl_context=(ssl_crt, ssl_key))
