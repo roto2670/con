@@ -423,6 +423,7 @@ def upload_firmware(product_id, model_id):
                                             _ep.version,
                                             model.code, current_user.email,
                                             ret, model_id)
+        in_apis.update_dev(product_id)
         _dev = in_apis.get_product_stage_by_dev(product_id)
         models_dict = {}
         for _info in _dev.stage_info_list:

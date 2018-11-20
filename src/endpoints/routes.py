@@ -161,6 +161,7 @@ def upload_header_file(product_id):
                                       current_user.email,
                                       current_user.organization_id,
                                       product_id)
+      in_apis.update_dev(product_id)
       title = common.get_msg("endpoints.upload.success_title")
       msg = common.get_msg("endpoints.upload.success_message")
       msg = msg.format(json_content['product'], json_content['version'])

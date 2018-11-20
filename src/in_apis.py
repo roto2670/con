@@ -10,7 +10,6 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import json
-import mail
 import uuid
 import logging
 import datetime
@@ -21,6 +20,7 @@ from sqlalchemy.orm.session import make_transient  # noqa : pylint: disable=impo
 from sqlalchemy import desc
 
 import apis
+import mail
 import models
 from base import db
 from models import _Product as Product
@@ -588,6 +588,14 @@ def _delete_before_pre_release(product_id):
   _pre_release = get_product_stage_by_pre_release(product_id)
   if _pre_release:
     db.session.delete(_pre_release)
+    db.session.commit()
+
+
+def update_dev(product_id):
+  _dev = get_product_stage_by_dev(product_id)
+  if _dev:
+    _dev.last_updated_time = get_datetime()
+    _dev.last_updated_user = current_user.email
     db.session.commit()
 
 
