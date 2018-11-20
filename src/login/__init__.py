@@ -55,8 +55,7 @@ class FirebaseAuth:
     if self.api_key is None:
       return
     self.project_id = app.config['FIREBASE_PROJECT_ID']
-    if self.auth_domain is None:
-      self.auth_domain = '{}.firebaseapp.com'.format(self.project_id)
+    self.auth_domain = '{}.firebaseapp.com'.format(self.project_id)
     provider_ids = []
     for name in app.config['FIREBASE_AUTH_SIGN_IN_OPTIONS'].split(','):
       class_name = self.PROVIDER_CLASSES[name.strip()]
