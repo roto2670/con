@@ -272,7 +272,8 @@ def require_login(f):
       return redirect(url_for('login_blueprint.login', next=request.url))
     elif not current_user.email_verified:
       return redirect(url_for('base_blueprint.route_verified'))
-    elif not session.get('_fresh', False):
-      return redirect(url_for('login_blueprint.login', next=request.url))
+    # TODO: check session _fresh
+    #elif not session.get('_fresh', False):
+    #  return redirect(url_for('login_blueprint.login', next=request.url))
     return f(*args, **kwargs)
   return check_email_auth
