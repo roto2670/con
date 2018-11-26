@@ -17,7 +17,7 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 import in_apis
 import common
 
-ONBOARDING_NOTI_DAYS = 30
+ONBOARDING_NOTI_DAYS = 14
 
 # Session
 # {"model": "", "download_file": "", "ep": , "header": "",
