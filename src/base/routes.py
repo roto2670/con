@@ -53,7 +53,6 @@ def route_verified():
 
 @blueprint.route('/verified/send')
 def send_verified_email():
-  # TODO: two times called
   has_email = in_apis.has_email(current_user.email)
   if has_email:
     in_apis.remove_email_auth(has_email.id)

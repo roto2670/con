@@ -16,12 +16,13 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 import in_apis
 import common
 
+ONBOARDING_NOTI_DAYS = 30
+
 # Session
 # {"model": "", "download_file": "", "ep": , "header": "",
 #  "firmware": "", "tester": "", "test": "", "release" : "",
 #  "next": ""}
 #
-
 
 def clear_session():
   if 'model' in session:
@@ -44,15 +45,21 @@ def clear_session():
     del session['next']
 
 
+def _check_time():
+  _cal_time = in_apis.get_datetime - current_user.created_time
+  return True if _cal_time.days <= ONBOARDING_NOTI_DAYS else False
+
+
 def check_onboarding(organization_id=None, product_id=None):
-  check_release(product_id)
-  check_test()
-  check_tester(product_id, organization_id)
-  check_firmware(product_id)
-  check_header_file()
-  check_ep(product_id)
-  check_download_file()
-  check_model(product_id)
+  if _check_time():
+    check_release(product_id)
+    check_test()
+    check_tester(product_id, organization_id)
+    check_firmware(product_id)
+    check_header_file()
+    check_ep(product_id)
+    check_download_file()
+    check_model(product_id)
 
 
 def check_model(product_id):
