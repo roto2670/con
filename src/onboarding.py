@@ -9,6 +9,7 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import datetime
 
 from flask import session  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
@@ -46,7 +47,7 @@ def clear_session():
 
 
 def _check_time():
-  _cal_time = in_apis.get_datetime() - current_user.created_time
+  _cal_time = datetime.datetime.utcnow() - current_user.created_time
   return True if _cal_time.days <= ONBOARDING_NOTI_DAYS else False
 
 
