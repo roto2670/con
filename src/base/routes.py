@@ -133,7 +133,7 @@ def production_sign_in(token):
     user = User(id=token['sub'],
                 firebase_user_id=token['sub'])
     db.session.add(user)
-  user.name = token.get('name')
+  user.name = token['name'] if 'name' in token else token['email']
   user.email = token['email']
   user.email_verified = token['email_verified']
   user.sign_in_provider = token['firebase']['sign_in_provider']
