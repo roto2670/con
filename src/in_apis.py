@@ -753,7 +753,7 @@ def has_email(email):
 def update_email_auth(_id):
   email_auth = EmailAuth.query.filter_by(id=_id).one_or_none()
   email_auth.is_confirm = True
-  email_auth.accepted_time = get_datetime
+  email_auth.accepted_time = get_datetime()
   db.session.commit()
 
 
