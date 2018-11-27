@@ -65,7 +65,7 @@ def send_verified_email():
 def _is_confirm(email_auth):
   if email_auth.user_id != current_user.id:
     return False
-  if (time.time() - email_auth.sent_time) > 300: # 5 minute
+  if (time.time() - email_auth.sent_time.timestamp()) > 300: # 5 minute
     return False
   return True
 
