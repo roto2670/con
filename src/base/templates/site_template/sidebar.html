@@ -35,7 +35,9 @@
                 <li><a href="/release/{{ current_product.id }}/list">Release</a></li>
             </ul>
           </li>
-          <li><a href="/doc"><i class="fa fa-file-text-o"></i> Document </a>
+        {% endif %}
+        <li><a href="/doc"><i class="fa fa-file-text-o"></i> Document </a>
+        {% if current_product %}
           <li><a href="javascript:void(0)"><i class="fa fa-credit-card"></i> Payment <span class="label label-success pull-right">Coming Soon</span></a></li>
         {% endif %}
       </ul>
