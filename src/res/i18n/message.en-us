@@ -4,9 +4,12 @@
           "success_title": "Upload successful",
           "success_message": "The Specification has successfully been uploaded. Product: {}, Version: {}",
           "fail_title": "Upload error",
-          "fail_message_not_equal_product": "Product name does not match the Specification. The name must be equal to the product code.",
+          "fail_message_not_equal_product": "Product name does not match the Specification. The name must be equal to the product ID.",
           "fail_message_request_start_mib": "Invalid name. Request names cannot start with mib.",
-          "fail_message_event_start_mib": "Invalid name. Event names cannot start with mib."
+          "fail_message_event_start_mib": "Invalid name. Event names cannot start with mib.",
+          "fail_message_required_key": "Invalid format specification. Please check the format of the specification.",
+          "fail_message_required_value": "There are no required values. Please check the specification.",
+          "fail_message_version_format": "Invalid version. Please check the format of the version."
       }
   },
   "organization": {
@@ -39,10 +42,10 @@
   "products": {
       "create": {
           "product": {
-              "invalid_code_title": "Invalid product code",
+              "invalid_code_title": "Invalid product ID",
               "invalid_code_message": "Only lowercase letters are accepted. Special characters including spaces can not be entered.",
-              "exists_product_title": "Product code exists",
-              "exists_product_message": "Product code must be unique. Please enter a different code.",
+              "exists_product_title": "Product ID exists",
+              "exists_product_message": "Product ID must be unique. Please enter a different ID.",
               "first": {
                   "title": "Create your product",
                   "sub_title": "Create your product",

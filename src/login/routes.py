@@ -26,7 +26,7 @@ def login():
   else:
     user = in_apis.get_user(current_user.id)
     user.last_access_time = in_apis.get_datetime()
-    user.ip_address = request.headers.get('X-Real-IP', util.get_ip_addr(request))
+    user.ip_address = util.get_ip_addr()
     db.session.commit()
     if current_user.email_verified:
       if not current_user.organization_id:

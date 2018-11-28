@@ -206,7 +206,7 @@ def product_index(product_id):
   base.routes.set_current_product(product)
   infos = _get_product_info(product_id)
   ep_infos = _get_endpoint_info(product_id)
-  in_apis.update_user_by_ip(current_user.id, util.get_ip_addr(request))
+  in_apis.update_user_by_ip(current_user.id, util.get_ip_addr())
   return render_template('index.html', infos=infos, ep_infos=ep_infos)
 
 

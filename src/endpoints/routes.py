@@ -22,6 +22,7 @@ import common
 import builder
 import in_apis
 import models
+import validate
 import onboarding
 import base.routes
 from endpoints import blueprint
@@ -109,31 +110,6 @@ def tests(product_id):
                            selected=selected, content=content)
 
 
-def _check_validate(product_id, json_content):
-  error_title = common.get_msg("endpoints.upload.fail_title")
-  if json_content['product'] != product_id:
-    msg = common.get_msg("endpoints.upload.fail_message_not_equal_product")
-    logging.warning(msg)
-    common.set_error_message(error_title, msg)
-    return False
-
-  _requests = json_content['requests']
-  for req in _requests:
-    if req['name'].lower().startswith('mib'):
-      msg = common.get_msg("endpoints.upload.fail_message_request_start_mib")
-      logging.warning(msg)
-      common.set_error_message(error_title, msg)
-      return False
-  _events = json_content['events']
-  for event in _events:
-    if event['name'].lower().startswith('mib'):
-      msg = common.get_msg("endpoints.upload.fail_message_event_start_mib")
-      logging.warning(msg)
-      common.set_error_message(error_title, msg)
-      return False
-  return True
-
-
 @blueprint.route('/<product_id>/upload', methods=['POST'])
 @util.require_login
 def upload_header_file(product_id):
@@ -145,8 +121,7 @@ def upload_header_file(product_id):
   try:
     decode_content = content.decode()
     json_content = json.loads(decode_content)
-    _validate = _check_validate(product_id, json_content)
-    if not _validate:
+    if not validate.check_validate_specification(product_id, json_content):
       return redirect('endpoints/' + product_id + '/specifications')
     ret = apis.register_specifications(product_id, json_content['version'],
                                        decode_content)

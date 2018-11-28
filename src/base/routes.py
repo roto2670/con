@@ -140,7 +140,7 @@ def production_sign_in(token):
   user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
   user.created_time = in_apis.get_datetime()
   user.last_access_time = in_apis.get_datetime()
-  user.ip_address = util.get_ip_addr(request)
+  user.ip_address = util.get_ip_addr()
   user.level = models.MEMBER
   invite = in_apis.get_invite_by_email(token['email'])
   if not user.organization_id and invite:
@@ -261,9 +261,9 @@ def set_timezone(ip_addr):
 
 def get_timezone():
   if current_user.id not in CUR_TIMEZONE:
-    set_timezone(util.get_ip_addr(request))
+    set_timezone(util.get_ip_addr())
   elif (time.time() - CUR_TIMEZONE[current_user.id]['last_access']) > 7200:
-    set_timezone(util.get_ip_addr(request))
+    set_timezone(util.get_ip_addr())
   if current_user.id in CUR_TIMEZONE and 'tz' in CUR_TIMEZONE[current_user.id]:
     return CUR_TIMEZONE[current_user.id]['tz']
   else:

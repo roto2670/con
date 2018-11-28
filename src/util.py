@@ -17,6 +17,10 @@ import os
 import json
 import logging
 from copy import deepcopy
+from functools import wraps
+
+from flask import redirect, request, session, url_for
+from flask_login import current_user
 
 
 class Settings(object):
@@ -247,18 +251,13 @@ def get_mail_form_path(file_name):
   return path
 
 
-def get_ip_addr(request):
+def get_ip_addr():
   if 'X-Real-Ip' in request.headers:
     return request.headers['X-Real-Ip']
   elif 'X-Forwarded-For' in request.headers:
     return request.headers['X-Forwarded-For']
   else:
     return request.remote_addr
-
-
-from functools import wraps
-from flask import redirect, request, session, url_for
-from flask_login import current_user
 
 
 def require_login(f):

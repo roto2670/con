@@ -116,8 +116,6 @@ def check_header_file():
 
 
 def check_firmware(product_id):
-  if True:
-    return True
   if session.get('firmware'):
     return True
   _model_list = in_apis.get_model_list(product_id)
@@ -133,8 +131,6 @@ def check_firmware(product_id):
 
 
 def check_tester(product_id, organization_id):
-  if True:
-    return True
   if session.get('tester'):
     return True
   _tester_list = in_apis.get_tester_list(product_id, organization_id)

@@ -132,7 +132,9 @@
                                 <td></td>
                               {% else %}
                                 {% if current_user.level == 0 %}
-                                  <td><i class="fa fa-remove"></i></td>
+                                  <td>
+                                    <a href="#" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i> Delete</a>
+                                  </td>
                                 {% else %}
                                   <td></td>
                                 {% endif %}
@@ -148,7 +150,7 @@
                                 <td></td>
                                 {% if current_user.level == 0 %}
                                   <td>
-                                    <a href="/organization/invite/delete/{{ invite.id }}" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i> Delete </a>
+                                    <a href="/organization/invite/delete/{{ invite.id }}" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i> Delete</a>
                                   </td>
                                 {% else %}
                                   <td></td>
