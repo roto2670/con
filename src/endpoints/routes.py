@@ -102,7 +102,8 @@ def tests(product_id):
     content = json.loads(selected.specifications)
 
     gadget = None
-    if request.form['gadget'] in gadget_dict:
+    gadget_id = None
+    if 'gadget' in request.form and request.form['gadget'] in gadget_dict:
       gadget = {request.form['gadget'] : gadget_dict[request.form['gadget']]}
       gadget_id = request.form['gadget']
     return render_template('ep_tests.html', specification_list=specification_list,
