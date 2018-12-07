@@ -161,7 +161,7 @@ def check_release(product_id):
     return True
   if session.get('next'):
     _stage = in_apis.get_product_stage_by_pre_release(product_id)
-    if _stage.stage_info_list:
+    if _stage and _stage.stage_info_list:
       session['release'] = True
       session['next'] = False
       return True

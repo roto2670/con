@@ -44,7 +44,7 @@ def route_doc():
 
 @blueprint.route('/verified')
 def route_verified():
-  if current_user.email_verified:
+  if current_user.is_anonymous or current_user.email_verified:
     return redirect(url_for('login_blueprint.login'))
   else:
     send_verified_email()
