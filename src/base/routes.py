@@ -64,8 +64,13 @@ def send_verified_email():
 
 def _is_confirm(email_auth):
   if email_auth.user_id != current_user.id:
+    logging.warning("Invalid user id. Cur ID : %s, Email user ID : %s",
+                    current_user.id, email_auth.user_id)
     return False
-  if (time.time() - email_auth.sent_time.timestamp()) > 300: # 5 minute
+  _time = time.time() - email_auth.sent_time.timestamp()
+  if _time > 300: # 5 minute
+    logging.warning("Time is expire. User ID : %s, time : %s",
+                    email_auth.user_id, _time)
     return False
   return True
 
@@ -79,8 +84,8 @@ def confirm_verified_email():
     in_apis.update_user_by_confirm(current_user.id)
     return redirect(url_for('login_blueprint.login'))
   else:
-    logging.warning("%s user is not auth. Sent time : %s",
-                    email_auth.email, email_auth.sent_time)
+    logging.warning("Email Auth is None. Email Auth : %s, current user : %s, key : %s",
+                    email_auth, current_user.email, key)
     in_apis.remove_email_auth(email_auth.id)
     return redirect(url_for('base_blueprint.route_verified'))
 
