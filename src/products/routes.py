@@ -203,8 +203,8 @@ def tester(product_id):
   if request.method == "GET":
     dev_level_list = in_apis.get_tester_list_by_dev(product_id,
                                                     current_user.organization_id)
-    pre_level_list = in_apis.get_tester_list_by_dev(product_id,
-                                                    current_user.organization_id)
+    pre_level_list = in_apis.get_tester_list_by_pre_release(product_id,
+                                                            current_user.organization_id)
     invite_list = in_apis.get_invite_list_by_tester(product_id,
                                                     current_user.organization_id)
     return render_template('prd_tester.html', dev_level_list=dev_level_list,
