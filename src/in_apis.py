@@ -522,6 +522,20 @@ def get_tester_list(product_id, organization_id):
   return tester_list
 
 
+def get_tester_list_by_dev(product_id, organization_id):
+  tester_list = Tester.query.\
+      filter_by(product_id=product_id, organization_id=organization_id,
+                level=2).all()
+  return tester_list
+
+
+def get_tester_list_by_pre_release(product_id, organization_id):
+  tester_list = Tester.query.\
+      filter_by(product_id=product_id, organization_id=organization_id,
+                level=1).all()
+  return tester_list
+
+
 def get_send_tester_list(product_id, organization_id, level):
   tester_list = Tester.query.filter_by(product_id=product_id, level=level,
                                        organization_id=organization_id,

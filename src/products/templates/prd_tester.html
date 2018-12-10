@@ -15,49 +15,74 @@
               <div class="col-md-7">
 
                 <h3>Tester</h3>
-                  {% for tester in tester_list %}
-                    {% if tester.authorized %}
-                      <div class="alert tester-email-list fade in">
-                        <strong>{{ tester.email }}</strong>
-                        <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/delete">
-                          <button type="button" class="close" aria-label="Close">
-                            <span class="fa fa-remove"></span>
-                          </button>
-                        </a>
-                        <!-- TODO: -->
-                        {% if tester.level == 1 %}
-                          <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/change/2">
-                            <button type="button" class="close">
-                              <span class=""><small>[Change to dev]</small></span>
+                  <h4> Dev Stage </h4>
+                    {% for tester in dev_level_list %}
+                      {% if tester.authorized %}
+                        <div class="alert tester-email-list fade in">
+                          <strong>{{ tester.email }}</strong>
+                          <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/delete">
+                            <button type="button" class="close" aria-label="Close">
+                              <span class="fa fa-remove"></span>
                             </button>
                           </a>
-                        {% else %}
                           <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/change/1">
                             <button type="button" class="close">
                               <span class=""><small>[Change to PreRelease]</small></span>
                             </button>
                           </a>
-                        {% endif %}
-                      </div>
-                    {% else %}
-                      <div class="alert tester-email-list-no-ftl fade in">
-                        <strong>{{ tester.email }}</strong>
-                        <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/delete">
-                          <button type="button" class="close" aria-label="Close">
-                            <span class="fa fa-remove"></span>
-                          </button>
-                        </a>
-                        <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/refresh">
-                          <button type="button" class="close" aria-label="Close">
-                            <span class="fa fa-refresh"></span>
-                          </button>
-                        </a>
-                      </div>
-                    {% endif %}
-                  {% endfor %}
-
+                        </div>
+                      {% else %}
+                        <div class="alert tester-email-list-no-ftl fade in">
+                          <strong>{{ tester.email }}</strong>
+                          <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/delete">
+                            <button type="button" class="close" aria-label="Close">
+                              <span class="fa fa-remove"></span>
+                            </button>
+                          </a>
+                          <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/refresh">
+                            <button type="button" class="close" aria-label="Close">
+                              <span class="fa fa-refresh"></span>
+                            </button>
+                          </a>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  <br>
+                  <h4> PreRelease Stage </h4>
+                    {% for tester in pre_level_list %}
+                      {% if tester.authorized %}
+                        <div class="alert tester-email-list fade in">
+                          <strong>{{ tester.email }}</strong>
+                          <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/delete">
+                            <button type="button" class="close" aria-label="Close">
+                              <span class="fa fa-remove"></span>
+                            </button>
+                          </a>
+                          <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/change/2">
+                            <button type="button" class="close">
+                              <span class=""><small>[Change to dev]</small></span>
+                            </button>
+                          </a>
+                        </div>
+                      {% else %}
+                        <div class="alert tester-email-list-no-ftl fade in">
+                          <strong>{{ tester.email }}</strong>
+                          <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/delete">
+                            <button type="button" class="close" aria-label="Close">
+                              <span class="fa fa-remove"></span>
+                            </button>
+                          </a>
+                          <a href="/products/{{ current_product.id }}/tester/{{ tester.id }}/refresh">
+                            <button type="button" class="close" aria-label="Close">
+                              <span class="fa fa-refresh"></span>
+                            </button>
+                          </a>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
 
                 <form id="tester" class="form-horizontal form-label-left" method="post">
+                  <br>
                   <h3>Invite Member</h3>
                   <div class="form-group">
                     <label class="control-label col-md-0" for="newTesterEmail">
@@ -74,6 +99,7 @@
                   </div>
                 </form>
 
+                <br>
                 <h3>Invited Member</h3>
                   {% for invite in invite_list %}
                     <div class="alert invite-email-list fade in">

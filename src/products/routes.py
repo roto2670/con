@@ -201,11 +201,14 @@ def hook(product_id):
 def tester(product_id):
   _set_product(product_id)
   if request.method == "GET":
-    #TODO: tester
-    tester_list = in_apis.get_tester_list(product_id, current_user.organization_id)
+    dev_level_list = in_apis.get_tester_list_by_dev(product_id,
+                                                    current_user.organization_id)
+    pre_level_list = in_apis.get_tester_list_by_dev(product_id,
+                                                    current_user.organization_id)
     invite_list = in_apis.get_invite_list_by_tester(product_id,
                                                     current_user.organization_id)
-    return render_template('prd_tester.html', tester_list=tester_list,
+    return render_template('prd_tester.html', dev_level_list=dev_level_list,
+                           pre_level_list=pre_level_list,
                            invite_list=invite_list)
   else:
     #TODO: Send email
