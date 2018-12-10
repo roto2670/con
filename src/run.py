@@ -105,7 +105,7 @@ if not apis.IS_DEV:
 if  __name__ == '__main__':
   _app = create_app()
   if apis.IS_DEV:
-    _app.debug = False
+    _app.debug = True
     _app.run(host='127.0.0.1', port=16000)
   else:
     cur_path = os.path.dirname(os.path.abspath(__file__))
