@@ -36,7 +36,9 @@ def register_extensions(app):
   app.context_processor(common.get_message)
   # jinja
   app.jinja_env.filters['datetimeFilter'] = base.routes.datetime_filter
+  app.jinja_env.filters['timestampFilter'] = base.routes.timestamp_filter
   app.jinja_env.filters['getCountryName'] = base.routes.get_country_name
+  app.jinja_env.filters['getLogId'] = base.routes.get_log_id
 
 
 def register_blueprints(app):

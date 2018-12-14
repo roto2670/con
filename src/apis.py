@@ -581,3 +581,63 @@ def delete_tester(organization_id, product_id, tester_email):
 
 
 # }}}
+
+
+LOG_BASE_URL = '''https://cloud-log-tracer-dot-protacloud.appspot.com/'''
+
+
+def _build_param(**kwargs):
+  if not kwargs:
+    return ""
+  _param = "?"
+  for key, value in kwargs.items():
+    if value:
+      _param += key + ":" + value + "&"
+  return _param[:len(_param)-2] if len(_param) > 1 else ""
+
+
+def get_logs(product_id, keyword=None, token=None, limit=None):
+  url = LOG_BASE_URL + "products/" + product_id
+  url += _build_param(keyword=keyword, token=token)
+  try:
+    if IS_DEV:
+      _test_data = []
+      return _test_data
+    else:
+      headers = {}
+      resp = requests.get(url, headers=headers)
+      if resp.ok:
+        value = resp.json()
+        logging.info("Get logs. url : %s", url)
+        return value
+      else:
+        logging.warning("Get logs Response. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return None
+  except:
+    logging.exception("Raise error.")
+    return None
+
+
+def get_logs_with_gadget(product_id, gadget_id, keyword=None, token=None,
+                         limit=None):
+  url = LOG_BASE_URL + "products/" + product_id + "/gadgets/" + gadget_id
+  url += _build_param(keyword=keyword, token=token)
+  try:
+    if IS_DEV:
+      _test_data = []
+      return _test_data
+    else:
+      headers = {}
+      resp = requests.get(url, headers=headers)
+      if resp.ok:
+        value = resp.json()
+        logging.info("Get logs with gadget. url : %s", url)
+        return value
+      else:
+        logging.warning("Get logs with gadget Response. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return None
+  except:
+    logging.exception("Raise error.")
+    return None
