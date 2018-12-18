@@ -82,8 +82,8 @@ def confirm_verified_email():
   key = request.args['key']
   email_auth = in_apis.get_email_auth(current_user.email, key)
   if email_auth and _is_confirm(email_auth):
-    in_apis.update_email_auth(email_auth.id)
     in_apis.update_user_by_confirm(current_user.id)
+    in_apis.update_email_auth(email_auth.id)
     return redirect(url_for('login_blueprint.login'))
   else:
     logging.warning("Email Auth is None. Email Auth : %s, current user : %s, key : %s",
@@ -142,7 +142,7 @@ def production_sign_in(token):
     db.session.add(user)
   user.name = token['name'] if 'name' in token else token['email']
   user.email = token['email']
-  user.email_verified = token['email_verified']
+  user.email_verified = user.email_verified if user.email_verified else token['email_verified']
   user.sign_in_provider = token['firebase']['sign_in_provider']
   user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
   user.created_time = in_apis.get_datetime()
