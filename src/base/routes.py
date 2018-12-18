@@ -139,16 +139,16 @@ def production_sign_in(token):
   if not user:
     user = User(id=token['sub'],
                 firebase_user_id=token['sub'])
+    user.name = token['name'] if 'name' in token else token['email']
+    user.email = token['email']
+    user.email_verified = user.email_verified if user.email_verified else token['email_verified']
+    user.sign_in_provider = token['firebase']['sign_in_provider']
+    user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
+    user.created_time = in_apis.get_datetime()
+    user.level = models.MEMBER
     db.session.add(user)
-  user.name = token['name'] if 'name' in token else token['email']
-  user.email = token['email']
-  user.email_verified = user.email_verified if user.email_verified else token['email_verified']
-  user.sign_in_provider = token['firebase']['sign_in_provider']
-  user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
-  user.created_time = in_apis.get_datetime()
   user.last_access_time = in_apis.get_datetime()
   user.ip_address = util.get_ip_addr()
-  user.level = models.MEMBER
   invite = in_apis.get_invite_by_email(token['email'])
   if not user.organization_id and invite:
     user.organization_id = invite.organization_id
