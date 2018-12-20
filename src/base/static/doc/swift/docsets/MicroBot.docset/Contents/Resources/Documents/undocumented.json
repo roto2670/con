@@ -1,0 +1,355 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBAuth.swift",
+      "line": 16,
+      "symbol": "MIBAuth.shared",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 15,
+      "symbol": "MIBGadget.id",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 16,
+      "symbol": "MIBGadget.uuid",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 17,
+      "symbol": "MIBGadget.name",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 18,
+      "symbol": "MIBGadget.kind",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 19,
+      "symbol": "MIBGadget.mac",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 20,
+      "symbol": "MIBGadget.sdkVersion",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 21,
+      "symbol": "MIBGadget.firmwareVersion",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 22,
+      "symbol": "MIBGadget.modelNumber",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 23,
+      "symbol": "MIBGadget.battery",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 24,
+      "symbol": "MIBGadget.beacon",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 25,
+      "symbol": "MIBGadget.security",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 26,
+      "symbol": "MIBGadget.accountId",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 27,
+      "symbol": "MIBGadget.status",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 28,
+      "symbol": "MIBGadget.latestVersion",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 29,
+      "symbol": "MIBGadget.hubId",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 30,
+      "symbol": "MIBGadget.modelName",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 32,
+      "symbol": "MIBGadget.init(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 51,
+      "symbol": "MIBGadget.toDict()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 77,
+      "symbol": "MIBGadget.cancelPairing()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadget.swift",
+      "line": 81,
+      "symbol": "MIBGadget.reveal()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBGadgetManager.swift",
+      "line": 16,
+      "symbol": "MIBGadgetManager.shared",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBHubManager.swift",
+      "line": 16,
+      "symbol": "MIBHubManager.shared",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBMessage.swift",
+      "line": 9,
+      "symbol": "MIBMessage",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBMessage.swift",
+      "line": 10,
+      "symbol": "MIBMessage.shared",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBMessage.swift",
+      "line": 33,
+      "symbol": "MIBMessage.digestNotificationWithCompletionHandler(_:completionHandler:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBReceiver.swift",
+      "line": 13,
+      "symbol": "GadgetTopic.Connected",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBReceiver.swift",
+      "line": 14,
+      "symbol": "GadgetTopic.Disconnected",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBReceiver.swift",
+      "line": 15,
+      "symbol": "GadgetTopic.Unauthorized",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBReceiver.swift",
+      "line": 16,
+      "symbol": "GadgetTopic.Paired",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBReceiver.swift",
+      "line": 17,
+      "symbol": "GadgetTopic.Pairing",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBReceiver.swift",
+      "line": 18,
+      "symbol": "GadgetTopic.Upgrading",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBReceiver.swift",
+      "line": 19,
+      "symbol": "GadgetTopic.Unpaired",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBReceiver.swift",
+      "line": 25,
+      "symbol": "MicroBotDelegate.mibReceivedAuthEvent(_:topic:data:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBReceiver.swift",
+      "line": 27,
+      "symbol": "MicroBotDelegate.mibReceivedGadgetEvenet(_:topic:data:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBSession.swift",
+      "line": 13,
+      "symbol": "AnyResponse.data",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBSession.swift",
+      "line": 14,
+      "symbol": "AnyResponse.error",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBStorage.swift",
+      "line": 17,
+      "symbol": "MIBStorage.shared",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBUser.swift",
+      "line": 15,
+      "symbol": "MIBUser.id",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBUser.swift",
+      "line": 16,
+      "symbol": "MIBUser.email",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBUser.swift",
+      "line": 17,
+      "symbol": "MIBUser.language",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBUser.swift",
+      "line": 18,
+      "symbol": "MIBUser.authorized",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MIBUser.swift",
+      "line": 27,
+      "symbol": "MIBUser.toDict()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MicroBot.swift",
+      "line": 38,
+      "symbol": "MicroBot.shared",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MicroBot.swift",
+      "line": 40,
+      "symbol": "MicroBot.auth",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MicroBot.swift",
+      "line": 41,
+      "symbol": "MicroBot.gadgets",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MicroBot.swift",
+      "line": 42,
+      "symbol": "MicroBot.hubs",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MicroBot.swift",
+      "line": 43,
+      "symbol": "MicroBot.message",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MicroBot.swift",
+      "line": 44,
+      "symbol": "MicroBot.storage",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift/Source/MicroBot.swift",
+      "line": 46,
+      "symbol": "MicroBot.delegate",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/jason/Dropbox/Naran/Workspace/Develop/MicroBot/microbot-swift"
+}

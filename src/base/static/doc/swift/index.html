@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MicroBot  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+
+  </head>
+  <body>
+    <a title="MicroBot  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">MicroBot Docs</a> (30% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">MicroBot Reference</a>
+        <img id="carat" src="img/carat.png" />
+        MicroBot  Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/MIBAuth.html">MIBAuth</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/MIBGadget.html">MIBGadget</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/MIBGadgetManager.html">MIBGadgetManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/MIBHub.html">MIBHub</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/MIBHubManager.html">MIBHubManager</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/MIBMessage.html">MIBMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/MIBSession.html">MIBSession</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/MIBStorage.html">MIBStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/MIBUser.html">MIBUser</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/MicroBot.html">MicroBot</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Enums/GadgetTopic.html">GadgetTopic</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Protocols/MicroBotDelegate.html">MicroBotDelegate</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Structs/AnyResponse.html">AnyResponse</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs.html#/s:8MicroBot8MIBErrorV">MIBError</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+
+            <h1 id='microbot' class='heading'>MicroBot</h1>
+
+<ul>
+<li><a href="#Prerequisites">Prerequisites</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#usage">Usage</a></li>
+</ul>
+<h2 id='prerequisites' class='heading'>Prerequisites</h2>
+
+<p>Before you begin, you need to set up a few things in your environment:</p>
+
+<ul>
+<li>Xcode 9.0 or later</li>
+<li>An Xcode project targeting iOS 10 or above</li>
+<li>Swift projects must use Swift 4.1 or later</li>
+<li>The bundle identifier of your app</li>
+<li>CocoaPods 1.4.0 or later</li>
+<li>For MicroBot:
+
+<ul>
+<li>A physical Gadget &amp; iOS device</li>
+<li>An Apple Push Notification Authentication Key for your Apple Developer account</li>
+</ul></li>
+</ul>
+<h2 id='installation' class='heading'>Installation</h2>
+<h3 id='wip-cocoapods' class='heading'>(WIP)CocoaPods</h3>
+
+<p><a href="https://cocoapods.org">CocoaPods</a> is a dependency manager for Cocoa projects. You can install it with the following command:</p>
+<pre class="highlight shell"><code><span class="nv">$ </span>gem <span class="nb">install </span>cocoapods
+</code></pre>
+
+<p>To integrate MicroBot into your Xcode project using CocoaPods, specify it in your <code>Podfile</code>:</p>
+<pre class="highlight ruby"><code><span class="n">source</span> <span class="s1">'https://github.com/CocoaPods/Specs.git'</span>
+<span class="n">platform</span> <span class="ss">:ios</span><span class="p">,</span> <span class="s1">'10.0'</span>
+<span class="n">use_frameworks!</span>
+
+<span class="n">target</span> <span class="s1">'&lt;Your Target Name&gt;'</span> <span class="k">do</span>
+    <span class="n">pod</span> <span class="s1">'MicroBot'</span><span class="p">,</span> <span class="s1">'~&gt; 0.0.1'</span>
+<span class="k">end</span>
+</code></pre>
+
+<p>Then, run the following command:</p>
+<pre class="highlight shell"><code><span class="nv">$ </span>pod <span class="nb">install</span>
+</code></pre>
+<h3 id='manually' class='heading'>Manually</h3>
+
+<ol>
+<li>Download the Microbot SDK in Release directory</li>
+<li>Select the project file from the project navigator on the left side of the project window.</li>
+<li>Select the target for where you want to add frameworks in the project settings editor.</li>
+<li>Select the “Build Phases” tab, and click the small triangle next to “Link Binary With Libraries” to view all of the frameworks in your application.</li>
+<li>To Add frameworks, click the “+” below the list of frameworks.</li>
+<li>To select multiple frameworks, press and hold the command key while using the mouse to click the desired frameworks.</li>
+</ol>
+
+<ul>
+<li><a href="http://docs.onemobilesdk.aol.com/ios-ad-sdk/adding-frameworks-xcode.html">Reference link</a></li>
+</ul>
+<h2 id='configuration' class='heading'>Configuration</h2>
+<h3 id='configuring-apns' class='heading'>Configuring APNs</h3>
+
+<ul>
+<li>Create an App ID on the <a href="https://developer.apple.com/account/">Apple Developer Member Center</a> (e.g com.thenaran.microbotexample)</li>
+<li>Generate .p12 authenticate file.</li>
+<li>Upload the APNs cerification key(.p12) to MicroBot Console</li>
+<li><a href="https://medium.com/@ankushaggarwal/generate-apns-certificate-for-ios-push-notifications-85e4a917d522">Reference link</a></li>
+</ul>
+<h3 id='configuring-capabilities-in-your-project' class='heading'>Configuring Capabilities in your project</h3>
+
+<ul>
+<li>Turn on &lsquo;Uses Bluetooth LE accessories&rsquo; and &lsquo;Remote notifications&rsquo; in Background Modes</li>
+<li>Turn on Push Notifications</li>
+<li>Turn on ‘Location updates’ in Background Mode (used for connecting nearby Gadget in the background)</li>
+</ul>
+<h3 id='add-your-product-keys' class='heading'>Add Your Product Keys</h3>
+
+<p>Copy product keys from MicroBot Console &amp; paste in your Info.plist</p>
+<pre class="highlight xml"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="cp">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span>
+<span class="nt">&lt;plist</span> <span class="na">version=</span><span class="s">"1.0"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;dict&gt;</span>
+    <span class="nt">&lt;key&gt;</span>MicroBot<span class="nt">&lt;/key&gt;</span>
+    <span class="nt">&lt;dict&gt;</span>
+        <span class="nt">&lt;key&gt;</span>ProductKeys<span class="nt">&lt;/key&gt;</span>
+        <span class="nt">&lt;dict&gt;</span>
+            <span class="nt">&lt;key&gt;</span>mibp<span class="nt">&lt;/key&gt;</span>
+            <span class="nt">&lt;string&gt;</span>0cc175b9c0f1b6a831c399e269772661<span class="nt">&lt;/string&gt;</span>
+            <span class="nt">&lt;key&gt;</span>mibs<span class="nt">&lt;/key&gt;</span>
+            <span class="nt">&lt;string&gt;</span>92eb5ffee6ae2fec3ad71c777531578f<span class="nt">&lt;/string&gt;</span>
+        <span class="nt">&lt;/dict&gt;</span>
+    <span class="nt">&lt;/dict&gt;</span>
+<span class="nt">&lt;/dict&gt;</span>
+<span class="nt">&lt;/plist&gt;</span>
+
+</code></pre>
+<h2 id='usage' class='heading'>Usage</h2>
+<h3 id='initialize' class='heading'>Initialize</h3>
+<pre class="highlight swift"><code><span class="c1">// Import MicroBot in your UIApplicationDelegate</span>
+<span class="kd">import</span> <span class="kt">MicroBot</span>
+
+<span class="c1">// Send push notification to MicroBot for handle requests from the MicroBot Cloud</span>
+<span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span> <span class="n">didReceiveRemoteNotification</span> <span class="nv">userInfo</span><span class="p">:</span> <span class="p">[</span><span class="kt">AnyHashable</span><span class="p">:</span> <span class="kt">Any</span><span class="p">],</span>
+                 <span class="n">fetchCompletionHandler</span> <span class="nv">completionHandler</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">UIBackgroundFetchResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Void</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">MicroBot</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="nf">digestNotification</span><span class="p">(</span><span class="n">userInfo</span><span class="p">)</span><span class="o">.</span><span class="n">done</span> <span class="p">{</span> <span class="p">(</span><span class="n">void</span><span class="p">)</span> <span class="k">in</span>
+        <span class="nf">completionHandler</span><span class="p">(</span><span class="kt">UIBackgroundFetchResult</span><span class="o">.</span><span class="n">newData</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// APNs token for MicroBot Cloud</span>
+<span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span> <span class="n">didRegisterForRemoteNotificationsWithDeviceToken</span> <span class="nv">deviceToken</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"APNs token retrieved: </span><span class="se">\(</span><span class="n">deviceToken</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="kt">MicroBot</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">deviceToken</span>
+<span class="p">}</span>
+
+</code></pre>
+<h3 id='receive-events' class='heading'>Receive Events</h3>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">MicroBot</span>
+
+<span class="kd">class</span> <span class="kt">EventReciever</span><span class="p">:</span> <span class="kt">MicroBotDelegate</span> <span class="p">{</span>
+    <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">super</span><span class="o">.</span><span class="nf">init</span><span class="p">()</span>
+        <span class="kt">Microbot</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="k">self</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">mibReceivedAuthEvent</span><span class="p">(</span><span class="n">_</span> <span class="nv">user</span><span class="p">:</span> <span class="kt">MIBUser</span><span class="p">,</span> <span class="nv">topic</span><span class="p">:</span> <span class="kt">AuthEvent</span><span class="p">,</span> <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="p">{</span>
+        <span class="nf">print</span><span class="p">(</span><span class="s">"Recieved event from user. topic: </span><span class="se">\(</span><span class="n">topic</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">mibReceivedGadgetEvent</span><span class="p">(</span><span class="n">_</span> <span class="nv">gadget</span><span class="p">:</span> <span class="kt">MIBGadget</span><span class="p">,</span> <span class="nv">topic</span><span class="p">:</span> <span class="kt">GadgetEvent</span><span class="p">,</span> <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">Any</span><span class="p">])</span>   <span class="p">{</span>
+       <span class="nf">print</span><span class="p">(</span><span class="s">"Recieved event from hub. topic: </span><span class="se">\(</span><span class="n">topic</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">mibReceivedHubEvent</span><span class="p">(</span><span class="n">_</span> <span class="nv">hub</span><span class="p">:</span> <span class="kt">MIBHub</span><span class="p">,</span> <span class="nv">topic</span><span class="p">:</span> <span class="kt">HubEvent</span><span class="p">,</span> <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="p">{</span>
+        <span class="nf">print</span><span class="p">(</span><span class="s">"Recieved event from hub. topic: </span><span class="se">\(</span><span class="n">topic</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre>
+<h3 id='authorize-user' class='heading'>Authorize User</h3>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">MicroBot</span>
+
+<span class="kd">class</span> <span class="kt">ViewController</span><span class="p">:</span> <span class="kt">UIViewController</span> <span class="p">{</span>
+
+    <span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">selectedAuthButton</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="k">let</span> <span class="nv">email</span> <span class="o">=</span> <span class="k">self</span><span class="o">.</span><span class="n">emailTextField</span><span class="o">.</span><span class="n">text</span> <span class="p">{</span>
+            <span class="c1">// Request user authroization to MicroBot Cloud</span>
+            <span class="kt">MicroBot</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="nf">authorize</span><span class="p">(</span><span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">done</span> <span class="p">{</span> <span class="p">(</span><span class="n">resp</span><span class="p">)</span> <span class="k">in</span>
+                <span class="k">if</span> <span class="k">let</span> <span class="nv">userId</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">data</span> <span class="p">{</span>
+                        <span class="nf">print</span><span class="p">(</span><span class="s">"email: </span><span class="se">\(</span><span class="n">email</span><span class="se">)</span><span class="s">, userId: </span><span class="se">\(</span><span class="n">userId</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Recieve an authroization event from MicroBotDelegate</span>
+    <span class="kd">func</span> <span class="nf">mibReceivedAuthEvent</span><span class="p">(</span><span class="n">_</span> <span class="nv">user</span><span class="p">:</span> <span class="kt">MIBUser</span><span class="p">,</span> <span class="nv">topic</span><span class="p">:</span> <span class="kt">AuthEvent</span><span class="p">,</span> <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="p">{</span>
+        <span class="nf">print</span><span class="p">(</span><span class="s">"Recieved event from user. topic: </span><span class="se">\(</span><span class="n">topic</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="n">topic</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">case</span><span class="p">:</span> <span class="o">.</span><span class="nv">authroized</span><span class="p">:</span>
+              <span class="nf">print</span><span class="p">(</span><span class="s">"</span><span class="se">\(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="se">)</span><span class="s"> is authroized."</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre>
+<h3 id='scan-gadgets' class='heading'>Scan Gadgets</h3>
+<pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">ViewController</span><span class="p">:</span> <span class="kt">UIViewController</span> <span class="p">{</span>
+    <span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">selectedScanButton</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">var</span> <span class="nv">scannedGadgets</span> <span class="o">=</span> <span class="p">[</span><span class="kt">MIBGadget</span><span class="p">]()</span>
+        <span class="kt">MicroBot</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">gadgets</span><span class="o">.</span><span class="nf">scan</span><span class="p">()</span><span class="o">.</span><span class="n">done</span> <span class="p">{</span> <span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="k">in</span>
+            <span class="k">if</span> <span class="k">let</span> <span class="nv">gadget</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">data</span> <span class="p">{</span>
+                <span class="n">scannedGadgets</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">gadget</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<h3 id='pair-with-the-gadget' class='heading'>Pair with The Gadget</h3>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">MicroBot</span>
+
+<span class="kd">class</span> <span class="kt">ViewController</span><span class="p">:</span> <span class="kt">UIViewController</span> <span class="p">{</span>
+
+    <span class="k">var</span> <span class="nv">scannedGadgets</span> <span class="o">=</span> <span class="p">[</span><span class="kt">MIBGadget</span><span class="p">]()</span>
+
+    <span class="k">override</span> <span class="kd">func</span> <span class="nf">viewDidLoad</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">super</span><span class="o">.</span><span class="nf">viewDidLoad</span><span class="p">()</span>
+
+    <span class="kd">@IBAction</span> <span class="kd">func</span> <span class="nf">selectedScannedGadgetButton</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">scannedGadget</span><span class="o">.</span><span class="nf">pair</span><span class="p">(</span><span class="n">optSecret</span><span class="p">)</span><span class="o">.</span><span class="n">done</span> <span class="p">{</span> <span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="k">in</span>
+        <span class="k">if</span> <span class="k">let</span> <span class="nv">error</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">error</span> <span class="p">{</span>
+            <span class="c1">// handle error</span>
+            <span class="p">}</span>
+        <span class="p">})</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Recieve a pair event from MicroBotDelegate</span>
+    <span class="kd">func</span> <span class="nf">mibReceivedGadgetEvent</span><span class="p">(</span><span class="n">_</span> <span class="nv">gadget</span><span class="p">:</span> <span class="kt">MIBGadget</span><span class="p">,</span> <span class="nv">topic</span><span class="p">:</span> <span class="kt">GadgetEvent</span><span class="p">,</span> <span class="nv">data</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="p">{</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="n">topic</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="o">.</span><span class="nv">paired</span><span class="p">:</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Paired with new gadget: </span><span class="se">\(</span><span class="n">gadget</span><span class="o">.</span><span class="n">name</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">case</span> <span class="o">.</span><span class="n">pairFailed</span>
+            <span class="nf">print</span><span class="p">(</span><span class="s">"Failed to pair with gadget: </span><span class="se">\(</span><span class="n">gadget</span><span class="o">.</span><span class="n">name</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="o">....</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre>
+<h3 id='call-an-endpoint-of-the-gadget' class='heading'>Call an Endpoint of The Gadget</h3>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">MicroBot</span>
+
+<span class="kd">class</span> <span class="kt">ViewController</span><span class="p">:</span> <span class="kt">UIViewController</span> <span class="p">{</span>
+
+    <span class="kd">func</span> <span class="nf">press</span><span class="p">(</span><span class="n">_</span> <span class="nv">gadget</span><span class="p">:</span> <span class="kt">MIBGadget</span><span class="p">,</span> <span class="nv">otp</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Call an endpoint of Gadget </span>
+       <span class="n">gadget</span><span class="o">.</span><span class="nf">callEndpoint</span><span class="p">(</span><span class="n">otp</span><span class="p">,</span> <span class="nv">name</span><span class="p">:</span> <span class="s">"press"</span><span class="p">,</span> <span class="nv">args</span><span class="p">:</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">done</span> <span class="p">{</span> <span class="n">response</span> <span class="k">in</span>
+           <span class="k">guard</span> <span class="n">response</span><span class="o">.</span><span class="n">error</span> <span class="o">==</span> <span class="kc">nil</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="c1">// handle error</span>
+                <span class="k">return</span>
+           <span class="p">}</span>
+           <span class="nf">print</span><span class="p">(</span><span class="s">"Push gadget is pressed"</span><span class="p">)</span>
+       <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2018 <a class="link" href="https://thenaran.com/" target="_blank" rel="external">Naran Inc.</a>. All rights reserved. (Last updated: 2018-12-11)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>
