@@ -110,12 +110,6 @@ def welcome_no_ftl():
   return render_template('welcome_noftl.html', msg=msg)
 
 
-@blueprint.route('/<template>')
-@util.require_login
-def route_template(template):
-  return render_template(template + '.html')
-
-
 @blueprint.route('/fixed_<template>')
 @util.require_login
 def route_fixed_template(template):
