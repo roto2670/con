@@ -264,6 +264,7 @@ def get_logs(product_id):
     return render_template('logs.html', logs=logs, keyword=_keyword,
                            token=token, limit=_limit)
   else:
+    _keyword = request.form['keyword']
     rets = apis.get_logs(product_id, keyword=_keyword, limit=_limit)
     token = rets.get('token', None)
     logs = rets.get('logs', [])
@@ -285,6 +286,7 @@ def get_logs_with_gadget(product_id, gadget_id):
     logs = rets.get('logs', [])
     return render_template('logs.html', logs=logs, token=token)
   else:
+    _keyword = request.form['keyword']
     rets = apis.get_logs(product_id, keyword=_keyword, limit=_limit)
     token = rets.get('token', None)
     logs = rets.get('logs', [])
