@@ -257,7 +257,8 @@ def get_logs(product_id):
   _keyword = request.args.get('keyword', "")
   if request.method == "GET":
     _token = request.args.get('token')
-    rets = apis.get_logs(product_id, keyword=_keyword, token=_token)
+    rets = apis.get_logs(product_id, keyword=_keyword, token=_token,
+                         limit=_limit)
     token = rets.get('token', None)
     logs = rets.get('logs', [])
     return render_template('logs.html', logs=logs, keyword=_keyword,
@@ -284,7 +285,7 @@ def get_logs_with_gadget(product_id, gadget_id):
     logs = rets.get('logs', [])
     return render_template('logs.html', logs=logs, token=token)
   else:
-    rets = apis.get_logs(product_id, keyword=_keyword)
+    rets = apis.get_logs(product_id, keyword=_keyword, limit=_limit)
     token = rets.get('token', None)
     logs = rets.get('logs', [])
     return render_template('logs.html', logs=logs, token=token,
