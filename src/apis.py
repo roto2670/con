@@ -598,7 +598,7 @@ def _build_param(**kwargs):
 
 def get_logs(product_id, keyword=None, token=None, limit=None):
   url = LOG_BASE_URL + "products/" + product_id
-  params = _build_param(keyword=keyword, token=token, limit=limit)
+  params = _build_param(keyword=keyword, token=token, size=limit)
   try:
     if IS_DEV:
       _test_data = []
@@ -622,7 +622,7 @@ def get_logs(product_id, keyword=None, token=None, limit=None):
 def get_logs_with_gadget(product_id, gadget_id, keyword=None, token=None,
                          limit=None):
   url = LOG_BASE_URL + "products/" + product_id + "/gadgets/" + gadget_id
-  params = _build_param(keyword=keyword, token=token, limit=limit)
+  params = _build_param(keyword=keyword, token=token, size=limit)
   try:
     if IS_DEV:
       _test_data = []
