@@ -88,7 +88,8 @@ def confirm_verified_email():
   else:
     logging.warning("Email Auth is None. Email Auth : %s, current user : %s, key : %s",
                     email_auth, current_user.email, key)
-    in_apis.remove_email_auth(email_auth.id)
+    if email_auth:
+      in_apis.remove_email_auth(email_auth.id)
     return redirect(url_for('base_blueprint.route_verified'))
 
 
