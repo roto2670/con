@@ -264,7 +264,7 @@ def get_logs(product_id):
     return render_template('logs.html', logs=logs, keyword=_keyword,
                            token=token, limit=_limit)
   else:
-    rets = apis.get_logs(product_id, keyword=_keyword)
+    rets = apis.get_logs(product_id, keyword=_keyword, limit=_limit)
     token = rets.get('token', None)
     logs = rets.get('logs', [])
     return render_template('logs.html', logs=logs, token=token,
