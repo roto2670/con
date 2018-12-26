@@ -281,6 +281,15 @@ def datetime_filter(value):
   return _new_time
 
 
+def timestamp_filter(value):
+  tz_info = get_timezone()
+  _value = pytz.timezone(tz_info).localize(datetime.datetime.utcfromtimestamp(value))
+  _timestamp = int(value)
+  _timestamp += _value.utcoffset().seconds
+  _new_time = datetime.datetime.fromtimestamp(_timestamp)
+  return _new_time
+
+
 COUNTRY_CODES = {}  # {"code": "name", ..}
 
 def get_country_name(code):
@@ -291,3 +300,7 @@ def get_country_name(code):
     return COUNTRY_CODES[code.upper()] + " ({})".format(code.upper())
   else:
     return code.upper()
+
+
+def get_log_id(value):
+  return str(value).replace(".", "")

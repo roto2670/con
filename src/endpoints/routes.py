@@ -246,6 +246,51 @@ def test_call(product_id, gadget, endpoint_name, version):
   return json.dumps(ret_data)
 
 
+DEFAULT_LIMIT = '''10'''
+
+
+@blueprint.route('/<product_id>/logs', methods=['GET', 'POST'])
+@util.require_login
+def get_logs(product_id):
+  _set_product(product_id)
+  _limit = request.args.get("limit", DEFAULT_LIMIT)
+  _keyword = request.args.get('keyword', "")
+  if request.method == "GET":
+    _token = request.args.get('token')
+    rets = apis.get_logs(product_id, keyword=_keyword, token=_token)
+    token = rets.get('token', None)
+    logs = rets.get('logs', [])
+    return render_template('logs.html', logs=logs, keyword=_keyword,
+                           token=token, limit=_limit)
+  else:
+    rets = apis.get_logs(product_id, keyword=_keyword)
+    token = rets.get('token', None)
+    logs = rets.get('logs', [])
+    return render_template('logs.html', logs=logs, token=token,
+                           keyword=_keyword, limit=_limit)
+
+
+@blueprint.route('/<product_id>/logs/gadget/<gadget_id>', methods=['GET', 'POST'])
+@util.require_login
+def get_logs_with_gadget(product_id, gadget_id):
+  _set_product(product_id)
+  _limit = request.args.get("limit", DEFAULT_LIMIT)
+  _keyword = request.args.get('keyword', "")
+  if request.method == "GET":
+    _token = request.args.get('token')
+    rets = apis.get_logs_with_gadget(product_id, gadget_id, keyword=_keyword,
+                                     token=_token, limit=_limit)
+    token = rets.get('token', None)
+    logs = rets.get('logs', [])
+    return render_template('logs.html', logs=logs, token=token)
+  else:
+    rets = apis.get_logs(product_id, keyword=_keyword)
+    token = rets.get('token', None)
+    logs = rets.get('logs', [])
+    return render_template('logs.html', logs=logs, token=token,
+                           keyword=_keyword, limit=_limit)
+
+
 def _set_product(product_id):
   product = in_apis.get_product(product_id)
   base.routes.set_current_product(product)

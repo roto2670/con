@@ -1,0 +1,85 @@
+{% extends "base_site.html" %}
+
+{% block title %} Logs {% endblock title %}
+
+{% block stylesheets %}
+  <link href="/static/vendors/jsonTreeViewer/libs/jsonTree/jsonTree.css" rel="stylesheet" />
+  <script src="/static/vendors/jsonTreeViewer/libs/jsonTree/jsonTree.js"></script>
+  {{ super() }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <!-- start row -->
+      <div class="row">
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+
+            <div class="x_content">
+              <form id="search" class="form-horizontal form-label-left" method="post">
+                <div class="form-group">
+
+                  <div class="btn-group">
+                    <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" aria-expanded="false">{{ limit }} <span class="caret"></span>
+                    </button>
+                    <ul role="menu" class="dropdown-menu" style="min-width:53px;">
+                      <li><a href="?limit=10&keyword={{ keyword }}">10</a>
+                      </li>
+                      <li><a href="?limit=25&keyword={{ keyword }}">25</a>
+                      </li>
+                      <li><a href="?limit=50&keyword={{ keyword }}">50</a>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div class="col-sm-3 alignright">
+                    <div class="input-group">
+                      <input type="text" id="keyword" name="keyword" class="form-control">
+                      <span class="input-group-btn">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </form>
+
+              <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+                {% for log in logs %}
+                  <div class="panel">
+                    <a class="panel-heading" role="tab" id="heading{{ loop.index|string }}" data-toggle="collapse" data-parent="#accordion"
+                        href="#{{ log._t|getLogId }}" aria-expanded="true" aria-controls="{{ log._t|getLogId }}">
+                      <h3 class="panel-title">{{ log._t|timestampFilter }}</h3>
+                    </a>
+                    <div id='{{ log._t|getLogId }}' class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ loop.index|string }}">
+                      <div class='panel-body'>
+                        <div id='v-{{ log._t|getLogId }}'></div>
+                      </div>
+                    </div>
+                  </div>
+                  <script>
+                    var wrapper = document.getElementById('v-{{ log._t|getLogId }}');
+                    var tree = jsonTree.create({{ log|tojson }}, wrapper);
+                  </script>
+                {% endfor %}
+              </div>
+
+              {% if logs %}
+                <a href="?token={{ token }}&keyword={{ keyword }}"><button type="button" class="btn btn-default alignright">Next</button></a>
+              {% endif %}
+            </div>
+
+          </div>  <!-- end x_content -->
+        </div>  <!-- end x_panel -->
+
+      </div>  <!-- End row -->
+
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+  {{ super() }}
+{% endblock javascripts %}
