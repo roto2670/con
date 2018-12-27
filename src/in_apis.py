@@ -36,6 +36,7 @@ from models import _Tester as Tester
 from models import _Firmware as Firmware
 from models import _History as History
 from models import _EmailAuth as EmailAuth
+from models import _ReferrerInfo as ReferrerInfo
 
 
 def get_datetime():
@@ -776,6 +777,24 @@ def remove_email_auth(_id):
   if email_auth:
     db.session.delete(email_auth)
     db.session.commit()
+
+
+# }}}
+
+
+# {{{ ReferrerInfo
+
+
+def create_referrer_info(user, ip_addr, referrer, user_agent, accept_language):
+  referrer_info = ReferrerInfo(id=uuid.uuid4().hex,
+                               user=user,
+                               ip_address=ip_addr,
+                               referrer=referrer,
+                               user_agent=user_agent,
+                               accept_language=accept_language,
+                               accepted_time=get_datetime())
+  db.session.add(referrer_info)
+  db.session.commit()
 
 
 # }}}

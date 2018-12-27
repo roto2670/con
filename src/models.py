@@ -374,3 +374,21 @@ class _EmailAuth(db.Model):
       if hasattr(value, '__iter__') and not isinstance(value, str):
         value = value[0]
       setattr(self, property, value)
+
+
+class _ReferrerInfo(db.Model):
+  __tablename__ = '_referrer_info'
+
+  id = Column(String(75), primary_key=True)
+  user = Column(String(75))
+  ip_address = Column(String(75))
+  referrer = Column(String(225))
+  user_agent = Column(String(225))
+  accept_language = Column(String(225))
+  accepted_time = Column(DateTime)
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        value = value[0]
+      setattr(self, property, value)
