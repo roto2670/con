@@ -17,6 +17,7 @@ from importlib import import_module
 
 
 from flask import Flask  # noqa : pylint: disable=import-error
+import flask_monitoringdashboard as dashboard
 
 import apis
 import common
@@ -102,12 +103,17 @@ if not apis.IS_DEV:
   # gunicorn
   __app = create_app()
   __app.debug = False
+  dashboard.config.init_from(file="./config.cfg")
+  dashboard.config.database_name = __app.config.get('SQLALCHEMY_DATABASE_URI')
+  dashboard.bind(__app)
 
 
 if  __name__ == '__main__':
   _app = create_app()
   if apis.IS_DEV:
     _app.debug = True
+    dashboard.config.init_from(file="./config.cfg")
+    dashboard.bind(_app)
     _app.run(host='127.0.0.1', port=16000)
   else:
     cur_path = os.path.dirname(os.path.abspath(__file__))
@@ -115,4 +121,7 @@ if  __name__ == '__main__':
     ssl_crt = os.path.join(ssl_path, 'mib_io.crt')
     ssl_key = os.path.join(ssl_path, 'mib_io.key')
     _app.debug = False
+    dashboard.config.init_from(file="./config.cfg")
+    dashboard.config.database_name = _app.config.get('SQLALCHEMY_DATABASE_URI')
+    dashboard.bind(_app)
     _app.run(host='127.0.0.1', port=5000, ssl_context=(ssl_crt, ssl_key))
