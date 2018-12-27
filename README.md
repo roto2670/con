@@ -58,6 +58,7 @@
 #### https://github.com/klokantech/flask-firebase
 #### https://cloud.google.com/sql/docs/mysql/connect-external-app#python
 #### https://github.com/GoogleCloudPlatform/getting-started-python/blob/504b3d550b551502cfe96f32542c31b232135eff/2-structured-data/config.py
+#### https://flask-monitoringdashboard.readthedocs.io/en/master/index.html
 
 
 # WordCloud
