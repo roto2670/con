@@ -17,3 +17,4 @@ celery
 mysqlclient
 country-list
 flask_monitoringdashboard
+pytest

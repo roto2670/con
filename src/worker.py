@@ -15,6 +15,7 @@ import logging
 import tempfile
 import subprocess
 
+import apis
 import requests
 import sendgrid  # noqa : pylint: disable=import-error
 from OpenSSL import crypto  # noqa : pylint: disable=import-error
@@ -89,9 +90,13 @@ def _get_hex_to_json(file_path):
 
 def get_hex_to_json(file_path):
   try:
-    ret = _get_hex_to_json.delay(file_path)
-    ret_json = ret.get()
-    return ret_json
+    if apis.IS_DEV:
+      ret = _get_hex_to_json(file_path)
+      return ret
+    else:
+      ret = _get_hex_to_json.delay(file_path)
+      ret_json = ret.get()
+      return ret_json
   except Exception:
     logging.exception("Raise error while convert firmware.")
 
