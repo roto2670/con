@@ -42,8 +42,8 @@
     cd console/cloud_sql
     nohup ./cloud_sql_proxy -instances=protacloud:us-west1:console=tcp:3306 -credential_file=console_db.json
     cd src
-    nohup celery -A worker.worker worker --loglevel=debug
     nohup gunicorn -w 3 -k gevent --certfile ssl/mib_io.crt --keyfile ssl/mib_io.key -b 127.0.0.1:5000 run:__app
+    nohup celery -A worker.worker worker --loglevel=debug
 
 
 # Structure![](res/cs_struct_180906.png)
