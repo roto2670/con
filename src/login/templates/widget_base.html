@@ -32,7 +32,7 @@
                 xhr.setRequestHeader("Content-Type", "application/jwt");
                 xhr.onreadystatechange = function() {
                   if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    window.location.replace(redirectUrl || "{{ request.url_root }}");
+                    window.location.replace(redirectUrl || "{{ referrer }}" || "{{ request.url_root }}");
                   }
                 };
                 xhr.send(token);

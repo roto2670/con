@@ -748,14 +748,13 @@ def create_email_auth(email, key, user_id):
                          key=key,
                          user_id=user_id,
                          is_confirm=False,
-                         sent_time=get_datetime(),
-                         accepted_time=get_datetime())
+                         sent_time=get_datetime())
   db.session.add(email_auth)
   db.session.commit()
 
 
-def get_email_auth(email, key):
-  email_auth = EmailAuth.query.filter_by(email=email, key=key,
+def get_auth_by_key(key):
+  email_auth = EmailAuth.query.filter_by(key=key,
                                          is_confirm=False).one_or_none()
   return email_auth
 
