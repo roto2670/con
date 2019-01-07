@@ -81,8 +81,9 @@ class FirebaseAuth:
         _scheme='http' if self.debug else 'https', **values
     )
 
-  def login(self):
-    return render_template('login.html', firebase_auth=self)
+  def login(self, referrer=None):
+    _referrer = referrer if referrer else ""
+    return render_template('login.html', firebase_auth=self, referrer=_referrer)
 
   def sign_in(self):
     header = jwt.get_unverified_header(request.data)

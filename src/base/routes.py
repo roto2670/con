@@ -76,8 +76,8 @@ def _is_confirm(email_auth):
     logging.warning("Invalid user id. Cur ID : %s, Email user ID : %s",
                     current_user.id, email_auth.user_id)
     return False
-  _time = time.time() - email_auth.sent_time.timestamp()
-  if _time > 300: # 5 minute
+  _time = in_apis.get_datetime().utcnow() - email_auth.sent_time
+  if _time.seconds > 300: # 5 minute
     logging.warning("Time is expire. User ID : %s, time : %s",
                     email_auth.user_id, _time)
     return False
@@ -87,14 +87,25 @@ def _is_confirm(email_auth):
 @blueprint.route('/verified/confirm')
 def confirm_verified_email():
   key = request.args['key']
-  email_auth = in_apis.get_email_auth(current_user.email, key)
-  if email_auth and _is_confirm(email_auth):
+  if current_user.is_anonymous:
+    return redirect("/auth/login?ref=" + "/verified/confirm?key=" + key)
+
+  email_auth = in_apis.get_auth_by_key(key)
+  if not email_auth:
+    logging.warning("Can not find email auth. current user : %s, key : %s",
+                    current_user.email, key)
+
+  if email_auth.email != current_user.email:
+    logout_user()
+    return redirect("/auth/login?ref=" + "/verified/confirm?key=" + key)
+
+  if _is_confirm(email_auth):
     in_apis.update_user_by_confirm(current_user.id)
     in_apis.update_email_auth(email_auth.id)
     return redirect(url_for('login_blueprint.login'))
   else:
-    logging.warning("Email Auth is None. Email Auth : %s, current user : %s, key : %s",
-                    email_auth, current_user.email, key)
+    logging.warning("Email Auth Failed. current user : %s, key : %s",
+                    current_user.email, key)
     if email_auth:
       in_apis.remove_email_auth(email_auth.id)
     return redirect(url_for('base_blueprint.route_verified'))
