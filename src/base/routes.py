@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2019 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -9,6 +9,7 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import os
 import json
 import time
 import uuid
@@ -17,6 +18,7 @@ import datetime
 
 import pytz
 from country_list import countries_for_language
+from flask import send_from_directory  # noqa : pylint: disable=import-error
 from flask import render_template, redirect, request, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user, login_user, logout_user  # noqa : pylint: disable=import-error
 
@@ -42,6 +44,12 @@ def route_default():
   in_apis.create_referrer_info(user, ip_addr, referrer, user_agent,
                                accept_language)
   return redirect(url_for('login_blueprint.login'))
+
+
+@blueprint.route('/robots.txt')
+def route_robots():
+  path = util.get_static_path()
+  return send_from_directory(path, 'robots.txt')
 
 
 @blueprint.route('/doc')

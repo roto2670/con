@@ -246,6 +246,12 @@ def get_res_path():
   return  path
 
 
+def get_static_path():
+  path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'base',
+                      'static')
+  return  path
+
+
 def get_mail_form_path(file_name):
   path = os.path.join(get_res_path(), 'mailform', file_name)
   return path
