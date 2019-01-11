@@ -401,9 +401,9 @@ def upload_firmware(product_id, model_id):
   firmware_version = _get_will_use_firmware_version(product_id, model_id)
   if request.method == "GET":
     _set_product(product_id)
-    model = in_apis.get_model(model_id)
+    _model = in_apis.get_model(model_id)
     return render_template('register_firmware.html', referrer=referrer,
-                           model=model, firmware_version=firmware_version)
+                           model=_model, firmware_version=firmware_version)
   else:
     upload_file = request.files['file']
     content = upload_file.read()
@@ -411,7 +411,7 @@ def upload_firmware(product_id, model_id):
     with open(tf_path, 'wb') as _f:
       _f.write(content)
 
-    model = in_apis.get_model(model_id)
+    _model = in_apis.get_model(model_id)
     try:
       ret_json = worker.get_hex_to_json(tf_path)
       os.remove(tf_path)
@@ -419,7 +419,7 @@ def upload_firmware(product_id, model_id):
         logging.warning("Result json is None. Json : %s", ret_json)
         abort(500)
 
-      ret = apis.register_firmware(product_id, model.code, firmware_version,
+      ret = apis.register_firmware(product_id, _model.code, firmware_version,
                                    ret_json)
       if ret:
         _dev_stage = in_apis.get_product_stage_by_dev(product_id)
@@ -427,14 +427,11 @@ def upload_firmware(product_id, model_id):
         _ep = in_apis.get_specifications(_stage_info.endpoint_id)
         _firmware = in_apis.create_firmware(firmware_version,
                                             _ep.version,
-                                            model.code, current_user.email,
+                                            _model.code, current_user.email,
                                             ret, model_id)
         in_apis.update_dev(product_id)
         _dev = in_apis.get_product_stage_by_dev(product_id)
-        models_dict = {}
-        for _info in _dev.stage_info_list:
-          _model = in_apis.get_model(_info.model_id)
-          models_dict[_model.code] = firmware_version
+        models_dict = {_model.code: firmware_version}
         _ret = apis.update_product_stage(product_id, _dev, models_dict,
                                          models.STAGE_DEV)
         if _ret:
