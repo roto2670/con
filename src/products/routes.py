@@ -122,6 +122,9 @@ def create_model(product_id):
     _model_list = in_apis.get_model_list(product_id)
     if _model_list:
       code = len(_model_list) + 1
+      has_model = in_apis.get_model_by_code(code, product_id)
+      if has_model:
+        code += 1
 
     if code < 0 or code > 65535:
       title = common.get_msg("products.create.model.usage_full_title")
