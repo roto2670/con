@@ -437,7 +437,7 @@ def upload_firmware(product_id, model_id):
         if _ret:
           in_apis.update_stage_info_by_dev_about_firmware(product_id, model_id,
                                                           _firmware.id)
-          mail.send_about_test_user(product_id, model.name, firmware_version,
+          mail.send_about_test_user(product_id, _model.name, firmware_version,
                                     models.TESTER_DEV)
           return redirect('products/' + product_id + '/model/' + model_id)
         else:
@@ -445,13 +445,13 @@ def upload_firmware(product_id, model_id):
           abort(500)
       else:
         logging.warning("Raise upload firmware error. Product : %s, model : %s, name : %s, user : %s",
-                        product_id, model_id, model.name, current_user.email)
+                        product_id, model_id, _model.name, current_user.email)
         abort(500)
     except Exception:
       if os.path.exists(tf_path):
         os.remove(tf_path)
       logging.exception("Raise error while upload firmware. Product : %s, model : %s, user : %s",
-                        product_id, model.name, current_user.email)
+                        product_id, _model.name, current_user.email)
       abort(500)
 
 
