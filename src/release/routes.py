@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2019 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -10,9 +10,10 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 
+import json
 import logging
 
-from flask import render_template, redirect  # noqa : pylint: disable=import-error
+from flask import render_template, redirect, request  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import base
@@ -30,19 +31,22 @@ def _is_allow_release(stage):
   if not stage.stage_info_list:
     logging.warning("Can not find stage info.")
     return False
-  for stage_info in stage.stage_info_list:
-    #endpoint
-    if not stage_info.endpoint_id:
-      logging.warning("Can not find endpoint")
-      return False
-    # model
-    if not stage_info.model_id:
-      logging.warning("Can not find model")
-      return False
-    # firmware
-    if not stage_info.firmware_id:
-      logging.warning("Can not find firmware")
-      return False
+  return True
+
+
+def _check_required_by_stage(stage_info):
+  #endpoint
+  if not stage_info.endpoint_id:
+    logging.warning("Can not find endpoint")
+    return False
+  # model
+  if not stage_info.model_id:
+    logging.warning("Can not find model")
+    return False
+  # firmware
+  if not stage_info.firmware_id:
+    logging.warning("Can not find firmware")
+    return False
   return True
 
 
@@ -56,6 +60,7 @@ def _build_release_info(stage_info):
     _info.endpoint = _endpoint
     _info.model = _model
     _info.firmware = _firmware
+    _info.is_allow = _check_required_by_stage(_info)
   return stage_info
 
 
@@ -103,7 +108,8 @@ def get_list(product_id):
 @blueprint.route('/<product_id>/pre_release', methods=['POST'])
 @util.require_login
 def pre_release(product_id):
-  ret = in_apis.pre_release(product_id)
+  release_dict = json.loads(request.form['devReleaseList'])
+  ret = in_apis.pre_release(product_id, list(release_dict.keys()))
   logging.info("%s Pre Release ret : %s", product_id, ret)
   return redirect("/release/" + product_id + "/list")
 
@@ -111,7 +117,8 @@ def pre_release(product_id):
 @blueprint.route('/<product_id>/release', methods=['POST'])
 @util.require_login
 def release(product_id):
-  ret = in_apis.release(product_id)
+  release_dict = json.loads(request.form['preReleaseList'])
+  ret = in_apis.release(product_id, list(release_dict.keys()))
   logging.info("%s Release ret : %s", product_id, ret)
   return redirect("/release/" + product_id + "/list")
 
