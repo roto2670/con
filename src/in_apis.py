@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2019 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -614,16 +614,19 @@ def update_dev(product_id):
     db.session.commit()
 
 
-def pre_release(product_id):
+def pre_release(product_id, model_id_list):
   dev = get_product_stage_by_dev(product_id)
   models_dict = {}  # {model_code : firmware_version}
   send_mail_info_dict = {}  # {model_name : firmware_version}
+  release_stage_info_list = []
   try:
     for _info in dev.stage_info_list:
-      _model = get_model(_info.model_id)
-      _firmware = get_firmware(_info.firmware_id)
-      models_dict[_model.code] = _firmware.version
-      send_mail_info_dict[_model.name] = _firmware.version
+      if _info.model_id in model_id_list:
+        _model = get_model(_info.model_id)
+        _firmware = get_firmware(_info.firmware_id)
+        models_dict[_model.code] = _firmware.version
+        send_mail_info_dict[_model.name] = _firmware.version
+        release_stage_info_list.append(_info)
   except:
     logging.exception("Fail to Release.")
     raise Exception("Fail to Release.")
@@ -631,9 +634,12 @@ def pre_release(product_id):
                                       models.STAGE_PRE_RELEASE)
   if prd_ret:
     _pre_release = get_product_stage_by_pre_release(product_id)
+    no_update_info_list = []
     # TODO: Is there a need?
-    # if _pre_release:
-    #   for _stage_info in _pre_release.stage_info_list:
+    if _pre_release:
+      for _stage_info in _pre_release.stage_info_list:
+        if _stage_info.model_id not in model_id_list:
+          no_update_info_list.append(_stage_info)
     #     history = History(id=uuid.uuid4().hex,
     #                       model_id=_stage_info.model_id,
     #                       firmware_id=_stage_info.firmware_id,
@@ -647,7 +653,6 @@ def pre_release(product_id):
     #                       product_id=product_id)
     #     db.session.add(history)
     #   db.session.commit()
-    remove_product_stage(_pre_release.id)
 
     new_pre_release_id = uuid.uuid4().hex
     new_pre_release = ProductStage(id=new_pre_release_id,
@@ -659,7 +664,7 @@ def pre_release(product_id):
                                    last_updated_user=current_user.email,
                                    product_id=product_id)
     db.session.add(new_pre_release)
-    for _info in dev.stage_info_list:
+    for _info in release_stage_info_list:
       stage_info = StageInfo(id=uuid.uuid4().hex,
                              model_id=_info.model_id,
                              endpoint_id=_info.endpoint_id,
@@ -669,7 +674,10 @@ def pre_release(product_id):
                              last_updated_user=current_user.email,
                              product_stage_id=new_pre_release_id)
       db.session.add(stage_info)
+    for _info in no_update_info_list:
+      _info.product_stage_id = new_pre_release_id
     db.session.commit()
+    remove_product_stage(_pre_release.id)
     for model_name, firmware_version in send_mail_info_dict.items():
       mail.send_about_test_user(product_id, model_name, firmware_version,
                                 models.TESTER_PRE_RELEASE)
@@ -678,14 +686,17 @@ def pre_release(product_id):
     return False
 
 
-def release(product_id):
+def release(product_id, model_id_list):
   _pre_release = get_product_stage_by_pre_release(product_id)
   models_dict = {}
+  release_stage_info_list = []
   try:
     for _info in _pre_release.stage_info_list:
-      _model = get_model(_info.model_id)
-      _firmware = get_firmware(_info.firmware_id)
-      models_dict[_model.code] = _firmware.version
+      if _info.model_id in model_id_list:
+        _model = get_model(_info.model_id)
+        _firmware = get_firmware(_info.firmware_id)
+        models_dict[_model.code] = _firmware.version
+        release_stage_info_list.append(_info)
   except:
     logging.exception("Fail to Release.")
     raise Exception("Fail to Release.")
@@ -693,23 +704,26 @@ def release(product_id):
                                       models.STAGE_RELEASE)
   if prd_ret:
     _release = get_product_stage_by_release(product_id)
+    no_update_info_list = []
     if _release:
       for _stage_info in _release.stage_info_list:
-        history = History(id=uuid.uuid4().hex,
-                          model_id=_stage_info.model_id,
-                          firmware_id=_stage_info.firmware_id,
-                          endpoint_id=_stage_info.endpoint_id,
-                          hook_url=_release.hook_url,
-                          hook_client_key=_release.hook_client_key,
-                          stage=_release.stage,
-                          created_time=get_datetime(),
-                          last_updated_time=get_datetime(),
-                          last_updated_user=current_user.email,
-                          product_id=product_id)
-        db.session.add(history)
+        if _stage_info.model_id in model_id_list:
+          history = History(id=uuid.uuid4().hex,
+                            model_id=_stage_info.model_id,
+                            firmware_id=_stage_info.firmware_id,
+                            endpoint_id=_stage_info.endpoint_id,
+                            hook_url=_release.hook_url,
+                            hook_client_key=_release.hook_client_key,
+                            stage=_release.stage,
+                            created_time=get_datetime(),
+                            last_updated_time=get_datetime(),
+                            last_updated_user=current_user.email,
+                            product_id=product_id)
+          db.session.add(history)
+        else:
+          no_update_info_list.append(_stage_info)
       db.session.commit()
 
-    remove_product_stage(_release.id)
     new_release_id = uuid.uuid4().hex
     new_release = ProductStage(id=new_release_id,
                                hook_url=_pre_release.hook_url,
@@ -720,7 +734,7 @@ def release(product_id):
                                last_updated_user=current_user.email,
                                product_id=product_id)
     db.session.add(new_release)
-    for _info in _pre_release.stage_info_list:
+    for _info in release_stage_info_list:
       stage_info = StageInfo(id=uuid.uuid4().hex,
                              model_id=_info.model_id,
                              endpoint_id=_info.endpoint_id,
@@ -730,7 +744,10 @@ def release(product_id):
                              last_updated_user=current_user.email,
                              product_stage_id=new_release_id)
       db.session.add(stage_info)
+    for _info in no_update_info_list:
+      _info.product_stage_id = new_release_id
     db.session.commit()
+    remove_product_stage(_release.id)
     return True
   else:
     return False
