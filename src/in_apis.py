@@ -69,26 +69,12 @@ def create_product(product_name, product_obj, product_type):
                                product_id=product.id)
   db.session.add(product_stage)
   db.session.commit()
-  create_product_stage_by_dev(product.id)
   return product
 
 
 def get_product(product_id):
   product = Product.query.filter_by(id=product_id).one_or_none()
   return product
-
-
-def create_product_stage_by_dev(product_id):
-  product_stage = ProductStage(id=uuid.uuid4().hex,
-                               hook_url="",
-                               hook_client_key="",
-                               stage=models.DEV_STATE,
-                               created_time=get_datetime(),
-                               last_updated_time=get_datetime(),
-                               last_updated_user=current_user.email,
-                               product_id=product_id)
-  db.session.add(product_stage)
-  db.session.commit()
 
 
 def get_product_list(developer_id):
