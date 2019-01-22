@@ -19,15 +19,26 @@
 
     var devDict = {},
         preDict = {};
+    var checkState = '',
+        devMulti = true,
+        preMulti = true;
+    var devSize = {{ dev_stage.stage_info_list|length }},
+        preSize = {{ pre_stage.stage_info_list|length }};
 
     $(".flat").on('ifChecked', function(event) {
       if (event.currentTarget.value) {
         if (event.currentTarget.value == "dev") {
           devDict[event.currentTarget.id] = event.currentTarget.value;
           handleButton('dev');
+          if (Object.keys(devDict).length >= devSize) {
+              checkedAllButton('dev');
+          }
         } else {
           preDict[event.currentTarget.id] = event.currentTarget.value;
           handleButton('pre');
+          if (Object.keys(preDict).length >= preSize) {
+              checkedAllButton('pre');
+          }
         }
       }
     });
@@ -35,33 +46,54 @@
       if (event.currentTarget.value == 'dev' && event.currentTarget.id in devDict) {
         delete devDict[event.currentTarget.id];
         handleButton('dev');
+        unCheckedAllButton('dev');
       } else if (event.currentTarget.value == 'pre' && event.currentTarget.id in preDict) {
         delete preDict[event.currentTarget.id];
         handleButton('pre');
+        handleChecked('pre');
       }
     });
 
-    var checkState = '';
-
     $('.bulk_action input#check-all-dev').on('ifChecked', function () {
         checkState = 'all';
+        devMulti = true;
         handleChecked('dev');
     });
     $('.bulk_action input#check-all-dev').on('ifUnchecked', function () {
         checkState = 'none';
-        handleChecked('dev');
+        if (devMulti) {
+          handleChecked('dev');
+        }
+        devMulti = true;
     });
     $('.bulk_action input#check-all-pre').on('ifChecked', function () {
         checkState = 'all';
+        preMulti = true;
         handleChecked('pre');
     });
     $('.bulk_action input#check-all-pre').on('ifUnchecked', function () {
         checkState = 'none';
-        handleChecked('pre');
+        if (preMulti) {
+          handleChecked('pre');
+        }
+        preMulti = true;
     });
 
     function objectToJson(object) {
       return JSON.stringify(object);
+    }
+
+    function checkedAllButton(stage) {
+        $(".bulk_action input#check-all-" + stage).iCheck('check');
+    }
+
+    function unCheckedAllButton(stage) {
+        if (stage === 'dev') {
+          devMulti = false;
+        } else {
+          preMulti = false;
+        }
+        $(".bulk_action input#check-all-" + stage).iCheck('uncheck');
     }
 
     function handleChecked(stage) {
