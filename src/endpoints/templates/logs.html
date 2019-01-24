@@ -50,7 +50,7 @@
                   <div class="panel">
                     <a class="panel-heading" role="tab" id="heading{{ loop.index|string }}" data-toggle="collapse" data-parent="#accordion"
                         href="#{{ log._t|getLogId }}" aria-expanded="true" aria-controls="{{ log._t|getLogId }}">
-                      <h3 class="panel-title">{{ log._t|timestampFilter }}</h3>
+                      <h3 class="panel-title">{{ log._t|timestampFilter }} {{log.payload|string|truncate(90, True)}}</h3>
                     </a>
                     <div id='{{ log._t|getLogId }}' class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ loop.index|string }}">
                       <div class='panel-body'>
