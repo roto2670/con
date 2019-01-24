@@ -284,7 +284,7 @@ def remove_tester(product_id, tester_id):
       else:
         logging.warning("Failed to delete tester. Tester : %s", _tester.email)
     else:
-      logging.info("%s is not ftl. Delete only from console DB.")
+      logging.info("%s is not ftl. Delete only from console DB.", _tester.email)
       in_apis.delete_tester(tester_id)
   return redirect('products/' + product_id + '/tester')
 
