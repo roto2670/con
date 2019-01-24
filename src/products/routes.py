@@ -276,11 +276,16 @@ def change_tester_level(product_id, tester_id, level):
 def remove_tester(product_id, tester_id):
   _tester = in_apis.get_tester(tester_id, product_id)
   if _tester:
-    ret = apis.delete_tester(_tester.organization_id, product_id, _tester.email)
-    if ret:
-      in_apis.delete_tester(tester_id)
+    if _tester.authorized:
+      ret = apis.delete_tester(_tester.organization_id, product_id,
+                               _tester.email)
+      if ret:
+        in_apis.delete_tester(tester_id)
+      else:
+        logging.warning("Failed to delete tester. Tester : %s", _tester.email)
     else:
-      logging.warning("Failed to delete tester. Tester : %s", _tester.email)
+      logging.info("%s is not ftl. Delete only from console DB.")
+      in_apis.delete_tester(tester_id)
   return redirect('products/' + product_id + '/tester')
 
 
