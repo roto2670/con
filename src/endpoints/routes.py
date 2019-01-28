@@ -59,13 +59,21 @@ def download_specification_file(product_id, specification_id):
     abort(500)
 
 
-def _build_gadget_dict(gadgets):
+def _check_version(ep_version, firmware_version):
+  return ep_version.split(".") == firmware_version.split(".")[:2]
+
+
+def _build_gadget_dict(gadgets, endpoint):
   gadget_dict = {}
+  ep_version = endpoint.version if endpoint else None
   for _gadget in gadgets:
     if _gadget['stage'] == models.STAGE_DEV:
       for __gadget in _gadget['gadgets']:
-        if __gadget['status'] == 1:
-          display = "{} ({})".format(__gadget['name'], _gadget['email'])
+        if __gadget['status'] == 1 and \
+            _check_version(ep_version, __gadget['firmware_version']):
+          display = "{} (Version : {}, {})".format(__gadget['name'],
+                                                   __gadget['firmware_version'],
+                                                   _gadget['email'])
           gadget_dict[__gadget['id']] = display
   return gadget_dict
 
@@ -76,8 +84,6 @@ def tests(product_id):
   _set_product(product_id)
   gadget_dict = {}
   gadgets = apis.get_gadget_list_by_tester(product_id)
-  if gadgets:
-    gadget_dict = _build_gadget_dict(gadgets)
   _product = in_apis.get_product(product_id)
   specification_list = _product.endpoint_list
   if request.method == "GET":
@@ -87,6 +93,8 @@ def tests(product_id):
     else:
       selected = None
       content = {}
+    if gadgets:
+      gadget_dict = _build_gadget_dict(gadgets, selected)
     gadget = None
     gadget_id = None
     if gadget_dict:
@@ -100,7 +108,8 @@ def tests(product_id):
     specification_id = request.form['specification']
     selected = in_apis.get_specifications(specification_id)
     content = json.loads(selected.specifications)
-
+    if gadgets:
+      gadget_dict = _build_gadget_dict(gadgets, selected)
     gadget = None
     gadget_id = None
     if 'gadget' in request.form and request.form['gadget'] in gadget_dict:

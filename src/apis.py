@@ -72,7 +72,12 @@ def get_gadget_list_by_tester(product_id):
                    'mac': 'testgadget_mac',
                    'name': 'testgadget_name',
                    'kind': 'testgadget_kind',
-                   'status': 0
+                   'status': 1,
+                   'firmware_version' : '1.3.1',
+                   'model_number': 0,
+                   'model_name': 'v4',
+                   'sdk_version': '0.1',
+                   'latest_version': '1.3.1'
                }
            ]},
           {'email': 'tester@example.com',
@@ -83,7 +88,12 @@ def get_gadget_list_by_tester(product_id):
                    'mac': 'testgadget_mac_2',
                    'name': 'testgadget_name_2',
                    'kind': 'testgadget_kind_2',
-                   'status': 1
+                   'status': 1,
+                   'firmware_version' : '1.0.1',
+                   'model_number': 0,
+                   'model_name': 'v4',
+                   'sdk_version': '0.1',
+                   'latest_version': '1.0.1'
                }
            ]}
       ]
