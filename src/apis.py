@@ -18,10 +18,13 @@ import requests  # noqa : pylint: disable=import-error
 IS_DEV = True
 BASE_URL = '''http://api.mib.io/i/v1/'''
 HEADERS = {}
+JSON_HEADERS = {}
 
 
 def init(app):
   HEADERS['Authorization'] = 'Bearer {}'.format(app.config.get('TOKEN'))
+  JSON_HEADERS['Authorization'] = 'Bearer {}'.format(app.config.get('TOKEN'))
+  JSON_HEADERS['Content-Type'] = 'application/json'
 
 
 # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.tauhkpflgrmp
@@ -190,7 +193,7 @@ def update_android_key(organization_id, kind, secret):
       _test_data = True
       return _test_data
     else:
-      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
         logging.info("Update android key. url : %s, data : %s", url, data)
@@ -218,7 +221,7 @@ def update_ios_key(organization_id, kind, cert, secret, is_dev):
       _test_data = True
       return _test_data
     else:
-      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
         logging.info("Update ios key. url : %s, data : %s", url, data)
@@ -246,7 +249,7 @@ def register_specifications(product_id, version, specification):
       _test_data = True
       return _test_data
     else:
-      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
         return value['v']
@@ -262,7 +265,7 @@ def register_specifications(product_id, version, specification):
 def call_endpoint(gadget_id, endpoint_name, data):
   url = BASE_URL + "gadgets/" + gadget_id + "/endpoints/" + endpoint_name
   try:
-    resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+    resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
     if resp.ok:
       value = resp.json()
       return value['v']
@@ -317,7 +320,7 @@ def create_product(product_name, developer_id):
       # mibio : df4f925b5233fc50b1a298e878d85367
       return _test_data
     else:
-      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
         return value['v']
@@ -343,7 +346,7 @@ def update_about_hook(product_id, stage, hook_url=None, hook_client_key=None):
     return _test_data
   else:
     try:
-      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
         logging.info("Update about hook. url : %s, data : %s", url, data)
@@ -370,7 +373,7 @@ def update_product_stage(product_id, product_stage, model_number_dict, stage):
     return _test_data
   else:
     try:
-      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
         logging.info("Update product stage. url : %s, data : %s", url, data)
@@ -401,7 +404,7 @@ def create_model(product_id, model_number, model_name):
       _test_data = True
       return _test_data
     else:
-      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
         return value['v']
@@ -436,7 +439,7 @@ def create_org(email):
       }
       return _test_data
     else:
-      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
         return value['v']
@@ -516,7 +519,7 @@ def delete_firmware(product_id, model_number, firmware_version):
     if IS_DEV:
       return True
     else:
-      resp = requests.delete(url)
+      resp = requests.delete(url, headers=HEADERS)
       if resp.ok:
         value = resp.json()
         logging.info("Delete firmware. url : %s", url)
@@ -549,7 +552,7 @@ def register_tester(organization_id, product_id, tester_email, stage):
       _test_data = True
       return _test_data
     else:
-      resp = requests.post(url, headers=HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
         logging.info("Register tester.  url : %s, data : %s", url, data)
