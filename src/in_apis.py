@@ -575,6 +575,8 @@ def get_firmware_list_order_by_version(ep_version, model_code):
 def delete_firmware(firmware_id):
   firmware = get_firmware(firmware_id)
   if firmware:
+    firmware.last_updated_time = get_datetime()
+    firmware.last_updated_user = current_user.email
     firmware.is_removed = True
     db.session.commit()
 
