@@ -334,6 +334,29 @@ def get_noti_key_list(organization_id):
   return noti_key
 
 
+def delete_noti_key(organization_id, noti_key_id):
+  noti_key = NotiKey.query.filter_by(organization_id=organization_id,
+                                     id=noti_key_id).one_or_none()
+  if noti_key:
+    if noti_key.typ == models.IOS:
+      ret = apis.delete_ios_key(organization_id, noti_key.name)
+    else:
+      ret = apis.delete_android_key(organization_id, noti_key.name)
+
+    if ret:
+      db.session.delete(noti_key)
+      db.session.commit()
+      return True
+    else:
+      logging.warning("Failed to delete noti key. org_id : %s, noti_id : %s, ret : %s",
+                      organization_id, noti_key_id, ret)
+      return False
+  else:
+    logging.warning("Can not find noti key. org_id : %s, noti_id : %s",
+                    organization_id, noti_key_id)
+    return False
+
+
 # {{{ specifications
 
 
