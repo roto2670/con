@@ -14,7 +14,7 @@
     <a title="GadgetTopic Enumeration Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">MicroBot Docs</a> (30% documented)</p>
+        <p><a href="../index.html">MicroBot Docs</a> (48% documented)</p>
       </div>
     </header>
     <div class="content-wrapper">
@@ -58,6 +58,9 @@
                 <a href="../Classes/MIBUser.html">MIBUser</a>
               </li>
               <li class="nav-group-task">
+                <a href="../Classes/MIBUserManager.html">MIBUserManager</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Classes/MicroBot.html">MicroBot</a>
               </li>
             </ul>
@@ -67,6 +70,12 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a href="../Enums/GadgetTopic.html">GadgetTopic</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/HubTopic.html">HubTopic</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/UserTopic.html">UserTopic</a>
               </li>
             </ul>
           </li>
@@ -97,7 +106,7 @@
             <h1>GadgetTopic</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">GadgetTopic</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">GadgetTopic</span> <span class="p">:</span> <span class="kt">String</span></code></pre>
 
                 </div>
               </div>
@@ -120,14 +129,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Received when paired gadget is connected with device.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Connected</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Connected</span> <span class="o">=</span> <span class="s">"connected"</span></code></pre>
 
                         </div>
                       </div>
@@ -147,14 +156,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Received when paired gadget is disconnected with device.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Disconnected</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Disconnected</span> <span class="o">=</span> <span class="s">"disconnected"</span></code></pre>
 
                         </div>
                       </div>
@@ -174,14 +183,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Received when the secret key send to gadget is wrong.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Unauthorized</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Unauthorized</span> <span class="o">=</span> <span class="s">"unauthorized"</span></code></pre>
 
                         </div>
                       </div>
@@ -201,14 +210,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Received when pairing with gadget is finished.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Paired</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Paired</span> <span class="o">=</span> <span class="s">"paired"</span></code></pre>
 
                         </div>
                       </div>
@@ -228,14 +237,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Received with the LED color when the gadget is pairing.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Pairing</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Pairing</span> <span class="o">=</span> <span class="s">"pairing"</span></code></pre>
 
                         </div>
                       </div>
@@ -255,14 +264,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Received with a progress when the gadget is upgrading.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Upgrading</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Upgrading</span> <span class="o">=</span> <span class="s">"upgrading"</span></code></pre>
 
                         </div>
                       </div>
@@ -282,14 +291,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Received when unpairing with gadget is finished.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Unpaired</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="kt">Unpaired</span> <span class="o">=</span> <span class="s">"unpaired"</span></code></pre>
 
                         </div>
                       </div>
@@ -301,7 +310,7 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2018 <a class="link" href="https://thenaran.com/" target="_blank" rel="external">Naran Inc.</a>. All rights reserved. (Last updated: 2018-12-11)</p>
+          <p>&copy; 2019 <a class="link" href="https://thenaran.com/" target="_blank" rel="external">Naran Inc.</a>. All rights reserved. (Last updated: 2019-02-27)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
         </section>
       </article>

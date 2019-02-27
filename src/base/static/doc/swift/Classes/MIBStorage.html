@@ -14,7 +14,7 @@
     <a title="MIBStorage Class Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">MicroBot Docs</a> (30% documented)</p>
+        <p><a href="../index.html">MicroBot Docs</a> (48% documented)</p>
       </div>
     </header>
     <div class="content-wrapper">
@@ -58,6 +58,9 @@
                 <a href="../Classes/MIBUser.html">MIBUser</a>
               </li>
               <li class="nav-group-task">
+                <a href="../Classes/MIBUserManager.html">MIBUserManager</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Classes/MicroBot.html">MicroBot</a>
               </li>
             </ul>
@@ -67,6 +70,12 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a href="../Enums/GadgetTopic.html">GadgetTopic</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/HubTopic.html">HubTopic</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/UserTopic.html">UserTopic</a>
               </li>
             </ul>
           </li>
@@ -135,12 +144,148 @@ You can store on and retreive data from MicroBot Cloud.</p>
                     </section>
                   </div>
                 </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8MicroBot10MIBStorageC8getValue3key11productNameAA10MIBSessionCyypGSS_SStF"></a>
+                    <a name="//apple_ref/swift/Method/getValue(key:productName:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8MicroBot10MIBStorageC8getValue3key11productNameAA10MIBSessionCyypGSS_SStF">getValue(key:productName:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Retrieve stored value</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getValue</span><span class="p">(</span><span class="nv">key</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">productName</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/MIBSession.html">MIBSession</a></span><span class="o">&lt;</span><span class="kt">Any</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>key</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p></p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>productName</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p></p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>MIBSession<Any></p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:8MicroBot10MIBStorageC8setValue3key5value11productNameAA10MIBSessionCyytGSS_ypSStF"></a>
+                    <a name="//apple_ref/swift/Method/setValue(key:value:productName:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:8MicroBot10MIBStorageC8setValue3key5value11productNameAA10MIBSessionCyytGSS_ypSStF">setValue(key:value:productName:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Store value on MicroBot Cloud</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">setValue</span><span class="p">(</span><span class="nv">key</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Any</span><span class="p">,</span> <span class="nv">productName</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Classes/MIBSession.html">MIBSession</a></span><span class="o">&lt;</span><span class="kt">Void</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>key</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p></p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p></p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>productName</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p></p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>MIBSession<Void></p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
               </ul>
             </div>
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2018 <a class="link" href="https://thenaran.com/" target="_blank" rel="external">Naran Inc.</a>. All rights reserved. (Last updated: 2018-12-11)</p>
+          <p>&copy; 2019 <a class="link" href="https://thenaran.com/" target="_blank" rel="external">Naran Inc.</a>. All rights reserved. (Last updated: 2019-02-27)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
         </section>
       </article>
