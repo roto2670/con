@@ -252,7 +252,7 @@ def get_gadget_list(product_id):
            "hub_id": "f1bac4169156cd1f29da073c51de33e5",
            "account_id": "dbb0cf4a18a37f79f13126e440ef1d75",
            "user_id": "d3e4022166cf428218f87aa8a1759eee", "status": 0,
-           "rssi": 0, "battery": 0, 'locale': 'UK'}
+           "rssi": 0, "battery": 0, 'locale': 'NO'}
       ]
       return _test_data
     else:

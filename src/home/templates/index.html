@@ -317,12 +317,13 @@
 
               <div class="x_content">
                 <div class="dashboard-widget-content">
-                  <div class="col-md-4 hidden-small">
+                  <div class="col-md-4 hidden-small fixed_height_320 dashboard-overflow-y">
                     <table class="countries_list">
                       <tbody>
                         {% for key, value in infos.locale.items() %}
                           <tr>
                             <td>{{ key|getCountryName }}</td>
+
                             <td class="fs15 fw700 text-right">{{ value }}</td>
                           </tr>
                         {% endfor %}
