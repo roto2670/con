@@ -63,3 +63,5 @@ privkey.pem
 maint/prota_addr
 
 *.idea/
+
+.vscode
