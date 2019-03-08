@@ -502,7 +502,7 @@
     d3.wordcloud()
       .size([300,200])
       .selector('#wordcloud')
-      .words(JSON.parse(nameList))
+      .words(JSON.parse(nameList.replace(/[\u0000-\u0019]+/g,"")))
       .start();
   }
   nameCloud('{{ infos["name_list"]|safe }}');
