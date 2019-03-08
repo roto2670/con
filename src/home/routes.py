@@ -88,7 +88,7 @@ def _build_product_info(product_id):
           _tmp_model_dict[gadget['model_name']] = 1
       _tmp_battery += gadget.get('battery', 0)
       # TODO: size check
-      _name_value = {'text': gadget['name'], 'size': 2}
+      _name_value = {'text': gadget['name'].replace('\u0002', '##'), 'size': 2}
       _tmp_name_list.append(_name_value)
 
       if 'locale' in gadget and gadget['locale']:

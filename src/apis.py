@@ -121,7 +121,7 @@ def get_gadget_list(product_id):
     if IS_DEV:
       _test_data = [
           {"id": "b105b0311157d3cc18076a4d3735b292", "mac": "f2d63431da9l",
-           "name": "mibs(aa16)", "kind": "mibs", "firmware_version": "1.3.0",
+           "name": "sh (f262\u0002", "kind": "mibs", "firmware_version": "1.3.0",
            "model_number": 512, "model_name": 512, "sdk_version": "0.1",
            "hub_id": "f2ba13169156ad1f29da073c51de33d5",
            "account_id": "dib0cf4aa8a37f79f13126e4407f1d75",
