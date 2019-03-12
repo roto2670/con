@@ -258,6 +258,21 @@ def test_call(product_id, gadget, endpoint_name, version):
 DEFAULT_LIMIT = '''10'''
 
 
+@blueprint.route('/<product_id>/next_logs', methods=['GET'])
+@util.require_login
+def get_next_logs(product_id):
+  _set_product(product_id)
+  _limit = request.args.get("limit", DEFAULT_LIMIT)
+  _keyword = request.args.get('keyword', "")
+  _token = request.args.get('token')
+  rets = apis.get_logs(product_id, keyword=_keyword, token=_token,
+                        limit=_limit)
+  token = rets.get('token', None)
+  logs = rets.get('logs', [])
+  data = {"logs": logs, "token": token}
+  return json.dumps(data)
+
+
 @blueprint.route('/<product_id>/logs', methods=['GET', 'POST'])
 @util.require_login
 def get_logs(product_id):
