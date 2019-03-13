@@ -156,7 +156,7 @@ def get_gadget_list(product_id):
            "user_id": "d3e4022166cf428218f87aa8a1759aee", "status": 1,
            "rssi": 0, "battery": 0, 'locale': 'JP'},
           {"id": "1a05b03cc357d3cc18076a4d3735b292", "mac": "f2d23434da9i",
-           "name": "mibs(f2d2)", "kind": "mibs", "firmware_version": "1.2.1",
+           "name": "Kid's room", "kind": "mibs", "firmware_version": "1.2.1",
            "model_number": 512, "model_name": 512, "sdk_version": "0.1",
            "hub_id": "f1bac4169156cd1f29da073c51de33i5",
            "account_id": "dbb0cf4a18a37f79f13126e440af1d75",
