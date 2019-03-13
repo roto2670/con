@@ -102,13 +102,16 @@ def _build_product_info(product_id):
     _info['total_users'] = len(_tmp_user)
     _tmp_od_firmware = collections.OrderedDict(sorted(_tmp_firmware.items(),
                                                       reverse=True))
+    _tmp_od_locale = collections.OrderedDict(sorted(_tmp_locale_dict.items(),
+                                                    key=lambda x: x[1],
+                                                    reverse=True))
     _info['firmware'] = _tmp_od_firmware
     _info['total_firmware'] = _tmp_total_firmware
     _info['created_time'] = time.time()
     _info['avg_battery'] = int((_tmp_battery / len(gadget_list)))
     _info['name_list'] = json.dumps(_tmp_name_list)
     _info['model'] = _tmp_model_dict
-    _info['locale'] = _tmp_locale_dict
+    _info['locale'] = dict(_tmp_od_locale)
     return _info
   else:
     return _info
