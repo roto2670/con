@@ -336,7 +336,6 @@
           </div>
         </div>
     </div> <!-- End Row 4 -->
-
   </div>
 {% endblock content %}
 
@@ -367,7 +366,12 @@
   <!-- D3 cloud -->
   <script src="{{ url_for('static', filename='vendors/d3/d3.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendors/d3cloud/src/d3.layout.cloud.js') }}"></script>
+  <!--
+    TODO: remove this
+  <script src="{{ url_for('static', filename='vendors/d3-wordcloud/lib/d3/d3.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendors/d3-wordcloud/lib/d3/d3.layout.cloud.js') }}"></script>
   <script src="{{ url_for('static', filename='vendors/d3-wordcloud/d3.wordcloud.js') }}"></script>
+  -->
 
   <script>
     function connectionGraph(offData, onData) {
@@ -465,6 +469,59 @@
     }
     performanceEndpoint('{{ ep_infos|safe }}');
 
+  var _list = '{{ infos["name_list"]|safe }}',
+      __list = JSON.parse(_list.replace(/[\u0000-\u0019]+/g,"")),
+      colorList = ['#654df7', '#9c1d1d', '#8fb52e', '#fdb736', '#3c7f92', '#482f01', '#eb8787'];
+  function d3cloud(nameList) {
+    var layout = d3.layout.cloud()
+      .size([320, 200])
+      .words(nameList)
+      .padding(3)
+      .fontSize(function(d) { return d.size; })
+      .on("end", draw);
+
+    function draw(words) {
+      d3.select("#wordcloud").append("svg")
+          .attr("width", layout.size()[0])
+          .attr("height", layout.size()[1])
+        .append("g")
+          .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+        .selectAll("text")
+          .data(words)
+        .enter().append("text")
+          .style("font-size", function(d) {
+            if (d.size <= 10) {
+              return 10 + "px";
+            } else if(d.size > 80) {
+              return 80 + "px";
+            } else {
+              return d.size + "px";
+            }
+          })
+          .style("font-family", "Impact")
+          .style("opacity", 0.7)
+          .style("fill", function(d, i) { return colorList[Math.floor(Math.random() * colorList.length)]})
+          .attr("text-anchor", "middle")
+          .attr("transform", function(d) {
+            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+          })
+          .text(function(d) { return d.text; })
+        // TODO:
+        // .on("mouseover", function(d, i) {
+        //   d3.select(this).trasition().style('fint-size', d.size + 3 + 'px');
+        // })
+        // .on("mouseout", function(d, i) {
+        //   d3.select(this).trasition().style('fint-size', d.size + 'px');
+        // })
+        // .on("click", function(d, i) {
+        //   window.alert("hihi : " + d.text);
+        // })
+        .style("cursor", "pointer");
+    }
+    layout.start();
+  }
+  d3cloud(__list);
+
 	function init_JQVmap(data){
 		if(typeof (jQuery.fn.vectorMap) === 'undefined'){ return; }
 			if ($('#world-map-gdp').length ){
@@ -498,14 +555,6 @@
   };
   init_JQVmap({{ infos['locale']|safe }});
 
-  function nameCloud(nameList) {
-    d3.wordcloud()
-      .size([300,200])
-      .selector('#wordcloud')
-      .words(JSON.parse(nameList.replace(/[\u0000-\u0019]+/g,"")))
-      .start();
-  }
-  nameCloud('{{ infos["name_list"]|safe }}');
 
   </script>
 
