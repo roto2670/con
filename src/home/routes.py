@@ -61,6 +61,7 @@ def _build_product_info(product_id):
     _tmp_total_firmware = 0
     _tmp_battery = 0
     _tmp_name_list = []
+    _tmp_name_dict = {}
     _tmp_model_dict = {}
     _tmp_locale_dict = {}
     _info['total_gadgets'] = len(gadget_list)
@@ -88,8 +89,11 @@ def _build_product_info(product_id):
           _tmp_model_dict[gadget['model_name']] = 1
       _tmp_battery += gadget.get('battery', 0)
       # TODO: size check
-      _name_value = {'text': gadget['name'].replace("'", "`"), 'size': 2}
-      _tmp_name_list.append(_name_value)
+      __name = gadget['name'].replace("'", "`").lower()
+      if __name in _tmp_name_dict:
+        _tmp_name_dict[__name] += 5
+      else:
+        _tmp_name_dict[__name] = 10
 
       if 'locale' in gadget and gadget['locale']:
         _locale = gadget['locale'].lower()
@@ -98,6 +102,10 @@ def _build_product_info(product_id):
             _tmp_locale_dict[_locale] += 1
           else:
             _tmp_locale_dict[_locale] = 1
+
+    for _name, _size in _tmp_name_dict.items():
+      _name_value = {"text": _name, "size": _size}
+      _tmp_name_list.append(_name_value)
 
     _info['total_users'] = len(_tmp_user)
     _tmp_od_firmware = collections.OrderedDict(sorted(_tmp_firmware.items(),
