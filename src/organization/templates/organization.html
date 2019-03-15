@@ -89,7 +89,11 @@
                           {% for noti_key in noti_key_list %}
                             <tr>
                               {% if noti_key.typ == 0 %}
-                                <td>IOS</td>
+                                {% if noti_key.is_dev == 0 %}
+                                  <td>IOS(Production)</td>
+                                {% else %}
+                                  <td>IOS(Dev)</td>
+                                {% endif %}
                               {% else %}
                                 <td>ANDROID</td>
                               {% endif %}
