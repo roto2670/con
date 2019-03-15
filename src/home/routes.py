@@ -88,12 +88,11 @@ def _build_product_info(product_id):
         else:
           _tmp_model_dict[gadget['model_name']] = 1
       _tmp_battery += gadget.get('battery', 0)
-      # TODO: size check
       __name = gadget['name'].replace("'", "`").lower()
       if __name in _tmp_name_dict:
-        _tmp_name_dict[__name] += 5
+        _tmp_name_dict[__name] += 1
       else:
-        _tmp_name_dict[__name] = 10
+        _tmp_name_dict[__name] = 1
 
       if 'locale' in gadget and gadget['locale']:
         _locale = gadget['locale'].lower()

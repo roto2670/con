@@ -471,12 +471,16 @@
 
   var _list = '{{ infos["name_list"]|safe }}',
       __list = JSON.parse(_list.replace(/[\u0000-\u0019]+/g,"")),
-      colorList = ['#654df7', '#9c1d1d', '#8fb52e', '#fdb736', '#3c7f92', '#482f01', '#eb8787'];
+      colorList = ['#654df7', '#9c1d1d', '#8fb52e', '#fdb736', '#3c7f92',
+                   '#482f01', '#eb8787', '#100f77', '#e0e02f', '#c714a3',
+                   '#e06ede', '#684236'];
   function d3cloud(nameList) {
     var layout = d3.layout.cloud()
       .size([320, 200])
       .words(nameList)
-      .padding(3)
+      .spiral("rectangular")
+      .padding(1)
+      .rotate(function () { return (~~(Math.random() * 2) * -40) || 50; })
       .fontSize(function(d) { return d.size; })
       .on("end", draw);
 
@@ -491,14 +495,13 @@
         .enter().append("text")
           .style("font-size", function(d) {
             if (d.size <= 10) {
-              return 10 + "px";
+              return 9 + d.size + "px";
             } else if(d.size > 80) {
               return 80 + "px";
             } else {
               return d.size + "px";
             }
           })
-          .style("font-family", "Impact")
           .style("opacity", 0.7)
           .style("fill", function(d, i) { return colorList[Math.floor(Math.random() * colorList.length)]})
           .attr("text-anchor", "middle")
