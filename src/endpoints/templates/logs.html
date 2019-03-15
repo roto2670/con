@@ -1,10 +1,14 @@
 {% extends "base_site.html" %}
 
 {% block title %} Logs {% endblock title %}
+{% block javascripts %}
 
+  {{ super() }}
+{% endblock javascripts %}
 {% block stylesheets %}
-  <link href="/static/vendors/jsonTreeViewer/libs/jsonTree/jsonTree.css" rel="stylesheet" />
-  <script src="/static/vendors/jsonTreeViewer/libs/jsonTree/jsonTree.js"></script>
+    <link href="/static/vendors/jsonTreeViewer/libs/jsonTree/jsonTree.css" rel="stylesheet"/>
+    <script src="/static/vendors/jsonTreeViewer/libs/jsonTree/jsonTree.js"></script>
+    <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js') }}"></script>
   {{ super() }}
 {% endblock stylesheets %}
 
@@ -13,28 +17,26 @@
     <div class="">
       <!-- start row -->
       <div class="row">
-
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="x_panel">
-
             <div class="x_content">
               <form id="search" class="form-horizontal form-label-left" method="post">
                 <div class="form-group">
-
                   <div class="btn-group">
-                    <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button" aria-expanded="false">{{ limit }} <span class="caret"></span>
+                    <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button"
+                      aria-expanded="false">{{ limit }}<span class="caret"></span>
                     </button>
-                    <ul role="menu" class="dropdown-menu" style="min-width:53px;">
-                      <li><a href="?limit=10&keyword={{ keyword }}">10</a>
+                    <ul role="menu" class="dropdown-menu" style="min-width:55px; text-align:center">
+                      <li><a href="?limit=20&keyword={{ keyword }}">20</a>
                       </li>
-                      <li><a href="?limit=25&keyword={{ keyword }}">25</a>
+                      <li><a href="?limit=40&keyword={{ keyword }}">40</a>
                       </li>
-                      <li><a href="?limit=50&keyword={{ keyword }}">50</a>
+                      <li><a href="?limit=100&keyword={{ keyword }}">100</a>
                       </li>
                     </ul>
                   </div>
 
-                  <div class="col-sm-3 alignright">
+                  <div class="col-sm-4 alignright">
                     <div class="input-group">
                       <input type="text" id="keyword" name="keyword" class="form-control">
                       <span class="input-group-btn">
@@ -45,41 +47,107 @@
                 </div>
               </form>
 
-              <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
-                {% for log in logs %}
-                  <div class="panel">
-                    <a class="panel-heading" role="tab" id="heading{{ loop.index|string }}" data-toggle="collapse" data-parent="#accordion"
-                        href="#{{ log._t|getLogId }}" aria-expanded="true" aria-controls="{{ log._t|getLogId }}">
-                      <h3 class="panel-title">{{ log._t|timestampFilter }} {{log.payload|string|truncate(90, True)}}</h3>
-                    </a>
-                    <div id='{{ log._t|getLogId }}' class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ loop.index|string }}">
-                      <div class='panel-body'>
-                        <div id='v-{{ log._t|getLogId }}'></div>
-                      </div>
-                    </div>
-                  </div>
-                  <script>
-                    var wrapper = document.getElementById('v-{{ log._t|getLogId }}');
-                    var tree = jsonTree.create({{ log|tojson }}, wrapper);
-                  </script>
-                {% endfor %}
-              </div>
+              <a id="moveTop" class="btn btn-primary btn-xs" href="#" style="padding: 5px; right: 2%; bottom: 50px; position: fixed; border-radius: 13px; z-index: 999;" onclick="$('html').animate({scrollTop: 0})">TOP</a>
+              <a id="moveBottom" class="btn btn-primary btn-xs" href="#" style="padding: 5px; right: 2%; bottom: 10px; position: fixed; border-radius: 13px; z-index: 999;"
+              onclick="$('html').animate({scrollTop: $(document).height()})">BTM</a>
 
-              {% if logs %}
-                <a href="?token={{ token }}&limit={{ limit }}&keyword={{ keyword }}"><button type="button" class="btn btn-default alignright">Next</button></a>
-              {% endif %}
+              <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
+                <script>
+                  var nextTokens = null,
+                      limit = null,
+                      keyword = "",
+                      logs = "",
+                      index = null;
+                
+                  function setToken(_token){
+                    nextTokens = _token;
+                  }
+
+                  function setKeyword(_keyword){
+                    keyword = _keyword;
+                  }
+
+                  function setLimit(_limit){
+                    limit = _limit;
+                  }
+
+                  function setIndex(_index){
+                    index = _index;
+                  }
+
+                  function getToken(){
+                    return nextTokens;
+                  }
+
+                  function getLimit(){
+                    return limit;
+                  }
+
+                  function getKeyword(){
+                    return keyword;
+                  }
+
+                  function getIndex(){
+                    return index;
+                  }
+
+                  function getLogs(productId){
+                    url = "/endpoints/" + productId + '/next_logs';
+                    jQuery.get(url, { 'token': getToken(), 'limit': getLimit(), 'keyword': getKeyword()})
+                      .done(function (data) {
+                        var jsonData = JSON.parse(data),
+                            index = getIndex(),
+                            logs = jsonData.logs;
+
+                        logs.forEach(function (log) {
+                          var logId = log._t.toString().replace('.', ''),
+                              payLoad = JSON.stringify(log.payload).slice(0, 90).replace(/\\/g, ''),
+                              timestamp = logId.substring(0, 10) * 1000,
+                              retVal = new Date(timestamp).toLocaleString('eu');
+                          index++;
+                          var addObj= "<div class = 'panel'>" +
+                                        "<a class='panel-heading' role= 'tab' id= 'heading" + index + "' data-toggle='collapse' data-parent= '#accordion'" +
+                                          "href='#" + logId + "' aria-expanded='true' aria-controls='" + logId + "'>" +
+                                          "<h3 class='panel-title'>" + retVal + " " + payLoad + "</h3>" +
+                                        "</a>" +
+                                        "<div id='" + logId + "' class='panel-collapse collapse' role='tabpanel' aria-labelledby='heading+" + index + "'>" +
+                                          "<div class='panel-body'>" +
+                                            "<div id='v-" + logId + "'></div>" +
+                                          "</div>" +
+                                        "</div>" +
+                                      "</div>"
+
+                          $(".accordion").append(addObj);
+                          var wrapper = document.getElementById('v-' + logId);
+                          var tree = jsonTree.create(log, wrapper);
+                        });
+
+                        setIndex(index);
+                        setToken(jsonData.token);
+                        setLimit(jsonData.limit);
+                        setKeyword(jsonData.keyword);
+                        });
+                      }
+
+                $(window).scroll(function(){
+                  var scrollHeight = $(document).height();
+                  var scrollPosition = $(window).height() + $(window).scrollTop();
+                  if ((scrollHeight - scrollPosition) / scrollHeight === 0) {
+                    getLogs("{{ current_product.id }}");
+                  }
+                });
+
+                setLimit({{ limit }});
+                setKeyword({{ keyword }});
+                getLogs("{{ current_product.id }}");
+
+              </script>
             </div>
-
-          </div>  <!-- end x_content -->
-        </div>  <!-- end x_panel -->
-
-      </div>  <!-- End row -->
-
-    </div>
+          </div>
+        </div> <!-- end x_content -->
+      </div> <!-- end x_panel -->
+    </div> <!-- End row -->
   </div>
+</div>
 
 {% endblock content %}
-
-{% block javascripts %}
-  {{ super() }}
-{% endblock javascripts %}
