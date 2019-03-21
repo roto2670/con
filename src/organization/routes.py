@@ -161,6 +161,19 @@ def register_noti_key(platform):
         abort(500)
 
 
+@blueprint.route('/notikey/delete/<noti_key_id>', methods=['GET'])
+@util.require_login
+def delete_noti_key(noti_key_id):
+  logging.info("Try to delete noti key. User : %s, noti id : %s",
+               current_user.email, noti_key_id)
+  ret = in_apis.delete_noti_key(current_user.organization_id, noti_key_id)
+  if ret:
+    return redirect('organization')
+  else:
+    logging.warning("Failed to delete noti key.")
+    return redirect('organization')
+
+
 @blueprint.route('/invite', methods=['POST'])
 @util.require_login
 def send_invite():

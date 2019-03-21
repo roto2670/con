@@ -298,6 +298,29 @@ def update_android_key(organization_id, kind, secret):
     return None
 
 
+def delete_android_key(organization_id, kind):
+  # kind : package name
+  url = BASE_URL + 'developers/' + organization_id + '/keys/' + kind + '/android'
+  try:
+    if IS_DEV:
+      _test_data = True
+      return _test_data
+    else:
+      resp = requests.delete(url, headers=HEADERS)
+      if resp.ok:
+        value = resp.json()
+        logging.info("Delete android key. url : %s", url)
+        return value['v']
+      else:
+        logging.warning("Delete android key response. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return None
+  except:
+    logging.exception("Raise error while delete android key. org : %s kind : %s",
+                      organization_id, kind)
+    return None
+
+
 def update_ios_key(organization_id, kind, cert, secret, is_dev):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.2q2o6bhvcg6
   # kind : bundle_id
@@ -323,6 +346,29 @@ def update_ios_key(organization_id, kind, cert, secret, is_dev):
         return None
   except:
     logging.exception("Raise error")
+    return None
+
+
+def delete_ios_key(organization_id, kind):
+  # kind : bundle_id
+  url = BASE_URL + 'developers/' + organization_id + '/keys/' + kind + '/ios'
+  try:
+    if IS_DEV:
+      _test_data = True
+      return _test_data
+    else:
+      resp = requests.delete(url, headers=HEADERS)
+      if resp.ok:
+        value = resp.json()
+        logging.info("Delete ios key. url : %s", url)
+        return value['v']
+      else:
+        logging.warning("Delete ios key response. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return None
+  except:
+    logging.exception("Raise error while delete ios key. org : %s kind : %s",
+                      organization_id, kind)
     return None
 
 

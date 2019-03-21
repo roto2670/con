@@ -83,6 +83,7 @@
                             <th>Bundle ID</th>
                             <th>Last Updated</th>
                             <th>Last Updated User</th>
+                            <th>Delete</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -100,6 +101,40 @@
                               <td>{{ noti_key.name }}</td>
                               <td>{{ noti_key.last_updated_time | datetimeFilter }}</td>
                               <td>{{ noti_key.last_updated_user }}</td>
+                              <td>
+                                <button type="button" class="btn-danger btn-xs" data-toggle="modal" data-target=".delete-modal-{{ noti_key.id }}">
+                                  <i class="fa fa-remove"></i>
+                                </button>
+                              </td>
+                              <!-- Modal -->
+                              <div class="modal fade delete-modal-{{ noti_key.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                                  <div class="modal-dialog modal-sm">
+                                    <div class="modal-content">
+
+                                      <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                                        </button>
+                                        <h4 class="modal-title" id="delete">Delete</h4>
+                                      </div>
+                                      <div>
+                                        <form id="deprecated" method="post" action="/orgazniation/notikey/delete/{{ noti_key.id }}">
+                                          <div class="modal-body">
+                                            {% if noti_key.typ == 0 %}
+                                              <h4>Are you sure you want to delete {{ noti_key.name }} on platform IOS?</h4>
+                                            {% else %}
+                                              <h4>Are you sure you want to delete {{ noti_key.name }} on platform ANDROID?</h4>
+                                            {% endif %}
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Ok</button>
+                                          </div>
+                                        </form>
+                                      </div>
+
+                                    </div>
+                                  </div>
+                              </div>  <!-- End modal-->
                             </tr>
                           {% endfor %}
                         </tbody>
