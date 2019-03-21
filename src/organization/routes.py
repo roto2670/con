@@ -161,7 +161,7 @@ def register_noti_key(platform):
         abort(500)
 
 
-@blueprint.route('/notikey/delete/<noti_key_id>', methods=['GET'])
+@blueprint.route('/notikey/delete/<noti_key_id>', methods=['POST'])
 @util.require_login
 def delete_noti_key(noti_key_id):
   logging.info("Try to delete noti key. User : %s, noti id : %s",
