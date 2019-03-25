@@ -255,7 +255,7 @@ def test_call(product_id, gadget, endpoint_name, version):
   return json.dumps(ret_data)
 
 
-DEFAULT_LIMIT = '''10'''
+DEFAULT_LIMIT = '''20'''
 
 
 @blueprint.route('/<product_id>/next_logs', methods=['GET'])
@@ -269,7 +269,7 @@ def get_next_logs(product_id):
                         limit=_limit)
   token = rets.get('token', None)
   logs = rets.get('logs', [])
-  data = {"logs": logs, "token": token}
+  data = {"logs": logs, "token": token, "keyword": _keyword, "limit": _limit}
   return json.dumps(data)
 
 
@@ -281,18 +281,10 @@ def get_logs(product_id):
   _keyword = request.args.get('keyword', "")
   if request.method == "GET":
     _token = request.args.get('token')
-    rets = apis.get_logs(product_id, keyword=_keyword, token=_token,
-                         limit=_limit)
-    token = rets.get('token', None)
-    logs = rets.get('logs', [])
-    return render_template('logs.html', logs=logs, keyword=_keyword,
-                           token=token, limit=_limit)
+    return render_template('logs.html', keyword=_keyword, limit=_limit)
   else:
     _keyword = request.form['keyword']
-    rets = apis.get_logs(product_id, keyword=_keyword, limit=_limit)
-    token = rets.get('token', None)
-    logs = rets.get('logs', [])
-    return render_template('logs.html', logs=logs, token=token,
+    return render_template('logs.html',
                            keyword=_keyword, limit=_limit)
 
 
