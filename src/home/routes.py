@@ -113,6 +113,7 @@ def _build_product_info(product_id):
     _tmp_od_locale = collections.OrderedDict(sorted(_tmp_locale_dict.items(),
                                                     key=lambda x: x[1],
                                                     reverse=True))
+
     _info['firmware'] = _tmp_od_firmware
     _info['total_firmware'] = _tmp_total_firmware
     _info['created_time'] = time.time()
