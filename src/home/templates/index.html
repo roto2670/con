@@ -178,7 +178,7 @@
             </button>
             <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
               <div class="modal-dialog modal-lg">
-                <div class="modal-content" style="height: 800px; width: 1200px;">
+                <div class="modal-content" style="width: 100%; height: 85%; text-align: center;">
                   <div class="modal-header">
                     <h3 class="modal-title" id="Name">NameCloud</h3>
                   </div>
@@ -497,8 +497,8 @@
 
     function drawWordCloud(nameList) {
       var svg_location = "#wordcloud",
-          width = 1200,
-          height = 750,
+          width = 800,
+          height = 500,
           fill = function (d, i) { return colorList[Math.floor(Math.random() * colorList.length)] };
 
       var xScale = d3.scale.linear()
@@ -509,7 +509,7 @@
 
       d3.layout.cloud().size([width, height])
         .words(nameList)
-        .fontSize(function (d) { return xScale(d.size + 3.5); })
+        .fontSize(function (d) { return xScale(d.size); })
         .text(function (d) { return d.text; })
         .rotate(function () { return ~~(Math.random() * 2) * 90; })
         .font("Impact")
@@ -539,7 +539,7 @@
 
     function drawWordCloud2(nameList) {
       var svg_location2 = "#wordcloud2",
-          width2 = 400,
+          width2 = 280,
           height2 = 200,
           fill2 = function (d, i) { return colorList[Math.floor(Math.random() * colorList.length)] };
 
@@ -579,6 +579,110 @@
       d3.layout.cloud().stop();
     }
 
+    var maxWidth = 1920,
+        maxHeight = 980,
+        maxSize = maxWidth * maxHeight;
+
+    window.addEventListener("resize", function () {
+      if ((maxSize * 0.9) > $(window).width() * $(window).height()) {
+        redraw(__list);
+        redraw2(__list2);
+        maxSize = $(window).width() * $(window).height();
+      } else if((maxSize * 1.1) < $(window).width() * $(window).height()){
+          redraw(__list);
+          redraw2(__list2);
+          maxSize = $(window).width() * $(window).height();
+        }
+      })
+
+    function redraw(nameList){
+      var newSvgLocation3 = "#wordcloud",
+          oldSvgLocation3 = "#wordcloud *",
+          width3 = $(window).width() / 2,
+          height3 = $(window).height() / 1.5,
+          fill3 = function (d, i) { return colorList[Math.floor(Math.random() * colorList.length)] };
+
+      var xScale3 = d3.scale.linear()
+          .domain([0, d3.max(nameList, function (d) {
+            return d.size;
+          })])
+          .range([1, 100]);
+
+      d3.layout.cloud().size([width3, height3])
+        .words(nameList)
+        .fontSize(function (d) { return xScale3(d.size); })
+        .text(function (d) { return d.text; })
+        .rotate(function () { return ~~(Math.random() * 2) * 90; })
+        .font("Impact")
+        .on("end", draw)
+        .start();
+
+      function draw(words) {
+        d3.select(oldSvgLocation3).remove();
+        d3.select(newSvgLocation3).append("svg")
+          .attr("width", width3)
+          .attr("height", height3)
+          .append("g")
+          .attr("transform", "translate(" + [width3 >> 1, height3 >> 1] + ")")
+          .selectAll("text")
+          .data(words)
+          .enter().append("text")
+          .style("font-size", function (d) { return d.size + "px"; })
+          .style("font-family", "Impact")
+          .style("fill", function (d, i) { return fill3(i); })
+          .attr("text-anchor", "middle")
+          .attr("transform", function (d) {
+            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+          })
+          .text(function (d) { return d.text; });
+        }
+        d3.layout.cloud().stop();
+      }
+
+    function redraw2(nameList){
+      var newSvgLocation4 = "#wordcloud2",
+          oldSvgLocation4 = "#wordcloud2 *",
+          width4 = $(window).width() / 4.5,
+          height4 = $(window).height() / 4,
+          fill4 = function (d, i) { return colorList[Math.floor(Math.random() * colorList.length)] };
+
+      var xScale4 = d3.scale.linear()
+          .domain([0, d3.max(nameList, function (d) {
+            return d.size;
+          })])
+          .range([1, 10]);
+
+      d3.layout.cloud().size([width4, height4])
+        .words(nameList)
+        .fontSize(function (d) { return xScale4(d.size + 40); })
+        .text(function (d) { return d.text; })
+        .rotate(function () { return ~~(Math.random() * 2) * 90; })
+        .font("Impact")
+        .on("end", draw)
+        .start();
+
+      function draw(words) {
+        d3.select(oldSvgLocation4).remove();
+        d3.select(newSvgLocation4).append("svg")
+          .attr("width", width4)
+          .attr("height", height4)
+          .append("g")
+          .attr("transform", "translate(" + [width4 >> 1, height4 >> 1] + ")")
+          .selectAll("text")
+          .data(words)
+          .enter().append("text")
+          .style("font-size", function (d) { return d.size + "px"; })
+          .style("font-family", "Impact")
+          .style("fill", function (d, i) { return fill4(i); })
+          .attr("text-anchor", "middle")
+          .attr("transform", function (d) {
+            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+          })
+          .text(function (d) { return d.text; });
+          }
+        d3.layout.cloud().stop();
+      }
+
 	function init_JQVmap(data){
 		if(typeof (jQuery.fn.vectorMap) === 'undefined'){ return; }
 			if ($('#world-map-gdp').length ){
@@ -608,10 +712,10 @@
             }
           }
 				});
-			}
-  };
+      }
+    };
+    
   init_JQVmap({{ infos['locale']|safe }});
-
 
   </script>
 
