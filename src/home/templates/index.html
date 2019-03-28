@@ -505,7 +505,7 @@
           .domain([0, d3.max(nameList, function (d) {
             return d.size;
           })])
-          .range([10, 100]);
+          .range([1, 100]);
 
       d3.layout.cloud().size([width, height])
         .words(nameList)
@@ -547,7 +547,7 @@
         .domain([0, d3.max(nameList, function (d) {
           return d.size;
         })])
-        .range([10, 100]);
+        .range([1, 100]);
 
       d3.layout.cloud().size([width2, height2])
         .words(nameList)
@@ -598,7 +598,7 @@
     function redraw(nameList){
       var newSvgLocation3 = "#wordcloud",
           oldSvgLocation3 = "#wordcloud *",
-          width3 = $(window).width() / 2,
+          width3 = $(window).width() / 3.5,
           height3 = $(window).height() / 1.5,
           fill3 = function (d, i) { return colorList[Math.floor(Math.random() * colorList.length)] };
 
@@ -610,7 +610,7 @@
 
       d3.layout.cloud().size([width3, height3])
         .words(nameList)
-        .fontSize(function (d) { if(d.size < 11) { return xScale3(+d.size + 5); } else { return xScale3(d.size); }})
+        .fontSize(function (d) { if(d.size < 5) { return xScale3(+d.size + 5); } else { return xScale3(d.size); }})
         .text(function (d) { return d.text; })
         .rotate(function () { return ~~(Math.random() * 2) * 90; })
         .font("Impact")
@@ -654,7 +654,7 @@
 
       d3.layout.cloud().size([width4, height4])
         .words(nameList)
-        .fontSize(function (d) { if(d.size < 11) { return xScale4(+d.size + 5); } else { return xScale4(d.size); }})
+        .fontSize(function (d) { if(d.size < 6) { return xScale4(+d.size + 5); } else { return xScale4(d.size); }})
         .text(function (d) { return d.text; })
         .rotate(function () { return ~~(Math.random() * 2) * 90; })
         .font("Impact")
