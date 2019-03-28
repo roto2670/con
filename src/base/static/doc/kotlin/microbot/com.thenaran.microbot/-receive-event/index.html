@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>ReceiveEvent - microbot</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">microbot</a>&nbsp;/&nbsp;<a href="../index.html">com.thenaran.microbot</a>&nbsp;/&nbsp;<a href="./index.html">ReceiveEvent</a><br/>
+<br/>
+<h1>ReceiveEvent</h1>
+<code><span class="keyword">interface </span><span class="identifier">ReceiveEvent</span></code>
+<p>Receive event from Gadget and Microbot Cloud</p>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="mib-received-auth-event.html">mibReceivedAuthEvent</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">mibReceivedAuthEvent</span><span class="symbol">(</span><span class="identifier" id="com.thenaran.microbot.ReceiveEvent$mibReceivedAuthEvent(com.thenaran.microbot.MIBUser, kotlin.String, kotlin.collections.Map((kotlin.String, kotlin.Any)))/user">user</span><span class="symbol">:</span>&nbsp;<a href="../-m-i-b-user/index.html"><span class="identifier">MIBUser</span></a><span class="symbol">, </span><span class="identifier" id="com.thenaran.microbot.ReceiveEvent$mibReceivedAuthEvent(com.thenaran.microbot.MIBUser, kotlin.String, kotlin.collections.Map((kotlin.String, kotlin.Any)))/topic">topic</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.thenaran.microbot.ReceiveEvent$mibReceivedAuthEvent(com.thenaran.microbot.MIBUser, kotlin.String, kotlin.collections.Map((kotlin.String, kotlin.Any)))/data">data</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span class="identifier">Map</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">,</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span class="symbol">&gt;</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="mib-received-gadget-evenet.html">mibReceivedGadgetEvenet</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">mibReceivedGadgetEvenet</span><span class="symbol">(</span><span class="identifier" id="com.thenaran.microbot.ReceiveEvent$mibReceivedGadgetEvenet(com.thenaran.microbot.MIBGadget, kotlin.String, kotlin.collections.Map((kotlin.String, kotlin.Any)))/gadget">gadget</span><span class="symbol">:</span>&nbsp;<a href="../-m-i-b-gadget/index.html"><span class="identifier">MIBGadget</span></a><span class="symbol">, </span><span class="identifier" id="com.thenaran.microbot.ReceiveEvent$mibReceivedGadgetEvenet(com.thenaran.microbot.MIBGadget, kotlin.String, kotlin.collections.Map((kotlin.String, kotlin.Any)))/topic">topic</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.thenaran.microbot.ReceiveEvent$mibReceivedGadgetEvenet(com.thenaran.microbot.MIBGadget, kotlin.String, kotlin.collections.Map((kotlin.String, kotlin.Any)))/data">data</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span class="identifier">Map</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">,</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span class="symbol">&gt;</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="mib-received-hub-event.html">mibReceivedHubEvent</a></p>
+</td>
+<td>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">mibReceivedHubEvent</span><span class="symbol">(</span><span class="identifier" id="com.thenaran.microbot.ReceiveEvent$mibReceivedHubEvent(com.thenaran.microbot.MIBHub, kotlin.String, kotlin.collections.Map((kotlin.String, kotlin.Any)))/gadget">gadget</span><span class="symbol">:</span>&nbsp;<a href="../-m-i-b-hub/index.html"><span class="identifier">MIBHub</span></a><span class="symbol">, </span><span class="identifier" id="com.thenaran.microbot.ReceiveEvent$mibReceivedHubEvent(com.thenaran.microbot.MIBHub, kotlin.String, kotlin.collections.Map((kotlin.String, kotlin.Any)))/topic">topic</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.thenaran.microbot.ReceiveEvent$mibReceivedHubEvent(com.thenaran.microbot.MIBHub, kotlin.String, kotlin.collections.Map((kotlin.String, kotlin.Any)))/data">data</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><span class="identifier">Map</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">,</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span class="symbol">&gt;</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
