@@ -610,7 +610,7 @@
 
       d3.layout.cloud().size([width3, height3])
         .words(nameList)
-        .fontSize(function (d) { return xScale3(d.size); })
+        .fontSize(function (d) { if(d.size < 11) { return xScale3(+d.size + 5); } else { return xScale3(d.size); }})
         .text(function (d) { return d.text; })
         .rotate(function () { return ~~(Math.random() * 2) * 90; })
         .font("Impact")
@@ -650,11 +650,11 @@
           .domain([0, d3.max(nameList, function (d) {
             return d.size;
           })])
-          .range([1, 10]);
+          .range([1, 100]);
 
       d3.layout.cloud().size([width4, height4])
         .words(nameList)
-        .fontSize(function (d) { return xScale4(d.size + 40); })
+        .fontSize(function (d) { if(d.size < 11) { return xScale4(+d.size + 5); } else { return xScale4(d.size); }})
         .text(function (d) { return d.text; })
         .rotate(function () { return ~~(Math.random() * 2) * 90; })
         .font("Impact")
