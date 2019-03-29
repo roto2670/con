@@ -174,7 +174,7 @@
           <div class="x_content">
             <button type="button" data-toggle="modal" data-target=".modal"
               style="border-color: none; border-style: none; border-width: 0px; padding: 0px; width: 100%; text-align: center;">
-              <div id="wordcloud2" class="dashboard-widget-content" style="background-color: white"></div>
+              <div id="wordcloud2" class="dashboard-widget-content" style="background-color: white;"></div>
             </button>
             <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
               <div class="modal-dialog modal-lg">
@@ -388,6 +388,9 @@
   <script src="{{ url_for('static', filename='vendors/d3-wordcloud/d3.wordcloud.js') }}"></script>
   -->
   <script>
+    var _width = 800,
+        _height = 500;
+
     function connectionGraph(offData, onData) {
       var ctx = document.getElementById("canvasDoughnut1");
         var data = {
@@ -495,21 +498,25 @@
     drawWordCloud(__list);
     drawWordCloud2(__list2);
 
+    var  _width2 = 280,
+         _height2 = 200;
+
     function drawWordCloud(nameList) {
       var svg_location = "#wordcloud",
-          width = 800,
-          height = 500,
           fill = function (d, i) { return colorList[Math.floor(Math.random() * colorList.length)] };
 
+      _width = $(window).width() / 3;
+      _height = $(window).height() / 1.5;
+          
       var xScale = d3.scale.linear()
           .domain([0, d3.max(nameList, function (d) {
             return d.size;
           })])
           .range([1, 100]);
 
-      d3.layout.cloud().size([width, height])
+      d3.layout.cloud().size([_width, _height])
         .words(nameList)
-        .fontSize(function (d) { return xScale(d.size); })
+        .fontSize(function (d) { return xScale(+d.size + 10); })
         .text(function (d) { return d.text; })
         .rotate(function () { return ~~(Math.random() * 2) * 90; })
         .font("Impact")
@@ -518,10 +525,10 @@
 
       function draw(words) {
         d3.select(svg_location).append("svg")
-          .attr("width", width)
-          .attr("height", height)
+          .attr("width", _width)
+          .attr("height", _height)
           .append("g")
-          .attr("transform", "translate(" + [width >> 1, height >> 1] + ")")
+          .attr("transform", "translate(" + [_width >> 1, _height >> 1] + ")")
           .selectAll("text")
           .data(words)
           .enter().append("text")
@@ -539,8 +546,8 @@
 
     function drawWordCloud2(nameList) {
       var svg_location2 = "#wordcloud2",
-          width2 = 280,
-          height2 = 200,
+          _width2 = $(window).width() / 4.5,
+          _height2 = $(window).height() / 4,
           fill2 = function (d, i) { return colorList[Math.floor(Math.random() * colorList.length)] };
 
       var xScale2 = d3.scale.linear()
@@ -549,9 +556,9 @@
         })])
         .range([1, 100]);
 
-      d3.layout.cloud().size([width2, height2])
+      d3.layout.cloud().size([_width2, _height2])
         .words(nameList)
-        .fontSize(function (d) { return xScale2(+d.size); })
+        .fontSize(function (d) { return xScale2(+d.size + 10); })
         .text(function (d) { return d.text; })
         .rotate(function () { return ~~(Math.random() * 2) * 90; })
         .font("Impact")
@@ -560,10 +567,10 @@
 
       function draw(words) {
         d3.select(svg_location2).append("svg")
-          .attr("width", width2)
-          .attr("height", height2)
+          .attr("width", _width2)
+          .attr("height", _height2)
           .append("g")
-          .attr("transform", "translate(" + [width2 >> 1, height2 >> 1] + ")")
+          .attr("transform", "translate(" + [_width2 >> 1, _height2 >> 1] + ")")
           .selectAll("text")
           .data(words)
           .enter().append("text")
@@ -579,109 +586,18 @@
       d3.layout.cloud().stop();
     }
 
-    var maxWidth = 1920,
-        maxHeight = 980,
-        maxSize = maxWidth * maxHeight;
-
+    var sX = "scaleX",
+        sY = "scaleY";
+        
     window.addEventListener("resize", function () {
-      if ((maxSize * 0.9) > $(window).width() * $(window).height()) {
-        redraw(__list);
-        redraw2(__list2);
-        maxSize = $(window).width() * $(window).height();
-      } else if((maxSize * 1.1) < $(window).width() * $(window).height()){
-          redraw(__list);
-          redraw2(__list2);
-          maxSize = $(window).width() * $(window).height();
-        }
-      })
-
-    function redraw(nameList){
-      var newSvgLocation3 = "#wordcloud",
-          oldSvgLocation3 = "#wordcloud *",
-          width3 = $(window).width() / 3.5,
-          height3 = $(window).height() / 1.5,
-          fill3 = function (d, i) { return colorList[Math.floor(Math.random() * colorList.length)] };
-
-      var xScale3 = d3.scale.linear()
-          .domain([0, d3.max(nameList, function (d) {
-            return d.size;
-          })])
-          .range([1, 100]);
-
-      d3.layout.cloud().size([width3, height3])
-        .words(nameList)
-        .fontSize(function (d) { if(d.size < 5) { return xScale3(+d.size + 5); } else { return xScale3(d.size); }})
-        .text(function (d) { return d.text; })
-        .rotate(function () { return ~~(Math.random() * 2) * 90; })
-        .font("Impact")
-        .on("end", draw)
-        .start();
-
-      function draw(words) {
-        d3.select(oldSvgLocation3).remove();
-        d3.select(newSvgLocation3).append("svg")
-          .attr("width", width3)
-          .attr("height", height3)
-          .append("g")
-          .attr("transform", "translate(" + [width3 >> 1, height3 >> 1] + ")")
-          .selectAll("text")
-          .data(words)
-          .enter().append("text")
-          .style("font-size", function (d) { return d.size + "px"; })
-          .style("font-family", "Impact")
-          .style("fill", function (d, i) { return fill3(i); })
-          .attr("text-anchor", "middle")
-          .attr("transform", function (d) {
-            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
-          })
-          .text(function (d) { return d.text; });
-        }
-        d3.layout.cloud().stop();
-      }
-
-    function redraw2(nameList){
-      var newSvgLocation4 = "#wordcloud2",
-          oldSvgLocation4 = "#wordcloud2 *",
-          width4 = $(window).width() / 4.5,
-          height4 = $(window).height() / 4,
-          fill4 = function (d, i) { return colorList[Math.floor(Math.random() * colorList.length)] };
-
-      var xScale4 = d3.scale.linear()
-          .domain([0, d3.max(nameList, function (d) {
-            return d.size;
-          })])
-          .range([1, 100]);
-
-      d3.layout.cloud().size([width4, height4])
-        .words(nameList)
-        .fontSize(function (d) { if(d.size < 6) { return xScale4(+d.size + 5); } else { return xScale4(d.size); }})
-        .text(function (d) { return d.text; })
-        .rotate(function () { return ~~(Math.random() * 2) * 90; })
-        .font("Impact")
-        .on("end", draw)
-        .start();
-
-      function draw(words) {
-        d3.select(oldSvgLocation4).remove();
-        d3.select(newSvgLocation4).append("svg")
-          .attr("width", width4)
-          .attr("height", height4)
-          .append("g")
-          .attr("transform", "translate(" + [width4 >> 1, height4 >> 1] + ")")
-          .selectAll("text")
-          .data(words)
-          .enter().append("text")
-          .style("font-size", function (d) { return d.size + "px"; })
-          .style("font-family", "Impact")
-          .style("fill", function (d, i) { return fill4(i); })
-          .attr("text-anchor", "middle")
-          .attr("transform", function (d) {
-            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
-          })
-          .text(function (d) { return d.text; });
-          }
-        d3.layout.cloud().stop();
-      }
+      var width = $(window).width() / 3,
+          height = $(window).height() / 1.5,
+          scaleX =  width / _width,
+          scaleY =  height / _height;
+      
+      $("#wordcloud").attr("style", "transform:" + sX + "(" + scaleX + ")" + sY + "(" + scaleY + ")");  
+      $("#wordcloud2").attr("style", "transform:" + sX + "(" + scaleX + ")" + sY + "(" + scaleY + ")");
+  })
 
 	function init_JQVmap(data){
 		if(typeof (jQuery.fn.vectorMap) === 'undefined'){ return; }
