@@ -142,28 +142,42 @@
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
+      "line": 33,
+      "symbol": "MIBGadget.protocolType",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
       "line": 34,
+      "symbol": "MIBGadget.meta",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
+      "line": 36,
       "symbol": "MIBGadget.init(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
-      "line": 96,
+      "line": 103,
       "symbol": "MIBGadget.toDict()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
-      "line": 123,
+      "line": 132,
       "symbol": "MIBGadget.cancelPairing()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
-      "line": 127,
+      "line": 136,
       "symbol": "MIBGadget.reveal()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
@@ -275,28 +289,35 @@
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBHub.swift",
-      "line": 31,
+      "line": 30,
+      "symbol": "MIBHub.status",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBHub.swift",
+      "line": 32,
       "symbol": "MIBHub.init(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBHub.swift",
-      "line": 48,
+      "line": 50,
       "symbol": "MIBHub.init(hub:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBHub.swift",
-      "line": 65,
+      "line": 68,
       "symbol": "MIBHub.toCHub()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBHub.swift",
-      "line": 82,
+      "line": 86,
       "symbol": "MIBHub.toDict()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
