@@ -32,15 +32,11 @@
                     <tr>
                       <td>{{ model.name }}</td>
                       <td>{{ model.firmware_list|length }}</td>
-                      {% if model.typ in type_dict %}
-                        <td>{{ typ_dict[model.typ] }}</td>
-                      {% else %}
-                        <td></td>
-                      {% endif %}
+                      <td>{{ typ_dict[model.typ] }}</td>
                       <td>{{ model.last_updated_time | datetimeFilter }}</td>
                       <td>{{ model.last_updated_user }}</td>
                         <td>
-                          {% if model.typ %}
+                          {% if model.typ != None %}
                             <a href="/products/{{ current_product.id }}/model/{{ model.id }}" class="btn btn-info btn-xs"><i class="fa fa-folder"></i> Firmware </a>
                               <!-- history
                               <td>2018-09-07</td>
