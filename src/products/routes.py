@@ -34,9 +34,18 @@ from base import db
 from products import blueprint
 
 
+def _get_prd_type_dict():
+  typ_dict = {
+      models.PRD_TYPE_BLE : "BLE",
+      models.PRD_TYPE_WEB : "HTTP"
+  }
+  return typ_dict
+
+
 @blueprint.route('/create', methods=['GET', 'POST'])
 @util.require_login
 def create():
+  typ_dict = _get_prd_type_dict()
   if request.method == "GET":
     modal = {}
     product_list = in_apis.get_product_list(current_user.organization_id)
@@ -47,7 +56,8 @@ def create():
       modal['ok'] = common.get_msg("products.create.product.first.ok")
     parse_ret = urllib.parse.urlparse(request.referrer)
     referrer = parse_ret.path if parse_ret else "/"
-    return render_template("prd_create.html", referrer=referrer, modal=modal)
+    return render_template("prd_create.html", referrer=referrer, modal=modal,
+                           typ_dict=typ_dict)
   else:
     parse_ret = urllib.parse.urlparse(request.referrer)
     referrer = parse_ret.path if parse_ret else "/"
@@ -57,6 +67,7 @@ def create():
 
     code = request.form['code']
     name = request.form['name']
+    prd_type = request.form['type']
     if re.compile(r'\W|\d').findall(code):
       title = common.get_msg("products.create.product.invalid_code_title")
       msg = common.get_msg("products.create.product.invalid_code_message")
@@ -72,7 +83,7 @@ def create():
       ret = apis.create_product(code, current_user.organization_id)
       if ret:
         # TODO: Product type
-        product = in_apis.create_product(name, ret, models.PRD_TYPE_BLE)
+        product = in_apis.create_product(name, ret, prd_type)
         org = in_apis.get_organization(current_user.organization_id)
         if org:
           product_list = json.loads(org.products)
@@ -108,7 +119,8 @@ def create_model(product_id):
     typ_dict = _get_type_dict(product)
     parse_ret = urllib.parse.urlparse(request.referrer)
     referrer = parse_ret.path if parse_ret else "/"
-    return render_template("model_create.html", referrer=referrer, typ_dict=typ_dict)
+    return render_template("model_create.html", referrer=referrer,
+                           typ_dict=typ_dict)
   else:
     parse_ret = urllib.parse.urlparse(request.referrer)
     referrer = parse_ret.path if parse_ret else "/"
@@ -117,7 +129,7 @@ def create_model(product_id):
       referrer = "/products/" + product_id + "/model"
 
     name = request.form['name']
-    model_type = request.form['type']
+    model_type = request.form.get('type')
     code = 0
     _model_list = in_apis.get_model_list(product_id)
     if _model_list:
@@ -140,7 +152,8 @@ def create_model(product_id):
     else:
       ret = apis.create_model(product_id, code, name)
       if ret:
-        in_apis.create_model(name, code, model_type, product_id, current_user.email)
+        in_apis.create_model(name, code, model_type, product_id,
+                             current_user.email)
         return redirect('products/' + product_id + '/general')
       else:
         logging.warning("Fail to create model. Name : %s, Type : %s, user : %s",

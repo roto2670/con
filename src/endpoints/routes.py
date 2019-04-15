@@ -66,15 +66,16 @@ def _check_version(ep_version, firmware_version):
 def _build_gadget_dict(gadgets, endpoint):
   gadget_dict = {}
   ep_version = endpoint.version if endpoint else None
-  for _gadget in gadgets:
-    if _gadget['stage'] == models.STAGE_DEV:
-      for __gadget in _gadget['gadgets']:
-        if __gadget['status'] == 1 and \
-            _check_version(ep_version, __gadget['firmware_version']):
-          display = "{} (Version : {}, {})".format(__gadget['name'],
-                                                   __gadget['firmware_version'],
-                                                   _gadget['email'])
-          gadget_dict[__gadget['id']] = display
+  if ep_version:
+    for _gadget in gadgets:
+      if _gadget['stage'] == models.STAGE_DEV:
+        for __gadget in _gadget['gadgets']:
+          if __gadget['status'] == 1 and \
+              _check_version(ep_version, __gadget['firmware_version']):
+            display = "{} (Version : {}, {})".format(__gadget['name'],
+                                                    __gadget['firmware_version'],
+                                                    _gadget['email'])
+            gadget_dict[__gadget['id']] = display
   return gadget_dict
 
 
