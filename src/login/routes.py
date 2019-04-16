@@ -31,7 +31,7 @@ def login():
     db.session.commit()
     if current_user.email_verified:
       if not current_user.organization_id:
-        return redirect(url_for('organization_blueprint.create'))
+        return redirect(url_for('management_blueprint.create'))
       else:
         return redirect(url_for('home_blueprint.index'))
     else:

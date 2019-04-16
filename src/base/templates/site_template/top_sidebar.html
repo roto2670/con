@@ -1,0 +1,33 @@
+
+<div class="nav-sm top_sidebar_menu">
+  <div class="logo_img_div">
+  <!--
+    <img class="logo_img_middle" src="/static/images/sk_enc-logo-white.svg">
+  -->
+    <img class="logo_img_middle" src="/static/images/naran-logo-white.svg">
+  </div>
+  <ul class="nav side-menu">
+    <li>
+      <a href="/dashboard">
+        <i class="fa fa-area-chart"></i>Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="/">
+        <i class="fa fa-edit"></i>Dev
+      </a>
+    </li>
+    <li>
+      <a href="javascript:void(0)" onClick="alert('Coming Soon!');">
+        <i class="fa fa-credit-card" style=""></i> Payment
+      </a>
+    </li>
+  </ul>
+  <ul class="nav navbar-nav organization_align_bottom">
+    <li>
+      <a href="/management/organization/general" class="user-profile">
+        <img src="{{ current_user.photo_url }}">
+      </a>
+    </li>
+  </ul>
+</div>

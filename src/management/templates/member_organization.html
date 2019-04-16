@@ -1,0 +1,113 @@
+{% extends "base_site.html" %}
+
+{% block title %} Member {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_management.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block content %}
+<div class="right_col" role="main">
+  <div class="row">  <!-- start row -->
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_content">  <!-- x_content 1 -->
+
+          <div class="x_content">  <!-- x_content 2 -->
+            <table class="table table-striped projects">
+              <thead>
+                <tr>
+                  <th style="width:10%"></th>
+                  <th>Email</th>
+                  <th>Level</th>
+                  <th>last_access</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in user_list %}
+                  <tr>
+                    <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
+                    <td>{{ user.email }}</td>
+                    {% if user.level == 0 %}
+                      <td>Owner</td>
+                    {% else %}
+                      <td>Member</td>
+                    {% endif %}
+                    <td>{{ user.last_access_time | datetimeFilter }}</td>
+                    {% if user.level == 0 %}
+                      <td></td>
+                    {% else %}
+                      {% if current_user.level == 0 %}
+                        <td>
+                          <a href="#" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i> Delete</a>
+                        </td>
+                      {% else %}
+                        <td></td>
+                      {% endif %}
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+                {% for invite in invite_list %}
+                  {% if invite.accepted == 0 %}
+                    <tr>
+                      <td></td>
+                      <td>{{ invite.email }}</td>
+                      <td>Invited</td>
+                      <td></td>
+                      {% if current_user.level == 0 %}
+                        <td>
+                          <a href="/management/organization/invite/delete/{{ invite.id }}" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i> Delete</a>
+                        </td>
+                      {% else %}
+                        <td></td>
+                      {% endif %}
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>  <!-- end x_content 2 -->
+
+          <div style="text-align: right">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Invite</button>
+          </div>
+          <!-- invite modal-->
+          <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                  </button>
+                  <h4 class="modal-title" id="inviteMember">Invite</h4>
+                </div>
+                <div>
+                  <form id="invite" method="post" action="/management/organization/invite">
+                    <div class="modal-body">
+                      <h4>Email Address</h4>
+                      <input type="email" id="email" name="email" required="required"
+                          placeHolder="member@email.com" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9_@.+\s]/g,'');">
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Send</button>
+                    </div>
+                  </form>
+                </div>
+
+              </div>
+            </div>
+          </div>  <!-- end invite modal -->
+
+        </div>  <!-- end x_content 1 -->
+      </div>  <!-- end x_panel -->
+    </div>
+
+  </div>  <!-- End row -->
+</div>
+
+{% endblock content %}

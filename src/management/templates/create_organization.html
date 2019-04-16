@@ -1,0 +1,85 @@
+{% extends "base_site.html" %}
+
+{% block title %} Organization Create {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_management.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block content %}
+  {% if not error_msg %}
+    <script>
+      onload = function() {
+        $('.bs-example-modal-lg').modal('show');
+      }
+    </script>
+  {% endif %}
+
+  <!-- modal -->
+  <div class="modal bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="false">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel">{{ modal['title'] }}</h4>
+        </div>
+        <div class="modal-body">
+          <h4>{{ modal['sub_title'] }}</h4>
+          <p>{{ modal['message'] }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">{{ modal['ok'] }}</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- end modal -->
+
+  <div class="right_col" role="main">
+    <div class="row">  <!-- start row -->
+
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Create <small>organization</small></h2>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="x_content">
+            <br />
+            <form id="create" class="form-horizontal form-label-left" method="post">
+              <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Name <span class="required">*</span>
+                </label>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                  <input type="text" id="name" name="name" required="required" maxlength="32"
+                      onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g,'');" class="form-control col-md-7 col-xs-12">
+                </div>
+              </div>
+              <div class="ln_solid"></div>
+              <div class="form-group">
+                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                  <button type="submit" class="btn btn-success">Create</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- End row -->
+  </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+  {{ super() }}
+  <!-- validator -->
+  <script src="{{ url_for('static', filename='vendors/validator/validator.js') }}"></script>
+{% endblock javascripts %}

@@ -4,6 +4,8 @@
 
 {% block stylesheets %}
   {{ super() }}
+  <!-- JQVMap -->
+  <link href="{{ url_for('static', filename='vendors/jqvmap/dist/jqvmap.min.css') }}" rel="stylesheet"/>
 {% endblock stylesheets %}
 
 {% block content %}
@@ -359,8 +361,6 @@
   <script src="{{ url_for('static', filename='vendors/Chart.js/dist/Chart.min.js') }}"></script>
   <!-- gauge.js -->
   <script src="{{ url_for('static', filename='vendors/gauge.js/dist/gauge.min.js') }}"></script>
-  <!-- Skycons -->
-  <script src="{{ url_for('static', filename='vendors/skycons/skycons.js') }}"></script>
   <!-- Flot -->
   <script src="{{ url_for('static', filename='vendors/Flot/jquery.flot.js') }}"></script>
   <script src="{{ url_for('static', filename='vendors/Flot/jquery.flot.pie.js') }}"></script>
@@ -371,8 +371,9 @@
   <script src="{{ url_for('static', filename='vendors/flot.orderbars/js/jquery.flot.orderBars.js') }}"></script>
   <script src="{{ url_for('static', filename='vendors/flot-spline/js/jquery.flot.spline.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendors/flot.curvedlines/curvedLines.js') }}"></script>
-  <!-- DateJS -->
+  <!-- DateJS
   <script src="{{ url_for('static', filename='vendors/DateJS/build/date.js') }}"></script>
+   -->
   <!-- JQVMap -->
   <script src="{{ url_for('static', filename='vendors/jqvmap/dist/jquery.vmap.js') }}"></script>
   <script src="{{ url_for('static', filename='vendors/jqvmap/dist/maps/jquery.vmap.world.js') }}"></script>

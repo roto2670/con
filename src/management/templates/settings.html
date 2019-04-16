@@ -1,0 +1,52 @@
+
+{% extends "base_site.html" %}
+
+{% block title %} Settings {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_management.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block content %}
+<div class="right_col" role="main">
+  <div class="row">  <!-- start row -->
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_content">
+
+          <div class="col-md-7">
+            <br>
+            <h3>Name</h3>
+            <div class="form-group">
+              <label class="control-label col-md-0" for="userName">
+              </label>
+              <div class="col-md-12">
+                <input type="text" value="{{ current_user.name }}" id="userName" name="userName"
+                    class="form-control col-md-6 col-xs-6" readonly>
+              </div>
+            </div>
+
+            <br>
+            <h3>Email</h3>
+            <div class="form-group">
+              <label class="control-label col-md-0" for="userEmail">
+              </label>
+              <div class="col-md-12">
+                <input type="text" value="{{ current_user.email }}" id="userEmail" name="userEmail"
+                    class="cursor-pointer form-control col-md-6 col-xs-6" readonly>
+              </div>
+            </div>
+            <br>
+          </div>
+
+        </div>  <!-- end x_content -->
+      </div>  <!-- end x_panel -->
+    </div>
+
+  </div>  <!-- End row -->
+</div>
+
+{% endblock content %}

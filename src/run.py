@@ -46,11 +46,11 @@ def register_blueprints(app):
   blueprints = [
       'base',
       'home',
-      'organization',
       'products',
       'endpoints',
-      'settings',
       'release',
+      'dashboard',
+      'management',
       'login'
   ]
   for blueprint in blueprints:

@@ -1,17 +1,40 @@
 <div class="left_col scroll-view">
-  <div class="navbar nav_title center" style="border: 0;">
-    <a href="/" class="site_title"><img src="/static/images/logo.svg"></a>
+
+  <div class="nav_title nav_sm_hidden sub_side_top_tile">
+    Dev
   </div>
+  <br><br><br>
 
-  <div class="clearfix"></div>
-
-  <br />
+  <div class="product_menu nav_sm_hidden">
+    <div class="btn-group">
+      {% if current_user.organization_id %}
+        {% if current_product %}
+          <button type="button" class="btn btn-primary product-title text-left">{{ current_product.id }}</button>
+        {% else %}
+          <button type="button" class="btn btn-primary product-title text-left">Products</button>
+        {% endif %}
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu" role="menu" style="width: 100%">
+          {% for product in product_list %}
+            <li><a href="/home/{{ product.id }}">{{ product.id }}</a></li>
+          {% endfor %}
+          {% if product_list %}
+            <li class="divider"></li>
+          {% endif %}
+          <li><a href="/products/create">Create New Product</a>
+        </ul>
+      {% endif %}
+    </div>
+  </div>
 
   <!-- sidebar menu -->
   <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-
+    <br><br><br>
     <div class="menu_section">
-      <ul class="nav side-menu">
+      <ul class="nav side-menu nav_sm_hidden">
         {% if current_product %}
           <li><a href="/"><i class="fa fa-area-chart"></i>Dashboard <span class="label label-success pull-right">Beta</span></a></li>
           <!-- Product -->
@@ -38,29 +61,9 @@
           </li>
         {% endif %}
         <li><a href="/doc"><i class="fa fa-file-text-o"></i> Document </a>
-        {% if current_product %}
-          <li><a href="javascript:void(0)"><i class="fa fa-credit-card"></i> Payment <span class="label label-success pull-right">Coming Soon</span></a></li>
-        {% endif %}
       </ul>
     </div>
   </div>
   <!-- /sidebar menu -->
 
-  <!-- /menu footer buttons
-  <div class="sidebar-footer hidden-small">
-    <a data-toggle="tooltip" data-placement="top" title="Organization" href="/organization">
-      <span class="fa fa-users" aria-hidden="true"></span>
-    </a>
-    <a data-toggle="tooltip" data-placement="top" title="Settings" href="/settings">
-      <span class="fa fa-cog" aria-hidden="true"></span>
-    </a>
-    <a data-toggle="tooltip" data-placement="top" title="Documentation" href="/doc">
-      <span class="fa fa-file-text-o" aria-hidden="true"></span>
-    </a>
-    <a data-toggle="tooltip" data-placement="top" title="Logout" href="/auth/sign-out">
-      <span class="fa fa-sign-out" aria-hidden="true"></span>
-    </a>
-  </div>
-   -->
-  <!-- /menu footer buttons -->
 </div>
