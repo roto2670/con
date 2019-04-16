@@ -72,13 +72,15 @@ def create():
       title = common.get_msg("products.create.product.invalid_code_title")
       msg = common.get_msg("products.create.product.invalid_code_message")
       common.set_error_message(title, msg)
-      return render_template("prd_create.html", referrer=referrer)
+      return render_template("prd_create.html", referrer=referrer,
+                             typ_dict=typ_dict)
     has_product = in_apis.get_product(code)
     if has_product:
       title = common.get_msg("products.create.product.exists_product_title")
       msg = common.get_msg("products.create.product.exists_product_message")
       common.set_error_message(title, msg)
-      return render_template("prd_create.html", referrer=referrer)
+      return render_template("prd_create.html", referrer=referrer,
+                             typ_dict=typ_dict)
     else:
       ret = apis.create_product(code, current_user.organization_id)
       if ret:
