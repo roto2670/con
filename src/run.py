@@ -17,9 +17,11 @@ from importlib import import_module
 
 
 from flask import Flask  # noqa : pylint: disable=import-error
+from flask_cors import CORS
 import flask_monitoringdashboard as dashboard
 
 import apis
+import dash_apis
 import common
 import base.routes
 from base import db, auth, login_manager
@@ -51,6 +53,7 @@ def register_blueprints(app):
       'release',
       'dashboard',
       'management',
+      'dash',
       'login'
   ]
   for blueprint in blueprints:
@@ -91,6 +94,7 @@ def create_app():
   else:
     app.config.from_object(ProductionConfig)
   apis.init(app)
+  dash_apis.init(app)
   configure_logs(app)
   register_extensions(app)
   register_blueprints(app)
@@ -114,6 +118,7 @@ if  __name__ == '__main__':
     _app.debug = True
     dashboard.config.init_from(file="./config.cfg")
     dashboard.bind(_app)
+    CORS(_app)
     _app.run(host='127.0.0.1', port=16000)
   else:
     cur_path = os.path.dirname(os.path.abspath(__file__))
