@@ -1,6 +1,6 @@
 {% extends "base_site.html" %}
 
-{% block title %} Register Android {% endblock title %}
+{% block title %} Update Notification {% endblock title %}
 
 {% block sidebar %}
   <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
@@ -19,18 +19,25 @@
   <!-- iCheck -->
   <script src="{{ url_for('static', filename='vendors/iCheck/icheck.min.js') }}"></script>
   <script>
+    var allowDict = {},
+        allowModelIdList = [];
+
     $(document).ready(function() {
       if ($(".flat")[0]) {
         $(document).ready(function () {
           $('.flat').iCheck({
               checkboxClass: 'icheckbox_flat-green'
           });
+          for (i=0; i < $(".flat").length; i++) {
+            if ($(".flat")[i].checked) {
+              var prdId = $(".flat")[i].id,
+                  modelInfo = $(".flat")[i].value.split(",");
+              handleCheck(prdId, modelInfo[0], modelInfo[1]);
+            }
+          }
         });
       }
     });
-
-    var allowDict = {},
-        allowModelIdList = [];
 
     $(".flat").on('ifChecked', function(event) {
       var prdId = event.currentTarget.id,
@@ -67,6 +74,17 @@
     function handleAllowData() {
       $("#allowDict")[0].value = objectToJson(allowDict);
       $("#allowModelIdList")[0].value = objectToJson(allowModelIdList);
+      console.log(allowDict);
+      console.log(allowModelIdList);
+    }
+
+    function handleCheck(prdId, modelCode, modelId) {
+      if (prdId in allowDict) {
+        allowDict[prdId].push(parseInt(modelCode));
+      } else {
+        allowDict[prdId] = [parseInt(modelCode)];
+      }
+      allowModelIdList.push(modelId);
     }
   </script>
 {% endblock javascripts %}
@@ -76,41 +94,29 @@
   <div class="row">  <!-- start row -->
 
     <div class="col-md-12 col-sm-12 col-xs-12">
-      <div class="x_panel tile">
+      <div class="x_panel">
         <div class="x_title">
-          <h2>Register Android </h2>
+          <h2>Update Notification </h2>
           <div class="clearfix"></div>
         </div>
 
         <div class="x_content">
 
-          <form action="/management/organization/register/android" method="post"
+          <form action="/management/organization/notikey/update/{{ noti_key.id }}" method="post"
               class="form-horizontal form-label-left" novalidate>
-
-            <div class="item form-group">
-              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="key">Key <span class="required">*</span>
-              </label>
-              <div class="col-md-6 col-sm-6 col-xs-12">
-                <input type="text" id="key" name="key" required="required" class="form-control col-md-7 col-xs-12"
-                    value="" placeholder="Key">
-              </div>
-            </div>
-            <div class="item form-group">
-              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="packageName">Package Name <span class="required">*</span>
-              </label>
-              <div class="col-md-6 col-sm-6 col-xs-12">
-                <input type="text" id="packageName" name="packageName" required="required" class="form-control col-md-7 col-xs-12",
-                    value="" placeholder="Package Name">
-              </div>
-            </div>
             <div class="item form-group">
               <label class="control-label col-md-3 col-sm-3 col-xs-12" for="AllowList">Allow List <span class="required">*</span>
               </label>
               <div class="col-md-6 col-sm-6 col-xs-12">
                 {% for product in product_list %}
                   {% for model in product.model_list %}
-                    <input id="{{ product.code }}" type="checkbox" class="flat"
-                        name="productValue" value="{{ model.code }},{{ model.id }}"> {{ product.name }}({{ model.name }})
+                    {% if model.id in allow_model_id_list %}
+                      <input id="{{ product.code }}" type="checkbox" class="flat"
+                          name="productValue" value="{{ model.code }},{{ model.id }}" checked> {{ product.name }}({{ model.name }})
+                    {% else %}
+                      <input id="{{ product.code }}" type="checkbox" class="flat"
+                          name="productValue" value="{{ model.code }},{{ model.id }}"> {{ product.name }}({{ model.name }})
+                    {% endif %}
                   {% endfor %}
                 {% endfor %}
               </div>
@@ -124,7 +130,7 @@
                 <a href={{ referrer }}>
                     <button type="button" class="btn btn-primary">Cancel</button>
                 </a>
-                <button id="send" type="submit" class="btn btn-success">Register</button>
+                <button id="send" type="submit" class="btn btn-success">Update</button>
               </div>
             </div>
           </form>

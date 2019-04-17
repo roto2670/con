@@ -20,9 +20,10 @@
               <tr>
                 <th>Platform</th>
                 <th>Bundle ID</th>
+                <th>Allow</th>
                 <th>Last Updated</th>
                 <th>Last Updated User</th>
-                <th>Delete</th>
+                <th>Edit</th>
               </tr>
             </thead>
             <tbody>
@@ -38,9 +39,15 @@
                     <td>ANDROID</td>
                   {% endif %}
                   <td>{{ noti_key.name }}</td>
+                  <td>
+                    {% for permit in noti_key.permission_list %}
+                      {{ permit.model.name }}
+                    {% endfor%}
+                  </td>
                   <td>{{ noti_key.last_updated_time | datetimeFilter }}</td>
                   <td>{{ noti_key.last_updated_user }}</td>
                   <td>
+                    <a href="/management/organization/notikey/update/{{ noti_key.id }}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Edit </a>
                     <button type="button" class="btn-danger btn-xs" data-toggle="modal" data-target=".delete-modal-{{ noti_key.id }}">
                       <i class="fa fa-remove"></i>
                     </button>

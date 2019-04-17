@@ -70,6 +70,12 @@ def register_noti_key(platform):
   return organization.register_noti_key(platform)
 
 
+@blueprint.route('/organization/notikey/update/<noti_key_id>', methods=['GET', 'POST'])
+@util.require_login
+def update_noti_key(noti_key_id):
+  return organization.update_noti_key(noti_key_id)
+
+
 @blueprint.route('/organization/notikey/delete/<noti_key_id>', methods=['POST'])
 @util.require_login
 def delete_noti_key(noti_key_id):
