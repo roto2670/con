@@ -36,7 +36,7 @@ class Config(object):
   LOG_MAX_BYTES = 10485760
   CELERY_BACKEND = 'rpc://'
   CELERY_BROKER = 'pyamqp://console:skfksrltnf1@localhost:5672/'
-  TOKEN = 'token'
+  TOKEN = 'console-admin'
 
 
 class ProductionConfig(Config):

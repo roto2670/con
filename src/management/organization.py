@@ -121,11 +121,16 @@ def create():
 def register_noti_key(platform):
   referrer = "/management/organization/notification"
   if request.method == "GET":
+    product_list = in_apis.get_product_list(current_user.organization_id)
     if platform == "ios":
-      return render_template("register_ios.html", referrer=referrer)
+      return render_template("register_ios.html", referrer=referrer,
+                             product_list=product_list)
     else:
-      return render_template("register_android.html", referrer=referrer)
+      return render_template("register_android.html", referrer=referrer,
+                             product_list=product_list)
   else:
+    allow_dict = json.loads(request.form['allowDict'])
+    allow_model_id_list = json.loads(request.form['allowModelIdList'])
     if platform == "ios":
       bundle_id = request.form['bundleId']
       password = request.form['password']
@@ -137,15 +142,23 @@ def register_noti_key(platform):
         _f.write(content)
       cert, secret_key = worker.get_about_noti_key(password, temp_file)
       ret = apis.update_ios_key(current_user.organization_id, bundle_id,
-                                cert, secret_key, state)
+                                cert, secret_key, state, allow_dict)
       if ret:
         noti_key = in_apis.get_ios_noti_key(current_user.organization_id,
                                             models.IOS, bundle_id, password,
                                             state)
         if noti_key:
           in_apis.update_noti_key(noti_key)
+          for model_id in allow_model_id_list:
+            in_apis.create_noti_model_permission(current_user.email,
+                                                 noti_key.id,
+                                                 model_id)
         else:
-          in_apis.create_ios_noti_key(bundle_id, password, state)
+          noti_key = in_apis.create_ios_noti_key(bundle_id, password, state)
+          for model_id in allow_model_id_list:
+            in_apis.create_noti_model_permission(current_user.email,
+                                                 noti_key.id,
+                                                 model_id)
         if os.path.exists(temp_file):
           os.remove(temp_file)
         return redirect('/management/organization/notification')
@@ -161,20 +174,73 @@ def register_noti_key(platform):
       package_name = request.form['packageName']
       key = request.form['key']
       ret = apis.update_android_key(current_user.organization_id, package_name,
-                                    key)
+                                    key, allow_dict)
       if ret:
         noti_key = in_apis.get_android_noti_key(current_user.organization_id,
                                                 models.ANDROID, package_name, key)
         if noti_key:
           in_apis.update_noti_key(noti_key)
+          for model_id in allow_model_id_list:
+            in_apis.create_noti_model_permission(current_user.email,
+                                                 noti_key.id,
+                                                 model_id)
         else:
-          in_apis.create_android_noti_key(package_name, key)
+          noti_key = in_apis.create_android_noti_key(package_name, key)
+          for model_id in allow_model_id_list:
+            in_apis.create_noti_model_permission(current_user.email,
+                                                 noti_key.id,
+                                                 model_id)
         return redirect('/management/organization/notification')
       else:
         logging.warning(
             "Fail to register android noti key. org : %s, name : %s, key : %s, user : %s",
             current_user.organization_id, package_name, key, current_user.email)
         abort(500)
+
+
+def update_noti_key(noti_key_id):
+  referrer = "/management/organization/notification"
+  if request.method == "GET":
+    noti_key = in_apis.get_noti_key(noti_key_id)
+    product_list = in_apis.get_product_list(current_user.organization_id)
+    allow_model_id_list = []
+    allow_dict = {}
+    for permit in noti_key.permission_list:
+      allow_model_id_list.append(permit.model_id)
+    for product in product_list:
+      for model in product.model_list:
+        if model.id in allow_model_id_list:
+          if product.code in allow_dict:
+            allow_dict[product.code].append(model.id)
+          else:
+            allow_dict[product.code] = [model.id]
+    return render_template("update_notification.html", referrer=referrer,
+                            noti_key=noti_key, product_list=product_list,
+                            allow_model_id_list=allow_model_id_list,
+                            allow_dict=allow_dict)
+  else:
+    allow_dict = json.loads(request.form['allowDict'])
+    allow_model_id_list = json.loads(request.form['allowModelIdList'])
+    noti_key = in_apis.get_noti_key(noti_key_id)
+    ret = apis.update_allow_noti_key(current_user.organization_id, '', allow_dict)
+    if ret:
+      permit_list = in_apis.get_noti_model_permission_list_by_noti_id(noti_key.id)
+      if permit_list:
+        for permit in permit_list:
+          if permit.model_id in allow_model_id_list:
+            in_apis.update_noti_model_permission(permit.id, current_user.email,
+                                                noti_key.id, permit.model_id)
+            allow_model_id_list.remove(permit.model_id)
+          else:
+            in_apis.delete_noti_model_permission(permit.id)
+      for model_id in allow_model_id_list:
+        in_apis.create_noti_model_permission(current_user.email, noti_key.id,
+                                              model_id)
+      return redirect('/management/organization/notification')
+    else:
+      logging.warning("Failed to update noti key. id : %s, user : %s, message : %s",
+                       noti_key_id, current_user.email, ret)
+      abort(500)
 
 
 def delete_noti_key(noti_key_id):

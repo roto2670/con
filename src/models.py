@@ -128,6 +128,8 @@ class _NotiKey(db.Model):
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   organization_id = Column(String(75), ForeignKey('_organization.id'))
+  permission_list = relationship("_NkModelPermission", backref='notikey',
+                                 cascade="all, delete")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -252,6 +254,8 @@ class _Model(db.Model):
   firmware_list = relationship("_Firmware", backref='model',
                                cascade="all, delete",
                                order_by="desc(_Firmware.version)")
+  permission_list = relationship("_NkModelPermission", backref='model',
+                                 cascade="all, delete")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -261,6 +265,25 @@ class _Model(db.Model):
 
   def __repr__(self):
     return self.id
+
+
+class _NkModelPermission(db.Model):
+
+  __tablename__ = '_nk_model_permission'
+
+  id = Column(String(75), primary_key=True)
+  permission = Column(Integer)
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  noti_key_id = Column(String(75), ForeignKey('_notikey.id'))
+  model_id = Column(String(75), ForeignKey('_model.id'))
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        value = value[0]
+      setattr(self, property, value)
 
 
 FIRMWARE_RELEASE = 0
