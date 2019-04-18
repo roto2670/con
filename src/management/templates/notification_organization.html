@@ -7,9 +7,17 @@
     {% include "site_template/sidebar_management.html" %}
   </div>
 {% endblock sidebar %}
+{% block javascript %}
+  {{ super() }}
+<script>
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+{% endblock javascript %}
 
 {% block content %}
-<div class="right_col" role="main">
+<div id="scroll-style-hidden" class="right_col" role="main">
   <div class="row">  <!-- start row -->
 
     <div class="col-md-12 col-sm-12 col-xs-12">
@@ -39,12 +47,12 @@
                     <td>ANDROID</td>
                   {% endif %}
                   <td>{{ noti_key.name }}</td>
-                  <td>
+                  <td style="max-width:100px; overflow:hidden; white-space: nowrap;">
                     {% for permit in noti_key.permission_list %}
-                      {{ permit.model.name }}
+                      {{ permit.model.product.code }} {{ permit.model.name }}<br>
                     {% endfor%}
                   </td>
-                  <td>{{ noti_key.last_updated_time | datetimeFilter }}</td>
+                  <td>{{ noti_key.last_updated_time|datetimeFilter }}</td>
                   <td>{{ noti_key.last_updated_user }}</td>
                   <td>
                     <a href="/management/organization/notikey/update/{{ noti_key.id }}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Edit </a>

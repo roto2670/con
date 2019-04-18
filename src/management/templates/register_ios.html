@@ -23,7 +23,7 @@
       if ($(".flat")[0]) {
         $(document).ready(function () {
           $('.flat').iCheck({
-              checkboxClass: 'icheckbox_flat-green'
+              checkboxClass: 'icheckbox_flat-green custom_margin_bottom_5'
           });
         });
       }
@@ -72,14 +72,14 @@
 {% endblock javascripts %}
 
 {% block content %}
-<div class="right_col" role="main">
+<div id="scroll-style-hidden" class="right_col" role="main">
   <div class="row"> <!-- start row -->
 
     <div class="col-md-12 col-sm-12 col-xs-12">
       <div class="x_panel tile">
 
         <div class="x_title">
-          <h2>Register IOS </h2>
+          <h3>Register IOS </h3>
           <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -121,11 +121,11 @@
             <div class="item form-group">
               <label class="control-label col-md-3 col-sm-3 col-xs-12" for="AllowList">Allow List <span class="required">*</span>
               </label>
-              <div class="col-md-6 col-sm-6 col-xs-12">
+              <div id="scroll-style-1" class="col-md-6 col-sm-6 col-xs-12 allow_list_height_150">
                 {% for product in product_list %}
                   {% for model in product.model_list %}
                     <input id="{{ product.code }}" type="checkbox" class="flat"
-                        name="productValue" value="{{ model.code }}"> {{ product.name }}({{ model.name }})
+                        name="productValue" value="{{ model.code }}"> {{ product.name }}({{ model.name }})<br>
                   {% endfor %}
                 {% endfor %}
               </div>

@@ -26,7 +26,7 @@
       if ($(".flat")[0]) {
         $(document).ready(function () {
           $('.flat').iCheck({
-              checkboxClass: 'icheckbox_flat-green'
+              checkboxClass: 'icheckbox_flat-green custom_margin_bottom_5'
           });
           for (i=0; i < $(".flat").length; i++) {
             if ($(".flat")[i].checked) {
@@ -90,13 +90,13 @@
 {% endblock javascripts %}
 
 {% block content %}
-<div class="right_col" role="main">
+  <div id="scroll-style-hidden" class="right_col" role="main">
   <div class="row">  <!-- start row -->
 
     <div class="col-md-12 col-sm-12 col-xs-12">
-      <div class="x_panel">
+      <div class="x_panel tile">
         <div class="x_title">
-          <h2>Update Notification </h2>
+          <h3>Update Notification </h3>
           <div class="clearfix"></div>
         </div>
 
@@ -107,15 +107,15 @@
             <div class="item form-group">
               <label class="control-label col-md-3 col-sm-3 col-xs-12" for="AllowList">Allow List <span class="required">*</span>
               </label>
-              <div class="col-md-6 col-sm-6 col-xs-12">
+              <div id="scroll-style-1" class="col-md-6 col-sm-6 col-xs-12 allow_list_height_200">
                 {% for product in product_list %}
                   {% for model in product.model_list %}
                     {% if model.id in allow_model_id_list %}
                       <input id="{{ product.code }}" type="checkbox" class="flat"
-                          name="productValue" value="{{ model.code }},{{ model.id }}" checked> {{ product.name }}({{ model.name }})
+                          name="productValue" value="{{ model.code }},{{ model.id }}" checked> {{ product.name }}({{ model.name }})<br>
                     {% else %}
                       <input id="{{ product.code }}" type="checkbox" class="flat"
-                          name="productValue" value="{{ model.code }},{{ model.id }}"> {{ product.name }}({{ model.name }})
+                          name="productValue" value="{{ model.code }},{{ model.id }}"> {{ product.name }}({{ model.name }})<br>
                     {% endif %}
                   {% endfor %}
                 {% endfor %}

@@ -4364,9 +4364,42 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     -ms-overflow-style: none;
 }
 
-::-webkit-scrollbar {
+#scroll-style-1::-webkit-scrollbar {
+    width:10px;
+}
+#scroll-style-1::-webkit-scrollbar-track {
+    background-color: #eff8ff;
+}
+#scroll-style-1::-webkit-scrollbar-thumb {
+    background-color: rgb(31, 166, 252, 0.6); /*#1fa6fc*/
+    border-radius: 10px;
+    opacity: 50%;
+}
+
+.allow_list_height_150 {
+    max-height: 150px;
+    overflow-y:scroll;
+    border-radius: 5px;
+    background: rgba(27, 141, 215, 0.05);  /*#1b8dd7*/
+    padding: 5px 5px 5px 10px;
+}
+.allow_list_height_200 {
+    max-height: 200px;
+    overflow-y:scroll;
+    border-radius: 5px;
+    background: rgba(27, 141, 215, 0.05);  /*#1b8dd7*/
+    padding: 5px 5px 5px 10px;
+}
+
+#scroll-style-hidden::-webkit-scrollbar {
     display: none !important;
 }
+.jumbotron::-webkit-scrollbar {
+    display: none !important;
+}
+/* ::-webkit-scrollbar {
+    display: none;
+} */
 
 .product_menu {
     float: left;
@@ -4409,6 +4442,10 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 
 .custom_padding_top_10 {
     padding-top: 10px;
+}
+
+.custom_margin_bottom_5 {
+    margin-bottom: 5px;
 }
 
 .tooltip.left .tooltip-inner {
