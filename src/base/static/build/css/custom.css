@@ -826,7 +826,7 @@ a:focus {
     border-right: 5px solid #efefef
 }
 .nav li.current-page {
-    background: rgba(255, 255, 255, 0.05)
+    background: rgba(255, 255, 255, 0.20)
 }
 .nav li li li.current-page {
     background: none
@@ -1008,7 +1008,7 @@ article.media {
 *,
 *:before,
 *:after {
-    box-sizing: border-box
+    box-sizing: border-box;
 }
 #integration-list {
     width: 100%;
@@ -1082,22 +1082,28 @@ h2 {
 .accordion .panel {
     margin-bottom: 5px;
     border-radius: 0;
-    border-bottom: 1px solid #efefef
+    border-bottom: 1px solid #efefef;
+    box-shadow: 0 0 0 rgba(0, 0, 0, .05);
+    -webkit-box-shadow: 0 0 0 rgba(0, 0, 0, .05);
 }
 .accordion .panel-heading {
     background: #F2F5F7;
     padding: 13px;
     width: 100%;
-    display: block
+    display: block;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 .accordion .panel:hover {
-    background: #F2F5F7
+    background: #F2F5F7;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 .x_panel {
     position: relative;
     width: 100%;
     margin-bottom: 10px;
-    padding: 10px 17px;
+    /*padding: 10px 17px;*/
     display: inline-block;
     background: #fff;
     border: 1px solid #E6E9ED;
@@ -1105,12 +1111,16 @@ h2 {
     -moz-column-break-inside: avoid;
     column-break-inside: avoid;
     opacity: 1;
-    transition: all .2s ease
+    transition: all .2s ease;
+    border-radius: 20px;
 }
 .x_title {
-    border-bottom: 2px solid #E6E9ED;
-    padding: 1px 5px 6px;
-    margin-bottom: 10px
+    /*border-bottom: 2px solid #E6E9ED;*/
+    /*padding: 1px 5px 6px;*/
+    border-bottom: 1px solid #e9f1f7;
+    padding: 1px 22px 0px;
+    margin-bottom: 10px;
+    background: #eff8ff;
 }
 .x_title .filter {
     width: 40%;
@@ -1131,7 +1141,8 @@ h2 {
     color: #BDBDBD
 }
 .x_content {
-    padding: 0 5px 6px;
+    /*padding: 0 5px 6px;*/
+    padding: 0 22px 6px;
     position: relative;
     width: 100%;
     float: left;
@@ -1732,8 +1743,10 @@ span.right {
     background: #425567
 }
 .tile_count {
-    margin-bottom: 20px;
-    margin-top: 20px
+    /*margin-bottom: 20px;
+    margin-top: 20px*/
+    margin-bottom: 10px;
+    margin-top: 10px
 }
 .tile_count .tile_stats_count {
     border-bottom: 1px solid #D9DEE4;
@@ -1776,20 +1789,21 @@ span.right {
 }
 @media (min-width: 768px) {
     .tile_count .tile_stats_count .count {
-        font-size: 40px
+        font-size: 45px
     }
 }
 @media (min-width: 992px) and (max-width: 1100px) {
     .tile_count .tile_stats_count .count {
-        font-size: 30px
+        font-size: 35px
     }
 }
 .tile_count .tile_stats_count span {
-    font-size: 12px
+    font-size: 14px;
+    color: #8e8e8e;
 }
 @media (min-width: 768px) {
     .tile_count .tile_stats_count span {
-        font-size: 13px
+        font-size: 15px
     }
 }
 .tile_count .tile_stats_count .count_bottom i {
@@ -4320,7 +4334,7 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     cursor: pointer
 }
 .product-title {
-    width: 14em;
+    width: 12em;
 }
 .error-message {
     color: #ff0000;
@@ -4357,7 +4371,7 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 .product_menu {
     float: left;
     /*background: #EDEDED;*/
-    padding: 4px;
+    padding: 10px 18px;
     width: 100%;
     position: relative
 }
@@ -4391,6 +4405,58 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     width: 60%;
     height: auto;
     margin: 20%
+}
+
+.custom_padding_top_10 {
+    padding-top: 10px;
+}
+
+.tooltip.left .tooltip-inner {
+    background-color: #1b8dd7;
+    border-color: #1b8dd7;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.tooltip.left .tooltip-arrow {
+    border-left-color: #1b8dd7;
+}
+
+.tooltip.right .tooltip-inner {
+    background-color: #1b8dd7;
+    border-color: #1b8dd7;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.tooltip.right .tooltip-arrow {
+    border-right-color: #1b8dd7;
+}
+
+.tooltip.top .tooltip-inner {
+    background-color: #1b8dd7;
+    border-color: #1b8dd7;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.tooltip.top .tooltip-arrow {
+    border-top-color: #1b8dd7;
+}
+
+.tooltip.bottom .tooltip-inner {
+    background-color: #1b8dd7;
+    border-color: #1b8dd7;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.tooltip.bottom .tooltip-arrow {
+    border-bottom-color: #1b8dd7;
 }
 
 /* keyser custom */

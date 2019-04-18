@@ -33,17 +33,18 @@
     </div>
     <!-- /top tiles -->
 
-    <br />
-
     <div class="row">  <!-- Row 1-->
 
       <div class="col-md-4 col-sm-4 col-xs-12">
-        <div class="x_panel">
+        <div class="x_panel tile fixed_height_320">
           <div class="x_title">
-            <h2>Firmware Version</h2>
+            <h3>Firmware Version</h3>
             <div class="clearfix"></div>
           </div>
           <div class="x_content tile fixed_height_320 dashboard-overflow-y" style="height: 230px;">
+          <!--
+          <div class="x_content fixed_height_320 dashboard-overflow-y">
+          -->
             <h4>Firmware Usage across versions</h4>
             {% for key, value in infos['firmware'].items() %}
               <div class="widget_summary">
@@ -72,7 +73,7 @@
       <div class="col-md-4 col-sm-4 col-xs-12">
         <div class="x_panel tile fixed_height_320 overflow_hidden">
           <div class="x_title">
-            <h2>Connected Device</h2>
+            <h3>Connected Device</h3>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -112,7 +113,7 @@
       <div class="col-md-4 col-sm-4 col-xs-12">
         <div class="x_panel tile fixed_height_320">
           <div class="x_title">
-            <h2>Battery Average</h2>
+            <h3>Battery Average</h3>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -138,7 +139,7 @@
       <div class="col-md-4 col-sm-4 col-xs-12">
         <div class="x_panel tile fixed_height_320 dashboard-overflow-y">
           <div class="x_title">
-            <h2>Model</h2>
+            <h3>Model</h3>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -170,7 +171,7 @@
       <div class="col-md-4 col-sm-4 col-xs-12">
         <div class="x_panel tile fixed_height_320">
           <div class="x_title">
-            <h2>Name</h2>
+            <h3>Name</h3>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -197,7 +198,7 @@
       <div class="col-md-4 col-sm-4 col-xs-12">
         <div class="x_panel tile fixed_height_320">
           <div class="x_title">
-            <h2>Performance Endpoint</h2>
+            <h3>Performance Endpoint</h3>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -216,7 +217,7 @@
         <div class="col-md-12">
           <div class="x_panel">
             <div class="x_title">
-              <h2>Transaction Summary <small>Weekly progress</small></h2>
+              <h3>Transaction Summary <small>Weekly progress</small></h3>
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -227,21 +228,21 @@
                 <div class="tiles">
                   <div class="col-md-4 tile">
                     <span>Total Sessions</span>
-                    <h2>231,809</h2>
+                    <h3>231,809</h3>
                     <span class="sparkline11 graph" style="height: 160px;">
                          <canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
                     </span>
                   </div>
                   <div class="col-md-4 tile">
                     <span>Total Revenue</span>
-                    <h2>$231,809</h2>
+                    <h3>$231,809</h3>
                     <span class="sparkline22 graph" style="height: 160px;">
                           <canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
                     </span>
                   </div>
                   <div class="col-md-4 tile">
                     <span>Total Sessions</span>
-                    <h2>231,809</h2>
+                    <h3>231,809</h3>
                     <span class="sparkline11 graph" style="height: 160px;">
                            <canvas width="200" height="60" style="display: inline-block; vertical-align: top; width: 94px; height: 30px;"></canvas>
                     </span>
@@ -253,7 +254,7 @@
               <div class="col-md-3 col-sm-12 col-xs-12">
                 <div>
                   <div class="x_title">
-                    <h2>Top Profiles</h2>
+                    <h3>Top Profiles</h3>
                     <div class="clearfix"></div>
                   </div>
                   <ul class="list-unstyled top_profiles scroll-view">
@@ -327,7 +328,7 @@
       <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
             <div class="x_title">
-                <h2>User Location</h2>
+                <h3>User Location</h3>
                 <div class="clearfix"></div>
               </div>
 
