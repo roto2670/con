@@ -47,11 +47,11 @@
                 </div>
               </form>
 
-              <a id="moveTop" class="btn btn-primary btn-xs" href="#" style="padding: 5px; right: 2%; bottom: 50px; position: fixed; border-radius: 13px; z-index: 999;" onclick="$('html').animate({scrollTop: 0})">TOP</a>
+              <a id="moveTop" class="btn btn-primary btn-xs" href="#" style="padding: 5px; right: 2%; bottom: 50px; position: fixed; border-radius: 13px; z-index: 999;" onclick="$('.right_col').animate({scrollTop: 0})">TOP</a>
               <a id="moveBottom" class="btn btn-primary btn-xs" href="#" style="padding: 5px; right: 2%; bottom: 10px; position: fixed; border-radius: 13px; z-index: 999;"
-              onclick="$('html').animate({scrollTop: $(document).height()})">BTM</a>
+              onclick="$('.right_col').animate({scrollTop: $('.accordion').height()})">BTM</a>
 
-              <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
+              <div class="accordion" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
                 <script>
                   var nextTokens = null,
                       limit = null,
@@ -91,6 +91,8 @@
                     return index;
                   }
 
+                  var allowLoading = true,
+                      lastPageHeight = 0;
                   function getLogs(productId){
                     url = "/endpoints/" + productId + '/next_logs';
                     jQuery.get(url, { 'token': getToken(), 'limit': getLimit(), 'keyword': getKeyword()})
@@ -126,13 +128,16 @@
                         setToken(jsonData.token);
                         setLimit(jsonData.limit);
                         setKeyword(jsonData.keyword);
+                        lastPageHeight = $('.accordion').height();
+                        allowLoading = true;
                         });
                       }
 
-                $(window).scroll(function(){
-                  var scrollHeight = $(document).height();
-                  var scrollPosition = $(window).height() + $(window).scrollTop();
-                  if ((scrollHeight - scrollPosition) / scrollHeight === 0) {
+                $(".right_col").scroll(function(){
+                  var scrollHeight = $('.right_col').height(),
+                      scrollPosition = $('.right_col').scrollTop();
+                  if (allowLoading && (scrollHeight + scrollPosition) > lastPageHeight) {
+                    allowLoading = false;
                     getLogs("{{ current_product.id }}");
                   }
                 });
@@ -140,7 +145,6 @@
                 setLimit({{ limit }});
                 setKeyword({{ keyword }});
                 getLogs("{{ current_product.id }}");
-
               </script>
             </div>
           </div>
