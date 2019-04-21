@@ -13,6 +13,7 @@ import json
 import logging
 
 import requests  # noqa : pylint: disable=import-error
+from flask_login import current_user
 
 
 IS_DEV = True
@@ -25,6 +26,17 @@ def init(app):
   HEADERS['Authorization'] = 'Bearer {}'.format(app.config.get('TOKEN'))
   JSON_HEADERS['Authorization'] = 'Bearer {}'.format(app.config.get('TOKEN'))
   JSON_HEADERS['Content-Type'] = 'application/json'
+
+
+def _get_user_header(is_json=False):
+  tokens = json.loads(current_user.organization.tokens)
+  token = tokens['access'] if 'access' in tokens else ""
+  headers = {
+      'Authorization': 'Bearer {}'.format(token)
+  }
+  if is_json:
+    headers['Content-Type'] = 'application/json'
+  return headers
 
 
 # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.tauhkpflgrmp

@@ -42,8 +42,15 @@ def get_beacon_list():
 
 @blueprint.route('/hubs/location', methods=["POST"])
 #@util.require_login
-def add_scanner_location():
+def update_scanner_location():
   json_data = request.get_json()
   hub_data = json_data['hub']
-  ret = dash_apis.add_scanner_location(hub_data)
+  ret = dash_apis.update_scanner_location(hub_data)
+  return json.dumps(ret)
+
+
+@blueprint.route('/beacons/<beacon_id>', methods=["GET"])
+#@util.require_login
+def get_beacon_info(beacon_id):
+  ret = dash_apis.get_beacon_info(beacon_id)
   return json.dumps(ret)

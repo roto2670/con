@@ -18,3 +18,4 @@ mysqlclient
 country-list
 flask_monitoringdashboard
 pytest
+flask_cors
