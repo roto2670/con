@@ -14,13 +14,14 @@ import time
 import logging
 
 import requests
+from flask_login import current_user
 
 
 URL_HOST = '''http://tapi.mib.io'''
 TEST_URL = URL_HOST + '''/v1/'''
-TEST_URL_I = URL_HOST + '''i/v1/'''
-BASE_URL = '''http://api.mib.io/v1'''
-BASE_URL_I = '''http://api.mib.io/i/v1'''
+TEST_URL_I = URL_HOST + '''/i/v1/'''
+BASE_URL = '''http://api.mib.io/v1/'''
+BASE_URL_I = '''http://api.mib.io/i/v1/'''
 
 HEADERS = {}
 JSON_HEADERS = {}
@@ -32,21 +33,39 @@ TEST_HUB_KIND = '''com.thenaran.skec'''                     #for test
 
 
 def init(app):
+  # used only i/v1 apis
   HEADERS['Authorization'] = 'Bearer {}'.format(TEST_TOKEN)
   JSON_HEADERS['Authorization'] = 'Bearer {}'.format(TEST_TOKEN)
   JSON_HEADERS['Content-Type'] = 'application/json'
 
 
-def add_scanner_location(hub_obj):
+def _get_user_header(is_json=False):
+  # tokens = json.loads(current_user.organization.tokens)
+  # token = tokens['access'] if 'access' in tokens else ""
+  # headers = {
+  #     'Authorization': 'Bearer {}'.format(token)
+  # }
+  # if is_json:
+  #   headers['Content-Type'] = 'application/json'
+  if is_json:
+    return JSON_HEADERS
+  else:
+    return HEADERS
+
+
+def update_scanner_location(hub_obj):
   try:
     url = TEST_URL + 'hubs/' + hub_obj['id']
-    resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(hub_obj['custom']))
+    headers = _get_user_header(is_json=True)
+    data = json.dumps({"custom": hub_obj['custom']})
+    resp = requests.post(url, headers=headers, data=data)
     if resp.ok:
       logging.info("update scanner location successful. Code : %s, Text : %s",
                    resp.status_code, resp.text)
       return True
     else:
-      logging.warning("update scanner location Response. Code : %s, Text : %s", resp.status_code, resp.text)
+      logging.warning("Failed update scanner location. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
       return False
   except:
     logging.exception("Raise error.")
@@ -55,13 +74,15 @@ def add_scanner_location(hub_obj):
 
 def get_scanner_list():
   url = TEST_URL + 'hub-kinds/' + TEST_HUB_KIND + '/hubs?kind=0&issuer=1'
+  headers = _get_user_header()
   try:
-    resp = requests.get(url, headers=HEADERS)
+    resp = requests.get(url, headers=headers)
     if resp.ok:
       scanners = resp.json()
+      print(scanners)
       return scanners
     else:
-      logging.warning("Get all scanners Response. Code : %s, Text : %s",
+      logging.warning("Failed get all scanners. Code : %s, Text : %s",
                       resp.status_code, resp.text)
       return []
   except:
@@ -70,9 +91,10 @@ def get_scanner_list():
 
 
 def get_beacon_list():
-  url = TEST_URL + 'products/mibs/gadgets'
+  url = TEST_URL + 'products/' + 'mibs' +'/gadgets'
   try:
-    resp = requests.get(url, headers=HEADERS)
+    headers = _get_user_header()
+    resp = requests.get(url, headers=headers)
     if resp.ok:
       gadgets = resp.json()
       return gadgets
@@ -84,6 +106,22 @@ def get_beacon_list():
     logging.exception("Raise error.")
     return None
 
+def get_beacon_info(beacon_id):
+  url = TEST_URL_I + "gadgets/" + beacon_id
+  try:
+    headers = _get_user_header()
+    resp = requests.get(url, headers=headers)
+    if resp.ok:
+      ret = resp.json()
+      return ret['v']
+    else:
+      logging.warning("Failed to get beacon info. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return {}
+  except:
+    logging.exception("Raise error.")
+    return None
+
 
 def get_detected_beacons(hub_id, query_id=None):
   # end_ts, start_ts = time.time(), time.time() - OFFSET_SEC
@@ -91,7 +129,9 @@ def get_detected_beacons(hub_id, query_id=None):
   # test URL
   #url = 'http://tapi.mib.io/i/v1/hubs/799b9f874bc1c50775233d2a0c00e388/location' \
   #      '?start_ts=1555475970.9703329&end_ts=1555475978.9703329'
-  url = 'http://tapi.mib.io/i/v1/hubs/799b9f874bc1c50775233d2a0c00e388/location?start_ts=1555669800.628462&end_ts=1555669812.628462'
+  ##url = 'http://tapi.mib.io/i/v1/hubs/799b9f874bc1c50775233d2a0c00e388/location?start_ts=1555669800.628462&end_ts=1555669812.628462'
+  url = 'http://tapi.mib.io/i/v1/hubs/' + hub_id + \
+      '/location?start_ts=1555669800.628462&end_ts=1555669812.628462'
   if not query_id:
     try:
       resp = requests.get(url, headers=HEADERS)

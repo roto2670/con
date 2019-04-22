@@ -119,7 +119,7 @@ if  __name__ == '__main__':
     dashboard.config.init_from(file="./config.cfg")
     dashboard.bind(_app)
     CORS(_app)
-    _app.run(host='127.0.0.1', port=16000)
+    _app.run(host='127.0.0.1', port=5000)
   else:
     cur_path = os.path.dirname(os.path.abspath(__file__))
     ssl_path = os.path.join(cur_path, 'ssl')
