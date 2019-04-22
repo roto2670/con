@@ -21,6 +21,7 @@ from dashboard import blueprint
 
 
 SCHEDULE_COMMON_FILE_NAME = '''schedule'''
+LOCATION_MAP_COMMON_FILE_NAME = '''location'''
 
 
 @blueprint.route('/', methods=['GET'])
@@ -71,3 +72,35 @@ def upload_workschedule():
 @util.require_login
 def default_location():
   return render_template("location.html")
+
+
+@blueprint.route('/location/view', methods=['GET'])
+@util.require_login
+def get_location_map():
+  base_path = util.get_static_path()
+  org_path = os.path.join(base_path, 'dashboard', 'location',
+                          current_user.organization_id)
+  file_path = os.path.join(org_path, LOCATION_MAP_COMMON_FILE_NAME)
+  if os.path.exists(file_path):
+    return '/static/dashboard/location/' + current_user.organization_id + \
+         "/" + LOCATION_MAP_COMMON_FILE_NAME
+  else:
+    return ""
+
+
+@blueprint.route('/location/upload', methods=['POST'])
+@util.require_login
+def upload_location_map():
+  upload_file = request.files['file']
+  content = upload_file.read()
+  base_path = util.get_static_path()
+  org_path = os.path.join(base_path, 'dashboard', 'location',
+                          current_user.organization_id)
+  if not os.path.exists(org_path):
+    os.makedirs(org_path)
+  file_path = os.path.join(org_path, LOCATION_MAP_COMMON_FILE_NAME)
+  with open(file_path, 'wb') as f:
+    f.write(content)
+  os.chmod(file_path, stat.S_IREAD)
+  return '/static/dashboard/location/' + current_user.organization_id + \
+      "/" + LOCATION_MAP_COMMON_FILE_NAME
