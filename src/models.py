@@ -159,6 +159,7 @@ class _Product(db.Model):
   developer_id = Column(String(75))
   key = Column(String(75))
   name = Column(String(75))
+  parent_product_id = Column(String(75))
   typ = Column(Integer)
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
@@ -173,6 +174,31 @@ class _Product(db.Model):
                               order_by="desc(_History.last_updated_time)")
   subdomain_list = relationship('_SubDomain', backref='product', cascade="all, delete",
                                 order_by="desc(_SubDomain.created_time)")
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        value = value[0]
+      setattr(self, property, value)
+
+  def __repr__(self):
+    return self.id
+
+
+class _ForkProduct(db.Model):
+
+  __tablename = '_forkproduct'
+
+  id = Column(String(75), primary_key=True)
+  model_id_list = Column(String(75))
+  target_email = Column(String(75))
+  target_organization = Column(String(75))
+  key = Column(String(75))
+  sent_user = Column(String(75))
+  accepted_user = Column(String(75))
+  created_time = Column(DateTime)
+  accepted_time = Column(DateTime)
+  product_id = Column(String(75), ForeignKey('_product.id'))
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():

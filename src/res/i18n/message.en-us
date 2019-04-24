@@ -83,6 +83,10 @@
           "tester_success_message": "You have succesfully joined as a tester",
           "tester_need_to_ftl_title": "Success",
           "tester_need_to_ftl_message": "You have succesfully joined as a tester, but you need to register your email in the app during the FTL process."
+      },
+      "product_import": {
+          "mail_title": "You can use {} product",
+          "mail_message": "If you accept this mail,<br> {} product and models will be created in your organization"
       }
   },
   "onboarding": {

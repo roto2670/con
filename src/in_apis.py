@@ -40,6 +40,7 @@ from models import _EmailAuth as EmailAuth
 from models import _ReferrerInfo as ReferrerInfo
 from models import _SubDomain as SubDomain
 from models import _Domain as Domain
+from models import _ForkProduct as ForkProduct
 
 
 def get_datetime():
@@ -73,6 +74,76 @@ def create_product(product_name, product_obj, product_type):
   db.session.add(product_stage)
   db.session.commit()
   return product
+
+
+def create_product_to_import(product_id, parent_prd):
+  product = Product(id=product_id,
+                    code=parent_prd.code,
+                    developer_id=current_user.organization_id,
+                    key=parent_prd.key,
+                    name=parent_prd.name,
+                    typ=parent_prd.typ,
+                    parent_product_id=parent_prd.id,
+                    created_time=get_datetime(),
+                    last_updated_time=get_datetime(),
+                    organization_id=current_user.organization_id)
+  db.session.add(product)
+  db.session.commit()
+  product_stage = ProductStage(id=uuid.uuid4().hex,
+                               hook_url="",
+                               hook_client_key="",
+                               stage=models.STAGE_DEV,
+                               created_time=get_datetime(),
+                               last_updated_time=get_datetime(),
+                               last_updated_user=current_user.email,
+                               product_id=product.id)
+  db.session.add(product_stage)
+  db.session.commit()
+  return product
+
+
+def create_fork_product(product_obj, email_addr, model_id_list, sent_user, key, target_organization):
+  fork_product = ForkProduct(id=uuid.uuid4().hex,
+                             model_id_list=model_id_list,
+                             target_email=email_addr,
+                             target_organization=target_organization,
+                             key=key,
+                             sent_user=sent_user,
+                             created_time=get_datetime(),
+                             product_id=product_obj.id)
+  db.session.add(fork_product)
+  db.session.commit()
+  return fork_product
+
+
+def delete_fork_product(fork_product_id):
+  fork_product = get_fork_product_by_id(fork_product_id)
+  if fork_product:
+    db.session.delete(fork_product)
+    db.session.commit()
+
+
+def get_fork_product_list(product_id):
+  fork_product_list = ForkProduct.query.filter_by(product_id=product_id).all()
+  return fork_product_list
+
+
+def get_fork_product_by_key(key):
+  fork_product = ForkProduct.query.filter_by(key=key, target_email=current_user.email).one_or_none()
+  return fork_product
+
+
+def get_fork_product_by_id(fork_product_id):
+  fork_product = ForkProduct.query.filter_by(id=fork_product_id).one_or_none()
+  return fork_product
+
+
+def update_fork_product(key):
+  fork_product = get_fork_product_by_id(key)
+  if fork_product:
+    fork_product.accepted_time = get_datetime()
+    fork_product.accepted_user = current_user.email
+    db.session.commit()
 
 
 def get_product(product_id):
@@ -277,6 +348,11 @@ def get_user_by_email(email, organization_id):
   return user
 
 
+def get_user_by_email_only(email):
+  user = User.query.filter_by(email=email).one_or_none()
+  return user
+
+
 def get_user_list(organization_id):
   user_list = User.query.filter_by(organization_id=organization_id).all()
   return user_list
@@ -433,7 +509,6 @@ def get_noti_model_permission_list_by_model_id(model_id):
   nk_model_permit_list = NkModelPermission.query.\
       filter_by(model_id=model_id).all()
   return nk_model_permit_list
-
 
 
 # {{{ specifications
@@ -686,7 +761,7 @@ def delete_firmware(firmware_id):
 # }}}
 
 
-#{{{  Handle release
+# {{{  Handle release
 
 
 def _delete_before_pre_release(product_id):
@@ -901,7 +976,6 @@ def create_referrer_info(user, ip_addr, referrer, user_agent, accept_language):
                                accepted_time=get_datetime())
   db.session.add(referrer_info)
   db.session.commit()
-
 
 # }}}
 

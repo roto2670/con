@@ -36,8 +36,8 @@ from products import blueprint
 
 def _get_prd_type_dict():
   typ_dict = {
-      models.PRD_TYPE_BLE : "BLE",
-      models.PRD_TYPE_WEB : "HTTP"
+      models.PRD_TYPE_BLE: "BLE",
+      models.PRD_TYPE_WEB: "HTTP"
   }
   return typ_dict
 
@@ -118,8 +118,8 @@ def create():
 def _get_type_dict(product):
   if product.typ == models.PRD_TYPE_BLE:
     typ_dict = {
-        models.MODEL_TYPE_NRF_51 : "NRF51",
-        models.MODEL_TYPE_NRF_52 : "NRF52"
+        models.MODEL_TYPE_NRF_51: "NRF51",
+        models.MODEL_TYPE_NRF_52: "NRF52"
     }
     return typ_dict
   else:
@@ -238,13 +238,11 @@ def tester(product_id):
                                                     current_user.organization_id)
     pre_level_list = in_apis.get_tester_list_by_pre_release(product_id,
                                                             current_user.organization_id)
-    invite_list = in_apis.get_invite_list_by_tester(product_id,
-                                                    current_user.organization_id)
-    return render_template('prd_tester.html', dev_level_list=dev_level_list,
-                           pre_level_list=pre_level_list,
-                           invite_list=invite_list)
+    return render_template('prd_tester.html',
+                           dev_level_list=dev_level_list,
+                           pre_level_list=pre_level_list)
   else:
-    #TODO: Send email
+    # TODO: Send email
     tester_email = request.form['newTesterEmail']
     _tester = in_apis.get_tester_by_email(tester_email, product_id)
     if not _tester:
@@ -256,7 +254,7 @@ def _send_invite(email_addr, product_id):
   with open(util.get_mail_form_path('tester_invite.html'), 'r') as _f:
     content = _f.read()
   key = uuid.uuid4().hex
-  auth_url = request.host_url + 'products/confirm?key=' + key + '&o=' + \
+  auth_url = request.host_url + 'products/confirm?key=' + key + '&o=' +\
       current_user.organization_id
   _product = in_apis.get_product(product_id)
   title = common.get_msg("products.tester.mail_title")
@@ -280,6 +278,64 @@ def _send_invite(email_addr, product_id):
     logging.exception("Raise error")
 
 
+@blueprint.route('/<product_id>/product_import', methods=['GET', 'POST'])
+@util.require_login
+def product_import(product_id):
+  _set_product(product_id)
+  if request.method == "GET":
+    product = in_apis.get_product(product_id)
+    fork_list = in_apis.get_fork_product_list(product_id)
+    org_dict = {}
+    for fork_product in fork_list:
+      org_id = fork_product.target_organization
+      org_name = in_apis.get_organization(org_id)
+      org_dict[org_id] = org_name
+    return render_template('prd_import.html',
+                           model_list=product.model_list,
+                           fork_list=fork_list,
+                           org_dict=org_dict)
+  else:
+    # TODO: Send email
+    _email = request.form['email']
+    _user = in_apis.get_user_by_email_only(_email)
+    if _user:
+      model_id_list = request.form['allowModelIdList']
+      model_id_list = json.loads(model_id_list)
+      product_send_invite(_email, product_id, model_id_list)
+    else:
+      logging.warning("User doesn't exist : %s", _email)
+    return redirect('./product_import')
+
+
+def product_send_invite(email, product_id, model_id_list):
+  # TODO : change mail form
+  with open(util.get_mail_form_path('prd_import_mail.html'), 'r') as _f:
+    content = _f.read()
+  key = uuid.uuid4().hex
+  auth_url = request.host_url + 'products/' + product_id + \
+      '/import/confirm?key=' + key + '&ml=' + ','.join(model_id_list)
+  _product = in_apis.get_product(product_id)
+  # TODO : title ~ message1
+  title = common.get_msg("products.product_import.mail_title")
+  title = title.format(_product.name)
+  msg = common.get_msg("products.product_import.mail_message")
+  msg = msg.format(_product.name)
+  content = content.format(auth_url=auth_url, title=title, msg=msg)
+  target_organization_id = in_apis.get_user_by_email_only(email).organization_id
+  try:
+    mail.send(email, title, content)
+    in_apis.create_fork_product(_product, email, model_id_list, current_user.email, key, target_organization_id)
+  except:
+    logging.exception("Raise error")
+
+
+@blueprint.route('/<product_id>/product_import/delete/<fork_id>', methods=['POST'])
+@util.require_login
+def delete_fork_product(product_id, fork_id):
+  in_apis.delete_fork_product(fork_id)
+  return redirect('/products/' + product_id + '/product_import')
+
+
 @blueprint.route('/<product_id>/tester/<tester_id>/change/<level>')
 @util.require_login
 def change_tester_level(product_id, tester_id, level):
@@ -298,7 +354,6 @@ def change_tester_level(product_id, tester_id, level):
   else:
     logging.warning("Can not find tester. Id : %s", tester_id)
     return redirect('products/' + product_id + '/tester')
-
 
 
 @blueprint.route('/<product_id>/tester/<tester_id>/delete')
@@ -369,6 +424,40 @@ def confirm_mail():
     abort(400)
 
 
+@blueprint.route('<product_id>/import/confirm', methods=['GET'])
+def confirm_product(product_id):
+  key = request.args['key']
+  model_list = request.args['ml']
+  fork_product = in_apis.get_fork_product(key)
+  if fork_product:
+    in_apis.update_fork_product(key)
+    parent_product = in_apis.get_product(product_id)
+    # prd_ret = apis.create_product(parent_product.code, current_user.organization_id)
+    target_org = in_apis.get_organization(fork_product.target_organization)
+    _product_id = product_id + '_' + target_org.name
+    if parent_product:
+      in_apis.create_product_to_import(_product_id, parent_product)
+      _model_list = model_list.split(',')
+      for model_id in _model_list:
+        model = in_apis.get_model(model_id)
+        # mod_ret = apis.create_model(_product_id, model.code, model.name)
+        if model:
+          in_apis.create_model(model.name, model.code, model.typ, _product_id, current_user.email)
+        else:
+          logging.warning("Fail to create model. Name : %s, Type : %s, user : %s",
+                          model.name, model.typ, current_user.email)
+          abort(500)
+    else:
+      logging.warning("Fail to create product. Name : %s, Code : %s, User : %s",
+                      _product_id, parent_product.code, current_user.email)
+      abort(500)
+    return redirect(url_for('home_blueprint.index'))
+  else:
+    logging.warning("Can not find fork product. product id : %s, target user : %s",
+                    product_id, current_user.email)
+    abort(400)
+
+
 @blueprint.route('/<product_id>/model', methods=['GET'])
 @util.require_login
 def model_list(product_id):
@@ -405,7 +494,7 @@ def model_info(product_id, model_id):
         release_id = info.firmware_id
   return render_template('model.html', model=model,
                          firmware_list=model.firmware_list,
-                         dev_id=dev_id, pre_id=pre_id, release_id=release_id )
+                         dev_id=dev_id, pre_id=pre_id, release_id=release_id)
 
 
 def _get_build_number(ep_version, firmware_version):

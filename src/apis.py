@@ -10,6 +10,7 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import json
+import uuid
 import logging
 
 import requests  # noqa : pylint: disable=import-error
@@ -615,7 +616,8 @@ def create_org(email):
   try:
     if IS_DEV:
       _test_data = {
-          "id" : "993a39cdeed84d72851efe581b9a74ed",
+          #"id" : "993a39cdeed84d72851efe581b9a74ed",
+          "id" : uuid.uuid4().hex,
           "users" : [],
           "products": [],
           "tokens": {"access": "d45eb188dd4511251ae7073a447050ad"},
