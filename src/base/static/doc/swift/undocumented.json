@@ -150,34 +150,41 @@
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
       "line": 34,
-      "symbol": "MIBGadget.meta",
+      "symbol": "MIBGadget.custom",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
-      "line": 36,
+      "line": 35,
+      "symbol": "MIBGadget.tags",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
+      "line": 37,
       "symbol": "MIBGadget.init(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
-      "line": 103,
+      "line": 107,
       "symbol": "MIBGadget.toDict()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
-      "line": 132,
+      "line": 137,
       "symbol": "MIBGadget.cancelPairing()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/jeonjongmin/Desktop/dev/wip/microbot-swift/Source/MIBGadget.swift",
-      "line": 136,
+      "line": 141,
       "symbol": "MIBGadget.reveal()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
