@@ -4496,6 +4496,10 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     border-bottom-color: #1b8dd7;
 }
 
+.info_page {
+    color: #ffffff;
+}
+
 /* keyser custom */
 .site_title img {
     margin: 0 5px;

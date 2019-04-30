@@ -122,8 +122,8 @@ def confirm_verified_email():
 @blueprint.route('/welcome')
 def welcome():
   msg = {
-      "title": common.get_msg("products.tester.tester_need_to_ftl_title"),
-      "message": common.get_msg("products.tester.tester_need_to_ftl_message")
+      "title": common.get_msg("products.tester.tester_success_title"),
+      "message": common.get_msg("products.tester.tester_success_message")
   }
   return render_template('welcome.html', msg=msg)
 
@@ -131,8 +131,8 @@ def welcome():
 @blueprint.route('/nowelcome')
 def welcome_no_ftl():
   msg = {
-      "title": common.get_msg("products.tester.tester_success_title"),
-      "message": common.get_msg("products.tester.tester_success_message")
+      "title": common.get_msg("products.tester.tester_need_to_ftl_title"),
+      "message": common.get_msg("products.tester.tester_need_to_ftl_message")
   }
   return render_template('welcome_noftl.html', msg=msg)
 
