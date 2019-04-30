@@ -290,8 +290,8 @@ def update_android_key(organization_id, kind, secret, availables):
   # availables : {"(string) gadget kind": ["(optional)(int) model number"], ..}
   url = BASE_URL + 'developers/' + organization_id + '/keys/' + kind + "/android"
   data = {
-      "secret": secret,
-      "availables": availables
+      "secret": secret
+      #"availables": availables
   }
   try:
     if IS_DEV:
@@ -342,8 +342,8 @@ def update_ios_key(organization_id, kind, cert, secret, is_dev, availables):
   data = {
       "cert": cert,
       "secret": secret,
-      "stage": is_dev,
-      "availables": availables
+      "stage": is_dev
+      #"availables": availables
   }
   try:
     if IS_DEV:

@@ -222,7 +222,7 @@ def update_noti_key(noti_key_id):
     allow_dict = json.loads(request.form['allowDict'])
     allow_model_id_list = json.loads(request.form['allowModelIdList'])
     noti_key = in_apis.get_noti_key(noti_key_id)
-    ret = apis.update_allow_noti_key(current_user.organization_id, '', allow_dict)
+    ret = apis.update_allow_noti_key(current_user.organization_id, noti_key.name, allow_dict)
     if ret:
       permit_list = in_apis.get_noti_model_permission_list_by_noti_id(noti_key.id)
       if permit_list:
