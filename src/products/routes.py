@@ -181,7 +181,8 @@ def delete_model(product_id, model_id):
 @util.require_login
 def general(product_id):
   _set_product(product_id)
-  return render_template('prd_general.html')
+  typ_dict = _get_prd_type_dict()
+  return render_template('prd_general.html', typ_dict=typ_dict)
 
 
 @blueprint.route('/<product_id>/authentication', methods=['GET'])

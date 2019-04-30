@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2019 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -10,13 +10,13 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 
-from flask import render_template  # noqa : pylint: disable=import-error
-
-import util
-from settings import blueprint
+from flask import Blueprint  # noqa : pylint: disable=import-error
 
 
-@blueprint.route('/', methods=['GET'])
-@util.require_login
-def default_route():
-  return render_template("settings.html")
+blueprint = Blueprint(
+    'management_blueprint',
+    __name__,
+    url_prefix='/management',
+    template_folder='templates',
+    static_folder='static'
+)

@@ -1,0 +1,145 @@
+{% extends "base_site.html" %}
+
+{% block title %} Update Notification {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_management.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+  {{ super()}}
+  <!-- iCheck -->
+  <link href="{{ url_for('static', filename='vendors/iCheck/skins/flat/green.css') }}" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block javascripts %}
+  {{ super()}}
+  <!-- iCheck -->
+  <script src="{{ url_for('static', filename='vendors/iCheck/icheck.min.js') }}"></script>
+  <script>
+    var allowDict = {},
+        allowModelIdList = [];
+
+    $(document).ready(function() {
+      if ($(".flat")[0]) {
+        $(document).ready(function () {
+          $('.flat').iCheck({
+              checkboxClass: 'icheckbox_flat-green custom_margin_bottom_5'
+          });
+          for (i=0; i < $(".flat").length; i++) {
+            if ($(".flat")[i].checked) {
+              var prdId = $(".flat")[i].id,
+                  modelInfo = $(".flat")[i].value.split(",");
+              handleCheck(prdId, modelInfo[0], modelInfo[1]);
+            }
+          }
+        });
+      }
+    });
+
+    $(".flat").on('ifChecked', function(event) {
+      var prdId = event.currentTarget.id,
+          modelInfo =  event.currentTarget.value.split(",");
+      if (prdId in allowDict) {
+        allowDict[prdId].push(parseInt(modelInfo[0]));
+      } else {
+        allowDict[prdId] = [parseInt(modelInfo[0])];
+      }
+      allowModelIdList.push(modelInfo[1]);
+      handleAllowData();
+    });
+    $(".flat").on('ifUnchecked', function(event) {
+      var prdId = event.currentTarget.id,
+          modelInfo =  event.currentTarget.value.split(",");
+      var modelIdIndex = allowModelIdList.indexOf(modelInfo[1]);
+      if (modelIdIndex > -1) {
+        allowModelIdList.splice(modelIdIndex, 1);
+      }
+      if (prdId in allowDict) {
+        var modelList = allowDict[prdId],
+            modelIndex = modelList.indexOf(parseInt(modelInfo[0]));
+        if (modelIndex > -1) {
+          modelList.splice(modelIndex, 1);
+          handleAllowData();
+        }
+      }
+    });
+
+    function objectToJson(object) {
+      return JSON.stringify(object);
+    }
+
+    function handleAllowData() {
+      $("#allowDict")[0].value = objectToJson(allowDict);
+      $("#allowModelIdList")[0].value = objectToJson(allowModelIdList);
+      console.log(allowDict);
+      console.log(allowModelIdList);
+    }
+
+    function handleCheck(prdId, modelCode, modelId) {
+      if (prdId in allowDict) {
+        allowDict[prdId].push(parseInt(modelCode));
+      } else {
+        allowDict[prdId] = [parseInt(modelCode)];
+      }
+      allowModelIdList.push(modelId);
+    }
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+  <div class="row">  <!-- start row -->
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel tile">
+        <div class="x_title">
+          <h3>Update Notification </h3>
+          <div class="clearfix"></div>
+        </div>
+
+        <div class="x_content">
+
+          <form action="/management/organization/notikey/update/{{ noti_key.id }}" method="post"
+              class="form-horizontal form-label-left" novalidate>
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="AllowList">Allow List <span class="required">*</span>
+              </label>
+              <div id="scroll-style-1" class="col-md-6 col-sm-6 col-xs-12 allow_list_height_200">
+                {% for product in product_list %}
+                  {% for model in product.model_list %}
+                    {% if model.id in allow_model_id_list %}
+                      <input id="{{ product.code }}" type="checkbox" class="flat"
+                          name="productValue" value="{{ model.code }},{{ model.id }}" checked> {{ product.name }}({{ model.name }})<br>
+                    {% else %}
+                      <input id="{{ product.code }}" type="checkbox" class="flat"
+                          name="productValue" value="{{ model.code }},{{ model.id }}"> {{ product.name }}({{ model.name }})<br>
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="ln_solid"></div>
+            <div class="form-group">
+              <div class="col-md-6 col-md-offset-3">
+                <input type="hidden" id="allowDict" name="allowDict" class="form-control" value="">
+                <input type="hidden" id="allowModelIdList" name="allowModelIdList" class="form-control" value="">
+                <a href={{ referrer }}>
+                    <button type="button" class="btn btn-primary">Cancel</button>
+                </a>
+                <button id="send" type="submit" class="btn btn-success">Update</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+  </div>  <!-- End row -->
+</div>
+
+{% endblock content %}

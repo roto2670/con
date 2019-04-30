@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2019 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -28,18 +28,12 @@ import util
 import onboarding
 import base.routes
 from base import db
-from organization import blueprint
 
 
-@blueprint.route('/', methods=['GET'])
-@util.require_login
-def default_route():
+def general():
   if current_user.organization_id:
     org = in_apis.get_organization(current_user.organization_id)
-    noti_key_list = in_apis.get_noti_key_list(current_user.organization_id)
     product_list = in_apis.get_product_list(current_user.organization_id)
-    user_list = in_apis.get_user_list(current_user.organization_id)
-    invite_list = in_apis.get_invite_list(current_user.organization_id)
     release_list = []
     for product in product_list:
       _release = in_apis.get_product_stage_by_release(product.id)
@@ -50,22 +44,46 @@ def default_route():
         "delete_ok": common.get_msg("organization.delete.organization.delete_ok"),
         "delete_cancel": common.get_msg("organization.delete.organization.delete_cancel")
     }
-    return render_template("organization.html", org=org,
-                           noti_key_list=noti_key_list, user_list=user_list,
-                           product_list=product_list,
-                           invite_list=invite_list,
+    return render_template("general_organization.html", org=org,
                            release_list=release_list,
                            msg=msg)
   else:
-    return redirect("/organization/create")
+    return redirect("/management/organization/create")
 
 
-@blueprint.route('/create', methods=['GET', 'POST'])
-@util.require_login
+def notification_key():
+  if current_user.organization_id:
+    noti_key_list = in_apis.get_noti_key_list(current_user.organization_id)
+    return render_template("notification_organization.html",
+                           noti_key_list=noti_key_list)
+  else:
+    return redirect("/management/organization/create")
+
+
+def member():
+  if current_user.organization_id:
+    user_list = in_apis.get_user_list(current_user.organization_id)
+    invite_list = in_apis.get_invite_list(current_user.organization_id)
+    return render_template("member_organization.html",
+                           user_list=user_list,
+                           invite_list=invite_list)
+  else:
+    return redirect("/management/organization/create")
+
+
+def product():
+  if current_user.organization_id:
+    product_list = in_apis.get_product_list(current_user.organization_id)
+    return render_template("product_organization.html",
+                           product_list=product_list)
+  else:
+    return redirect("/management/organization/create")
+
+
 def create():
   if request.method == "GET":
     if current_user.organization_id:
-      return redirect('/organization')
+      return redirect('/management/organization')
     else:
       modal = {
           "title": common.get_msg("organization.create.organization.modal_title"),
@@ -74,7 +92,7 @@ def create():
           "ok": common.get_msg("organization.create.organization.modal_ok")
       }
       onboarding.clear_session()
-      return render_template("create.html", modal=modal)
+      return render_template("create_organization.html", modal=modal)
   else:
     name = request.form['name']
     owner_email = current_user.email
@@ -83,7 +101,7 @@ def create():
       title = common.get_msg("organization.create.organization.fail_exists_organization_title")
       msg = common.get_msg("organization.create.organization.fail_exists_organization_message")
       common.set_error_message(title, msg)
-      return redirect('/organization/create')
+      return redirect('/management/organization/create')
     else:
       ret = apis.create_org(owner_email)
       if ret:
@@ -100,16 +118,19 @@ def create():
         abort(500)
 
 
-@blueprint.route('/register/<platform>', methods=['GET', 'POST'])
-@util.require_login
 def register_noti_key(platform):
-  referrer = "/organization"
+  referrer = "/management/organization/notification"
   if request.method == "GET":
+    product_list = in_apis.get_product_list(current_user.organization_id)
     if platform == "ios":
-      return render_template("register_ios.html", referrer=referrer)
+      return render_template("register_ios.html", referrer=referrer,
+                             product_list=product_list)
     else:
-      return render_template("register_android.html", referrer=referrer)
+      return render_template("register_android.html", referrer=referrer,
+                             product_list=product_list)
   else:
+    allow_dict = json.loads(request.form['allowDict'])
+    allow_model_id_list = json.loads(request.form['allowModelIdList'])
     if platform == "ios":
       bundle_id = request.form['bundleId']
       password = request.form['password']
@@ -121,18 +142,26 @@ def register_noti_key(platform):
         _f.write(content)
       cert, secret_key = worker.get_about_noti_key(password, temp_file)
       ret = apis.update_ios_key(current_user.organization_id, bundle_id,
-                                cert, secret_key, state)
+                                cert, secret_key, state, allow_dict)
       if ret:
         noti_key = in_apis.get_ios_noti_key(current_user.organization_id,
                                             models.IOS, bundle_id, password,
                                             state)
         if noti_key:
           in_apis.update_noti_key(noti_key)
+          for model_id in allow_model_id_list:
+            in_apis.create_noti_model_permission(current_user.email,
+                                                 noti_key.id,
+                                                 model_id)
         else:
-          in_apis.create_ios_noti_key(bundle_id, password, state)
+          noti_key = in_apis.create_ios_noti_key(bundle_id, password, state)
+          for model_id in allow_model_id_list:
+            in_apis.create_noti_model_permission(current_user.email,
+                                                 noti_key.id,
+                                                 model_id)
         if os.path.exists(temp_file):
           os.remove(temp_file)
-        return redirect('organization')
+        return redirect('/management/organization/notification')
       else:
         logging.warning(
             "Fail to ios register noti key. org : %s, id : %s, pw : %s, state : %s, user : %s",
@@ -145,15 +174,23 @@ def register_noti_key(platform):
       package_name = request.form['packageName']
       key = request.form['key']
       ret = apis.update_android_key(current_user.organization_id, package_name,
-                                    key)
+                                    key, allow_dict)
       if ret:
         noti_key = in_apis.get_android_noti_key(current_user.organization_id,
                                                 models.ANDROID, package_name, key)
         if noti_key:
           in_apis.update_noti_key(noti_key)
+          for model_id in allow_model_id_list:
+            in_apis.create_noti_model_permission(current_user.email,
+                                                 noti_key.id,
+                                                 model_id)
         else:
-          in_apis.create_android_noti_key(package_name, key)
-        return redirect('organization')
+          noti_key = in_apis.create_android_noti_key(package_name, key)
+          for model_id in allow_model_id_list:
+            in_apis.create_noti_model_permission(current_user.email,
+                                                 noti_key.id,
+                                                 model_id)
+        return redirect('/management/organization/notification')
       else:
         logging.warning(
             "Fail to register android noti key. org : %s, name : %s, key : %s, user : %s",
@@ -161,21 +198,62 @@ def register_noti_key(platform):
         abort(500)
 
 
-@blueprint.route('/notikey/delete/<noti_key_id>', methods=['POST'])
-@util.require_login
+def update_noti_key(noti_key_id):
+  referrer = "/management/organization/notification"
+  if request.method == "GET":
+    noti_key = in_apis.get_noti_key(noti_key_id)
+    product_list = in_apis.get_product_list(current_user.organization_id)
+    allow_model_id_list = []
+    allow_dict = {}
+    for permit in noti_key.permission_list:
+      allow_model_id_list.append(permit.model_id)
+    for product in product_list:
+      for model in product.model_list:
+        if model.id in allow_model_id_list:
+          if product.code in allow_dict:
+            allow_dict[product.code].append(model.id)
+          else:
+            allow_dict[product.code] = [model.id]
+    return render_template("update_notification.html", referrer=referrer,
+                            noti_key=noti_key, product_list=product_list,
+                            allow_model_id_list=allow_model_id_list,
+                            allow_dict=allow_dict)
+  else:
+    allow_dict = json.loads(request.form['allowDict'])
+    allow_model_id_list = json.loads(request.form['allowModelIdList'])
+    noti_key = in_apis.get_noti_key(noti_key_id)
+    ret = apis.update_allow_noti_key(current_user.organization_id, '', allow_dict)
+    if ret:
+      permit_list = in_apis.get_noti_model_permission_list_by_noti_id(noti_key.id)
+      if permit_list:
+        for permit in permit_list:
+          if permit.model_id in allow_model_id_list:
+            in_apis.update_noti_model_permission(permit.id, current_user.email,
+                                                noti_key.id, permit.model_id)
+            allow_model_id_list.remove(permit.model_id)
+          else:
+            in_apis.delete_noti_model_permission(permit.id)
+      for model_id in allow_model_id_list:
+        in_apis.create_noti_model_permission(current_user.email, noti_key.id,
+                                              model_id)
+      return redirect('/management/organization/notification')
+    else:
+      logging.warning("Failed to update noti key. id : %s, user : %s, message : %s",
+                       noti_key_id, current_user.email, ret)
+      abort(500)
+
+
 def delete_noti_key(noti_key_id):
   logging.info("Try to delete noti key. User : %s, noti id : %s",
                current_user.email, noti_key_id)
   ret = in_apis.delete_noti_key(current_user.organization_id, noti_key_id)
   if ret:
-    return redirect('organization')
+    return redirect('/management/organization/notification')
   else:
     logging.warning("Failed to delete noti key.")
-    return redirect('organization')
+    return redirect('/management/organization/notification')
 
 
-@blueprint.route('/invite', methods=['POST'])
-@util.require_login
 def send_invite():
   email_addr = request.form['email']
   _user = in_apis.get_user_by_email(email_addr, current_user.organization_id)
@@ -183,7 +261,7 @@ def send_invite():
     with open(util.get_mail_form_path('invite.html'), 'r') as _f:
       content = _f.read()
     key = uuid.uuid4().hex
-    auth_url = request.host_url + 'organization/confirm?key=' + key + \
+    auth_url = request.host_url + 'management/organization/confirm?key=' + key + \
         '&o=' + current_user.organization_id
     org = in_apis.get_organization(current_user.organization_id)
     title = common.get_msg("organization.member.mail_title")
@@ -206,10 +284,9 @@ def send_invite():
       logging.exception("Raise error. to : %s, sender : %s, org : %s",
                         email_addr, current_user.email, org.original_name)
       abort(500)
-  return redirect('organization')
+  return redirect('/management/organization/member')
 
 
-@blueprint.route('/confirm', methods=['GET'])
 def confirm_mail():
   key = request.args['key']
   organization_id = request.args['o']
@@ -237,20 +314,16 @@ def confirm_mail():
     abort(400)
 
 
-@blueprint.route('/invite/delete/<invite_id>')
-@util.require_login
 def delete_invite(invite_id):
   try:
     in_apis.delete_invite(invite_id)
-    return redirect('organization')
+    return redirect('/management/organization/member')
   except:
     logging.exception("Raise error while delete invite. Id : %s, user : %s",
                       invite_id, current_user.email)
     abort(500)
 
 
-@blueprint.route('/delete', methods=['POST'])
-@util.require_login
 def delete_organization():
   if current_user.level == models.OWNER:
     try:

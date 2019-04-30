@@ -1,0 +1,161 @@
+{% extends "base_site.html" %}
+
+{% block title %} Register IOS {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_management.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+  {{ super()}}
+  <!-- iCheck -->
+  <link href="{{ url_for('static', filename='vendors/iCheck/skins/flat/green.css') }}" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block javascripts %}
+  {{ super()}}
+  <!-- iCheck -->
+  <script src="{{ url_for('static', filename='vendors/iCheck/icheck.min.js') }}"></script>
+  <script>
+    $(document).ready(function() {
+      if ($(".flat")[0]) {
+        $(document).ready(function () {
+          $('.flat').iCheck({
+              checkboxClass: 'icheckbox_flat-green custom_margin_bottom_5'
+          });
+        });
+      }
+    });
+
+    var allowDict = {},
+        allowModelIdList = [];
+
+    $(".flat").on('ifChecked', function(event) {
+      var prdId = event.currentTarget.id,
+          modelInfo =  event.currentTarget.value.split(",");
+      if (prdId in allowDict) {
+        allowDict[prdId].push(parseInt(modelInfo[0]));
+      } else {
+        allowDict[prdId] = [parseInt(modelInfo[0])];
+      }
+      allowModelIdList.push(modelInfo[1]);
+      handleAllowData();
+    });
+    $(".flat").on('ifUnchecked', function(event) {
+      var prdId = event.currentTarget.id,
+          modelInfo =  event.currentTarget.value.split(",");
+      var modelIdIndex = allowModelIdList.indexOf(modelInfo[1]);
+      if (modelIdIndex > -1) {
+        allowModelIdList.splice(modelIdIndex, 1);
+      }
+      if (prdId in allowDict) {
+        var modelList = allowDict[prdId],
+            modelIndex = modelList.indexOf(parseInt(modelInfo[0]));
+        if (modelIndex > -1) {
+          modelList.splice(modelIndex, 1);
+          handleAllowData();
+        }
+      }
+    });
+
+    function objectToJson(object) {
+      return JSON.stringify(object);
+    }
+
+    function handleAllowData() {
+      $("#allowDict")[0].value = objectToJson(allowDict);
+      $("#allowModelIdList")[0].value = objectToJson(allowModelIdList);
+    }
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col" role="main">
+  <div class="row"> <!-- start row -->
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel tile">
+
+        <div class="x_title">
+          <h3>Register IOS </h3>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+
+          <form action="/organization/register/ios" method="post"
+              class="form-horizontal form-label-left" enctype="multipart/form-data">
+
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="dev">State <span class="required">*</span>
+              </label>
+              <div class="btn-group col-md-6 col-sm-6 col-xs-12" data-toggle="buttons">
+                <label class="btn btn-default active" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                  <input type="radio" name="state" value="1" required="required" id="state"
+                      class="form-control col-md-7 col-xs-12" checked> Dev
+                </label>
+                <label class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                  <input type="radio" name="state" value="0" required="required" id="state"
+                      class="form-control col-md-7 col-xs-12"> Production
+                </label>
+              </div>
+            </div>
+
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="bundleId">Bundle ID <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="text" id="bundleId" name="bundleId" required="required" class="form-control col-md-7 col-xs-12"
+                    value="" placeholder="Bundle ID">
+              </div>
+            </div>
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="password">Password <span class="required">*</span>
+              </label>
+              <div class="col-md-6 col-sm-6 col-xs-12">
+                <input type="password" id="password" name="password" required="required" class="form-control col-md-7 col-xs-12",
+                    value="" placeholder="Password">
+              </div>
+            </div>
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="AllowList">Allow List <span class="required">*</span>
+              </label>
+              <div id="scroll-style-1" class="col-md-6 col-sm-6 col-xs-12 allow_list_height_150">
+                {% for product in product_list %}
+                  {% for model in product.model_list %}
+                    <input id="{{ product.code }}" type="checkbox" class="flat"
+                        name="productValue" value="{{ model.code }}"> {{ product.name }}({{ model.name }})<br>
+                  {% endfor %}
+                {% endfor %}
+              </div>
+            </div>
+            <div class="item form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12" for="file">File <span class="required">*</span>
+              </label>
+              <input type="file" id="file" name="file" accept="application/x-pkcs12"
+                  required="required" class="control-label col-md-3 col-sm-3 col-xs-12"/>
+            </div>
+
+
+            <div class="ln_solid"></div>
+            <div class="form-group">
+              <div class="col-md-6 col-md-offset-3">
+                <input type="hidden" id="allowDict" name="allowDict" class="form-control" value="">
+                <input type="hidden" id="allowModelIdList" name="allowModelIdList" class="form-control" value="">
+                <a href={{ referrer }}>
+                    <button type="button" class="btn btn-primary">Cancel</button>
+                </a>
+                <button id="send" type="submit" class="btn btn-success">Register</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+  </div>  <!-- End row -->
+</div>
+
+{% endblock content %}

@@ -1,0 +1,37 @@
+
+{% extends "base_site.html" %}
+
+{% block title %} Work Schedule {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_dashboard.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+
+      <!-- start row -->
+      <div class="row">
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">
+            <div class="x_title">
+              <h3>Work Schedule</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div id="workSchedule">
+              </div>
+              <script src="/static/dashboard/workschedule/build.js"></script>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- End row -->
+    </div>
+  </div>
+
+{% endblock content %}

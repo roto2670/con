@@ -1,10 +1,9 @@
-
 {% extends "base_site.html" %}
 
 {% block title %} General {% endblock title %}
 
 {% block content %}
-  <div class="right_col" role="main">
+  <div id="scroll-style-hidden" class="right_col" role="main">
     <div class="">
 
       <div class="row">  <!-- start row -->
@@ -19,7 +18,7 @@
                   </label>
                   <div class="col-md-12">
                     <input type="text" value="{{ current_product.id }}" id="code" name="code"
-                        class="form-control col-md-6 col-xs-6" readonly>
+                       class="form-control col-md-6 col-xs-6" readonly>
                   </div>
                 </div>
 
@@ -30,7 +29,7 @@
                   </label>
                   <div class="col-md-12">
                     <input type="text" value="{{ current_product.name }}" id="prdName" name="prdName"
-                        class="form-control col-md-6 col-xs-6" readonly>
+                       class="form-control col-md-6 col-xs-6" readonly>
                   </div>
                 </div>
 
@@ -41,11 +40,23 @@
                   </label>
                   <div class="col-md-12">
                     <input type="text" value="{{ current_product.key }}" id="prdKey" name="prdKey"
-                        class="cursor-pointer form-control col-md-6 col-xs-6" readonly onclick="copyToClipboard(id);">
+                       class="cursor-pointer form-control col-md-6 col-xs-6" readonly
+                       onclick="copyToClipboard(id);">
                   </div>
                 </div>
 
                 <br>
+
+                <h3>Product Type</h3>
+                <div class="form-group">
+                  <label class="control-label col-md-0" for="prdTyp">
+                  </label>
+                  <div class="col-md-12">
+                    <input type="text" value={{ typ_dict[current_product.typ] }} id="prdTyp" name="prdTyp"
+                       class="form-control col-md-6 col-xs-6" readonly>
+                  </div>
+                  <br><br>
+                </div>
               </div>
 
             </div>  <!-- End x_content -->

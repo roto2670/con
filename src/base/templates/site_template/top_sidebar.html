@@ -1,0 +1,43 @@
+<script>
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+
+<div class="nav-sm top_sidebar_menu">
+  <div class="logo_img_div">
+    <a href="/">
+      <img class="logo_img_middle" src="/static/images/naran-logo-white.svg">
+    <!--
+      <img class="logo_img_middle" src="/static/images/sk_enc-logo-white.svg">
+    -->
+    </a>
+  </div>
+  <ul class="nav side-menu">
+  <!--
+    <li>
+      <a href="/dashboard" data-toggle="tooltip" data-placement="right" title="" data-original-title="Dashboard">
+        <i class="fa fa-area-chart"></i>
+      </a>
+    </li>
+  -->
+    <li>
+      <a href="/" data-toggle="tooltip" data-placement="right" data-original-title="Dev">
+        <i class="fa fa-edit"></i>
+      </a>
+    </li>
+    <li>
+      <a href="javascript:void(0)" data-toggle="tooltip" data-placement="right" data-original-title="Payment (Comming Soon!)">
+        <i class="fa fa-credit-card"></i>
+      </a>
+    </li>
+  </ul>
+  <ul class="nav navbar-nav organization_align_bottom">
+    <li>
+      <a href="/management/organization/general" class="user-profile" data-toggle="tooltip" data-placement="right" data-original-title="Management">
+        <img src="{{ current_user.photo_url }}">
+      </a>
+    </li>
+  </ul>
+</div>

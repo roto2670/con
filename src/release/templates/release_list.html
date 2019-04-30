@@ -3,15 +3,22 @@
 
 {% block title %} Release {% endblock title %}
 
+{% block stylesheets %}
+  {{ super()}}
+  <!-- iCheck -->
+  <link href="{{ url_for('static', filename='vendors/iCheck/skins/flat/green.css') }}" rel="stylesheet">
+{% endblock stylesheets %}
+
 {% block javascripts %}
   {{ super()}}
+  <!-- iCheck -->
+  <script src="{{ url_for('static', filename='vendors/iCheck/icheck.min.js') }}"></script>
   <script>
     $(document).ready(function() {
         if ($(".flat")[0]) {
             $(document).ready(function () {
                 $('.flat').iCheck({
-                    checkboxClass: 'icheckbox_flat-green',
-                    radioClass: 'iradio_flat-green'
+                    checkboxClass: 'icheckbox_flat-green'
                 });
             });
         }
@@ -128,7 +135,7 @@
 {% endblock javascripts %}
 
 {% block content %}
-  <div class="right_col" role="main">
+  <div id="scroll-style-hidden" class="right_col" role="main">
     <div class="">
 
       <!-- start row -->

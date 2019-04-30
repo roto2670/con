@@ -13,6 +13,7 @@ import json
 import logging
 
 import requests  # noqa : pylint: disable=import-error
+from flask_login import current_user
 
 
 IS_DEV = True
@@ -25,6 +26,17 @@ def init(app):
   HEADERS['Authorization'] = 'Bearer {}'.format(app.config.get('TOKEN'))
   JSON_HEADERS['Authorization'] = 'Bearer {}'.format(app.config.get('TOKEN'))
   JSON_HEADERS['Content-Type'] = 'application/json'
+
+
+def _get_user_header(is_json=False):
+  tokens = json.loads(current_user.organization.tokens)
+  token = tokens['access'] if 'access' in tokens else ""
+  headers = {
+      'Authorization': 'Bearer {}'.format(token)
+  }
+  if is_json:
+    headers['Content-Type'] = 'application/json'
+  return headers
 
 
 # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.tauhkpflgrmp
@@ -272,12 +284,14 @@ def get_gadget_list(product_id):
 # }}}
 
 
-def update_android_key(organization_id, kind, secret):
+def update_android_key(organization_id, kind, secret, availables):
   # kind : package name
   # secret : key
+  # availables : {"(string) gadget kind": ["(optional)(int) model number"], ..}
   url = BASE_URL + 'developers/' + organization_id + '/keys/' + kind + "/android"
   data = {
-      "secret": secret
+      "secret": secret,
+      "availables": availables
   }
   try:
     if IS_DEV:
@@ -321,14 +335,15 @@ def delete_android_key(organization_id, kind):
     return None
 
 
-def update_ios_key(organization_id, kind, cert, secret, is_dev):
+def update_ios_key(organization_id, kind, cert, secret, is_dev, availables):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.2q2o6bhvcg6
   # kind : bundle_id
   url = BASE_URL + 'developers/' + organization_id + '/keys/' + kind + "/ios"
   data = {
       "cert": cert,
       "secret": secret,
-      "stage": is_dev
+      "stage": is_dev,
+      "availables": availables
   }
   try:
     if IS_DEV:
@@ -370,6 +385,32 @@ def delete_ios_key(organization_id, kind):
     logging.exception("Raise error while delete ios key. org : %s kind : %s",
                       organization_id, kind)
     return None
+
+
+def update_allow_noti_key(organization_id, kind, availables):
+  # http://i.narantech.com/mib-rest/#api-Developer-update_availables_gadget_kind_of_hub
+  # kind : bundle_id
+  url = BASE_URL + 'developers/' + organization_id + '/hubs/' + kind + "/availables"
+  data = availables
+  try:
+    if IS_DEV:
+      _test_data = True
+      return _test_data
+    else:
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      if resp.ok:
+        value = resp.json()
+        logging.info("Update ios key. url : %s, data : %s", url, data)
+        return value['v']
+      else:
+        logging.warning("Register android key Response. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return None
+  except:
+    logging.exception("Raise error")
+    return None
+
+
 
 
 # {{{ Endpoints

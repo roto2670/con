@@ -14,9 +14,9 @@ from flask import Blueprint  # noqa : pylint: disable=import-error
 
 
 blueprint = Blueprint(
-    'settings_blueprint',
+    'dashboard_blueprint',
     __name__,
-    url_prefix='/settings',
+    url_prefix='/dashboard',
     template_folder='templates',
     static_folder='static'
 )

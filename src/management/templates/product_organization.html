@@ -1,0 +1,62 @@
+{% extends "base_site.html" %}
+
+{% block title %} Product {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_management.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="row">  <!-- start row -->
+
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="x_content">
+
+            <table class="table table-striped projects">
+              <thead>
+                <tr>
+                  <th style="width: 25%">Product Name</th>
+                  <th style="width: 25%">Product ID</th>
+                  <th style="width: 25%">Last Updated</th>
+                  <th style="width: 25%">Edit</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for product in product_list %}
+                  <tr>
+                    <td>
+                      <a>{{ product.name }}</a>
+                      <br />
+                      <small>Created {{ product.created_time | datetimeFilter }}</small>
+                    </td>
+                    <td>
+                      <a>{{ product.id }}</a>
+                    </td>
+                    <td>
+                      <a>{{ product.last_updated_time | datetimeFilter }}</a>
+                    </td>
+                    <td>
+                      <a href="/home/{{ product.id }}" class="btn btn-primary btn-xs"><i class="fa fa-folder"></i> View </a>
+                      <a href="/products/{{ product.id }}/general" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Edit </a>
+                      <!--  TODO: remove menu
+                      {% if current_user.level == 0 and product.id not in release_list %}
+                        <a href="#" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Delete </a>
+                      {% endif %}
+                      -->
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+          </div>  <!-- end x_content -->
+        </div>  <!-- end x_panel -->
+      </div>
+
+    </div>  <!-- End row -->
+</div>
+{% endblock content %}

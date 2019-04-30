@@ -29,6 +29,7 @@ from models import _StageInfo as StageInfo
 from models import _Model as Model
 from models import _Endpoint as Endpoint
 from models import _NotiKey as NotiKey
+from models import _NkModelPermission as NkModelPermission
 from models import _Organization as Organization
 from models import _User as User
 from models import _Invite as Invite
@@ -308,6 +309,7 @@ def create_ios_noti_key(name, key, state):
                      last_updated_user=current_user.email,
                      organization_id=current_user.organization_id)
   _create_noti_key(noti_key)
+  return noti_key
 
 
 def create_android_noti_key(name, key):
@@ -321,12 +323,18 @@ def create_android_noti_key(name, key):
                      last_updated_user=current_user.email,
                      organization_id=current_user.organization_id)
   _create_noti_key(noti_key)
+  return noti_key
 
 
 def update_noti_key(noti_key):
   noti_key.last_updated_time = get_datetime()
   noti_key.last_updated_user = current_user.email
   db.session.commit()
+
+
+def get_noti_key(_id):
+  noti_key = NotiKey.query.filter_by(id=_id).one_or_none()
+  return noti_key
 
 
 def get_noti_key_list(organization_id):
@@ -355,6 +363,54 @@ def delete_noti_key(organization_id, noti_key_id):
     logging.warning("Can not find noti key. org_id : %s, noti_id : %s",
                     organization_id, noti_key_id)
     return False
+
+
+# {{{ Noti Model Permission
+
+
+def create_noti_model_permission(user_email, noti_key_id, model_id):
+  nk_model_permit = NkModelPermission(id=uuid.uuid4().hex,
+                                      permission=0,
+                                      created_time=get_datetime(),
+                                      last_updated_time=get_datetime(),
+                                      last_updated_user=user_email,
+                                      noti_key_id=noti_key_id,
+                                      model_id=model_id)
+  db.session.add(nk_model_permit)
+  db.session.commit()
+
+
+def update_noti_model_permission(_id, user_email, noti_key_id, model_id):
+  nk_model_permit = get_noti_model_permission(_id)
+  nk_model_permit.noti_key_id = noti_key_id
+  nk_model_permit.model_id = model_id
+  nk_model_permit.last_update_time = get_datetime()
+  nk_model_permit.last_update_user = user_email
+  db.session.commit()
+
+
+def delete_noti_model_permission(_id):
+  nk_model_permit = get_noti_model_permission(_id)
+  db.session.delete(nk_model_permit)
+  db.session.commit()
+
+
+def get_noti_model_permission(_id):
+  nk_model_permit = NkModelPermission.query.filter_by(id=_id).one_or_none()
+  return nk_model_permit
+
+
+def get_noti_model_permission_list_by_noti_id(noti_key_id):
+  nk_model_permit_list = NkModelPermission.query.\
+      filter_by(noti_key_id=noti_key_id).all()
+  return nk_model_permit_list
+
+
+def get_noti_model_permission_list_by_model_id(model_id):
+  nk_model_permit_list = NkModelPermission.query.\
+      filter_by(model_id=model_id).all()
+  return nk_model_permit_list
+
 
 
 # {{{ specifications
