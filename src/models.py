@@ -169,6 +169,8 @@ class _Product(db.Model):
   tester_list = relationship('_Tester', backref='product', cascade="all, delete")
   history_list = relationship('_History', backref='product', cascade="all, delete",
                               order_by="desc(_History.last_updated_time)")
+  subdomain_list = relationship('_SubDomain', backref='product', cascade="all, delete",
+                                order_by="desc(_SubDomain.created_time)")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -409,6 +411,34 @@ class _ReferrerInfo(db.Model):
   user_agent = Column(String(225))
   accept_language = Column(String(225))
   accepted_time = Column(DateTime)
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        value = value[0]
+      setattr(self, property, value)
+
+
+# protocol type
+HTTP = 0
+HTTPS = 1
+
+class _SubDomain(db.Model):
+  __tablename__ = '_sub_domain'
+
+  id = Column(String(75), primary_key=True)
+  gadget_id = Column(String(75))
+  subname = Column(String(75))
+  domain = Column(String(75))
+  protocol = Column(Integer)
+  files_path = Column(String(225))
+  request_ip_address = Column(String(75))
+  accepted = Column(Boolean, default=False)
+  created_time = Column(DateTime)
+  accepted_time = Column(DateTime)
+  accepted_user = Column(String(75))
+  organization_id = Column(String(75))
+  product_id = Column(String(75), ForeignKey('_product.id'))
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():

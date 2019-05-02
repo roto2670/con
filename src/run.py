@@ -54,6 +54,7 @@ def register_blueprints(app):
       'dashboard',
       'management',
       'dash',
+      'openapi',
       'login'
   ]
   for blueprint in blueprints:

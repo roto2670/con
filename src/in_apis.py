@@ -38,6 +38,7 @@ from models import _Firmware as Firmware
 from models import _History as History
 from models import _EmailAuth as EmailAuth
 from models import _ReferrerInfo as ReferrerInfo
+from models import _SubDomain as SubDomain
 
 
 def get_datetime():
@@ -75,6 +76,11 @@ def create_product(product_name, product_obj, product_type):
 
 def get_product(product_id):
   product = Product.query.filter_by(id=product_id).one_or_none()
+  return product
+
+
+def get_product_by_key(product_key):
+  product = Product.query.filter_by(key=product_key).one_or_none()
   return product
 
 
@@ -878,6 +884,65 @@ def create_referrer_info(user, ip_addr, referrer, user_agent, accept_language):
                                accepted_time=get_datetime())
   db.session.add(referrer_info)
   db.session.commit()
+
+
+# }}}
+
+
+# {{{ SubDomain
+
+
+PROTOCOL_DICT = {
+  "http": models.HTTP,
+  "https": models.HTTPS
+}
+
+
+def create_sub_domain(gadget_id, subname, domain, protocol, files_path,
+                      request_ip_address, organization_id, product_id):
+  sub_domain = SubDomain(id=uuid.uuid4().hex,
+                         gadget_id=gadget_id,
+                         subname=subname,
+                         domain=domain,
+                         protocol=PROTOCOL_DICT[protocol],
+                         files_path=json.dumps(files_path),
+                         request_ip_address=request_ip_address,
+                         accepted=False,
+                         created_time=get_datetime(),
+                         organization_id=organization_id,
+                         product_id=product_id)
+  db.session.add(sub_domain)
+  db.session.commit()
+
+
+def update_sub_domain(sub_domain_id):
+  sub_domain = get_sub_domain(sub_domain_id)
+  sub_domain.accepted = True
+  sub_domain.accepted_time = get_datetime()
+  sub_domain.accepted_user = current_user.email
+  db.session.commit()
+
+
+def delete_sub_domain(sub_domain_id):
+  sub_domain = get_sub_domain(sub_domain_id)
+  db.session.delete(sub_domain)
+  db.session.commit()
+
+
+def get_sub_domain(_id):
+  sub_domain = SubDomain.query.filter_by(id=_id).one_or_none()
+  return sub_domain
+
+
+def get_sub_domain_list(product_id):
+  sub_domain_list = SubDomain.query.filter_by(product_id=product_id).all()
+  return sub_domain_list
+
+
+def get_sub_domain_by_sub_domain(subname, domain):
+  sub_domain = SubDomain.query.filter_by(subname=subname, domain=domain).\
+      one_or_none()
+  return sub_domain
 
 
 # }}}

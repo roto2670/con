@@ -18,6 +18,7 @@ from flask_login import current_user
 
 IS_DEV = True
 BASE_URL = '''http://api.mib.io/i/v1/'''
+THIRD_BASE_URL = '''http://api.mib.io/v1/'''
 HEADERS = {}
 JSON_HEADERS = {}
 
@@ -831,4 +832,32 @@ def get_logs_with_gadget(product_id, gadget_id, keyword=None, token=None,
         return None
   except:
     logging.exception("Raise error.")
+    return None
+
+
+def register_sub_domain(gadget_id, sub_name, domain):
+  """http://i.narantech.com/mibiot-api/index.html#api-Products-update_product_subdomain_mapping
+  """
+  url = "{base}gadgets/{gadget_id}/subdomain".format(base=THIRD_BASE_URL,
+                                                     gadget_id=gadget_id)
+  data = {
+      "subname": sub_name,
+      "domain": domain
+  }
+  try:
+    if IS_DEV:
+      return True
+    else:
+      headers = _get_user_header(is_json=True)
+      resp = requests.POST(url, headers=headers, data=json.dumps(data))
+      if resp.ok:
+        value = resp.json()
+        logging.info("Register sub domain resp : %s, data : %s", value, data)
+        return value
+      else:
+        logging.warning("Falied to register sub domain. url : %s, data: %s, gid : %s",
+                        url, data, gadget_id)
+        return False
+  except:
+    logging.exception("Raise error while register sub domain.")
     return None
