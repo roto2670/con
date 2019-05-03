@@ -43,6 +43,9 @@
                 <li><a href="/products/{{ current_product.id }}/general">General</a></li>
                 <li><a href="/products/{{ current_product.id }}/model">Model</a></li>
                 <li><a href="/products/{{ current_product.id }}/authentication">Authentication</a></li>
+                {% if current_product.typ == 1 %}
+                  <li><a href="/products/{{ current_product.id }}/subdomain">Subdomain</a></li>
+                {% endif %}
                 <li><a href="/products/{{ current_product.id }}/tester">Tester</a></li>
             </ul>
           </li>

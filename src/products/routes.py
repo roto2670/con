@@ -493,6 +493,7 @@ def delete_firmware(product_id, model_id, firmware_id):
 
 @blueprint.route('/<product_id>/model/<model_id>/firmware/<model_type>/download',
                  methods=['GET', 'POST'])
+@util.require_login
 def download_software(product_id, model_id, model_type):
   if int(model_type) == models.MODEL_TYPE_NRF_51:
     path = os.path.join(util.get_res_path(), 'firmware', 'nrf51')
@@ -503,6 +504,36 @@ def download_software(product_id, model_id, model_type):
     file_name = "nrf52.zip"
   onboarding.set_download_file()
   return send_from_directory(directory=path, filename=file_name, as_attachment=True)
+
+
+@blueprint.route('/<product_id>/subdomain', methods=['GET'])
+@util.require_login
+def sub_domain(product_id):
+  sub_domain_list = in_apis.get_sub_domain_list(product_id)
+  protocol_dict = {
+    models.HTTP: "http",
+    models.HTTPS: "https"
+  }
+  return render_template('subdomain.html', sub_domain_list=sub_domain_list,
+                         protocol_dict=protocol_dict)
+
+
+@blueprint.route('/<product_id>/subdomain/accept/<sub_domain_id>',
+                 methods=['GET'])
+@util.require_login
+def accept_sub_domain(product_id, sub_domain_id):
+  sub_domain = in_apis.get_sub_domain(sub_domain_id)
+  ret = apis.register_sub_domain(sub_domain.gadget_id, sub_domain.subname,
+                                 sub_domain.domain)
+  if ret:
+    #TODO: Register to Domain server
+    in_apis.update_sub_domain(sub_domain_id)
+    logging.info("Accetped Sub domain. Product : %s, Sub Domain : %s, User : %s",
+                 product_id, sub_domain_id, current_user.email)
+  else:
+    logging.warning("Failed to accepted sub domain. Product : %s, Sub Domain : %s, User : %s",
+                    product_id, sub_domain_id, current_user.email)
+  return redirect('products/' + product_id + '/subdomain')
 
 
 def _set_product(product_id):
