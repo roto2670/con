@@ -129,7 +129,7 @@ def get_gadget_list_by_tester(product_id):
 
 
 def get_gadget_list(product_id):
-  url = BASE_URL + 'products/' + product_id + "/gadgets"
+  url = THIRD_BASE_URL + 'products/' + product_id + "/gadgets"
   try:
     if IS_DEV:
       _test_data = [
@@ -269,12 +269,13 @@ def get_gadget_list(product_id):
       ]
       return _test_data
     else:
-      resp = requests.get(url, headers=HEADERS)
+      headers = _get_user_header(is_json=True)
+      resp = requests.get(url, headers=headers)
       if resp.ok:
         value = resp.json()
-        return value['v']
+        return value
       else:
-        logging.warning("Register android key Response. Code : %s, Text : %s",
+        logging.warning("Get Gadget List Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
