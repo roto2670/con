@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2019 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -103,6 +103,18 @@ def delete_invite(invite_id):
 @util.require_login
 def delete_organization():
   return organization.delete_organization()
+
+
+@blueprint.route('/organization/domain', methods=['GET'])
+@util.require_login
+def get_domain_list():
+  return organization.get_domain_list()
+
+
+@blueprint.route('/organization/domain/register', methods=['GET', 'POST'])
+@util.require_login
+def register_domain():
+  return organization.register_domain()
 
 
 # }}}

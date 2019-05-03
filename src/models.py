@@ -40,6 +40,7 @@ class _Organization(db.Model):
                               cascade="all, delete",
                               order_by="desc(_Product.last_updated_time)")
   noti_key = relationship("_NotiKey", backref='organization', cascade="all, delete")
+  domain_list = relationship("_Domain", backref='organization', cascade="all, delete")
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():
@@ -419,9 +420,27 @@ class _ReferrerInfo(db.Model):
       setattr(self, property, value)
 
 
-# protocol type
-HTTP = 0
-HTTPS = 1
+class _Domain(db.Model):
+  __tablename__ = '_domain'
+
+  id = Column(String(75), primary_key=True)
+  domain = Column(String(75))
+  request_ip_address = Column(String(75))
+  accepted = Column(Boolean, default=False)
+  request_user = Column(String(75))
+  files_path = Column(String(225))
+  created_time = Column(DateTime)
+  accepted_time = Column(DateTime)
+  accepted_user = Column(String(75))
+  organization_id = Column(String(75), ForeignKey('_organization.id'))
+  subdomain_list = relationship("_SubDomain", backref='domain', cascade="all, delete")
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        value = value[0]
+      setattr(self, property, value)
+
 
 class _SubDomain(db.Model):
   __tablename__ = '_sub_domain'
@@ -429,15 +448,14 @@ class _SubDomain(db.Model):
   id = Column(String(75), primary_key=True)
   gadget_id = Column(String(75))
   subname = Column(String(75))
-  domain = Column(String(75))
-  protocol = Column(Integer)
-  files_path = Column(String(225))
+  domain_name = Column(String(75))
   request_ip_address = Column(String(75))
   accepted = Column(Boolean, default=False)
   created_time = Column(DateTime)
   accepted_time = Column(DateTime)
   accepted_user = Column(String(75))
   organization_id = Column(String(75))
+  domain_id = Column(String(75), ForeignKey('_domain.id'))
   product_id = Column(String(75), ForeignKey('_product.id'))
 
   def __init__(self, **kwargs):

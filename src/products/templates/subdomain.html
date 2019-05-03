@@ -24,8 +24,7 @@
                 <thead>
                   <tr>
                     <th>Subname</th>
-                    <th>Domain</th>
-                    <th>Protocol</th>
+                    <th>Domain Name</th>
                     <th>Request Time</th>
                     <th>Accept Time</th>
                     <th>Accept User</th>
@@ -37,8 +36,7 @@
                   {% for sub_domain in sub_domain_list %}
                     <tr>
                       <td>{{ sub_domain.subname }}</td>
-                      <td>{{ sub_domain.domain }}</td>
-                      <td>{{ protocol_dict[sub_domain.protocol] }}</td>
+                      <td>{{ sub_domain.domain_name }}</td>
                       <td>{{ sub_domain.created_time | datetimeFilter }}</td>
                       {% if sub_domain.accepted_time %}
                         <td>{{ sub_domain.accepted_time | datetimeFilter}}</td>

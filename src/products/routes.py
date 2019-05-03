@@ -519,13 +519,9 @@ def download_http_software(product_id, model_id):
 @blueprint.route('/<product_id>/subdomain', methods=['GET'])
 @util.require_login
 def sub_domain(product_id):
+  _set_product(product_id)
   sub_domain_list = in_apis.get_sub_domain_list(product_id)
-  protocol_dict = {
-    models.HTTP: "http",
-    models.HTTPS: "https"
-  }
-  return render_template('subdomain.html', sub_domain_list=sub_domain_list,
-                         protocol_dict=protocol_dict)
+  return render_template('subdomain.html', sub_domain_list=sub_domain_list)
 
 
 @blueprint.route('/<product_id>/subdomain/accept/<sub_domain_id>',

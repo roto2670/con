@@ -23,89 +23,145 @@ from openapi import blueprint
 GADGET_ID_KEY = '''gadget_id'''
 SUBNAME_KEY = '''subname'''
 DOMAIN_KEY = '''domain'''
-PROTOCOL_KEY = '''protocol'''
-SUB_DOMAIN_REQUIRED_KEYS = set([GADGET_ID_KEY, SUBNAME_KEY, DOMAIN_KEY,
-                                PROTOCOL_KEY])
+SUB_DOMAIN_REQUIRED_KEYS = set([GADGET_ID_KEY, SUBNAME_KEY, DOMAIN_KEY])
 
 
 @blueprint.route('/subdomain/register', methods=["POST"])
 def register_subdomain():
   """
-  METHOD
-    POST
-  HEADER
-    Authorization : Bearer {product_key}
-    Content-Type : application/json
+  @api {post} /openapi/subdomain/register
+              Register subdomain
+  @apiVersion 0.0.1
+  @apiName register_subdomain
+  @apiGroup Subdomain
+  @apiPermission developer
+  @apiHeader {string} Authorization Product key.
+  @apiHeader {String} Content-Type=application/json
+  @apiHeaderExample {json} Header-Example:
+      {
+        "Authorization": "Bearer (product_key)"
+        "Content-Type": "application/json"
+      }
 
-  BODY
-    gadget_id : String
-    subname :  String
-    domain : String
-    protocol :  String
+  @apiParamExample {string} Request-Body-Example
+        {"gadget_id": "(string) gadget id to use",
+         "subname": "(string) top level domain name",
+         "domain": "(stirng) domain"
+         }
 
-  Example
-    url : https://console.mib.io/openapi/subdomain/register
-    method : POST
-    Header
-    {
-      "Authorization": "Bearer {product_key}",
-      "Content-Type": "application/json"
-    }
-    Body
-    {
-      "gadget_id": "gadget_id",
-      "subname": "test",
-      "domain": "naran.com",
-      "protocol": "http"
-    }
+        # testsubdomain2ffd9835f5b99643dca use "push.mib.io"
+        {"gadget_id": "testsubdomain2ffd9835f5b99643dca"
+         "subname": "push",
+         "domain": "mib.io"
+        }
+
+  @apiSuccessExample Success-Response:
+        HTTP/1.1 200 OK
+        {
+          "result": True
+        }
+
+  @apiErrorExample Error-Response:
+        HTTP/1.1 401 OK
+        {
+          "result": False,
+          "message": "Unauthorized"
+        }
   """
   if 'Authorization' not in request.headers:
     logging.warning("Unauthorized. Header : %s", request.headers)
-    return make_response("Unauthorized", 401)
+    ret = {
+      "result": False,
+      "message": "Unauthorized"
+    }
+    return make_response(json.dumps(ret), 401)
   auth_value = request.headers.get('Authorization')
   if not auth_value.startswith("Bearer"):
     logging.warning("Unauthorized. Header : %s", request.headers)
-    return make_response("Unauthorized", 401)
+    ret = {
+      "result": False,
+      "message": "Unauthorized"
+    }
+    return make_response(json.dumps(ret), 401)
 
   prd_keys = auth_value.split()
   if len(prd_keys) != 2:
     logging.warning("Unauthorized. Header : %s", request.headers)
-    return make_response("Unauthorized", 401)
+    ret = {
+      "result": False,
+      "message": "Unauthorized"
+    }
+    return make_response(json.dumps(ret), 401)
 
   prd = in_apis.get_product_by_key(prd_keys[1])
   if not prd:
     logging.warning("Unauthorized. Can not find prd. Header : %s",
                     request.headers)
-    return make_response("Unauthorized", 401)
+    ret = {
+      "result": False,
+      "message": "Unauthorized"
+    }
+    return make_response(json.dumps(ret), 401)
 
   data = json.loads(request.data)
   if SUB_DOMAIN_REQUIRED_KEYS != set(data.keys()):
     logging.warning("Component missing. Data : %s", data)
-    return make_response("Some component is Missing", 400)
+    ret = {
+      "result": False,
+      "message": "Some component is Missing"
+    }
+    return make_response(json.dumps(ret), 400)
 
-  domain = data[DOMAIN_KEY]
+  domain_name = data[DOMAIN_KEY]
   subname = data[SUBNAME_KEY]
-  protocol = data[PROTOCOL_KEY].lower()
   gadget_id = data[GADGET_ID_KEY]
-  sub_domain = in_apis.get_sub_domain_by_sub_domain(domain, subname)
+
+  parent_domain = in_apis.get_domain_by_domain_name(domain_name,
+                                                    prd.organization_id)
+  if not parent_domain:
+    logging.warning("Domain is not registered . Domain : %s, org : %s",
+                    domain_name, prd.organization_id)
+    ret = {
+      "result": False,
+      "message": "Domain is not registered your organization."
+    }
+    return make_response(json.dumps(ret), 400)
+  elif not parent_domain.accepted:
+    logging.warning("Domain is not accepted . Domain : %s, org : %s",
+                    domain_name, prd.organization_id)
+    ret = {
+      "result": False,
+      "message": "Domain is not accepted your organization."
+    }
+    return make_response(json.dumps(ret), 400)
+
+  sub_domain = in_apis.get_sub_domain_by_sub_domain(domain_name, subname)
   if sub_domain:
     if sub_domain.organization_id != prd.organization_id:
+      # TODO: Remove this?
       logging.warning("Not available Domain. Domain : %s, subname : %s",
-                      domain, subname)
+                      domain_name, subname)
       logging.warning("Prd Org : %s, subdomain org : %s",
                       prd.organization_id, sub_domain.organization_id)
-      return make_response("Domain And Subname is not Available.", 400)
+      ret = {
+        "result": False,
+        "message": "Domain And Subname is not Available"
+      }
+      return make_response(json.dumps(ret), 400)
     if sub_domain.product_id == prd.id:
       logging.warning("Not available Domain. Domain : %s, subname : %s",
-                      domain, subname)
+                      domain_name, subname)
       logging.warning("Prd id : %s", prd.id)
-      return make_response("Domain And Subname is not Available", 400)
+      ret = {
+        "result": False,
+        "message": "Domain And Subname is not Available"
+      }
+      return make_response(json.dumps(ret), 400)
 
   ip_addr = util.get_ip_addr()
-  if protocol == "https":
-    # TODO: Save files of crt, key about secure
-    pass
-  files_path = []
-  in_apis.create_sub_domain(gadget_id, subname, domain, protocol,
-                            files_path, ip_addr, prd.organization_id, prd.id)
-  return make_response("Success", 200)
+  in_apis.create_sub_domain(gadget_id, subname, domain_name, ip_addr,
+                            parent_domain.id, prd.organization_id, prd.id)
+  ret = {
+    "result": True
+  }
+  return make_response(json.dumps(ret), 200)

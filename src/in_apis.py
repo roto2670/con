@@ -39,6 +39,7 @@ from models import _History as History
 from models import _EmailAuth as EmailAuth
 from models import _ReferrerInfo as ReferrerInfo
 from models import _SubDomain as SubDomain
+from models import _Domain as Domain
 
 
 def get_datetime():
@@ -892,24 +893,17 @@ def create_referrer_info(user, ip_addr, referrer, user_agent, accept_language):
 # {{{ SubDomain
 
 
-PROTOCOL_DICT = {
-  "http": models.HTTP,
-  "https": models.HTTPS
-}
-
-
-def create_sub_domain(gadget_id, subname, domain, protocol, files_path,
-                      request_ip_address, organization_id, product_id):
+def create_sub_domain(gadget_id, subname, domain_name, request_ip_address,
+                      domain_id, organization_id, product_id):
   sub_domain = SubDomain(id=uuid.uuid4().hex,
                          gadget_id=gadget_id,
                          subname=subname,
-                         domain=domain,
-                         protocol=PROTOCOL_DICT[protocol],
-                         files_path=json.dumps(files_path),
+                         domain_name=domain_name,
                          request_ip_address=request_ip_address,
                          accepted=False,
                          created_time=get_datetime(),
                          organization_id=organization_id,
+                         domain_id=domain_id,
                          product_id=product_id)
   db.session.add(sub_domain)
   db.session.commit()
@@ -939,10 +933,62 @@ def get_sub_domain_list(product_id):
   return sub_domain_list
 
 
-def get_sub_domain_by_sub_domain(subname, domain):
-  sub_domain = SubDomain.query.filter_by(subname=subname, domain=domain).\
+def get_sub_domain_by_sub_domain(subname, domain_name):
+  sub_domain = SubDomain.query.filter_by(subname=subname,
+                                         domain_name=domain_name).\
       one_or_none()
   return sub_domain
 
 
 # }}}
+
+
+# {{{
+
+
+def create_domain(domain, request_ip_address, request_user, file_paths,
+                  organization_id):
+  domain = Domain(id=uuid.uuid4().hex,
+                  domain=domain,
+                  request_ip_address=request_ip_address,
+                  accepted=False,
+                  request_user=request_user,
+                  file_paths=file_paths,
+                  created_time=get_datetime(),
+                  organization_id=organization_id)
+  db.session.add(domain)
+  db.session.commit()
+
+
+def update_domain(domain_id):
+  domain = get_domain(domain_id)
+  domain.accepted = True
+  domain.files_path = "[]"
+  domain.accepted_time = get_datetime()
+  domain.accepted_user = current_user.email
+  db.session.commit()
+
+
+def get_domain(_id):
+  domain = Domain.query.filter_by(id=_id).one_or_none()
+  return domain
+
+
+def get_domain_list(organization_id):
+  domain_list = Domain.query.filter_by(organization_id=organization_id).all()
+  return domain_list
+
+
+def get_domain_by_domain_name(domain_name, organization_id):
+  domain = Domain.query.filter_by(domain=domain_name,
+                                  organization_id=organization_id).\
+      one_or_none()
+  return domain
+
+
+def has_domain_by_domain(domain_name):
+  domain = Domain.query.filter_by(domain=domain_name).one_or_none()
+  return True if domain else False
+
+
+#}}}
