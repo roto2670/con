@@ -1,0 +1,19 @@
+{
+  "product": "mibhttp",
+  "type": 1,
+  "version": "0.1",
+  "requests": [
+    {
+      "name": "*",
+      "scheme": "http",
+      "host": "{ip}",
+      "path": "",
+      "method": "",
+      "headers": {},
+      "params": [
+      ],
+      "timeout": 10
+    }
+  ],
+  "events": []
+}

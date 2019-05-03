@@ -9,7 +9,8 @@
           "fail_message_event_start_mib": "Invalid name. Event names cannot start with mib.",
           "fail_message_required_key": "Invalid format specification. Please check the format of the specification.",
           "fail_message_required_value": "There are no required values. Please check the specification.",
-          "fail_message_version_format": "Invalid version. Please check the format of the version."
+          "fail_message_version_format": "Invalid version. Please check the format of the version.",
+          "fail_message_product_type": "Invalid Product Type. Please check the your product type."
       }
   },
   "organization": {

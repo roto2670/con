@@ -506,6 +506,16 @@ def download_software(product_id, model_id, model_type):
   return send_from_directory(directory=path, filename=file_name, as_attachment=True)
 
 
+@blueprint.route('/<product_id>/model/<model_id>/http/download',
+                 methods=['GET', 'POST'])
+@util.require_login
+def download_http_software(product_id, model_id):
+  path = os.path.join(util.get_res_path(), 'http')
+  file_name = "example.json"
+  onboarding.set_download_file()
+  return send_from_directory(directory=path, filename=file_name, as_attachment=True)
+
+
 @blueprint.route('/<product_id>/subdomain', methods=['GET'])
 @util.require_login
 def sub_domain(product_id):

@@ -132,7 +132,8 @@ def upload_header_file(product_id):
   try:
     decode_content = content.decode()
     json_content = json.loads(decode_content)
-    if not validate.check_validate_specification(product_id, json_content):
+    if not validate.check_validate_specification(product_id, _product.typ,
+                                                 json_content):
       return redirect('endpoints/' + product_id + '/specifications')
     ret = apis.register_specifications(product_id, json_content['version'],
                                        decode_content)
