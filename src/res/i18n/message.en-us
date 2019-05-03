@@ -38,6 +38,10 @@
       "verified": {
           "mail_title": "MiB Console authentication",
           "mail_message": "Please confirm authentication for continued use."
+      },
+      "domain": {
+          "duplicated_title": "Duplicated",
+          "duplicated_message": "Your input domain is duplicated."
       }
   },
   "products": {

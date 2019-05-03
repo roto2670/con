@@ -343,3 +343,40 @@ def delete_organization():
       abort(500)
   else:
     return redirect('/')
+
+
+def get_domain_list():
+  domain_list = in_apis.get_domain_list(current_user.organization_id)
+  return render_template("domain_organization.html", domain_list=domain_list)
+
+
+def register_domain():
+  if request.method == "GET":
+    referrer = "/management/organization/domain"
+    return render_template("register_domain.html", referrer=referrer)
+  else:
+    domain = request.form['domain']
+    if in_apis.has_domain_by_domain(domain):
+      title = common.get_msg("organization.domain.duplicated_title")
+      msg = common.get_msg("organization.domain.duplicated_message")
+      common.set_error_message(title, msg)
+      return redirect('/management/organization/domain/register')
+    files_path = []
+    # TODO: file save
+    ip_addr = util.get_ip_addr()
+    try:
+      in_apis.create_domain(domain, ip_addr, current_user.email,
+                            json.dumps(files_path),
+                            current_user.organization_id)
+      return redirect('/management/organization/domain')
+    except:
+      logging.exception("Failed to register domain")
+      return redirect('/management/organization/domain')
+
+
+def accepted_domain():
+  # TODO: accepted domain
+  # TODO: Send cert files and register domain to reverse proxy server
+  # TODO: in_apis.update_domain(domain_id)
+  pass
+

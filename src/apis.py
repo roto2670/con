@@ -836,14 +836,14 @@ def get_logs_with_gadget(product_id, gadget_id, keyword=None, token=None,
     return None
 
 
-def register_sub_domain(gadget_id, sub_name, domain):
+def register_sub_domain(gadget_id, sub_name, domain_name):
   """http://i.narantech.com/mibiot-api/index.html#api-Products-update_product_subdomain_mapping
   """
   url = "{base}gadgets/{gadget_id}/subdomain".format(base=THIRD_BASE_URL,
                                                      gadget_id=gadget_id)
   data = {
       "subname": sub_name,
-      "domain": domain
+      "domain": domain_name
   }
   try:
     if IS_DEV:

@@ -36,7 +36,7 @@ def hello():
   @apiSuccessExample Success-Response:
         HTTP/1.1 200 OK
         {
-          "v": True
+          "result": True
         }
   """
   return True
