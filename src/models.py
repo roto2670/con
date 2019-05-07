@@ -31,6 +31,7 @@ class _Organization(db.Model):
   kinds = Column(Text)  # dict
   # ======= upper cloud data
   name = Column(String(120), unique=True)
+  topside_logo_path = Column(String(225))
   original_name = Column(String(120), unique=True)
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)

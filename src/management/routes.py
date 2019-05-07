@@ -34,10 +34,13 @@ def default_organization():
   return organization.general()
 
 
-@blueprint.route('/organization/general', methods=['GET'])
+@blueprint.route('/organization/general', methods=['GET', 'POST'])
 @util.require_login
 def default_organization_general():
-  return organization.general()
+  if request.method == "GET":
+    return organization.general()
+  else:
+    return organization.register_logo_image()
 
 
 @blueprint.route('/organization/notification', methods=['GET'])

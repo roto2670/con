@@ -847,10 +847,11 @@ def register_sub_domain(gadget_id, sub_name, domain_name):
   }
   try:
     if IS_DEV:
+      json_data = json.dumps(data)
       return True
     else:
       headers = _get_user_header(is_json=True)
-      resp = requests.POST(url, headers=headers, data=json.dumps(data))
+      resp = requests.post(url, headers=headers, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
         logging.info("Register sub domain resp : %s, data : %s", value, data)

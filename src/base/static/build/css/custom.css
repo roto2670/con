@@ -4500,6 +4500,14 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     color: #ffffff;
 }
 
+.logo_image {
+    text-align: center;
+    background-color: #1b8dd7;
+    width: 150px;
+    height: 150px;
+    margin: 20px;
+}
+
 /* keyser custom */
 .site_title img {
     margin: 0 5px;

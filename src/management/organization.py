@@ -9,7 +9,7 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-import os
+import os, stat
 import json
 import uuid
 import logging
@@ -30,6 +30,9 @@ import base.routes
 from base import db
 
 
+LOGO_URL_FORMAT = '''/static/images/{}/{}'''
+
+
 def general():
   if current_user.organization_id:
     org = in_apis.get_organization(current_user.organization_id)
@@ -44,11 +47,36 @@ def general():
         "delete_ok": common.get_msg("organization.delete.organization.delete_ok"),
         "delete_cancel": common.get_msg("organization.delete.organization.delete_cancel")
     }
+    #TODO: remove logo allow when support payment
+    logo_allow = request.args.get("logo")
     return render_template("general_organization.html", org=org,
                            release_list=release_list,
-                           msg=msg)
+                           msg=msg, logo_allow=logo_allow)
   else:
     return redirect("/management/organization/create")
+
+
+def register_logo_image():
+  try:
+    upload_file = request.files['file']
+    content = upload_file.read()
+    base_path = util.get_static_path()
+    org_path = os.path.join(base_path, 'images', current_user.organization_id)
+    if not os.path.exists(org_path):
+      os.makedirs(org_path)
+    file_path = os.path.join(org_path, upload_file.filename)
+    if os.path.exists(file_path):
+      os.remove(file_path)
+    with open(file_path, 'wb') as _f:
+      _f.write(content)
+    os.chmod(file_path, stat.S_IREAD)
+    logo_url = LOGO_URL_FORMAT.format(current_user.organization_id,
+                                      upload_file.filename)
+    in_apis.update_organization_by_logo(current_user.organization_id, logo_url)
+    return redirect("/management/organization/general")
+  except:
+    logging.exception("Raise error while register logo image")
+    abort(500)
 
 
 def notification_key():
