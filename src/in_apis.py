@@ -211,6 +211,8 @@ def delete_model(_id):
 
 # {{{  Organization
 
+DEFAULT_LOGO_PATH = '''/static/images/naran-logo-white.svg'''
+
 
 def create_organization(owner_email, organization_name, ret):
   # ret -> developer object from cloud server
@@ -220,6 +222,7 @@ def create_organization(owner_email, organization_name, ret):
                      tokens=json.dumps(ret['tokens']),
                      kinds=json.dumps(ret['kinds']),
                      name=organization_name.lower(),
+                     topside_logo_path=DEFAULT_LOGO_PATH,
                      original_name=organization_name,
                      created_time=get_datetime(),
                      last_updated_time=get_datetime())
@@ -242,6 +245,14 @@ def delete_organization(organization_id):
   org = Organization.query.filter_by(id=organization_id).one_or_none()
   if org:
     db.session.delete(org)
+    db.session.commit()
+
+
+def update_organization_by_logo(organization_id, logo_path):
+  org = Organization.query.filter_by(id=organization_id).one_or_none()
+  if org:
+    org.topside_logo_path = logo_path
+    org.last_updated_time = get_datetime()
     db.session.commit()
 
 

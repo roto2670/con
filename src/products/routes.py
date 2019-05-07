@@ -530,7 +530,7 @@ def sub_domain(product_id):
 def accept_sub_domain(product_id, sub_domain_id):
   sub_domain = in_apis.get_sub_domain(sub_domain_id)
   ret = apis.register_sub_domain(sub_domain.gadget_id, sub_domain.subname,
-                                 sub_domain.domain)
+                                 sub_domain.domain_name)
   if ret:
     #TODO: Register to Domain server
     in_apis.update_sub_domain(sub_domain_id)

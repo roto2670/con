@@ -8,10 +8,11 @@
 <div class="nav-sm top_sidebar_menu">
   <div class="logo_img_div">
     <a href="/">
-      <img class="logo_img_middle" src="/static/images/naran-logo-white.svg">
-    <!--
-      <img class="logo_img_middle" src="/static/images/sk_enc-logo-white.svg">
-    -->
+      {% if current_user.organization.topside_logo_path %}
+        <img class="logo_img_middle" src="{{ current_user.organization.topside_logo_path }}">
+      {% else %}
+        <img class="logo_img_middle" src="/static/images/naran-logo-white.svg">
+      {% endif %}
     </a>
   </div>
   <ul class="nav side-menu">
