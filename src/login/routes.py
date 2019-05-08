@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2019 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -19,11 +19,15 @@ from base import db
 from login import blueprint
 
 
+BASE_LOGO_URI = '''/static/images/logo--mib_console-color.svg'''
+
+
 @blueprint.route('/login', methods={'GET', 'POST'})
 def login():
   if not current_user.is_authenticated:
     referrer = request.args['ref'] if 'ref' in request.args else None
-    return current_app.extensions['firebase_auth'].login(referrer=referrer)
+    return current_app.extensions['firebase_auth'].login(referrer=referrer,
+                                                         logo_uri=BASE_LOGO_URI)
   else:
     user = in_apis.get_user(current_user.id)
     user.last_access_time = in_apis.get_datetime()
