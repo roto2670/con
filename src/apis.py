@@ -132,6 +132,8 @@ def get_gadget_list(product_id):
   url = THIRD_BASE_URL + 'products/' + product_id + "/gadgets"
   try:
     if IS_DEV:
+      if product_id not in ['mibp', 'mibs']:
+        return []
       _test_data = [
           {"id": "b105b0311157d3cc18076a4d3735b292", "mac": "f2d63431da9l",
            "name": "verter Switc\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0083\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00af\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00bf\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u0082\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00bd", "kind": "mibs", "firmware_version": "1.3.0",

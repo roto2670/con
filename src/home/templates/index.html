@@ -34,179 +34,188 @@
 
     <div class="row">  <!-- Row 1-->
 
-      <div class="col-md-4 col-sm-4 col-xs-12">
-        <div class="x_panel tile fixed_height_320">
-          <div class="x_title">
-            <h3>Gadget Version</h3>
-            <div class="clearfix"></div>
-          </div>
-          <div id="scroll-style-hidden" class="x_content tile fixed_height_320 dashboard-overflow-y" style="height: 230px;">
-          <!--
-          <div class="x_content fixed_height_320 dashboard-overflow-y">
-          -->
-            <h4>Firmware Usage across versions</h4>
-            {% for key, value in infos['firmware'].items() %}
-              <div class="widget_summary">
-                <div class="w_left w_25">
-                  <span>{{ key }}</span>
-                </div>
-                <div class="w_center w_55">
-                  <div class="progress">
-                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{ ((value / infos['total_firmware']) * 100)|int }}"
-                       aria-valuemin="0" aria-valuemax="100" style="width: {{ ((value / infos['total_firmware']) * 100)|int }}%;">
-                      <span class="sr-only">{{ value }}</span>
+      {% if infos.firmware %}
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="x_panel tile fixed_height_320">
+            <div class="x_title">
+              <h3>Gadget Version</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div id="scroll-style-hidden" class="x_content tile fixed_height_320 dashboard-overflow-y" style="height: 230px;">
+              <h4>Firmware Usage across versions</h4>
+              {% for key, value in infos['firmware'].items() %}
+                <div class="widget_summary">
+                  <div class="w_left w_25">
+                    <span>{{ key }}</span>
+                  </div>
+                  <div class="w_center w_55">
+                    <div class="progress">
+                      <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{ ((value / infos['total_firmware']) * 100)|int }}"
+                        aria-valuemin="0" aria-valuemax="100" style="width: {{ ((value / infos['total_firmware']) * 100)|int }}%;">
+                        <span class="sr-only">{{ value }}</span>
+                      </div>
                     </div>
                   </div>
+                  <div class="w_right w_20">
+                    <span>{{ value }}</span>
+                  </div>
+                  <div class="clearfix"></div>
                 </div>
-                <div class="w_right w_20">
-                  <span>{{ value }}</span>
-                </div>
-                <div class="clearfix"></div>
-              </div>
-            {% endfor %}
+              {% endfor %}
 
+            </div>
           </div>
         </div>
-      </div>
+      {% endif %}
 
-      <div class="col-md-4 col-sm-4 col-xs-12">
-        <div class="x_panel tile fixed_height_320 overflow_hidden">
-          <div class="x_title">
-            <h3>Connected Gadget</h3>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-            <table class="" style="width:100%">
-              <tr>
-                <th style="width:37%;">
-                </th>
-                <th>
-                  <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
-                  </div>
-                </th>
-              </tr>
-              <tr>
-                <td>
-                  <canvas id="canvasDoughnut1" class="canvasDoughnut1" height="200" width="200" style="margin: 15px 10px 10px 0"></canvas>
-                </td>
-                <td>
-                  <table class="tile_info">
-                    <tr>
-                      <td>
-                        <p><i class="fa fa-square blue"></i>On </p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <p><i class="fa fa-square red"></i>Off </p>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
+      {% if infos.offline != 0 and infos.online != 0 %}
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="x_panel tile fixed_height_320 overflow_hidden">
+            <div class="x_title">
+              <h3>Connected Gadget</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <table class="" style="width:100%">
+                <tr>
+                  <th style="width:37%;">
+                  </th>
+                  <th>
+                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                    </div>
+                  </th>
+                </tr>
+                <tr>
+                  <td>
+                    <canvas id="canvasDoughnut1" class="canvasDoughnut1" height="200" width="200" style="margin: 15px 10px 10px 0"></canvas>
+                  </td>
+                  <td>
+                    <table class="tile_info">
+                      <tr>
+                        <td>
+                          <p><i class="fa fa-square blue"></i>On </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p><i class="fa fa-square red"></i>Off </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
+      {% endif %}
 
-      <div class="col-md-4 col-sm-4 col-xs-12">
-        <div class="x_panel tile fixed_height_320">
-          <div class="x_title">
-            <h3>Battery Average</h3>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-            <div class="dashboard-widget-content">
-              <div class="center-margin center-align">
-                  <canvas width="250" height="140" id="chart_gauge_001" class="" style="height: 140px;"></canvas>
-                  <div class="goal-wrapper">
-                    <span id="gauge-text001" class="gauge-value">0</span>
-                    <span class="gauge-value">%</span>
-                    <span id="goal-text" class="goal-value margin-left-10em">100%</span>
-                  </div>
+      {% if infos.avg_battery != 0 %}
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="x_panel tile fixed_height_320">
+            <div class="x_title">
+              <h3>Battery Average</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="dashboard-widget-content">
+                <div class="center-margin center-align">
+                    <canvas width="250" height="140" id="chart_gauge_001" class="" style="height: 140px;"></canvas>
+                    <div class="goal-wrapper">
+                      <span id="gauge-text001" class="gauge-value">0</span>
+                      <span class="gauge-value">%</span>
+                      <span id="goal-text" class="goal-value margin-left-10em">100%</span>
+                    </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      {% endif %}
 
     </div>  <!-- End ROW 1 -->
 
 
     <div class="row"> <!-- Row 2 -->
 
-      <div class="col-md-4 col-sm-4 col-xs-12">
-        <div id="scroll-style-hidden" class="x_panel tile fixed_height_320 dashboard-overflow-y">
-          <div class="x_title">
-            <h3>Model</h3>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-            <h4>Model Usage across name</h4>
-            {% for key, value in infos['model'].items() %}
-              <div class="widget_summary">
-                <div class="w_left w_25">
-                  <span>{{ key }}</span>
+      {% if infos.model %}
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div id="scroll-style-hidden" class="x_panel tile fixed_height_320 dashboard-overflow-y">
+            <div class="x_title">
+              <h3>Model</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <h4>Model Usage across name</h4>
+              {% for key, value in infos['model'].items() %}
+                <div class="widget_summary">
+                  <div class="w_left w_25">
+                    <span>{{ key }}</span>
+                  </div>
+                  <div class="w_center w_55">
+                    <div class="progress">
+                      <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{ ((value / infos['total_gadgets']) * 100)|int }}"
+                          aria-valuemin="0" aria-valuemax="100" style="width: {{ ((value / infos['total_gadgets']) * 100)|int }}%;">
+                        <span class="sr-only">{{ value }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w_right w_20">
+                    <span>{{ value }}</span>
+                  </div>
+                  <div class="clearfix"></div>
                 </div>
-                <div class="w_center w_55">
-                  <div class="progress">
-                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{ ((value / infos['total_gadgets']) * 100)|int }}"
-                        aria-valuemin="0" aria-valuemax="100" style="width: {{ ((value / infos['total_gadgets']) * 100)|int }}%;">
-                      <span class="sr-only">{{ value }}</span>
+              {% endfor %}
+
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if infos.name_list %}
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="x_panel tile fixed_height_320">
+            <div class="x_title">
+              <h3>Name</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <button type="button" data-toggle="modal" data-target=".modal"
+                style="border-color: none; border-style: none; border-width: 0px; padding: 0px; width: 100%; text-align: center;">
+                <div id="wordcloud2" class="dashboard-widget-content" style="background-color: white;"></div>
+              </button>
+              <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content" style="width: 100%; height: 85%; text-align: center;">
+                    <div class="modal-header">
+                      <h3 class="modal-title" id="Name">NameCloud</h3>
+                    </div>
+                    <div id="wordcloud" class="dashboard-widget-content" style="padding-top: initial;">
                     </div>
                   </div>
                 </div>
-                <div class="w_right w_20">
-                  <span>{{ value }}</span>
-                </div>
-                <div class="clearfix"></div>
               </div>
-            {% endfor %}
 
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4 col-sm-4 col-xs-12">
-        <div class="x_panel tile fixed_height_320">
-          <div class="x_title">
-            <h3>Name</h3>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-            <button type="button" data-toggle="modal" data-target=".modal"
-              style="border-color: none; border-style: none; border-width: 0px; padding: 0px; width: 100%; text-align: center;">
-              <div id="wordcloud2" class="dashboard-widget-content" style="background-color: white;"></div>
-            </button>
-            <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-              <div class="modal-dialog modal-lg">
-                <div class="modal-content" style="width: 100%; height: 85%; text-align: center;">
-                  <div class="modal-header">
-                    <h3 class="modal-title" id="Name">NameCloud</h3>
-                  </div>
-                  <div id="wordcloud" class="dashboard-widget-content" style="padding-top: initial;">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4 col-sm-4 col-xs-12">
-        <div class="x_panel tile fixed_height_320">
-          <div class="x_title">
-            <h3>Performance Endpoint</h3>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-            <div class="w_center w_66">
-              <canvas id="performance1" class="performance1" height="200" width="200" style="margin: 15px 10px 10px 0"></canvas>
             </div>
           </div>
         </div>
-      </div>
+      {% endif %}
+
+      {% if ep_infos.ep %}
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="x_panel tile fixed_height_320">
+            <div class="x_title">
+              <h3>Performance Endpoint</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="w_center w_66">
+                <canvas id="performance1" class="performance1" height="200" width="200" style="margin: 15px 10px 10px 0"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
 
     </div> <!-- End Row 2-->
 
@@ -324,33 +333,35 @@
     </div>  <!-- End Row 3 -->
 
     <div class="row"> <!-- Row 4 -->
-      <div class="col-md-12 col-sm-12 col-xs-12">
-        <div class="x_panel tile">
-            <div class="x_title">
-                <h3>User Location</h3>
-                <div class="clearfix"></div>
-              </div>
-
-              <div class="x_content">
-                <div class="dashboard-widget-content">
-                  <div id="scroll-style-hidden" class="col-md-4 fixed_height_320 dashboard-overflow-y">
-                    <table class="countries_list">
-                      <tbody>
-                        {% for key, value in infos.locale.items() %}
-                          <tr>
-                            <td>{{ key|getCountryName }}</td>
-
-                            <td class="fs15 fw700 text-right">{{ value }}</td>
-                          </tr>
-                        {% endfor %}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div id="world-map-gdp" class="col-md-8 col-sm-12 col-xs-12" style="height:320px;"></div>
+      {% if infos.locale %}
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">
+              <div class="x_title">
+                  <h3>User Location</h3>
+                  <div class="clearfix"></div>
                 </div>
-              </div>
+
+                <div class="x_content">
+                  <div class="dashboard-widget-content">
+                    <div id="scroll-style-hidden" class="col-md-4 fixed_height_320 dashboard-overflow-y">
+                      <table class="countries_list">
+                        <tbody>
+                          {% for key, value in infos.locale.items() %}
+                            <tr>
+                              <td>{{ key|getCountryName }}</td>
+
+                              <td class="fs15 fw700 text-right">{{ value }}</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div id="world-map-gdp" class="col-md-8 col-sm-12 col-xs-12" style="height:320px;"></div>
+                  </div>
+                </div>
+            </div>
           </div>
-        </div>
+        {% endif %}
     </div> <!-- End Row 4 -->
   </div>
 {% endblock content %}
@@ -390,55 +401,58 @@
   -->
   <script>
     function connectionGraph(offData, onData) {
-      var ctx = document.getElementById("canvasDoughnut1");
-        var data = {
-          labels: [
-            "Off",
-            "On"
-          ],
-          datasets: [{
-            data: [offData, onData],
-            backgroundColor: [
-              "#E74C3C",
-              "#3498DB"
+      if (offData != 0 && onData != 0) {
+        var ctx = document.getElementById("canvasDoughnut1");
+          var data = {
+            labels: [
+              "Off",
+              "On"
             ],
-            hoverBackgroundColor: [
-              "#E95E4F",
-              "#49A9EA"
-            ]
-          }]
-        };
-        var options = {
-          legend: false,
-          responsive: false
-        }
+            datasets: [{
+              data: [offData, onData],
+              backgroundColor: [
+                "#E74C3C",
+                "#3498DB"
+              ],
+              hoverBackgroundColor: [
+                "#E95E4F",
+                "#49A9EA"
+              ]
+            }]
+          };
+          var options = {
+            legend: false,
+            responsive: false
+          }
 
-        var canvasDoughnut1 = new Chart(ctx, {
-          type: 'doughnut',
-          tooltipFillColor: "rgba(51, 51, 51, 0.55)",
-          data: data,
-          options: options
-        });
+          var canvasDoughnut1 = new Chart(ctx, {
+            type: 'doughnut',
+            tooltipFillColor: "rgba(51, 51, 51, 0.55)",
+            data: data,
+            options: options
+          });
+      }
 
     }
     connectionGraph('{{ infos["offline"] }}', '{{ infos["online"] }}');
 
     function averageBattery(battery) {
-      var chart_gauge_settings = {
-        lines: 12,
-        angle: 0,
-        lineWidth: 0.4,
-        pointer: {
-          length: 0.5,
-          strokeWidth: 0.042,
-          color: '#1D212A'
-        },
-        limitMax: 'true',
-        colorStart: '#1ABC9C',
-        colorStop: '#1ABC9C',
-        strokeColor: '#F0F3F3',
-        generateGradient: true
-      };
+      if (battery != 0) {
+        var chart_gauge_settings = {
+          lines: 12,
+          angle: 0,
+          lineWidth: 0.4,
+          pointer: {
+            length: 0.5,
+            strokeWidth: 0.042,
+            color: '#1D212A'
+          },
+          limitMax: 'true',
+          colorStart: '#1ABC9C',
+          colorStop: '#1ABC9C',
+          strokeColor: '#F0F3F3',
+          generateGradient: true
+        };
         var chart_gauge_001_elem = document.getElementById('chart_gauge_001');
         var chart_gauge_001 = new Gauge(chart_gauge_001_elem).setOptions(chart_gauge_settings);
         chart_gauge_001.maxValue = 100;
@@ -446,41 +460,43 @@
         chart_gauge_001.animationSpeed = 20;
         chart_gauge_001.set(parseInt(battery));
         chart_gauge_001.setTextField(document.getElementById("gauge-text001"));
+      }
     }
     averageBattery('{{ infos["avg_battery"] }}');
 
     function performanceEndpoint(dataDict) {
       var _data = JSON.parse(dataDict);
-      var data = {
-        labels: _data.ep,
-        datasets: [{
-            label: 'Cloud',
-            backgroundColor: "#33a46A",
-            data: _data.r1
-          }, {
-            label: 'Gadget-Hub',
-            backgroundColor: "#ff8a1a",
-            data: _data.r2
-        }]
-      };
-      var ctx = document.getElementById("performance1");
-        var options = {
-          scales: {
-            xAxes: [{
-                stacked: true
-            }],
-            yAxes: [{
-                stacked: true
-            }]
-        }
-        }
+      if (_data.ep) {
+        var data = {
+          labels: _data.ep,
+          datasets: [{
+              label: 'Cloud',
+              backgroundColor: "#33a46A",
+              data: _data.r1
+            }, {
+              label: 'Gadget-Hub',
+              backgroundColor: "#ff8a1a",
+              data: _data.r2
+          }]
+        };
+        var ctx = document.getElementById("performance1");
+          var options = {
+            scales: {
+              xAxes: [{
+                  stacked: true
+              }],
+              yAxes: [{
+                  stacked: true
+              }]
+          }
+          }
 
         var performance1 = new Chart(ctx, {
           type: 'horizontalBar',
           data: data,
           options: options
         });
-
+      }
     }
     performanceEndpoint('{{ ep_infos|safe }}');
 
@@ -608,36 +624,38 @@
   })
 
 	function init_JQVmap(data){
-		if(typeof (jQuery.fn.vectorMap) === 'undefined'){ return; }
-			if ($('#world-map-gdp').length ){
-				$('#world-map-gdp').vectorMap({
-					map: 'world_en',
-          backgroundColor: "",
-          color: '#f4f3f0',
-          borderColor: '#ADB2B5',
-          borderWidth: 1,
-          borderOpacity: 0,
-          hoverColor: '#536A7F',
-					hoverOpacity: 0,
-					selectedColor: '#536A7F',
-          enableZoom: true,
-          showTooltip: true,
-          multiSelectRegion: false,
-          values: data,
-          normalizeFunction: 'linear',
-					scaleColors: ['#b6d6ff', '#005ace', '#14a4bc', '#2c7582'],
-          normalizeFunction: 'polynomial',
-          onLabelShow(event, label, code) {
-            var value = data[code];
-            if (value !== null && value !== undefined && value !== "") {
-              label.append(" (" + data[code] + ")");
-            } else {
-              label.append(" (" + 0 + ")");
+    if (data) {
+      if (typeof (jQuery.fn.vectorMap) === 'undefined'){ return; }
+        if ($('#world-map-gdp').length ){
+          $('#world-map-gdp').vectorMap({
+            map: 'world_en',
+            backgroundColor: "",
+            color: '#f4f3f0',
+            borderColor: '#ADB2B5',
+            borderWidth: 1,
+            borderOpacity: 0,
+            hoverColor: '#536A7F',
+            hoverOpacity: 0,
+            selectedColor: '#536A7F',
+            enableZoom: true,
+            showTooltip: true,
+            multiSelectRegion: false,
+            values: data,
+            normalizeFunction: 'linear',
+            scaleColors: ['#b6d6ff', '#005ace', '#14a4bc', '#2c7582'],
+            normalizeFunction: 'polynomial',
+            onLabelShow(event, label, code) {
+              var value = data[code];
+              if (value !== null && value !== undefined && value !== "") {
+                label.append(" (" + data[code] + ")");
+              } else {
+                label.append(" (" + 0 + ")");
+              }
             }
-          }
-				});
+        });
       }
-    };
+    }
+  };
 
   init_JQVmap({{ infos['locale']|safe }});
 

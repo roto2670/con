@@ -153,6 +153,8 @@ def _get_data():
 
 
 def _get_endpoint_info(product_id):
+  if apis.IS_DEV:
+    return json.dumps({})
   # {ep : [press, push], r1 : [1, 2], r2 : [3, 4]}
   if DATA_CACHE:
     st_time = DATA_CACHE['time']
