@@ -63,15 +63,9 @@ MOCK_HUB_LIST = [
     "issuer": "com.thenaran.skec",
     "beacons": [
       {
-        "uuid": "fab50d95-70bd-ffff-ffff-ffffffffffff",
-        "major": 65535,
-        "minor": 65535,
-        "interval": 2
-      },
-      {
         "uuid": "897d4536-ad17-eb35-7c12-6cfeef2b6c4b",
-        "major": 45667,
-        "minor": 38143,
+        "major": -1,
+        "minor": -1,
         "interval": 2
       }
     ],
@@ -201,9 +195,9 @@ MOCK_BEACON_LIST = [
     "custom": {},
     "tags": [],
     "beacon_spec": {
-      "uuid": "d5a25468-161e-ffff-ffff-ffffffffffff",
-      "major": 65535,
-      "minor": 65535,
+      "uuid": "897d4536-ad17-eb35-7c12-6cfeef2b6c4b",
+      "major": 1,
+      "minor": 5234,
       "interval": 700,
       "during_second": 0
     }
@@ -228,8 +222,8 @@ MOCK_BEACON_LIST = [
     "tags": "",
     "beacon_spec": {
       "uuid": "897d4536-ad17-eb35-7c12-6cfeef2b6c4b",
-      "major": 45667,
-      "minor": 38143,
+      "major": 2,
+      "minor": 3814,
       "interval": 700,
       "during_second": 0
     }
