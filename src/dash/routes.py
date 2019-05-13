@@ -33,11 +33,11 @@ def get_detected_beacons_by_hub(hub_id):
   return json.dumps(ret)
 
 
-@blueprint.route('/hubs/detected/<product_id>/<uuid>', methods=["GET"])
+@blueprint.route('/hubs/detected/<gadget_id>', methods=["GET"])
 @util.require_login
-def get_detected_hubs_by_beacon(product_id, uuid):
+def get_detected_hubs_by_beacon(gadget_id):
   query_id = request.args.get("qid", None)
-  ret = dash_apis.get_detected_hubs(uuid, product_id, query_id=query_id)
+  ret = dash_apis.get_detected_hubs(gadget_id, query_id=query_id)
   return json.dumps(ret)
 
 

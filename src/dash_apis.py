@@ -159,27 +159,9 @@ def get_beacon_info(beacon_id):
     return None
 
 
-def get_detected_hubs(uuid, product_id, query_id=None):
+def get_detected_hubs(gadget_id, query_id=None):
   if apis.IS_DEV:
     return dash_api_mock.MOCK_GET_DETECTED_HUBS
-
-  beacon_list = get_beacon_list(product_id)
-  if not beacon_list:
-    logging.warning("Fail to get beacon list")
-    return None
-
-  gadget_id = None
-  for beacon in beacon_list:
-    if beacon['beacon_spec'] and 'uuid' in beacon['beacon_spec']:
-      if beacon['beacon_spec']['uuid'] == uuid:
-        gadget_id = beacon['id']
-        break
-      else:
-        logging.warning("Can't find uuid is not matched")
-  if not gadget_id:
-    logging.warning("Not mateched gadget id. uuid : %s, list : %s",
-                    uuid, beacon_list)
-    return None
 
   try:
     url = "{base}gadgets/{gid}/location".format(base=BASE_URL, gid=gadget_id)
@@ -216,7 +198,7 @@ def get_detected_hubs(uuid, product_id, query_id=None):
                         query_resp.status_code, query_resp.text)
         return {}
   except:
-    logging.exception("Raise error while detected hub. uuid : %s", uuid)
+    logging.exception("Raise error while detected hub. gadget_id : %s", gadget_id)
     return None
 
 
