@@ -28,6 +28,7 @@ import common
 import models
 import worker
 import in_apis
+import in_config_apis
 from base import blueprint
 from base import db, login_manager, auth
 from models import _User as User
@@ -275,6 +276,19 @@ def _get_current_product():
 def about_product():
   return dict(current_product=_get_current_product(),
               product_list=_get_product_list())
+
+
+def _get_footer():
+  if current_user.organization_id:
+    footer = in_config_apis.get_footer_by_organization(current_user.organization_id)
+    if footer:
+      footer.file_names = json.loads(footer.file_names)
+      return footer
+  return None
+
+
+def about_organization():
+  return dict(footer=_get_footer())
 
 
 ## Jinja template

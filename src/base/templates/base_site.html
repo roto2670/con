@@ -105,6 +105,28 @@
           {% block content %}
             <!-- {{ content }} -->
           {% endblock content %}
+
+          {% block footer %}
+            <div class="custom-footer">
+              <div class="left-container">
+                {% if footer %}
+                  <div class="text-container">
+                    {{ footer.text }}
+                  </div>
+                  <div class="image-container" style="display:inline-block;">
+                    {% for file_name in footer.file_names %}
+                      <img src="{{footer.image_uri}}{{file_name}}">
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="right-container">
+                <div class="text-container">
+                  <a href="https://thenaran.com" target="_blank" style="cursor:pointer;">Naran</a> Inc.
+                </div>
+              </div>
+            </div>
+          {% endblock footer %}
         </div>
       </div>
 

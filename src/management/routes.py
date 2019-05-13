@@ -43,6 +43,12 @@ def default_organization_general():
     return organization.register_logo_image()
 
 
+@blueprint.route('/organization/general/footer', methods=['POST'])
+@util.require_login
+def register_footer_image():
+  return organization.register_footer_image()
+
+
 @blueprint.route('/organization/notification', methods=['GET'])
 @util.require_login
 def default_organization_notification():
