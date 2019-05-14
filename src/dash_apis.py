@@ -193,8 +193,7 @@ def get_detected_hubs(gadget_id, query_id=None):
                   최초 30개 이후 연속된 data를 받는다.
   """
   if apis.IS_DEV:
-    return dash_api_mock.MOCK_GET_DETECTED_HUBS
-
+    return dash_api_mock.get_detected_hubs(gadget_id)
   try:
     url = "{base}gadgets/{gid}/location".format(base=BASE_URL, gid=gadget_id)
     end_ts = time.time()
@@ -244,8 +243,7 @@ def get_detected_beacons(hub_id, query_id=None):
                   최초 30개 이후 연속된 data를 받는다.
   """
   if apis.IS_DEV:
-    return dash_api_mock.MOCK_GET_DETECTED_BEACONS
-
+    return dash_api_mock.get_detected_beacons(hub_id)
   try:
     url = "{base}hubs/{hid}/location".format(base=BASE_URL, hid=hub_id)
     end_ts = time.time()

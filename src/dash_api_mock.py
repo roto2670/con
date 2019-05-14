@@ -28,23 +28,31 @@ MOCK_HUB_LIST = [
     "id": "64598ab247e597fcb3cc44839d9ad63c",
     "uuid": "ad078ca3e4bdcfa9",
     "status": 1,
-    "name": "Galaxy Note Naran",
-    "kind": "com.thenaran.microbots",
-    "app_version": "0.0.13(82)",
-    "platform": "Android",
-    "model": "SM-N935K",
-    "locale": "KR",
-    "system_version": "8.0.0",
+    "name": "mibh(mock)",
+    "kind": "com.thenaran.rtos.m",
+    "app_version": "0.1.21",
+    "platform": "rtos",
+    "model": "hubm",
+    "locale": "locale",
+    "system_version": "v3.2",
     "gadget_ids": [],
-    "latest_version": "0.0.13(82)",
+    "latest_version": "0.1.21",
     "issuer": "com.thenaran.skec",
-    "beacons": [],
-    "custom": {
-      "map_location": {
-        "x": 80.31005859375,
-        "y": 54.36714426926093
+    "beacons": [
+      {
+        "uuid": "d3224588-8d09-a53b-268f-09977a9e418f",
+        "major": -1,
+        "minor": -1,
+        "interval": 2
+      },
+      {
+        "uuid": "f2d464da-2384-72a9-ac8a-5592e4d90835",
+        "major": -1,
+        "minor": -1,
+        "interval": 2
       }
-    },
+    ],
+    "custom": {},
     "tags": []
   },
   {
@@ -67,14 +75,15 @@ MOCK_HUB_LIST = [
         "major": -1,
         "minor": -1,
         "interval": 2
+      },
+      {
+        "uuid": "f2d464da-2384-72a9-ac8a-5592e4d90835",
+        "major": -1,
+        "minor": -1,
+        "interval": 2
       }
     ],
-    "custom": {
-      "map_location": {
-        "x": 82.96875,
-        "y": 49.022770049687296
-      }
-    },
+    "custom": {},
     "tags": []
   },
   {
@@ -212,7 +221,7 @@ MOCK_BEACON_LIST = [
     "model_name": "v4",
     "sdk_version": "0.2",
     "hub_id": "c05babe4c40386090db95ac2e544deee",
-    "account_id": "206db440fe1273adcf7d901e72737423",
+    "account_id": "897d4536ad17eb357c126cfeef2b6c4b",
     "user_id": "0b2023c3a692415c9bd6314cdbf8a0a8",
     "status": 1,
     "locale": "KR",
@@ -227,16 +236,228 @@ MOCK_BEACON_LIST = [
       "interval": 700,
       "during_second": 0
     }
+  },
+  {
+    "id": "0cd28df214ddcc23a44abe080dc463a7",
+    "mac": "f9c38f6aa512",
+    "name": "Beacon mock",
+    "kind": "mibs",
+    "firmware_version": "1.3.8",
+    "model_number": 0,
+    "model_name": "v4",
+    "sdk_version": "0.2",
+    "hub_id": "c05babe4c40386090db95ac2e544deee",
+    "account_id": "897d4536ad17eb357c126cfeef2b6c4b",
+    "user_id": "0b2023c3a692415c9bd6314cdbf8a0a8",
+    "status": 1,
+    "locale": "KR",
+    "rssi": 0,
+    "battery": 100,
+    "custom": "",
+    "tags": "",
+    "beacon_spec": {
+      "uuid": "897d4536-ad17-eb35-7c12-6cfeef2b6c4b",
+      "major": 2,
+      "minor": 381,
+      "interval": 700,
+      "during_second": 0
+    }
+  },
+  {
+    "id": "0010d38c17bb4ec66e5043fc5d75f0e8",
+    "mac": "c79373039061",
+    "name": "Beacon what",
+    "kind": "mibs",
+    "firmware_version": "1.3.8",
+    "model_number": 0,
+    "model_name": "v4",
+    "sdk_version": "0.2",
+    "hub_id": "c05babe4c40386090db95ac2e544deee",
+    "account_id": "f2d464da238472a9ac8a5592e4d90835",
+    "user_id": "0b2023c3a692415c9bd6314cdbf8a0a8",
+    "status": 1,
+    "locale": "KR",
+    "rssi": 0,
+    "battery": 100,
+    "custom": "",
+    "tags": "",
+    "beacon_spec": {
+      "uuid": "f2d464da-2384-72a9-ac8a-5592e4d90835",
+      "major": 2,
+      "minor": 33,
+      "interval": 700,
+      "during_second": 0
+    }
+  },
+  {
+    "id": "00163daabe25a08ea8f80e21ee476249",
+    "mac": "f14e18e672a5",
+    "name": "Beacon when",
+    "kind": "mibs",
+    "firmware_version": "1.3.8",
+    "model_number": 0,
+    "model_name": "v4",
+    "sdk_version": "0.2",
+    "hub_id": "c05babe4c40386090db95ac2e544deee",
+    "account_id": "f2d464da238472a9ac8a5592e4d90835",
+    "user_id": "0b2023c3a692415c9bd6314cdbf8a0a8",
+    "status": 1,
+    "locale": "KR",
+    "rssi": 0,
+    "battery": 100,
+    "custom": "",
+    "tags": "",
+    "beacon_spec": {
+      "uuid": "f2d464da-2384-72a9-ac8a-5592e4d90835",
+      "major": 1,
+      "minor": 993,
+      "interval": 700,
+      "during_second": 0
+    }
+  },
+  {
+    "id": "003ac8dfa487a958b50b4eb734eede29",
+    "mac": "e6c4f0e68f88",
+    "name": "Beacon who",
+    "kind": "mibs",
+    "firmware_version": "1.3.8",
+    "model_number": 0,
+    "model_name": "v4",
+    "sdk_version": "0.2",
+    "hub_id": "c05babe4c40386090db95ac2e544deee",
+    "account_id": "f2d464da238472a9ac8a5592e4d90835",
+    "user_id": "0b2023c3a692415c9bd6314cdbf8a0a8",
+    "status": 1,
+    "locale": "KR",
+    "rssi": 0,
+    "battery": 100,
+    "custom": "",
+    "tags": "",
+    "beacon_spec": {
+      "uuid": "f2d464da-2384-72a9-ac8a-5592e4d90835",
+      "major": 1,
+      "minor": 1212,
+      "interval": 700,
+      "during_second": 0
+    }
+  },
+  {
+    "id": "003adf032a4727e89453a13347b3d9f2",
+    "mac": "e838140a4c69",
+    "name": "Beacon how",
+    "kind": "mibs",
+    "firmware_version": "1.3.8",
+    "model_number": 0,
+    "model_name": "v4",
+    "sdk_version": "0.2",
+    "hub_id": "c05babe4c40386090db95ac2e544deee",
+    "account_id": "d32245888d09a53b268f09977a9e418f",
+    "user_id": "0b2023c3a692415c9bd6314cdbf8a0a8",
+    "status": 1,
+    "locale": "KR",
+    "rssi": 0,
+    "battery": 100,
+    "custom": "",
+    "tags": "",
+    "beacon_spec": {
+      "uuid": "d3224588-8d09-a53b-268f-09977a9e418f",
+      "major": 2,
+      "minor": 445,
+      "interval": 700,
+      "during_second": 0
+    }
+  },
+  {
+    "id": "00982357be27a0782ee9938e74d6f7f9",
+    "mac": "ca589f7e9be1",
+    "name": "Beacon where",
+    "kind": "mibs",
+    "firmware_version": "1.3.8",
+    "model_number": 0,
+    "model_name": "v4",
+    "sdk_version": "0.2",
+    "hub_id": "c05babe4c40386090db95ac2e544deee",
+    "account_id": "d32245888d09a53b268f09977a9e418f",
+    "user_id": "0b2023c3a692415c9bd6314cdbf8a0a8",
+    "status": 1,
+    "locale": "KR",
+    "rssi": 0,
+    "battery": 100,
+    "custom": "",
+    "tags": "",
+    "beacon_spec": {
+      "uuid": "d3224588-8d09-a53b-268f-09977a9e418f",
+      "major": 2,
+      "minor": 5,
+      "interval": 700,
+      "during_second": 0
+    }
+  },
+  {
+    "id": "009ec27cfd2a80c9aa72640f7cc13119",
+    "mac": "cae18ee8fd7f",
+    "name": "Beacon which",
+    "kind": "mibs",
+    "firmware_version": "1.3.8",
+    "model_number": 0,
+    "model_name": "v4",
+    "sdk_version": "0.2",
+    "hub_id": "c05babe4c40386090db95ac2e544deee",
+    "account_id": "d32245888d09a53b268f09977a9e418f",
+    "user_id": "0b2023c3a692415c9bd6314cdbf8a0a8",
+    "status": 1,
+    "locale": "KR",
+    "rssi": 0,
+    "battery": 100,
+    "custom": "",
+    "tags": "",
+    "beacon_spec": {
+      "uuid": "d3224588-8d09-a53b-268f-09977a9e418f",
+      "major": 1,
+      "minor": 530,
+      "interval": 700,
+      "during_second": 0
+    }
   }
 ]
 
-MOCK_GET_DETECTED_HUBS = {
-  "query_id": 140147009473448,
+MOCK_GET_DETECTED_HUBS_A = {
+  "query_id": 140147009473401,
   "data": [
     {
+      "hid": "799b9f874bc1c50775233d2a0c00e388",
       "_t": 1557194150.12,
+      "gid": "23083dde817b2fd416112733d6985baf",
+      "dist": 11.1
+    },
+    {
+      "_t": 1557194160.12,
+      "gid": "23083dde817b2fd416112733d6985baf",
+      "dist": 9.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194165.9,
+      "gid": "23083dde817b2fd416112733d6985baf",
+      "dist": 7.7,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    }
+  ]
+}
+
+MOCK_GET_DETECTED_HUBS_B = {
+  "query_id": 140147009473402,
+  "data": [
+    {
+      "_t": 1557194162.12,
       "gid": "822c5303bcb71f54e891e5c493537aae",
-      "dist": 11.1,
+      "dist": 12.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194166.8,
+      "gid": "822c5303bcb71f54e891e5c493537aae",
+      "dist": 2.1,
       "hid": "799b9f874bc1c50775233d2a0c00e388"
     },
     {
@@ -244,35 +465,257 @@ MOCK_GET_DETECTED_HUBS = {
       "gid": "822c5303bcb71f54e891e5c493537aae",
       "dist": 9.2,
       "hid": "799b9f874bc1c50775233d2a0c00e388"
-    },
-    {
-      "_t": 1557194156.12,
-      "gid": "822c5303bcb71f54e891e5c493537aae",
-      "dist": 8.8,
-      "hid": "799b9f874bc1c50775233d2a0c00e388"
-    },
-    {
-      "_t": 1557194158.12,
-      "gid": "822c5303bcb71f54e891e5c493537aae",
-      "dist": 10.4,
-      "hid": "799b9f874bc1c50775233d2a0c00e388"
-    },
-    {
-      "gid": "822c5303bcb71f54e891e5c493537aae",
-      "dist": 7.9,
-      "hid": "799b9f874bc1c50775233d2a0c00e388",
-      "_t": 1557194159.12
     }
   ]
 }
 
-MOCK_GET_DETECTED_BEACONS = {
+MOCK_GET_DETECTED_HUBS_C = {
+  "query_id": 140147009473403,
+  "data": [
+    {
+      "_t": 1557194156.12,
+      "dist": 8.8,
+      "gid": "0cd28df214ddcc23a44abe080dc463a7",
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194163.12,
+      "gid": "0cd28df214ddcc23a44abe080dc463a7",
+      "dist": 2.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194167.1,
+      "gid": "0cd28df214ddcc23a44abe080dc463a7",
+      "dist": 7.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    }
+  ]
+}
+
+MOCK_GET_DETECTED_HUBS_D = {
+  "query_id": 140147009473404,
+  "data": [
+    {
+      "_t": 1557194158.12,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 10.4,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194158.12,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 18.4,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194163.9,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 7.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194163.9,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 17.7,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194167.9,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 8.8,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194167.9,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 4.6,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    }
+  ]
+}
+
+MOCK_GET_DETECTED_HUBS_E = {
+  "query_id": 140147009473405,
+  "data": [
+    {
+      "_t": 1557194159.12,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 7.9,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194159.12,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 9.7,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194164.2,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 3.9,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194164.2,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 8.8,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194168.9,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 12.8,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194168.9,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 10.0,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    }
+  ]
+}
+
+MOCK_GET_DETECTED_HUBS_F = {
+  "query_id": 140147009473406,
+  "data": [
+    {
+      "_t": 1557194160.12,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 9.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194160.12,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 1.9,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194165.6,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 7.2,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194165.6,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 17.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194168.9,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 1.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194168.9,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 8.5,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    }
+  ]
+}
+
+MOCK_GET_DETECTED_HUBS_G = {
+  "query_id": 140147009473407,
+  "data": [
+    {
+      "hid": "003adf032a4727e89453a13347b3d9f2",
+      "_t": 1557194150.12,
+      "gid": "23083dde817b2fd416112733d6985baf",
+      "dist": 14.1
+    },
+    {
+      "_t": 1557194160.12,
+      "gid": "003adf032a4727e89453a13347b3d9f2",
+      "dist": 11.9,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194165.9,
+      "gid": "003adf032a4727e89453a13347b3d9f2",
+      "dist": 5.1,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    }
+  ]
+}
+
+MOCK_GET_DETECTED_HUBS_H = {
+  "query_id": 140147009473408,
+  "data": [
+    {
+      "_t": 1557194153.12,
+      "gid": "00982357be27a0782ee9938e74d6f7f9",
+      "dist": 9.2,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194162.12,
+      "gid": "00982357be27a0782ee9938e74d6f7f9",
+      "dist": 8.1,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194166.8,
+      "gid": "00982357be27a0782ee9938e74d6f7f9",
+      "dist": 12.6,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    }
+  ]
+}
+
+MOCK_GET_DETECTED_HUBS_I = {
+  "query_id": 140147009473403,
+  "data": [
+    {
+      "_t": 1557194156.12,
+      "dist": 18.8,
+      "gid": "009ec27cfd2a80c9aa72640f7cc13119",
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194163.12,
+      "gid": "009ec27cfd2a80c9aa72640f7cc13119",
+      "dist": 12.3,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194167.1,
+      "gid": "009ec27cfd2a80c9aa72640f7cc13119",
+      "dist": 6.6,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    }
+  ]
+}
+
+DETECTED_HUBS_DATA = {
+  "23083dde817b2fd416112733d6985baf": MOCK_GET_DETECTED_HUBS_A,
+  "822c5303bcb71f54e891e5c493537aae": MOCK_GET_DETECTED_HUBS_B,
+  "0cd28df214ddcc23a44abe080dc463a7": MOCK_GET_DETECTED_HUBS_C,
+  "0010d38c17bb4ec66e5043fc5d75f0e8": MOCK_GET_DETECTED_HUBS_D,
+  "00163daabe25a08ea8f80e21ee476249": MOCK_GET_DETECTED_HUBS_E,
+  "003ac8dfa487a958b50b4eb734eede29": MOCK_GET_DETECTED_HUBS_F,
+  "003adf032a4727e89453a13347b3d9f2": MOCK_GET_DETECTED_HUBS_G,
+  "00982357be27a0782ee9938e74d6f7f9": MOCK_GET_DETECTED_HUBS_H,
+  "009ec27cfd2a80c9aa72640f7cc13119": MOCK_GET_DETECTED_HUBS_I
+}
+
+def get_detected_hubs(gadget_id):
+  if gadget_id in DETECTED_HUBS_DATA:
+    return DETECTED_HUBS_DATA[gadget_id]
+  else:
+    return []
+
+MOCK_GET_DETECTED_BEACONS_799b = {
   "query_id": 140146640728920,
   "data": [
     {
       "hid": "799b9f874bc1c50775233d2a0c00e388",
       "_t": 1557194150.12,
-      "gid": "822c5303bcb71f54e891e5c493537aae",
+      "gid": "23083dde817b2fd416112733d6985baf",
       "dist": 11.1
     },
     {
@@ -284,20 +727,223 @@ MOCK_GET_DETECTED_BEACONS = {
     {
       "_t": 1557194156.12,
       "dist": 8.8,
-      "gid": "822c5303bcb71f54e891e5c493537aae",
+      "gid": "0cd28df214ddcc23a44abe080dc463a7",
       "hid": "799b9f874bc1c50775233d2a0c00e388"
     },
     {
       "_t": 1557194158.12,
-      "gid": "822c5303bcb71f54e891e5c493537aae",
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
       "dist": 10.4,
       "hid": "799b9f874bc1c50775233d2a0c00e388"
     },
     {
       "_t": 1557194159.12,
-      "gid": "822c5303bcb71f54e891e5c493537aae",
+      "gid": "00163daabe25a08ea8f80e21ee476249",
       "dist": 7.9,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194160.12,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 9.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194160.12,
+      "gid": "23083dde817b2fd416112733d6985baf",
+      "dist": 9.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194162.12,
+      "gid": "822c5303bcb71f54e891e5c493537aae",
+      "dist": 12.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194163.12,
+      "gid": "0cd28df214ddcc23a44abe080dc463a7",
+      "dist": 2.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194163.9,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 7.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194164.2,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 8.8,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194165.6,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 17.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194165.9,
+      "gid": "23083dde817b2fd416112733d6985baf",
+      "dist": 7.7,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194166.8,
+      "gid": "822c5303bcb71f54e891e5c493537aae",
+      "dist": 2.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194167.1,
+      "gid": "0cd28df214ddcc23a44abe080dc463a7",
+      "dist": 7.1,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194167.9,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 8.8,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194168.9,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 12.8,
+      "hid": "799b9f874bc1c50775233d2a0c00e388"
+    },
+    {
+      "_t": 1557194168.9,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 1.1,
       "hid": "799b9f874bc1c50775233d2a0c00e388"
     }
   ]
 }
+
+MOCK_GET_DETECTED_BEACONS_6459 = {
+  "query_id": 140147009400001,
+  "data": [
+    {
+      "hid": "003adf032a4727e89453a13347b3d9f2",
+      "_t": 1557194150.12,
+      "gid": "23083dde817b2fd416112733d6985baf",
+      "dist": 14.1
+    },
+    {
+      "_t": 1557194153.12,
+      "gid": "00982357be27a0782ee9938e74d6f7f9",
+      "dist": 9.2,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194156.12,
+      "dist": 18.8,
+      "gid": "009ec27cfd2a80c9aa72640f7cc13119",
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194158.12,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 18.4,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194159.12,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 9.7,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194160.12,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 1.9,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194160.12,
+      "gid": "003adf032a4727e89453a13347b3d9f2",
+      "dist": 11.9,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194162.12,
+      "gid": "00982357be27a0782ee9938e74d6f7f9",
+      "dist": 8.1,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194163.12,
+      "gid": "009ec27cfd2a80c9aa72640f7cc13119",
+      "dist": 12.3,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194163.9,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 17.7,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194164.2,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 3.9,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194165.6,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 7.2,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194165.9,
+      "gid": "003adf032a4727e89453a13347b3d9f2",
+      "dist": 5.1,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194166.8,
+      "gid": "00982357be27a0782ee9938e74d6f7f9",
+      "dist": 12.6,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194167.1,
+      "gid": "009ec27cfd2a80c9aa72640f7cc13119",
+      "dist": 6.6,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194167.9,
+      "gid": "0010d38c17bb4ec66e5043fc5d75f0e8",
+      "dist": 4.6,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194168.9,
+      "gid": "00163daabe25a08ea8f80e21ee476249",
+      "dist": 10.0,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    },
+    {
+      "_t": 1557194168.9,
+      "gid": "003ac8dfa487a958b50b4eb734eede29",
+      "dist": 8.5,
+      "hid": "64598ab247e597fcb3cc44839d9ad63c"
+    }
+  ]
+}
+
+DETECTED_BEACONS_DATA = {
+  "64598ab247e597fcb3cc44839d9ad63c": MOCK_GET_DETECTED_BEACONS_6459,
+  "799b9f874bc1c50775233d2a0c00e388": MOCK_GET_DETECTED_BEACONS_799b
+}
+
+def get_detected_beacons(beacon_id):
+  if beacon_id in DETECTED_BEACONS_DATA:
+    return DETECTED_BEACONS_DATA[beacon_id]
+  else:
+    return []
