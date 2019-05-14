@@ -67,6 +67,7 @@ def create():
 
     code = request.form['code']
     name = request.form['name']
+    keyword = request.form['keyword']
     prd_type = request.form['type']
     if re.compile(r'\W|\d').findall(code):
       title = common.get_msg("products.create.product.invalid_code_title")
@@ -81,8 +82,21 @@ def create():
       common.set_error_message(title, msg)
       return render_template("prd_create.html", referrer=referrer,
                              typ_dict=typ_dict)
+    if re.compile(r'\W').findall(keyword):
+      title = common.get_msg("products.create.product.invalid_keyword_title")
+      msg = common.get_msg("products.create.product.invalid_keyword_message")
+      common.set_error_message(title, msg)
+      return render_template("prd_create.html", referrer=referrer,
+                             typ_dict=typ_dict)
+    has_product_keyword = in_apis.get_product_by_keyword(keyword)
+    if has_product_keyword:
+      title = common.get_msg("products.create.product.exists_keyword_title")
+      msg = common.get_msg("products.create.product.exists_keyword_message")
+      common.set_error_message(title, msg)
+      return render_template("prd_create.html", referrer=referrer,
+                             typ_dict=typ_dict)
     else:
-      ret = apis.create_product(code, current_user.organization_id)
+      ret = apis.create_product(code, keyword, current_user.organization_id)
       if ret:
         # TODO: Product type
         product = in_apis.create_product(name, ret, prd_type)
