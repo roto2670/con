@@ -48,6 +48,11 @@ def get_inforamtion():
 @blueprint.route('/scanner/list', methods=["GET"])
 @util.require_login
 def get_scanner_list():
+  """
+  :param : None
+  :return : hubs list (list of dict)
+  :content : noti_key db의 kind를 확인 하여 서버에 Request를 보내고 그에 맞는 Hublist를 가져온다
+  """
   ret = dash_apis.get_scanner_list()
   return json.dumps(ret)
 
@@ -55,6 +60,11 @@ def get_scanner_list():
 @blueprint.route('/beacons/detected/<hub_id>', methods=["GET"])
 @util.require_login
 def get_detected_beacons_by_hub(hub_id):
+  """
+  :param : hub_id
+  :return : dist info (dict(max = 30))
+  :content : hub_id를 기준으로 주변의 비콘을 스캔한 정보를 가져온다.
+  """
   ret = dash_apis.get_detected_beacons(hub_id)
   return json.dumps(ret)
 
@@ -62,6 +72,11 @@ def get_detected_beacons_by_hub(hub_id):
 @blueprint.route('/hubs/detected/<gadget_id>', methods=["GET"])
 @util.require_login
 def get_detected_hubs_by_beacon(gadget_id):
+  """
+  :param : gadget_id 
+  :return : dist info (dict(max = 30))
+  :content : gadget_id 가진 가젯을 기준으로 주변의 스캐너 거리정보를 가져온다.
+  """
   query_id = request.args.get("qid", None)
   ret = dash_apis.get_detected_hubs(gadget_id, query_id=query_id)
   return json.dumps(ret)
@@ -70,13 +85,24 @@ def get_detected_hubs_by_beacon(gadget_id):
 @blueprint.route('/beacons/list/<product_id>', methods=["GET"])
 @util.require_login
 def get_beacon_list(product_id):
+  """
+  :param : product_id
+  :return : gadgets(beacons) list (list of dict)
+  :content : product id를 kind로 갖는 모든 gadget을 가져온다
+  """
   ret = dash_apis.get_beacon_list(product_id)
   return json.dumps(ret)
+
 
 
 @blueprint.route('/hubs/location', methods=["POST"])
 @util.require_login
 def update_scanner_location():
+  """
+  :param : None
+  :return : bool
+  :content : body에 custom정보가 담긴 hub data 를 post 한다
+  """
   json_data = request.get_json()
   hub_data = json_data['hub']
   ret = dash_apis.update_scanner_location(hub_data)
@@ -86,5 +112,10 @@ def update_scanner_location():
 @blueprint.route('/beacons/<beacon_id>', methods=["GET"])
 @util.require_login
 def get_beacon_info(beacon_id):
+  """
+  :param : gadget_id(beacon_id)
+  :return : gadget data (dict)
+  :content : 입력받은 gadget_id에 맞는 gadget data를 준다
+  """
   ret = dash_apis.get_beacon_info(beacon_id)
   return json.dumps(ret)

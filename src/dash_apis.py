@@ -42,6 +42,12 @@ def _get_user_header(is_json=False):
 
 
 def update_scanner_location(hub_obj):
+  """
+  :param : hub data (dict)
+  :return type : bool
+  :ret_content : post body 로 받은 json 데이터에 location이 입력된 hubdata 가 있다.
+                    cloud에 post후 성공하면 true, 실패시 false
+  """
   try:
     if apis.IS_DEV:
       hub_list = dash_api_mock.MOCK_HUB_LIST
@@ -71,6 +77,11 @@ def update_scanner_location(hub_obj):
 
 
 def get_scanner_list():
+  """
+  :param : None
+  :return type : list of dict
+  :ret_content : noti key에 있는 kind를 확인하여 kind를 _get_scanner_list로 넘긴다.
+  """
   if apis.IS_DEV:
     return dash_api_mock.MOCK_HUB_LIST
   else:
@@ -86,8 +97,13 @@ def get_scanner_list():
         scanner_list += ret
     return scanner_list
 
-
 def _get_scanner_list(kind):
+  """
+  :param : kind
+  :return type : list of dict
+  :ret_content : get_scanner_list()에서 받은 kind로 cloud에 정보를 요청한다.
+                      kind 가 일치하는 hub들의 data를 받는다.
+  """
   try:
     if apis.IS_DEV:
       return dash_api_mock.MOCK_HUB_LIST
@@ -111,8 +127,13 @@ def _get_scanner_list(kind):
     logging.exception("Raise error while get scanner list.")
     return None
 
-
 def get_beacon_list(product_id):
+  """
+  :param : product_id
+  :return type : list of dict
+  :ret_content : product_id가 일치하는 gadget들의 정보를 받아온다. dict 형식의
+                      gadget data들이 list로 만들어져 온다.
+  """
   try:
     if apis.IS_DEV:
       return dash_api_mock.MOCK_BEACON_LIST
@@ -133,8 +154,12 @@ def get_beacon_list(product_id):
                       product_id)
     return None
 
-
 def get_beacon_info(beacon_id):
+  """
+  :param : beacon_id(gadget_id)
+  :return type : dict
+  :ret_content : beacon_id 일치하는 gadget의 정보를 받아온다. dict형식의 단일 data를 받는다.
+  """
   try:
     if apis.IS_DEV:
       beacon_list = dash_api_mock.MOCK_BEACON_LIST
@@ -160,6 +185,13 @@ def get_beacon_info(beacon_id):
 
 
 def get_detected_hubs(gadget_id, query_id=None):
+  """
+  :param : gadget_id, query_id
+  :return type : dict
+  :ret_content : gadget id를 가진 gadget이 어떤 hub에 어느정도 거리로 탐지되었는지에 대한
+                  data를 전달 받는다 data는 최대 30개를 받으며 query id를 입력하여 get할 경우
+                  최초 30개 이후 연속된 data를 받는다.
+  """
   if apis.IS_DEV:
     return dash_api_mock.MOCK_GET_DETECTED_HUBS
 
@@ -204,6 +236,13 @@ def get_detected_hubs(gadget_id, query_id=None):
 
 
 def get_detected_beacons(hub_id, query_id=None):
+  """
+  :param : hub_id, query_id
+  :return type : dict
+  :ret_content : hub id를 가진 hub에 어떤 gadget이 어느정도 거리로 탐지되었는지에 대한
+                  data를 전달 받는다 data는 최대 30개를 받으며 query id를 입력하여 get할 경우
+                  최초 30개 이후 연속된 data를 받는다.
+  """
   if apis.IS_DEV:
     return dash_api_mock.MOCK_GET_DETECTED_BEACONS
 
