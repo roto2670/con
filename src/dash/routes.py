@@ -14,9 +14,35 @@ import json
 from flask import request
 from flask_login import current_user
 
+import apis
 import util
 import dash_apis
+import base.routes
 from dash import blueprint
+
+
+@blueprint.route('/info', methods=["GET"])
+@util.require_login
+def get_inforamtion():
+  """
+  :param : None
+  :return : infomation of dict
+  """
+
+  if apis.IS_DEV:
+    data = {
+        "product_id": "mibs"
+    }
+    return json.dumps(data)
+  else:
+    prd = base.routes.get_current_product(current_user.id)
+    if not prd:
+      data = {
+          "product_id": prd.id
+      }
+      return json.dumps(data)
+    else:
+      return json.dumps({})
 
 
 @blueprint.route('/scanner/list', methods=["GET"])

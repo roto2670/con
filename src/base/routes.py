@@ -252,6 +252,13 @@ def set_current_product(cur_product):
     CUR_PRODUCT[current_user.id] = cur_product
 
 
+def get_current_product(user_id):
+  if user_id in CUR_PRODUCT:
+    return CUR_PRODUCT[user_id]
+  else:
+    return None
+
+
 def _get_current_product():
   if current_user and current_user.is_authenticated:
     if current_user.id in CUR_PRODUCT:
