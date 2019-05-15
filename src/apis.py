@@ -482,10 +482,11 @@ def get_endpoint_result(gadget_id, task_id):
 # {{{  product
 
 
-def create_product(product_name, developer_id):
+def create_product(product_name, keyword, developer_id):
   url = BASE_URL + 'product'
   data = {
       "name": product_name,
+      "keyword": keyword,
       "developer_id": developer_id
   }
   try:
@@ -493,6 +494,7 @@ def create_product(product_name, developer_id):
       _test_data = {
           "id": product_name,
           "developer_id": developer_id,
+          "keyword": keyword,
           "key": "df4f925b5233fc50b1a298e878d85367",
           "hook_url": "",
           "hook_client_key": ""

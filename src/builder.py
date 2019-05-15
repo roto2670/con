@@ -22,6 +22,7 @@ from io import StringIO
 
 MIBIO_JSON = '''
 {
+"pid":"mibio",
 "product":"mibio",
 "version":"0.0",
 "requests":[{
@@ -113,6 +114,7 @@ HEADER_FRAME = '''
 #define REQUEST_CNT {requests_num}
 #define EVENT_CNT {events_num}
 
+static char MIB_PRODUCT_ID[PRODUCT_ID_LEN]  = "{product_id}";  // max 12
 static char MIB_PRODUCT_NAME[PRODUCT_NAME_LEN]  = "{product_name}";  // max 12
 
 #pragma pack(push,1)
@@ -138,6 +140,7 @@ static uint32_t mib_init(mib_init_t* init_data) {{
   init_data->firmware_version_minor = FIRMWARE_VERSION_MINOR;
   init_data->firmware_build_number = FIRMWARE_BUILD_NUMBER;
   memcpy(init_data->product_name, MIB_PRODUCT_NAME, PRODUCT_NAME_LEN);
+  memcpy(init_data->product_id, MIB_PRODUCT_ID, PRODUCT_ID_LEN);
 
   init_data->endpoint_length = REQUEST_CNT;
 
@@ -148,6 +151,7 @@ static uint32_t mib_init(mib_init_t* init_data) {{
 #endif // GADGET_H__
 '''
 
+ID_KEY = '''pid'''
 NAME_KEY = '''product'''
 VER_KEY = '''version'''
 REQUESTS_KEY = '''requests'''
@@ -218,9 +222,11 @@ MAIN_EP_RET_NONE_VALUE = '''
 
 
 class MibEndpoints(object):
+  ID_MAX_LEN = 12
   NAME_MAX_LEN = 12
 
   def __init__(self):
+    self.id = None
     self.name = None
     self._requests = {}
     self._events = {}
@@ -337,6 +343,7 @@ class MibEndpoints(object):
         requests_define=_requests_define.getvalue(),
         request_funcs_interface=_req_funcs_interface.getvalue(),
         main_body=_main_body.getvalue(),
+        product_id=self.id[:self.ID_MAX_LEN],
         product_name=self.name[:self.NAME_MAX_LEN],
         requests_num=len(self._requests),
         events_num=len(self._events))
@@ -348,6 +355,7 @@ class MibEndpoints(object):
   @staticmethod
   def build(json_data):
     _ep = MibEndpoints()
+    _ep.id = json_data[ID_KEY]
     _ep.name = json_data[NAME_KEY]
     _ep.set_version(*json_data[VER_KEY].split('.'))
     _ep_id = -1

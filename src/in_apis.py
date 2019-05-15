@@ -52,7 +52,7 @@ def get_datetime():
 def create_product(product_name, product_obj, product_type):
   # product_obj : response from microbot cloud
   product = Product(id=product_obj['id'],
-                    code=product_obj['id'],
+                    code=product_obj['keyword'],  # When BLE Scan
                     developer_id=product_obj['developer_id'],
                     key=product_obj['key'],
                     name=product_name,
@@ -82,6 +82,11 @@ def get_product(product_id):
 
 def get_product_by_key(product_key):
   product = Product.query.filter_by(key=product_key).one_or_none()
+  return product
+
+
+def get_product_by_keyword(product_keyword):
+  product = Product.query.filter_by(code=product_keyword).one_or_none()
   return product
 
 
