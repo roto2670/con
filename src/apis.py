@@ -483,17 +483,17 @@ def get_endpoint_result(gadget_id, task_id):
 # {{{  product
 
 
-def create_product(product_name, keyword, developer_id):
+def create_product(product_id, keyword, developer_id):
   url = BASE_URL + 'product'
   data = {
-      "name": product_name,
+      "name": product_id,
       "keyword": keyword,
       "developer_id": developer_id
   }
   try:
     if IS_DEV:
       _test_data = {
-          "id": product_name,
+          "id": product_id,
           "developer_id": developer_id,
           "keyword": keyword,
           "key": "df4f925b5233fc50b1a298e878d85367",
@@ -868,4 +868,32 @@ def register_sub_domain(gadget_id, sub_name, domain_name):
         return False
   except:
     logging.exception("Raise error while register sub domain.")
+    return None
+
+
+def register_or_update_stream_product(product_id, hub_kind, up_product, down_model):
+  """http://i.narantech.com/mib-rest/#api-Products-register_product_stream
+  """
+  url = "{base}products/{pid}/stream".format(base=BASE_URL, pid=product_id)
+  data = {
+      "hub-kind": hub_kind,
+      "up_product": up_product,
+      "down_model": down_model
+  }
+  try:
+    if IS_DEV:
+      return True
+    else:
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      if resp.ok:
+        value = resp.json()
+        logging.info("Register or update product stream. resp : %s, data : %s",
+                     value, data)
+        return value
+      else:
+        logging.warning("Failed to register or update product stream. data : %s",
+                        data)
+        return False
+  except:
+    logging.exception("Raise error while register or update stream product.")
     return None

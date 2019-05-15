@@ -1,0 +1,175 @@
+
+{% extends "base_site.html" %}
+
+{% block title %} Product Import {% endblock title %}
+
+{% block stylesheets %}
+  {{ super()}}
+  <!-- iCheck -->
+  <link href="{{ url_for('static', filename='vendors/iCheck/skins/flat/green.css') }}" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block javascripts %}
+  {{ super()}}
+  <!-- iCheck -->
+  <script src="{{ url_for('static', filename='vendors/iCheck/icheck.min.js') }}"></script>
+  <script>
+    $(document).ready(function() {
+      if ($(".flat")[0]) {
+        $(document).ready(function () {
+          $('.flat').iCheck({
+              checkboxClass: 'icheckbox_flat-green custom_margin_bottom_5'
+          });
+        });
+      }
+    });
+
+    var allowNotiIdList = [];
+
+    $(".flat").on('ifChecked', function(event) {
+      var notiId = event.currentTarget.id;
+      allowNotiIdList.push(notiId);
+      handleAllowData();
+    });
+    $(".flat").on('ifUnchecked', function(event) {
+      var notiId = event.currentTarget.id;
+      var notiIdIndex = allowNotiIdList.indexOf(notiId);
+      if (notiIdIndex > -1) {
+        allowNotiIdList.splice(notiIdIndex, 1);
+        handleAllowData();
+      }
+    });
+
+    function objectToJson(object) {
+      return JSON.stringify(object);
+    }
+
+    function handleAllowData() {
+      $("#allowNotiIdList")[0].value = objectToJson(allowNotiIdList);
+    }
+  </script>
+{% endblock javascripts %}
+
+{% block sidebar %}
+{% endblock sidebar %}
+
+{% block content %}
+  {% if modal %}
+    <script>
+      onload = function() {
+        $('.bs-example-modal-lg').modal('show');
+      }
+    </script>
+
+    <!-- modal -->
+    <div class="modal bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="false">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel">{{ modal['title'] }}</h4>
+        </div>
+        <div class="modal-body">
+          <h4>{{ modal['sub_title'] }}</h4>
+          <p>{{ modal['message'] }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">{{ modal['ok'] }}</button>
+        </div>
+
+      </div>
+    </div>
+    </div>
+    <!-- end modal -->
+  {% endif %}
+
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+
+      <div class="row">  <!-- start row -->
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">  <!-- start x_panel -->
+
+            <div class="x_title">
+              <h3>Import <small>import product</small></h3>
+              <div class="clearfix"></div>
+            </div>
+
+            <div class="x_content">  <!-- start x_content -->
+              <br />
+              <form action="/products/import/create" class="form-horizontal form-label-left" method="post">
+
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Product ID <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="code" name="code" required="required" maxlength="10" onkeyup="this.value=this.value.replace(/[^a-zA-Z]/g,'');"
+                        value="{{ product_id }}" class="form-control col-md-7 col-xs-12 only-eng only-lower" readonly>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Product Keyword <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="keyword" name="keyword" required="required" maxlength="10" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'');"
+                        class="form-control col-md-7 col-xs-12 only-eng only-lower">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Product Name <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="name" name="name" required="required" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g,'');"
+                      class="form-control col-md-7 col-xs-12">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Product Type <span class="required">*</span></label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="typ" name="typ" required="required" value="{{ product_type}}"
+                        class="form-control col-md-7 col-xs-12 only-eng only-lower" readonly>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Model Name <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="modelName" name="modelName" required="required" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g,'');"
+                      class="form-control col-md-7 col-xs-12">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Allow List <span class="required">*</span>
+                  </label>
+                  <div id="scroll-style-1" class="col-md-6 col-sm-6 col-xs-12 allow_list_height_150">
+                    {% for noti_key in noti_key_list %}
+                      <input id="{{ noti_key.id }}" type="checkbox" class="flat"
+                          name="productValue" value="{{ noti_key.id }}"> {{ noti_key.name }}<br>
+                    {% endfor %}
+                  </div>
+                </div>
+                <input type="hidden" id="allowNotiIdList" name="allowNotiIdList" class="form-control" value="">
+                <input type="hidden" id="parentProductId" name="parentProductId" class="form-control" value="{{ parent_product_id }}">
+                <input type="hidden" id="parentModelId" name="parentModelId" class="form-control" value="{{ parent_model_id }}">
+                <input type="hidden" id="forkProductKey" name="forkProductKey" class="form-control" value="{{ fork_prd_key }}">
+
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <button type="submit" class="btn btn-success">Create</button>
+                  </div>
+                </div>
+
+              </form>
+            </div>  <!-- end x_content-->
+
+          </div>  <!-- End x_panel -->
+        </div>
+      </div>  <!-- End row -->
+
+    </div>
+  </div>
+
+{% endblock content %}

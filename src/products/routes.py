@@ -108,7 +108,7 @@ def create():
           org.last_updated_time = in_apis.get_datetime()
           db.session.commit()
         _set_product(product.id)
-        return redirect('products/' + ret['id'] + '/model/create')
+        return redirect('/products/' + ret['id'] + '/model/create')
       else:
         logging.warning("Fail to create product. Name : %sCode : %s, User : %s",
                         name, code, current_user.email)
@@ -170,7 +170,7 @@ def create_model(product_id):
       if ret:
         in_apis.create_model(name, code, model_type, product_id,
                              current_user.email)
-        return redirect('products/' + product_id + '/general')
+        return redirect('/products/' + product_id + '/general')
       else:
         logging.warning("Fail to create model. Name : %s, Type : %s, user : %s",
                         name, model_type, current_user.email)
@@ -222,7 +222,7 @@ def hook(product_id):
     dev.hook_url = hook_url
     dev.hook_client_key = hook_client_key
     db.session.commit()
-    return redirect('products/' + product_id + '/authentication')
+    return redirect('/products/' + product_id + '/authentication')
   else:
     logging.warning("Fail to update hook. Url : %s, Key : %s, Product : %s, User : %s",
                     hook_url, hook_client_key, product_id, current_user.email)
@@ -247,7 +247,7 @@ def tester(product_id):
     _tester = in_apis.get_tester_by_email(tester_email, product_id)
     if not _tester:
       _send_invite(tester_email, product_id)
-    return redirect('products/' + product_id + '/tester')
+    return redirect('/products/' + product_id + '/tester')
 
 
 def _send_invite(email_addr, product_id):
@@ -295,25 +295,30 @@ def product_import(product_id):
                            fork_list=fork_list,
                            org_dict=org_dict)
   else:
-    # TODO: Send email
     _email = request.form['email']
+    _model_id = request.form['modelId']
     _user = in_apis.get_user_by_email_only(_email)
     if _user:
-      model_id_list = request.form['allowModelIdList']
-      model_id_list = json.loads(model_id_list)
-      product_send_invite(_email, product_id, model_id_list)
+      has_fork_product = in_apis.has_fork_product(_model_id, product_id,
+                                                  _user.organization_id)
+      if has_fork_product:
+        title = common.get_msg("products.product_import.duplicate_title")
+        msg = common.get_msg("products.product_import.duplicate_message")
+        common.set_error_message(title, msg)
+        return redirect('/products/{}/product_import'.format(product_id))
+      product_send_invite(_email, product_id, _model_id)
     else:
       logging.warning("User doesn't exist : %s", _email)
-    return redirect('./product_import')
+    return redirect('/products/{}/product_import'.format(product_id))
 
 
-def product_send_invite(email, product_id, model_id_list):
+def product_send_invite(email, product_id, model_id):
   # TODO : change mail form
   with open(util.get_mail_form_path('prd_import_mail.html'), 'r') as _f:
     content = _f.read()
   key = uuid.uuid4().hex
   auth_url = request.host_url + 'products/' + product_id + \
-      '/import/confirm?key=' + key + '&ml=' + ','.join(model_id_list)
+      '/import/confirm?key=' + key + '&mid=' + model_id
   _product = in_apis.get_product(product_id)
   # TODO : title ~ message1
   title = common.get_msg("products.product_import.mail_title")
@@ -324,7 +329,8 @@ def product_send_invite(email, product_id, model_id_list):
   target_organization_id = in_apis.get_user_by_email_only(email).organization_id
   try:
     mail.send(email, title, content)
-    in_apis.create_fork_product(_product, email, model_id_list, current_user.email, key, target_organization_id)
+    in_apis.create_fork_product(_product, email, model_id,
+                                current_user.email, key, target_organization_id)
   except:
     logging.exception("Raise error")
 
@@ -353,7 +359,7 @@ def change_tester_level(product_id, tester_id, level):
       return redirect('products/' + product_id + '/tester')
   else:
     logging.warning("Can not find tester. Id : %s", tester_id)
-    return redirect('products/' + product_id + '/tester')
+    return redirect('/products/' + product_id + '/tester')
 
 
 @blueprint.route('/<product_id>/tester/<tester_id>/delete')
@@ -371,7 +377,7 @@ def remove_tester(product_id, tester_id):
     else:
       logging.info("%s is not ftl. Delete only from console DB.", _tester.email)
       in_apis.delete_tester(tester_id)
-  return redirect('products/' + product_id + '/tester')
+  return redirect('/products/' + product_id + '/tester')
 
 
 @blueprint.route('/<product_id>/tester/<tester_id>/refresh')
@@ -383,14 +389,14 @@ def check_authorized(product_id, tester_id):
     tester_authorized = tester_info['user']['authorized']
     if tester_authorized:
       in_apis.update_tester_to_authorized(_tester.id)
-  return redirect('products/' + product_id + '/tester')
+  return redirect('/products/' + product_id + '/tester')
 
 
 @blueprint.route('/<product_id>/invite/tester/<invite_id>/delete')
 @util.require_login
 def remove_invite_tester(product_id, invite_id):
   in_apis.delete_invite(invite_id)
-  return redirect('products/' + product_id + '/tester')
+  return redirect('/products/' + product_id + '/tester')
 
 
 @blueprint.route('/confirm', methods=['GET'])
@@ -425,37 +431,74 @@ def confirm_mail():
 
 
 @blueprint.route('<product_id>/import/confirm', methods=['GET'])
+@util.require_login
 def confirm_product(product_id):
+  noti_key_list = current_user.organization.noti_key
+  if not noti_key_list:
+    title = common.get_msg("products.product_import.notNotiKey_title")
+    msg = common.get_msg("products.product_import.notNotiKey_message")
+    common.set_error_message(title, msg)
+    return redirect('/management/organization/notification')
   key = request.args['key']
-  model_list = request.args['ml']
-  fork_product = in_apis.get_fork_product(key)
+  parent_model_id = request.args['mid']
+  fork_product = in_apis.get_fork_product_by_key(key)
   if fork_product:
-    in_apis.update_fork_product(key)
     parent_product = in_apis.get_product(product_id)
-    # prd_ret = apis.create_product(parent_product.code, current_user.organization_id)
     target_org = in_apis.get_organization(fork_product.target_organization)
-    _product_id = product_id + '_' + target_org.name
-    if parent_product:
-      in_apis.create_product_to_import(_product_id, parent_product)
-      _model_list = model_list.split(',')
-      for model_id in _model_list:
-        model = in_apis.get_model(model_id)
-        # mod_ret = apis.create_model(_product_id, model.code, model.name)
-        if model:
-          in_apis.create_model(model.name, model.code, model.typ, _product_id, current_user.email)
-        else:
-          logging.warning("Fail to create model. Name : %s, Type : %s, user : %s",
-                          model.name, model.typ, current_user.email)
-          abort(500)
-    else:
-      logging.warning("Fail to create product. Name : %s, Code : %s, User : %s",
-                      _product_id, parent_product.code, current_user.email)
-      abort(500)
-    return redirect(url_for('home_blueprint.index'))
+    new_product_id = product_id + target_org.name
+    new_product_type = parent_product.typ
+    return render_template('import_prd_create.html', product_id=new_product_id[:10],
+                           product_type=new_product_type,
+                           noti_key_list=noti_key_list,
+                           parent_product_id=product_id,
+                           parent_model_id=parent_model_id,
+                           fork_prd_key=key)
   else:
     logging.warning("Can not find fork product. product id : %s, target user : %s",
                     product_id, current_user.email)
     abort(400)
+
+
+@blueprint.route('/import/create', methods=['POST'])
+@util.require_login
+def create_import_product():
+  try:
+    prd_id = request.form['code']
+    prd_keyword = request.form['keyword']
+    prd_name = request.form['name']
+    prd_type = request.form['typ']
+    model_name = request.form['modelName']
+    parent_prd_id = request.form['parentProductId']
+    parent_model_id = request.form['parentModelId']
+    key = request.form['forkProductKey']
+    raw_allow_noti_key_list = request.form['allowNotiIdList']
+    allow_noti_key_list = json.loads(raw_allow_noti_key_list)
+
+    in_apis.update_fork_product(key)
+    parent_product = in_apis.get_product(parent_prd_id)
+    prd_ret = apis.create_product(prd_id, prd_keyword, current_user.organization_id)
+    in_apis.create_product_to_import(prd_name, prd_ret, prd_type, parent_prd_id)
+    parent_model = in_apis.get_model(parent_model_id)
+
+    code = 0
+    model_ret = apis.create_model(prd_id, code, model_name)
+    model = in_apis.create_model_import(model_name, code, parent_model.typ,
+                                        prd_id, current_user.email,
+                                        parent_model_id)
+    for noti_key_id in allow_noti_key_list:
+      noti_key = in_apis.get_noti_key(noti_key_id)
+      apis.register_or_update_stream_product(prd_id, noti_key.name,
+                                             parent_prd_id, code)
+      data = {prd_id: []}  # list에 code가 없으면 스캔만 가능해진다.
+      apis.update_allow_noti_key(current_user.organization_id, noti_key.name,
+                                 data)
+      in_apis.create_noti_model_permission(current_user.email, noti_key.id,
+                                           model.id)
+
+    return redirect(url_for('home_blueprint.index'))
+  except:
+    logging.exception("Raise error while create import product")
+    abort(500)
 
 
 @blueprint.route('/<product_id>/model', methods=['GET'])
@@ -563,7 +606,7 @@ def upload_firmware(product_id, model_id):
                                                           _firmware.id)
           mail.send_about_test_user(product_id, _model.name, firmware_version,
                                     models.TESTER_DEV)
-          return redirect('products/' + product_id + '/model/' + model_id)
+          return redirect('/products/' + product_id + '/model/' + model_id)
         else:
           logging.warning("Failed to update stage while upload firmware.")
           abort(500)
@@ -591,7 +634,7 @@ def delete_firmware(product_id, model_id, firmware_id):
     else:
       logging.warning("Failed to delete firmware. P: %s, M: %s, F: %s",
                       product_id, _model.name, _firmware.version)
-  return redirect('products/' + product_id + '/model/' + model_id)
+  return redirect('/products/' + product_id + '/model/' + model_id)
 
 
 @blueprint.route('/<product_id>/model/<model_id>/firmware/<model_type>/download',
@@ -642,7 +685,7 @@ def accept_sub_domain(product_id, sub_domain_id):
   else:
     logging.warning("Failed to accepted sub domain. Product : %s, Sub Domain : %s, User : %s",
                     product_id, sub_domain_id, current_user.email)
-  return redirect('products/' + product_id + '/subdomain')
+  return redirect('/products/' + product_id + '/subdomain')
 
 
 def _set_product(product_id):

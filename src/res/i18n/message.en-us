@@ -86,7 +86,11 @@
       },
       "product_import": {
           "mail_title": "You can use {} product",
-          "mail_message": "If you accept this mail,<br> {} product and models will be created in your organization"
+          "mail_message": "If you accept this mail,<br> {} product and models will be created in your organization",
+          "duplicate_title": "Already import product",
+          "duplicate_message": "Already import product.",
+          "notNotiKey_title": "Need to register notification key",
+          "notNotiKey_message": "Please register the Notification key and try again."
       }
   },
   "onboarding": {
