@@ -157,11 +157,8 @@ def register_noti_key(platform):
       return render_template("register_android.html", referrer=referrer,
                              product_list=product_list)
   else:
-    # TODO: : Comment out about Not supported feature from mib cloud
-    #allow_dict = json.loads(request.form['allowDict'])
-    #allow_model_id_list = json.loads(request.form['allowModelIdList'])
-    allow_dict = {}
-    allow_model_id_list = []
+    allow_dict = json.loads(request.form['allowDict'])
+    allow_model_id_list = json.loads(request.form['allowModelIdList'])
     if platform == "ios":
       bundle_id = request.form['bundleId']
       password = request.form['password']
@@ -250,11 +247,8 @@ def update_noti_key(noti_key_id):
                             allow_model_id_list=allow_model_id_list,
                             allow_dict=allow_dict)
   else:
-    # TODO: : Comment out about Not supported feature from mib cloud
-    #allow_dict = json.loads(request.form['allowDict'])
-    #allow_model_id_list = json.loads(request.form['allowModelIdList'])
-    allow_dict = {}
-    allow_model_id_list = []
+    allow_dict = json.loads(request.form['allowDict'])
+    allow_model_id_list = json.loads(request.form['allowModelIdList'])
     noti_key = in_apis.get_noti_key(noti_key_id)
     ret = apis.update_allow_noti_key(current_user.organization_id, noti_key.name, allow_dict)
     if ret:
