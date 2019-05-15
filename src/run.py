@@ -36,6 +36,7 @@ def register_extensions(app):
   login_manager.init_app(app)
   # custom
   app.context_processor(base.routes.about_product)
+  app.context_processor(base.routes.about_organization)
   app.context_processor(common.get_message)
   # jinja
   app.jinja_env.filters['datetimeFilter'] = base.routes.datetime_filter

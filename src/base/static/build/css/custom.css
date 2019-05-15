@@ -167,12 +167,18 @@ html , body{
     visibility: hidden
 }
 .nav-sm .container.body .right_col {
-    padding: 10px 20px;
+    padding: 10px 20px 0;
     margin-left: 70px;
     /*margin-left: 140px;*/
     z-index: 2;
     overflow: scroll;
-    height: 93vh;
+    height: 1vh;
+}
+.nav-sm .custom-footer {
+    margin-left: 70px;
+    height: 32px;
+    background-color:#f5f6f5;
+    min-height: 32px;
 }
 .nav-sm .navbar.nav_title {
     width: 70px
@@ -368,7 +374,7 @@ body .container.body .right_col {
     /*margin-left: 230px*/
     margin-left: 300px;
     overflow: scroll;
-    height: 93vh;
+    height: 1vh;
 }
 .nav-md .nav_title {
     width: 230px;
@@ -376,6 +382,12 @@ body .container.body .right_col {
     /*background: #2A3F54;*/
     border-radius: 0;
     height: 57px
+}
+.nav-md .custom-footer {
+    margin-left: 300px;
+    height: 32px;
+    background-color:#f5f6f5;
+    min-height: 32px;
 }
 .nav-sm .nav_sm_hidden {
     display: none
@@ -399,6 +411,12 @@ body .container.body .right_col {
     }
     .right_col {
         padding: 10px !important
+    }
+    .nav-md .custom-footer {
+        margin-left: 70px;
+        height: 32px;
+        background-color:#f5f6f5;
+        min-height: 32px;
     }
 }
 @media (max-width: 1200px) {
@@ -4506,6 +4524,47 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     width: 150px;
     height: 150px;
     margin: 20px;
+}
+
+.custom-footer .left-container {
+    display:inline-block;
+}
+
+.custom-footer .left-container .text-container {
+    display:inline-block;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    margin-left: 5px;
+    margin-right: 5px;
+    color:#b1b2b2;
+    size: 12px;
+}
+
+.custom-footer .left-container .image-container {
+    display:inline-block;
+    margin-top: 7px;
+    margin-bottom: 2px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.custom-footer .left-container .image-container > img{
+    width: 46px;
+    margin-left: 4px;
+    margin-right: 4px;
+    padding-bottom: 4px;
+}
+
+.custom-footer .right-container {
+    display:inline-block;
+    right: 0%;
+    position: absolute;
+}
+
+.custom-footer .right-container .text-container {
+    margin: 7px;
+    color: #b1b2b2;
+    size: 12px;
 }
 
 /* keyser custom */
