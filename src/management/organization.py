@@ -249,26 +249,30 @@ def update_noti_key(noti_key_id):
   else:
     allow_dict = json.loads(request.form['allowDict'])
     allow_model_id_list = json.loads(request.form['allowModelIdList'])
-    noti_key = in_apis.get_noti_key(noti_key_id)
-    ret = apis.update_allow_noti_key(current_user.organization_id, noti_key.name, allow_dict)
-    if ret:
-      permit_list = in_apis.get_noti_model_permission_list_by_noti_id(noti_key.id)
-      if permit_list:
-        for permit in permit_list:
-          if permit.model_id in allow_model_id_list:
-            in_apis.update_noti_model_permission(permit.id, current_user.email,
-                                                noti_key.id, permit.model_id)
-            allow_model_id_list.remove(permit.model_id)
-          else:
-            in_apis.delete_noti_model_permission(permit.id)
-      for model_id in allow_model_id_list:
-        in_apis.create_noti_model_permission(current_user.email, noti_key.id,
+    if allow_dict and allow_model_id_list:
+      noti_key = in_apis.get_noti_key(noti_key_id)
+      ret = apis.update_allow_noti_key(current_user.organization_id, noti_key.name,
+                                       allow_dict)
+      if ret:
+        permit_list = in_apis.get_noti_model_permission_list_by_noti_id(noti_key.id)
+        if permit_list:
+          for permit in permit_list:
+            if permit.model_id in allow_model_id_list:
+              in_apis.update_noti_model_permission(permit.id, current_user.email,
+                                                  noti_key.id, permit.model_id)
+              allow_model_id_list.remove(permit.model_id)
+            else:
+              in_apis.delete_noti_model_permission(permit.id)
+        for model_id in allow_model_id_list:
+          in_apis.create_noti_model_permission(current_user.email, noti_key.id,
                                               model_id)
-      return redirect('/management/organization/notification')
+        return redirect('/management/organization/notification')
+      else:
+        logging.warning("Failed to update noti key. id : %s, user : %s, message : %s",
+                        noti_key_id, current_user.email, ret)
+        abort(500)
     else:
-      logging.warning("Failed to update noti key. id : %s, user : %s, message : %s",
-                       noti_key_id, current_user.email, ret)
-      abort(500)
+      return redirect('/management/organization/notification')
 
 
 def delete_noti_key(noti_key_id):

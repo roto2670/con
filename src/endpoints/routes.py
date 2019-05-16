@@ -135,7 +135,7 @@ def upload_header_file(product_id):
     if not validate.check_validate_specification(product_id, _product.typ,
                                                  _product.code,
                                                  json_content):
-      return redirect('endpoints/' + product_id + '/specifications')
+      return redirect('/endpoints/' + product_id + '/specifications')
     ret = apis.register_specifications(product_id, json_content['version'],
                                        decode_content)
     if ret:
@@ -154,14 +154,14 @@ def upload_header_file(product_id):
       msg = common.get_msg("endpoints.upload.success_message")
       msg = msg.format(json_content['product'], json_content['version'])
       common.set_info_message(title, msg)
-      return redirect('endpoints/' + product_id + '/specifications')
+      return redirect('/endpoints/' + product_id + '/specifications')
     else:
       logging.warning("Failed to register specifications. Prd : %s, user : %s",
                       product_id, current_user.email)
       abort(500)
   except:
     logging.exception("Raise error while upload header file.")
-    return redirect('endpoints/' + product_id + '/specifications')
+    return redirect('/endpoints/' + product_id + '/specifications')
 
 
 def _get_build_number(version):
