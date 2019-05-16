@@ -9,7 +9,6 @@
 {% endblock stylesheets %}
 
 {% block content %}
-
   <div id="scroll-style-hidden" class="right_col" role="main">
     <!-- top tiles -->
     <div class="row tile_count">
@@ -28,6 +27,10 @@
       <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
         <span class="count_top"><i class="fa fa-exclamation-circle"></i> Offline</span>
         <div class="count">{{ infos['offline'] }}</div>
+      </div>
+      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+        <span><div id="divDate" class="count_top right-align"></div></span>
+        <div id="divTime" class="count right-align"></div>
       </div>
     </div>
     <!-- /top tiles -->
@@ -658,6 +661,27 @@
   };
 
   init_JQVmap({{ infos['locale']|safe }});
+
+  var weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
+      month = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  function showClock(){
+      var currentDate = new Date(),
+          divTime = document.getElementById("divTime"),
+          divDate = document.getElementById("divDate");
+
+      var timeMsg = currentDate.getHours()+":";
+      timeMsg += currentDate.getMinutes()+":";
+      timeMsg += currentDate.getSeconds();
+      var dateMsg = month[currentDate.getMonth()] + " ";
+      dateMsg += currentDate.getDate() + " ";
+      dateMsg += "(" + weekday[currentDate.getDay()] + ")";
+      dateMsg += ", " + currentDate.getFullYear();
+
+      divTime.innerText = timeMsg;
+      divDate.innerText = dateMsg;
+      setTimeout(showClock,1000);
+  }
+  showClock();
 
   </script>
 
