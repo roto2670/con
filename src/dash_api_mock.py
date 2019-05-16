@@ -942,8 +942,8 @@ DETECTED_BEACONS_DATA = {
   "799b9f874bc1c50775233d2a0c00e388": MOCK_GET_DETECTED_BEACONS_799b
 }
 
-def get_detected_beacons(beacon_id):
-  if beacon_id in DETECTED_BEACONS_DATA:
-    return DETECTED_BEACONS_DATA[beacon_id]
+def get_detected_beacons(hub_id):
+  if hub_id in DETECTED_BEACONS_DATA:
+    return DETECTED_BEACONS_DATA[hub_id]
   else:
     return []
