@@ -12,7 +12,7 @@
 
 # 3rd party
 from sqlalchemy import ForeignKey  # noqa : pylint: disable=import-error
-from sqlalchemy import Column, DateTime, String, Text  # noqa : pylint: disable=import-error
+from sqlalchemy import Column, DateTime, String, Text, Integer  # noqa : pylint: disable=import-error
 
 from base import db
 
@@ -27,4 +27,18 @@ class _Footer(db.Model):
   image_uri = Column(Text)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
+  organization_id = Column(String(75))
+
+
+class _SupremaConfig(db.Model):
+  __tablename__ = '_suprema_config'
+
+  id = Column(Integer, primary_key=True)
+  base_url = Column(String(75))
+  suprema_id = Column(String(75))
+  suprema_pw = Column(String(75))
+  last_data_id = Column(Integer)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  created_time = Column(DateTime)
   organization_id = Column(String(75))
