@@ -22,7 +22,6 @@ import dash_api_mock
 
 THIRD_BASE_URL = '''http://api.mib.io/v1/'''
 BASE_URL = '''http://api.mib.io/i/v1/'''
-
 OFFSET_SEC = 60
 
 
@@ -50,12 +49,7 @@ def update_scanner_location(hub_obj):
   """
   try:
     if apis.IS_DEV:
-      hub_list = dash_api_mock.MOCK_HUB_LIST
-      for hub in hub_list:
-        if hub['id'] == hub_obj['id']:
-          hub['custom'] = hub_obj['custom']
-          return True
-      return False
+      return dash_api_mock.update_hub_location_mock(hub_obj)
     else:
       url = "{base}hubs/{hub_id}".format(base=THIRD_BASE_URL,
                                          hub_id=hub_obj['id'])
@@ -83,7 +77,7 @@ def get_scanner_list():
   :ret_content : noti key에 있는 kind를 확인하여 kind를 _get_scanner_list로 넘긴다.
   """
   if apis.IS_DEV:
-    return dash_api_mock.MOCK_HUB_LIST
+    return dash_api_mock.scanner_list()
   else:
     # TODO: Fixed this logic
     kind_list = []
@@ -105,24 +99,21 @@ def _get_scanner_list(kind):
                       kind 가 일치하는 hub들의 data를 받는다.
   """
   try:
-    if apis.IS_DEV:
-      return dash_api_mock.MOCK_HUB_LIST
+    url = "{base}hub-kinds/{kind}/hubs".format(base=THIRD_BASE_URL,
+                                              kind=kind)
+    headers = _get_user_header()
+    params = {
+        'kind': 0,
+        'issuer': 1
+    }
+    resp = requests.get(url, headers=headers, params=params)
+    if resp.ok:
+      scanners = resp.json()
+      return scanners
     else:
-      url = "{base}hub-kinds/{kind}/hubs".format(base=THIRD_BASE_URL,
-                                                kind=kind)
-      headers = _get_user_header()
-      params = {
-          'kind': 0,
-          'issuer': 1
-      }
-      resp = requests.get(url, headers=headers, params=params)
-      if resp.ok:
-        scanners = resp.json()
-        return scanners
-      else:
-        logging.warning("Failed get scanner list. Code : %s, Text : %s",
-                        resp.status_code, resp.text)
-        return []
+      logging.warning("Failed get scanner list. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return []
   except:
     logging.exception("Raise error while get scanner list.")
     return None
@@ -136,7 +127,7 @@ def get_beacon_list(product_id):
   """
   try:
     if apis.IS_DEV:
-      return dash_api_mock.MOCK_BEACON_LIST
+      return dash_api_mock.beacon_list()
     else:
       url = "{base}products/{pid}/gadgets".format(base=THIRD_BASE_URL,
                                                   pid=product_id)
@@ -162,11 +153,7 @@ def get_beacon_info(beacon_id):
   """
   try:
     if apis.IS_DEV:
-      beacon_list = dash_api_mock.MOCK_BEACON_LIST
-      for beacon in beacon_list:
-        if beacon['id'] == beacon_id:
-          return beacon
-      return None
+      return dash_api_mock.beacon_info(beacon_id)
     else:
       url = "{base}gadgets/{bid}".format(base=BASE_URL, bid=beacon_id)
       headers = _get_user_header()
@@ -193,7 +180,7 @@ def get_detected_hubs(gadget_id, query_id=None):
                   최초 30개 이후 연속된 data를 받는다.
   """
   if apis.IS_DEV:
-    return dash_api_mock.get_detected_hubs(gadget_id)
+    return dash_api_mock.make_get_detected_hubs(gadget_id)
   try:
     url = "{base}gadgets/{gid}/location".format(base=BASE_URL, gid=gadget_id)
     end_ts = time.time()
@@ -243,7 +230,7 @@ def get_detected_beacons(hub_id, query_id=None):
                   최초 30개 이후 연속된 data를 받는다.
   """
   if apis.IS_DEV:
-    return dash_api_mock.get_detected_beacons(hub_id)
+    return dash_api_mock.make_get_detected_beacons(hub_id)
   try:
     url = "{base}hubs/{hid}/location".format(base=BASE_URL, hid=hub_id)
     end_ts = time.time()
