@@ -246,8 +246,9 @@ def get_res_path():
   return  path
 
 
-def get_static_path():
-  path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'base',
+def get_static_path(name=None):
+  dir_name = name if name else "base"
+  path = os.path.join(os.path.dirname(os.path.abspath(__file__)), dir_name,
                       'static')
   return  path
 

@@ -4566,6 +4566,12 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     color: #b1b2b2;
     size: 12px;
 }
+.mapView {
+    height: 77vh;
+}
+.width-96-per {
+    width: 96% !important;
+}
 
 /* keyser custom */
 .site_title img {
