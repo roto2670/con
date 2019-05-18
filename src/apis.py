@@ -10,6 +10,7 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import json
+import uuid
 import logging
 
 import requests  # noqa : pylint: disable=import-error
@@ -294,8 +295,8 @@ def update_android_key(organization_id, kind, secret, availables):
   # availables : {"(string) gadget kind": ["(optional)(int) model number"], ..}
   url = BASE_URL + 'developers/' + organization_id + '/keys/' + kind + "/android"
   data = {
-      "secret": secret
-      #"availables": availables
+      "secret": secret,
+      "availables": availables
   }
   try:
     if IS_DEV:
@@ -346,8 +347,8 @@ def update_ios_key(organization_id, kind, cert, secret, is_dev, availables):
   data = {
       "cert": cert,
       "secret": secret,
-      "stage": is_dev
-      #"availables": availables
+      "stage": is_dev,
+      "availables": availables
   }
   try:
     if IS_DEV:
@@ -482,17 +483,19 @@ def get_endpoint_result(gadget_id, task_id):
 # {{{  product
 
 
-def create_product(product_name, developer_id):
+def create_product(product_id, keyword, developer_id):
   url = BASE_URL + 'product'
   data = {
-      "name": product_name,
+      "name": product_id,
+      "keyword": keyword,
       "developer_id": developer_id
   }
   try:
     if IS_DEV:
       _test_data = {
-          "id": product_name,
+          "id": product_id,
           "developer_id": developer_id,
+          "keyword": keyword,
           "key": "df4f925b5233fc50b1a298e878d85367",
           "hook_url": "",
           "hook_client_key": ""
@@ -613,7 +616,8 @@ def create_org(email):
   try:
     if IS_DEV:
       _test_data = {
-          "id" : "993a39cdeed84d72851efe581b9a74ed",
+          #"id" : "993a39cdeed84d72851efe581b9a74ed",
+          "id" : uuid.uuid4().hex,
           "users" : [],
           "products": [],
           "tokens": {"access": "d45eb188dd4511251ae7073a447050ad"},
@@ -864,4 +868,32 @@ def register_sub_domain(gadget_id, sub_name, domain_name):
         return False
   except:
     logging.exception("Raise error while register sub domain.")
+    return None
+
+
+def register_or_update_stream_product(product_id, hub_kind, up_product, down_model):
+  """http://i.narantech.com/mib-rest/#api-Products-register_product_stream
+  """
+  url = "{base}products/{pid}/stream".format(base=BASE_URL, pid=product_id)
+  data = {
+      "hub-kind": hub_kind,
+      "up_product": up_product,
+      "down_model": down_model
+  }
+  try:
+    if IS_DEV:
+      return True
+    else:
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      if resp.ok:
+        value = resp.json()
+        logging.info("Register or update product stream. resp : %s, data : %s",
+                     value, data)
+        return value
+      else:
+        logging.warning("Failed to register or update product stream. data : %s",
+                        data)
+        return False
+  except:
+    logging.exception("Raise error while register or update stream product.")
     return None

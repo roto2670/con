@@ -14,8 +14,8 @@ import common
 
 
 # Specification
-OLD_REQUIRED_KEY = set(['product', 'version', 'requests', 'events'])
-NEW_REQUIRED_KEY = set(['product', 'type', 'version', 'requests', 'events'])
+OLD_REQUIRED_KEY = set(['product', 'version', 'requests', 'events', 'pid'])
+NEW_REQUIRED_KEY = set(['product', 'type', 'version', 'requests', 'events', 'pid'])
 
 
 def _check_key(key_list):
@@ -47,7 +47,8 @@ def _check_version_format(version):
     return False
 
 
-def check_validate_specification(product_id, product_type, json_content):
+def check_validate_specification(product_id, product_type, product_keyword,
+                                 json_content):
   error_title = common.get_msg("endpoints.upload.fail_title")
   if not _check_key(json_content.keys()):
     msg = common.get_msg("endpoints.upload.fail_message_required_key")
@@ -61,8 +62,14 @@ def check_validate_specification(product_id, product_type, json_content):
     common.set_error_message(error_title, msg)
     return False
 
-  if json_content['product'] != product_id:
+  if json_content['pid'] != product_id:
     msg = common.get_msg("endpoints.upload.fail_message_not_equal_product")
+    logging.warning(msg)
+    common.set_error_message(error_title, msg)
+    return False
+
+  if json_content['product'] != product_keyword:
+    msg = common.get_msg("endpoints.upload.fail_message_not_equal_product_keyword")
     logging.warning(msg)
     common.set_error_message(error_title, msg)
     return False

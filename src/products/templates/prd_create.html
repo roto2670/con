@@ -49,13 +49,21 @@
 
             <div class="x_content">  <!-- start x_content -->
               <br />
-              <form id="create" class="form-horizontal form-label-left" method="post">
+              <form action="/products/create" class="form-horizontal form-label-left" method="post">
 
                 <div class="form-group">
                   <label class="control-label col-md-3 col-sm-3 col-xs-12" for="code">ID <span class="required">*</span>
                   </label>
                   <div class="col-md-6 col-sm-6 col-xs-12">
                     <input type="text" id="code" name="code" required="required" maxlength="10" onkeyup="this.value=this.value.replace(/[^a-zA-Z]/g,'');"
+                        class="form-control col-md-7 col-xs-12 only-eng only-lower">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="keyword">Keyword <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="keyword" name="keyword" required="required" maxlength="10" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'');"
                         class="form-control col-md-7 col-xs-12 only-eng only-lower">
                   </div>
                 </div>
