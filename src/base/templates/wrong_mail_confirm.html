@@ -1,0 +1,40 @@
+{% extends "base_site.html" %}
+
+{% block title %} Invalid Email {% endblock title %}
+
+{% block stylesheets %}
+{{ super() }}
+{% endblock stylesheets %}
+
+{% block topSidebar %}{% endblock topSidebar%}
+{% block sidebar %}{% endblock sidebar %}
+{% block top_navigation %}{% endblock top_navigation %}
+
+{% block content %}
+  <div class="col-ms-12 info_page">
+    <div class="col-middle">
+      <div class="text-center text-left">
+        <h1>
+          Invalid Email Link
+          <br>
+          <br>
+        </h1>
+        <h4>
+          <br>
+          <br>This is the Invalid Link. Please check the email again.
+          <br>
+          <br>To send mail again, please the button below.
+          <br>
+        </h4>
+          <br><a href="/verified">Resend</a>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block footer %}{% endblock footer %}
+
+{% block javascripts %}
+  {{ super() }}
+{% endblock javascripts %}
+

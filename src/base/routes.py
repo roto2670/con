@@ -78,6 +78,7 @@ def send_verified_email():
   auth_url = request.host_url + 'verified/confirm?key=' + key
   mail.send_about_verified(current_user.email, auth_url)
   in_apis.create_email_auth(current_user.email, key, current_user.id)
+  logging.info("Send verified email. Email : %s", current_user.email)
 
 
 def _is_confirm(email_auth):
@@ -103,6 +104,7 @@ def confirm_verified_email():
   if not email_auth:
     logging.warning("Can not find email auth. current user : %s, key : %s",
                     current_user.email, key)
+    return render_template('wrong_mail_confirm.html')
 
   if email_auth.email != current_user.email:
     logout_user()
