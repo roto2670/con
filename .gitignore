@@ -65,3 +65,6 @@ maint/prota_addr
 *.idea/
 
 .vscode
+
+src/base/static/dashboard/workschedule/
+
