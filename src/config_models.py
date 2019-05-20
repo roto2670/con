@@ -12,7 +12,7 @@
 
 # 3rd party
 from sqlalchemy import ForeignKey  # noqa : pylint: disable=import-error
-from sqlalchemy import Column, DateTime, String  # noqa : pylint: disable=import-error
+from sqlalchemy import Column, DateTime, String, Text  # noqa : pylint: disable=import-error
 
 from base import db
 
@@ -24,7 +24,7 @@ class _Footer(db.Model):
   text = Column(String(75))
   file_path = Column(String(225))
   file_names = Column(String(225))
-  image_uri = Column(String(75))
+  image_uri = Column(Text)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   organization_id = Column(String(75))
