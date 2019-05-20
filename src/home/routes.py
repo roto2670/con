@@ -221,7 +221,9 @@ def product_index(product_id):
   infos = _get_product_info(product_id)
   ep_infos = _get_endpoint_info(product_id)
   in_apis.update_user_by_ip(current_user.id, util.get_ip_addr())
-  return render_template('index.html', infos=infos, ep_infos=ep_infos)
+  has_ep_infos = True if json.loads(ep_infos) else False
+  return render_template('index.html', infos=infos, ep_infos=ep_infos,
+                         has_ep_infos=has_ep_infos)
 
 
 @blueprint.route('/<template>')
