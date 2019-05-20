@@ -122,6 +122,27 @@
                             $(".accordion").append(addObj);
                             var wrapper = document.getElementById('v-' + logId);
                             var tree = jsonTree.create(log, wrapper);
+                          } else if (log.body !== undefined && log.body != null) {
+                            var logId = log._t.toString().replace('.', ''),
+                                payLoad = JSON.stringify(log.body).slice(0, 90).replace(/\\/g, ''),
+                                timestamp = logId.substring(0, 10) * 1000,
+                                retVal = new Date(timestamp).toLocaleString('eu');
+                            index++;
+                            var addObj= "<div class = 'panel'>" +
+                                          "<a class='panel-heading' role= 'tab' id= 'heading" + index + "' data-toggle='collapse' data-parent= '#accordion'" +
+                                            "href='#" + logId + "' aria-expanded='true' aria-controls='" + logId + "'>" +
+                                            "<h3 class='panel-title'>" + retVal + " " + payLoad + "</h3>" +
+                                          "</a>" +
+                                          "<div id='" + logId + "' class='panel-collapse collapse' role='tabpanel' aria-labelledby='heading+" + index + "'>" +
+                                            "<div class='panel-body'>" +
+                                              "<div id='v-" + logId + "'></div>" +
+                                            "</div>" +
+                                        "</div>"
+
+                            $(".accordion").append(addObj);
+                            var wrapper = document.getElementById('v-' + logId);
+                            var tree = jsonTree.create(log, wrapper);
+
                           }
                         });
 

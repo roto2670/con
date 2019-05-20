@@ -128,8 +128,13 @@
                 <div class="form-group">
                   <label class="control-label col-md-3 col-sm-3 col-xs-12">Product Type <span class="required">*</span></label>
                   <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" id="typ" name="typ" required="required" value="{{ product_type}}"
-                        class="form-control col-md-7 col-xs-12 only-eng only-lower" readonly>
+                    {% if product_type == 0 %}
+                      <input type="text" id="typ" name="typ" required="required" value="BLE"
+                          class="form-control col-md-7 col-xs-12 only-eng only-lower" readonly>
+                    {% else %}
+                      <input type="text" id="typ" name="typ" required="required" value="HTTP"
+                          class="form-control col-md-7 col-xs-12 only-eng only-lower" readonly>
+                    {% endif %}
                   </div>
                 </div>
                 <div class="form-group">
