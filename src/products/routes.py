@@ -477,11 +477,19 @@ def create_import_product():
     in_apis.update_fork_product(key)
     parent_product = in_apis.get_product(parent_prd_id)
     prd_ret = apis.create_product(prd_id, prd_keyword, current_user.organization_id)
+    if not prd_ret:
+      logging.warning("Failed to create product. Ret : %s, prd id : %s, keyword : %s",
+                      prd_ret, prd_id, prd_keyword)
+      abort(500)
     in_apis.create_product_to_import(prd_name, prd_ret, prd_type, parent_prd_id)
     parent_model = in_apis.get_model(parent_model_id)
 
     code = 0
     model_ret = apis.create_model(prd_id, code, model_name)
+    if not model_ret:
+      logging.warning("Failed to create model. Ret : %s, code : %s, name : %s",
+                      model_ret, code, model_name)
+      abort(500)
     model = in_apis.create_model_import(model_name, code, parent_model.typ,
                                         prd_id, current_user.email,
                                         parent_model_id)

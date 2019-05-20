@@ -286,8 +286,13 @@ def _get_footer():
       footer = in_config_apis.get_footer_by_organization(current_user.organization_id)
       if footer:
         footer.file_names = json.loads(footer.file_names)
-        return footer
-  return None
+        data = {
+            "text": footer.text,
+            "image_uri": footer.image_uri,
+            "file_names": json.loads(footer.file_names)
+        }
+        return data
+  return {}
 
 
 def about_organization():
