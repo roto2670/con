@@ -279,11 +279,12 @@ def about_product():
 
 
 def _get_footer():
-  if current_user.organization_id:
-    footer = in_config_apis.get_footer_by_organization(current_user.organization_id)
-    if footer:
-      footer.file_names = json.loads(footer.file_names)
-      return footer
+  if current_user and current_user.is_authenticated:
+    if current_user.organization_id:
+      footer = in_config_apis.get_footer_by_organization(current_user.organization_id)
+      if footer:
+        footer.file_names = json.loads(footer.file_names)
+        return footer
   return None
 
 

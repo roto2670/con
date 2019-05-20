@@ -77,12 +77,12 @@ def default_location():
 @blueprint.route('/location/view', methods=['GET'])
 @util.require_login
 def get_location_map():
-  base_path = util.get_static_path()
-  org_path = os.path.join(base_path, 'dashboard', 'location',
+  base_path = util.get_static_path("dashboard")
+  org_path = os.path.join(base_path, 'location',
                           current_user.organization_id)
   file_path = os.path.join(org_path, LOCATION_MAP_COMMON_FILE_NAME)
   if os.path.exists(file_path):
-    return '/static/dashboard/location/' + current_user.organization_id + \
+    return '/static/location/' + current_user.organization_id + \
          "/" + LOCATION_MAP_COMMON_FILE_NAME
   else:
     return ""
@@ -93,8 +93,8 @@ def get_location_map():
 def upload_location_map():
   upload_file = request.files['file']
   content = upload_file.read()
-  base_path = util.get_static_path()
-  org_path = os.path.join(base_path, 'dashboard', 'location',
+  base_path = util.get_static_path("dashboard")
+  org_path = os.path.join(base_path, 'location',
                           current_user.organization_id)
   if not os.path.exists(org_path):
     os.makedirs(org_path)
@@ -102,5 +102,5 @@ def upload_location_map():
   with open(file_path, 'wb') as f:
     f.write(content)
   os.chmod(file_path, stat.S_IREAD)
-  return '/static/dashboard/location/' + current_user.organization_id + \
+  return '/static/location/' + current_user.organization_id + \
       "/" + LOCATION_MAP_COMMON_FILE_NAME
