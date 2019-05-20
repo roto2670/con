@@ -28,7 +28,6 @@ def get_inforamtion():
   :param : None
   :return : infomation of dict
   """
-
   if apis.IS_DEV:
     data = {
         "product_id": "mibs"
