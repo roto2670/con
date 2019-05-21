@@ -61,16 +61,19 @@ def get_user(email_addr):
       }
       return _test_data
     else:
+      logging.info("Get user Request. Url : %s, params : %s", url, params)
       resp = requests.get(url, headers=HEADERS, params=params)
       if resp.ok:
         value = resp.json()
+        logging.warning("Get User Resp : %s", value)
         return value['v']
       else:
-        logging.warning("Get User Response. Code : %s, Text : %s",
+        logging.warning("Failed to get user response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while get user. url : %s, params : %s",
+                      url, params)
     return None
 
 
@@ -116,16 +119,19 @@ def get_gadget_list_by_tester(product_id):
       ]
       return _test_data
     else:
+      logging.info("Get gadget list by tester Request. Url : %s", url)
       resp = requests.get(url, headers=HEADERS)
       if resp.ok:
         value = resp.json()
+        logging.info("Get gadget list by tester resp : %s", value)
         return value['v']
       else:
-        logging.warning("Register android key Response. Code : %s, Text : %s",
+        logging.warning("Failed to get gadget list by tester Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while get gadget list by tester. url : %s",
+                      url)
     return None
 
 
@@ -273,16 +279,18 @@ def get_gadget_list(product_id):
       return _test_data
     else:
       headers = _get_user_header(is_json=True)
+      logging.info("Get gadget list Request. Url : %s", url)
       resp = requests.get(url, headers=headers)
       if resp.ok:
         value = resp.json()
+        logging.info("Get gadget list resp : %s", value)
         return value
       else:
         logging.warning("Get Gadget List Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while get gadget list. url : %s", url)
     return None
 
 
@@ -303,17 +311,19 @@ def update_android_key(organization_id, kind, secret, availables):
       _test_data = True
       return _test_data
     else:
+      logging.info("Update android key Request. Url : %s, data : %s", url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
-        logging.info("Update android key. url : %s, data : %s", url, data)
+        logging.info("Update android key resp : %s", value)
         return value['v']
       else:
-        logging.warning("Register android key Response. Code : %s, Text : %s",
+        logging.warning("Failed to register android key Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while update android key. url : %s, data : %s",
+                      url, data)
     return None
 
 
@@ -325,13 +335,14 @@ def delete_android_key(organization_id, kind):
       _test_data = True
       return _test_data
     else:
+      logging.info("Delete android key Request. Url : %s", url)
       resp = requests.delete(url, headers=HEADERS)
       if resp.ok:
         value = resp.json()
-        logging.info("Delete android key. url : %s", url)
+        logging.info("Delete android key resp : %s", value)
         return value['v']
       else:
-        logging.warning("Delete android key response. Code : %s, Text : %s",
+        logging.warning("Failed to delete android key response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
@@ -355,17 +366,19 @@ def update_ios_key(organization_id, kind, cert, secret, is_dev, availables):
       _test_data = True
       return _test_data
     else:
+      logging.info("Update ios key Request. Url : %s, data : %s", url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
-        logging.info("Update ios key. url : %s, data : %s", url, data)
+        logging.info("Update ios key resp %s", value)
         return value['v']
       else:
-        logging.warning("Register android key Response. Code : %s, Text : %s",
+        logging.warning("Failed to Register ios key Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error")
+    logging.exception("Raise error while register ios key. url : %s, data : %s",
+                      url, data)
     return None
 
 
@@ -377,18 +390,18 @@ def delete_ios_key(organization_id, kind):
       _test_data = True
       return _test_data
     else:
+      logging.info("Delete ios key Request. Url : %s", url)
       resp = requests.delete(url, headers=HEADERS)
       if resp.ok:
         value = resp.json()
-        logging.info("Delete ios key. url : %s", url)
+        logging.info("Delete ios key resp : %s", value)
         return value['v']
       else:
         logging.warning("Delete ios key response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error while delete ios key. org : %s kind : %s",
-                      organization_id, kind)
+    logging.exception("Raise error while delete ios key. url : %s", url)
     return None
 
 
@@ -402,20 +415,21 @@ def update_allow_noti_key(organization_id, kind, availables):
       _test_data = True
       return _test_data
     else:
+      logging.info("Update allow noti key Request. Url : %s, data : %s",
+                   url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
-        logging.info("Update ios key. url : %s, data : %s", url, data)
+        logging.info("Update ios key resp : %s", value)
         return value['v']
       else:
-        logging.warning("Register android key Response. Code : %s, Text : %s",
+        logging.warning("Failed to update allow noti key Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error")
+    logging.exception("Raise error while update allow noti key. url : %s, data : %s",
+                      url, data)
     return None
-
-
 
 
 # {{{ Endpoints
@@ -432,48 +446,57 @@ def register_specifications(product_id, version, specification):
       _test_data = True
       return _test_data
     else:
+      logging.info("Register specifications Request. Url : %s, data : %s",
+                   url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
+        logging.info("Register specifications resp : %s", value)
         return value['v']
       else:
-        logging.warning("Register specification Response Code : %s, Text : %s",
+        logging.warning("FAiled to Register specification Response Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while register specifications. url : %s, data : %s",
+                      url, data)
     return None
 
 
 def call_endpoint(gadget_id, endpoint_name, data):
   url = BASE_URL + "gadgets/" + gadget_id + "/endpoints/" + endpoint_name
   try:
+    logging.info("Call endpoint request. Url : %s, data : %s", url, data)
     resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
     if resp.ok:
       value = resp.json()
+      logging.info("Call endpoint resp : %s", value)
       return value['v']
     else:
       logging.warning(
-          "Call endpoint Response. gadget : %s, endpoint : %s, Code : %s, Text : %s",
+          "Failed to call endpoint Response. gadget : %s, endpoint : %s, Code : %s, Text : %s",
           gadget_id, endpoint_name, resp.status_code, resp.text)
       return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while call endpoint. url : %s, data : %s",
+                      url, data)
     return None
 
 
 def get_endpoint_result(gadget_id, task_id):
   url = BASE_URL + "gadgets/" + gadget_id + "/results/" + task_id
   try:
+    logging.info("Get endpoint result request. Url : %s", url)
     resp = requests.get(url, headers=HEADERS)
     if resp.ok:
       value = resp.json()
+      logging.info("Get endpoint result resp : %s", value)
       return value['v']
     else:
-      logging.warning("Get endpoint result Response. Code : %s, Text : %s",
+      logging.warning("Failed to Get endpoint result Response. Code : %s, Text : %s",
                       resp.status_code, resp.text)
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while get endpoint result. url : %s", url)
     return None
 
 
@@ -505,16 +528,19 @@ def create_product(product_id, keyword, developer_id):
       # mibio : df4f925b5233fc50b1a298e878d85367
       return _test_data
     else:
+      logging.info("Create product request. url : %s, data : %s", url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
+        logging.info("Create product resp : %s", value)
         return value['v']
       else:
-        logging.warning("Create product Response. Code : %s, Text : %s",
+        logging.warning("Failed to create product Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while create product. url : %s, data : %s",
+                      url, data)
     return None
 
 
@@ -531,17 +557,19 @@ def update_about_hook(product_id, stage, hook_url=None, hook_client_key=None):
     return _test_data
   else:
     try:
+      logging.info("Update about hook request. url : %s, data : %s", url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
-        logging.info("Update about hook. url : %s, data : %s", url, data)
+        logging.info("Update about hook resp : %s", value)
         return value['v']
       else:
-        logging.warning("Update about hook Response. Code : %s, Text : %s",
+        logging.warning("Failed to update about hook Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
     except:
-      logging.exception("Raise error.")
+      logging.exception("Raise error while update about hook. url : %s, data : %s",
+                        url, data)
       return None
 
 
@@ -558,17 +586,19 @@ def update_product_stage(product_id, product_stage, model_number_dict, stage):
     return _test_data
   else:
     try:
+      logging.info("Update product stage request. url : %s, data : %s", url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
-        logging.info("Update product stage. url : %s, data : %s", url, data)
+        logging.info("Update product stage resp : %s", value)
         return value['v']
       else:
-        logging.warning("Update product stage Response. Code : %s, Text : %s",
+        logging.warning("Failed to update product stage Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
     except:
-      logging.exception("Raise error.")
+      logging.exception("Raise error while update product stage. url : %s, data ; %s",
+                        url, data)
       return None
 
 
@@ -589,16 +619,19 @@ def create_model(product_id, model_number, model_name):
       _test_data = True
       return _test_data
     else:
+      logging.info("Create model request. url : %s, data : %s", url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
+        logging.info("Create model resp : %s", value)
         return value['v']
       else:
-        logging.warning("Create model Response. Code : %s, Text : %s",
+        logging.warning("Failed to create model Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while create model. url : %s, data : %s",
+                      url, data)
     return None
 
 
@@ -625,16 +658,19 @@ def create_org(email):
       }
       return _test_data
     else:
+      logging.info("Create org request. url : %s, data : %s", url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
+        logging.info("Create org resp : %s", value)
         return value['v']
       else:
-        logging.warning("Create Organization Response. Code : %s, Text : %s",
+        logging.warning("Failed to create Organization Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while create org. url : %s, data : %s",
+                      url, data)
     return None
 
 
@@ -651,16 +687,18 @@ def get_org(organization_id):
       }
       return _test_data
     else:
+      logging.info("Get org request. url : %s", url)
       resp = requests.get(url, headers=HEADERS)
       if resp.ok:
         value = resp.json()
+        logging.info("Get org resp : %s", value)
         return value['v']
       else:
-        logging.warning("Create Organization Response. Code : %s, Text : %s",
+        logging.warning("Failed to get Organization Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while get org. url : %s", url)
     return None
 
 
@@ -684,17 +722,18 @@ def register_firmware(product_id, model_number, firmware_version, firmware_binar
       _test_data = "https://test.firmware"
       return _test_data
     else:
+      logging.info("Register firmware request. url : %s", url)
       resp = requests.post(url, headers=headers, data=firmware_binary)
       if resp.ok:
         value = resp.json()
-        logging.info("Register firmware. url : %s", url)
+        logging.info("Register firmware resp : %s", value)
         return value['v']
       else:
-        logging.warning("Register firmware Response. Code : %s, Text : %s",
+        logging.warning("Failed to Register firmware Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while register firmware. url : %s", url)
     return None
 
 
@@ -705,18 +744,18 @@ def delete_firmware(product_id, model_number, firmware_version):
     if IS_DEV:
       return True
     else:
+      logging.info("Delete firmware request. url :%s", url)
       resp = requests.delete(url, headers=HEADERS)
       if resp.ok:
         value = resp.json()
-        logging.info("Delete firmware. url : %s", url)
+        logging.info("Delete firmware resp : %s", value)
         return value['v']
       else:
-        logging.warning("Delete firmware Response. Code : %s, Text : %s",
+        logging.warning("Failed to Delete firmware Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error while delete firmware. P: %s, M: %s, F: %s",
-                      product_id, model_number, firmware_version)
+    logging.exception("Raise error while delete firmware. url : %s", url)
     return None
 
 
@@ -738,21 +777,24 @@ def register_tester(organization_id, product_id, tester_email, stage):
       _test_data = True
       return _test_data
     else:
+      logging.info("Register tester request. url : %s, data : %s", url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
-        logging.info("Register tester.  url : %s, data : %s", url, data)
+        logging.info("Register tester resp %s", value)
         return value['v']
       elif resp.status_code == 403:
-        logging.debug("Status 403. %s user not FTL.", tester_email)
+        logging.debug("Status 403. %s user not FTL. code : %s, text :%s",
+                      tester_email, resp.status_code, resp.text)
         value = resp.json()
         return value['v']
       else:
-        logging.warning("Regsiter tester Response. Code : %s, Text : %s",
+        logging.warning("Failed to Regsiter tester Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while register tester. url : %s, data : %s",
+                      url, data)
     return None
 
 
@@ -765,17 +807,19 @@ def delete_tester(organization_id, product_id, tester_email):
       _test_data = True
       return _test_data
     else:
+      logging.info("Delete tester request. url : %s, param : %s", url, params)
       resp = requests.delete(url, headers=HEADERS, params=params)
       if resp.ok:
         value = resp.json()
-        logging.info("Delete Tester. url : %s, param : %s", url, params)
+        logging.info("Delete Tester resp : %s", value)
         return value['v']
       else:
-        logging.warning("Register tester Response. Code : %s, Text : %s",
+        logging.warning("Failed to delete tester Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return None
   except:
-    logging.exception("Raise error.")
+    logging.exception("Raise error while delete tester. url : %s, params : %s",
+                      url, params)
     return None
 
 
@@ -857,17 +901,19 @@ def register_sub_domain(gadget_id, sub_name, domain_name):
       return True
     else:
       headers = _get_user_header(is_json=True)
+      logging.info("Register sub domain request. url : %s, data : %s", url, data)
       resp = requests.post(url, headers=headers, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
-        logging.info("Register sub domain resp : %s, data : %s", value, data)
+        logging.info("Register sub domain resp : %s", value)
         return value
       else:
-        logging.warning("Falied to register sub domain. url : %s, data: %s, gid : %s",
-                        url, data, gadget_id)
+        logging.warning("Falied to register sub domain. code : %s, text : %s",
+                        resp.status_code, resp.text)
         return False
   except:
-    logging.exception("Raise error while register sub domain.")
+    logging.exception("Raise error while register sub domain. url : %s, data : %s",
+                      url, data)
     return None
 
 
@@ -884,16 +930,18 @@ def register_or_update_stream_product(product_id, hub_kind, up_product, down_mod
     if IS_DEV:
       return True
     else:
+      logging.info("Register or update stream product request. url : %s, data : %s",
+                   url, data)
       resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
       if resp.ok:
         value = resp.json()
-        logging.info("Register or update product stream. resp : %s, data : %s",
-                     value, data)
+        logging.info("Register or update product stream resp : %s", value)
         return value
       else:
-        logging.warning("Failed to register or update product stream. data : %s",
-                        data)
+        logging.warning("Failed to register or update product stream. code : %s, text : %s",
+                        resp.status_code, resp.text)
         return False
   except:
-    logging.exception("Raise error while register or update stream product.")
+    logging.exception("Raise error while register or update stream product. url : %s, data : %s",
+                      url, data)
     return None
