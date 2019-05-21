@@ -55,10 +55,12 @@ def update_scanner_location(hub_obj):
                                          hub_id=hub_obj['id'])
       headers = _get_user_header(is_json=True)
       data = json.dumps({"custom": hub_obj['custom']})
+      logging.info("Update scanner location request. url : %s, data : %s",
+                   url, data)
       resp = requests.post(url, headers=headers, data=data)
       if resp.ok:
         logging.info("update scanner location successful. Code : %s, Text : %s",
-                    resp.status_code, resp.text)
+                     resp.status_code, resp.text)
         return True
       else:
         logging.warning("Failed update scanner location. Code : %s, Text : %s",
@@ -91,6 +93,7 @@ def get_scanner_list():
         scanner_list += ret
     return scanner_list
 
+
 def _get_scanner_list(kind):
   """
   :param : kind
@@ -106,17 +109,21 @@ def _get_scanner_list(kind):
         'kind': 0,
         'issuer': 1
     }
+    logging.info("Get scanner list request. url :%s, params : %s", url, params)
     resp = requests.get(url, headers=headers, params=params)
     if resp.ok:
       scanners = resp.json()
+      logging.info("Get scanner list resp : %s", scanners)
       return scanners
     else:
       logging.warning("Failed get scanner list. Code : %s, Text : %s",
                       resp.status_code, resp.text)
       return []
   except:
-    logging.exception("Raise error while get scanner list.")
+    logging.exception("Raise error while get scanner list. url : %s, params : %s",
+                      url, params)
     return None
+
 
 def get_beacon_list(product_id):
   """
@@ -132,18 +139,20 @@ def get_beacon_list(product_id):
       url = "{base}products/{pid}/gadgets".format(base=THIRD_BASE_URL,
                                                   pid=product_id)
       headers = _get_user_header()
+      logging.info("Get beacon list request. url : %s", url)
       resp = requests.get(url, headers=headers)
       if resp.ok:
         gadgets = resp.json()
+        logging.info("Get beacon list resp : %s", gadgets)
         return gadgets
       else:
         logging.warning("Failed to get beacon list. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return []
   except:
-    logging.exception("Raise error while get beacon list. pid : %s",
-                      product_id)
+    logging.exception("Raise error while get beacon list. url : %s", url)
     return None
+
 
 def get_beacon_info(beacon_id):
   """
@@ -157,17 +166,18 @@ def get_beacon_info(beacon_id):
     else:
       url = "{base}gadgets/{bid}".format(base=BASE_URL, bid=beacon_id)
       headers = _get_user_header()
+      logging.info("Get beacon info request. url : %s", url)
       resp = requests.get(url, headers=headers)
       if resp.ok:
         ret = resp.json()
+        logging.info("Get beacon info resp : %s", ret)
         return ret['v']
       else:
         logging.warning("Failed to get beacon info. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return {}
   except:
-    logging.exception("Raise error while get beacon info. beacon id : %s",
-                      beacon_id)
+    logging.exception("Raise error while get beacon info. url : %s", url)
     return None
 
 
@@ -181,44 +191,50 @@ def get_detected_hubs(gadget_id, query_id=None):
   """
   if apis.IS_DEV:
     return dash_api_mock.make_get_detected_hubs(gadget_id)
+  url = "{base}gadgets/{gid}/location".format(base=BASE_URL, gid=gadget_id)
+  end_ts = time.time()
+  start_ts = end_ts - OFFSET_SEC
+  params = {
+      'start_ts': start_ts,
+      'end_ts': end_ts
+  }
+  headers = _get_user_header()
   try:
-    url = "{base}gadgets/{gid}/location".format(base=BASE_URL, gid=gadget_id)
-    end_ts = time.time()
-    start_ts = end_ts - OFFSET_SEC
-    params = {
-        'start_ts': start_ts,
-        'end_ts': end_ts
-    }
-    headers = _get_user_header()
     if not query_id:
+      logging.info("Get detected hubs requests. url : %s, params : %s",
+                   url, params)
       resp = requests.get(url, headers=headers, params=params)
       if resp.ok:
         value = resp.json()
         beacons = value['v']
+        logging.info("Get detected hubs resp : %s", beacons)
         return beacons
       else:
-        logging.warning("Get Detected Beacons Response. Code : %s, Text : %s",
+        logging.warning("Failed to Get Detected Beacons Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return {}
     else:
       params['query_id'] = query_id
+      logging.info("Get detected hubs requests. url : %s, params : %s",
+                   url, params)
       query_resp = requests.get(url, headers=headers, params=params)
       if query_resp.ok:
         query_val = query_resp.json()
         query_data = query_val['v']
+        logging.info("Get detected hubs resp : %s", query_data)
         if query_data:
           return query_data
         else:
           query_data['query_id'] = None
           return query_data
       else:
-        logging.warning("Get Detected Beacons Response. Code : %s, Text : %s",
+        logging.warning("Failed to Get Detected Beacons Response. Code : %s, Text : %s",
                         query_resp.status_code, query_resp.text)
         return {}
   except:
-    logging.exception("Raise error while detected hub. gadget_id : %s", gadget_id)
+    logging.exception("Raise error while detected hub. url : %s, params : %s",
+                      url, params)
     return None
-
 
 
 def get_detected_beacons(hub_id, query_id=None):
@@ -231,41 +247,47 @@ def get_detected_beacons(hub_id, query_id=None):
   """
   if apis.IS_DEV:
     return dash_api_mock.make_get_detected_beacons(hub_id)
+  url = "{base}hubs/{hid}/location".format(base=BASE_URL, hid=hub_id)
+  end_ts = time.time()
+  start_ts = end_ts - OFFSET_SEC
+  params = {
+      'start_ts': start_ts,
+      'end_ts': end_ts
+  }
+  headers = _get_user_header()
   try:
-    url = "{base}hubs/{hid}/location".format(base=BASE_URL, hid=hub_id)
-    end_ts = time.time()
-    start_ts = end_ts - OFFSET_SEC
-    params = {
-        'start_ts': start_ts,
-        'end_ts': end_ts
-    }
-    headers = _get_user_header()
     if not query_id:
+      logging.info("Get detected beacons request. url : %s, params : %s",
+                   url, params)
       resp = requests.get(url, headers=headers, params=params)
       if resp.ok:
         value = resp.json()
         beacons = value['v']
+        logging.info("Get detected beacons resp : %s", beacons)
         return beacons
       else:
-        logging.warning("Get Detected Beacons Response. Code : %s, Text : %s",
+        logging.warning("Failed to Get Detected Beacons Response. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return {}
     else:
       params['query_id'] = query_id
+      logging.info("Get detected beacons request. url : %s, params : %s",
+                   url, params)
       query_resp = requests.get(url, headers=headers, params=params)
       if query_resp.ok:
         query_val = query_resp.json()
         query_data = query_val['v']
+        logging.info("Get detected beacons resp : %s", query_data)
         if query_data:
           return query_data
         else:
           query_data['query_id'] = None
           return query_data
       else:
-        logging.warning("Get Detected Beacons Response. Code : %s, Text : %s",
+        logging.warning("Failed to Get Detected Beacons Response. Code : %s, Text : %s",
                         query_resp.status_code, query_resp.text)
         return {}
   except:
-    logging.exception("Raise error while get detected beacons. hid : %s",
-                      hub_id)
+    logging.exception("Raise error while get detected beacons. url : %s, params : %s",
+                      url, params)
     return None
