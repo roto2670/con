@@ -174,7 +174,9 @@ def _get_build_number(version):
 def download_header_file(product_id, specification_id, model_id):
   content = in_apis.get_specifications(specification_id)
   model = in_apis.get_model(model_id)
-  firmware_list = in_apis.get_firmware_list_order_by_version(content.version, model.code)
+  firmware_list = in_apis.get_firmware_list_order_by_version(model_id,
+                                                             content.version,
+                                                             model.code)
   if firmware_list:
     build_number = _get_build_number(firmware_list[0].version)
   else:

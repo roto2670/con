@@ -238,9 +238,12 @@ def tester(product_id):
                                                     current_user.organization_id)
     pre_level_list = in_apis.get_tester_list_by_pre_release(product_id,
                                                             current_user.organization_id)
+    invite_list = in_apis.get_invite_list_by_tester(product_id,
+                                                    current_user.organization_id)
     return render_template('prd_tester.html',
                            dev_level_list=dev_level_list,
-                           pre_level_list=pre_level_list)
+                           pre_level_list=pre_level_list,
+                           invite_list=invite_list)
   else:
     # TODO: Send email
     tester_email = request.form['newTesterEmail']
@@ -352,11 +355,11 @@ def change_tester_level(product_id, tester_id, level):
     if ret:
       _tester.level = level
       db.session.commit()
-      return redirect('products/' + product_id + '/tester')
+      return redirect('/products/' + product_id + '/tester')
     else:
       logging.warning("Failed to change tester level. Id : %s, ret : %s",
                       tester_id, ret)
-      return redirect('products/' + product_id + '/tester')
+      return redirect('/products/' + product_id + '/tester')
   else:
     logging.warning("Can not find tester. Id : %s", tester_id)
     return redirect('/products/' + product_id + '/tester')

@@ -777,8 +777,10 @@ def get_firmware(_id):
   return firmware
 
 
-def get_firmware_list_order_by_version(ep_version, model_code):
-  firmware_list = Firmware.query.filter_by(ep_version=ep_version, model_code=model_code).\
+def get_firmware_list_order_by_version(model_id, ep_version, model_code):
+  firmware_list = Firmware.query.filter_by(model_id=model_id,
+                                           ep_version=ep_version,
+                                           model_code=model_code).\
       order_by(desc(Firmware.last_updated_time)).all()
   return firmware_list
 
