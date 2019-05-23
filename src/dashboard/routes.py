@@ -3,8 +3,7 @@
 # Copyright 2017-2019 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
-# |   |_| |  |_|  |   | || |  |_|  |   |_| |
-# |       |       |   |_||_|       |       |
+# |   |_| |  |_|  |   | || |  |_|  |   |_| | # |       |       |   |_||_|       |       |
 # |  _    |       |    __  |       |  _    |
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
@@ -21,7 +20,8 @@ from dashboard import blueprint
 
 
 SCHEDULE_COMMON_FILE_NAME = '''schedule'''
-LOCATION_MAP_COMMON_FILE_NAME = '''location'''
+LOCATION_MAP_COMMON_FILE_NAME = '''location.png'''
+LOCATION_MAP_URI = "/dashboard/static/location/{org_id}/{file_name}"
 
 
 @blueprint.route('/', methods=['GET'])
@@ -82,8 +82,9 @@ def get_location_map():
                           current_user.organization_id)
   file_path = os.path.join(org_path, LOCATION_MAP_COMMON_FILE_NAME)
   if os.path.exists(file_path):
-    return '/static/location/' + current_user.organization_id + \
-         "/" + LOCATION_MAP_COMMON_FILE_NAME
+    uri = LOCATION_MAP_URI.format(org_id=current_user.organization_id,
+                                  file_name=LOCATION_MAP_COMMON_FILE_NAME)
+    return uri
   else:
     return ""
 
@@ -102,5 +103,7 @@ def upload_location_map():
   with open(file_path, 'wb') as f:
     f.write(content)
   os.chmod(file_path, stat.S_IREAD)
-  return '/static/location/' + current_user.organization_id + \
-      "/" + LOCATION_MAP_COMMON_FILE_NAME
+  uri = LOCATION_MAP_URI.format(org_id=current_user.organization_id,
+                                file_name=LOCATION_MAP_COMMON_FILE_NAME)
+  return uri
+
