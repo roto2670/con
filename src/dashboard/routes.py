@@ -61,6 +61,8 @@ def upload_workschedule():
   if not os.path.exists(org_path):
     os.makedirs(org_path)
   file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
+  if os.path.exists:
+    os.remove(file_path)
   with open(file_path, 'wb') as f:
     f.write(content)
   os.chmod(file_path, stat.S_IREAD)
@@ -100,6 +102,8 @@ def upload_location_map():
   if not os.path.exists(org_path):
     os.makedirs(org_path)
   file_path = os.path.join(org_path, LOCATION_MAP_COMMON_FILE_NAME)
+  if os.path.exists:
+    os.remove(file_path)
   with open(file_path, 'wb') as f:
     f.write(content)
   os.chmod(file_path, stat.S_IREAD)

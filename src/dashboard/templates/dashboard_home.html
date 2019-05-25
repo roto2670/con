@@ -9,29 +9,125 @@
 
 {% block content %}
   <div id="scroll-style-hidden" class="right_col" role="main">
-    <div class="">
+    <!-- top tiles -->
+    <div class="row tile_count">
+      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> Total Worker </span>
+        <div id="divWorker" class="count">0</div>
+      </div>
+      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> Total Equipment </span>
+        <div id="divEquip" class="count">0</div>
+      </div>
+      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+        <span><div id="divDate" class="count_top right-align"></div></span>
+        <div id="divTime" class="count right-align"></div>
+      </div>
+    </div>
 
-      <!-- start row -->
-      <div class="row">
+    <!-- start row -->
+    <div class="row">
 
-        <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="col-md-6 col-sm-6 col-xs-12">
           <div class="x_panel tile">
             <div class="x_title">
-              <h3>Dashboard</h3>
+              <h3>Location Tracking</h3>
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
-              <div id="locationTracking">
+            <!--
+            -->
+              <div class="mapView">
+                {% include "location/index.html" %}
               </div>
-              <!--
-                <script src="/static/dashboard/location/build.js"></script>
-              -->
             </div>
           </div>
         </div>
 
-      </div><!-- End row -->
-    </div>
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <div class="x_panel tile">
+            <div class="x_title">
+              <h3>Logs</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+            <!--
+              <div class="mapView">
+                {% include "location/index.html" %}
+              </div>
+            -->
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <div class="x_panel tile">
+            <div class="x_title">
+              <h3>Work Schedule</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <img src="" id="workSchedule" class="col-md-12 col-sm-12">
+            </div>
+          </div>
+        </div>
+
+    </div><!-- End row -->
   </div>
 
 {% endblock content %}
+
+{% block javascripts %}
+  {{ super()}}
+  <script>
+    var weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
+        month = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    function showClock(){
+        var currentDate = new Date(),
+            divTime = document.getElementById("divTime"),
+            divDate = document.getElementById("divDate");
+
+        var timeMsg = currentDate.getHours()+":";
+        timeMsg += currentDate.getMinutes()+":";
+        timeMsg += currentDate.getSeconds();
+        var dateMsg = month[currentDate.getMonth()] + " ";
+        dateMsg += currentDate.getDate() + " ";
+        dateMsg += "(" + weekday[currentDate.getDay()] + ")";
+        dateMsg += ", " + currentDate.getFullYear();
+
+        divTime.innerText = timeMsg;
+        divDate.innerText = dateMsg;
+        setTimeout(showClock, 1000);
+    }
+    showClock();
+
+    function getEquip() {
+      jQuery.get("/dash/total_equip").done(function(data){
+        var jsonData = JSON.parse(data);
+            divEquip = document.getElementById("divEquip");
+        divEquip.innerText = jsonData;
+        setTimeout(getEquip, 1000 * 60);  // 1m
+      });
+    }
+    //getEquip();
+
+    function getWorker() {
+      // TODO: total users?
+      jQuery.get("/dash/total_users").done(function(data){
+        var jsonData = JSON.parse(data);
+            divWorker = document.getElementById("divWorker");
+        divWorker.innerText = jsonData;
+        setTimeout(getWorker, 1000 * 60);  // 1m
+      });
+    }
+    //getWorker();
+
+    function getWorkSchedule() {
+      jQuery.get("/dashboard/workschedule/view").done(function(data){
+        var divWorkSchedule = document.getElementById("workSchedule");
+        divWorkSchedule.src = data;
+      });
+    }
+    getWorkSchedule();
+  </script>
+{% endblock javascripts %}

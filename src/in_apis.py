@@ -16,6 +16,7 @@ import datetime
 
 import pytz
 from flask_login import current_user  # noqa : pylint: disable=import-error
+from flask import abort, render_template  # noqa : pylint: disable=import-error
 from sqlalchemy.orm.session import make_transient  # noqa : pylint: disable=import-error
 from sqlalchemy import desc
 
@@ -161,8 +162,18 @@ def has_fork_product(model_id, product_id, organization_id):
 
 
 def get_product(product_id):
-  product = Product.query.filter_by(id=product_id).one_or_none()
-  return product
+  try:
+    product = Product.query.filter_by(id=product_id,
+                                      organization_id=current_user.organization_id).\
+        one_or_none()
+    if product:
+      return product
+    else:
+      raise Exception("This product(%s) does not belong to %s. user : %s",
+                      product_id, current_user.organization_id,
+                      current_user.email)
+  except:
+    abort(403)
 
 
 def get_product_by_key(product_key):
