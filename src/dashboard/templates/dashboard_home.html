@@ -20,6 +20,10 @@
         <div id="divEquip" class="count">0</div>
       </div>
       <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> Total Count </span>
+        <div id="divCount" class="count">0</div>
+      </div>
+      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
         <span><div id="divDate" class="count_top right-align"></div></span>
         <div id="divTime" class="count right-align"></div>
       </div>
@@ -35,8 +39,6 @@
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
-            <!--
-            -->
               <div class="mapView">
                 {% include "location/index.html" %}
               </div>
@@ -74,7 +76,6 @@
 
     </div><!-- End row -->
   </div>
-
 {% endblock content %}
 
 {% block javascripts %}
@@ -103,10 +104,11 @@
 
     function getEquip() {
       jQuery.get("/dash/total_equip").done(function(data){
-        var jsonData = JSON.parse(data);
+        var jsonData = JSON.parse(data),
             divEquip = document.getElementById("divEquip");
         divEquip.innerText = jsonData;
-        setTimeout(getEquip, 1000 * 60);  // 1m
+        setTotalCount();
+        setTimeout(getEquip, 1000 * 30);  // 30s
       });
     }
     //getEquip();
@@ -114,13 +116,21 @@
     function getWorker() {
       // TODO: total users?
       jQuery.get("/dash/total_users").done(function(data){
-        var jsonData = JSON.parse(data);
+        var jsonData = JSON.parse(data),
             divWorker = document.getElementById("divWorker");
         divWorker.innerText = jsonData;
+        setTotalCount();
         setTimeout(getWorker, 1000 * 60);  // 1m
       });
     }
     //getWorker();
+
+    function setTotalCount() {
+      var divCount = document.getElementById("divCount"),
+          divEquip = document.getElementById("divEquip"),
+          divWorker = document.getElementById("divWorker");
+      divCount.innerText = parseInt(divEquip.innerText) + parseInt(divWorker.innerText);
+    }
 
     function getWorkSchedule() {
       jQuery.get("/dashboard/workschedule/view").done(function(data){
@@ -129,5 +139,6 @@
       });
     }
     getWorkSchedule();
+
   </script>
 {% endblock javascripts %}
