@@ -20,6 +20,7 @@ from login import blueprint
 
 
 BASE_LOGO_URI = '''/static/images/logo--mib_console-color.svg'''
+SK_LOGO_URI = '''/static/images/logo-scs-temp.png'''
 
 
 @blueprint.route('/login', methods={'GET', 'POST'})

@@ -16,6 +16,8 @@ from flask_login import current_user
 
 import apis
 import util
+import models
+import in_apis
 import dash_apis
 import base.routes
 from dash import blueprint
@@ -41,7 +43,14 @@ def get_inforamtion():
       }
       return json.dumps(data)
     else:
-      return json.dumps({})
+      data = {}
+      prd_list = in_apis.get_product_list(current_user.organization.id)
+      for prd in prd_list:
+        if prd.typ == models.PRD_TYPE_BLE:
+          data["product_id"] = prd.id
+          base.routes.set_current_product(prd)
+          break
+      return json.dumps(data)
 
 
 @blueprint.route('/scanner/list', methods=["GET"])
@@ -72,7 +81,7 @@ def get_detected_beacons_by_hub(hub_id):
 @util.require_login
 def get_detected_hubs_by_beacon(gadget_id):
   """
-  :param : gadget_id 
+  :param : gadget_id
   :return : dist info (dict(max = 30))
   :content : gadget_id 가진 가젯을 기준으로 주변의 스캐너 거리정보를 가져온다.
   """
