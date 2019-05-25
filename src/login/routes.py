@@ -28,7 +28,8 @@ def login():
   if not current_user.is_authenticated:
     referrer = request.args['ref'] if 'ref' in request.args else None
     return current_app.extensions['firebase_auth'].login(referrer=referrer,
-                                                         logo_uri=BASE_LOGO_URI)
+                                                         logo_uri=BASE_LOGO_URI,
+                                                         default=True)
   else:
     user = in_apis.get_user(current_user.id)
     user.last_access_time = in_apis.get_datetime()

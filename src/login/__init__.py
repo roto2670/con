@@ -81,8 +81,8 @@ class FirebaseAuth:
         _scheme='http' if self.debug else 'https', **values
     )
 
-  def login(self, referrer=None, logo_uri=None):
-    default = True
+  def login(self, referrer=None, logo_uri=None, default=None):
+    default = True if default else False
     _referrer = referrer if referrer else ""
     return render_template('login.html', firebase_auth=self, referrer=_referrer,
                            logo_uri=logo_uri, default=default)
