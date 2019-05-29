@@ -3,7 +3,8 @@
 # Copyright 2017-2019 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
-# |   |_| |  |_|  |   | || |  |_|  |   |_| | # |       |       |   |_||_|       |       |
+# |   |_| |  |_|  |   | || |  |_|  |   |_| |
+# |       |       |   |_||_|       |       |
 # |  _    |       |    __  |       |  _    |
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
@@ -16,7 +17,10 @@ from flask import abort, render_template, request, redirect, url_for  # noqa : p
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import util
+import in_apis
+import in_config_apis
 from dashboard import blueprint
+from third import suprema_apis
 
 
 SCHEDULE_COMMON_FILE_NAME = '''schedule'''
@@ -27,7 +31,17 @@ LOCATION_MAP_URI = "/dashboard/static/location/{org_id}/{file_name}"
 @blueprint.route('/', methods=['GET'])
 @util.require_login
 def default_route():
-  return render_template("dashboard_home.html")
+  _org_id = current_user.organization_id
+  worker_interval = 10
+  equip_interval = 10
+  suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
+  location_config = in_config_apis.get_location_config_by_org(_org_id)
+  if suprema_config:
+    worker_interval = suprema_config.client_interval
+  if location_config:
+    equip_interval = location_config.client_interval
+  return render_template("dashboard_home.html", worker_interval=worker_interval,
+                         equip_interval=equip_interval)
 
 
 @blueprint.route('/workschedule', methods=['GET'])
@@ -111,3 +125,65 @@ def upload_location_map():
                                 file_name=LOCATION_MAP_COMMON_FILE_NAME)
   return uri
 
+
+@blueprint.route('/settings', methods=['GET'])
+@util.require_login
+def dashboard_settings():
+  _org_id = current_user.organization_id
+  prd_list = in_apis.get_product_list(_org_id)
+  biostar_event_list = suprema_apis.get_event_list()
+  suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
+  location_config = in_config_apis.get_location_config_by_org(_org_id)
+  return render_template("dashboard_settings.html", prd_list=prd_list,
+                         biostar_event_list=biostar_event_list,
+                         suprema_config=suprema_config,
+                         location_config=location_config)
+
+
+@blueprint.route('/settings/location', methods=['POST'])
+@util.require_login
+def set_location_settings():
+  _product_id = request.form['locationPrdId']
+  _client_interval = request.form['locationClientInterval']
+  _server_interval = request.form['locationServerInterval']
+  _org_id = current_user.organization_id
+
+  config_data = in_config_apis.get_location_config_by_org(_org_id)
+  if config_data:
+    in_config_apis.update_location_config(_product_id, _client_interval,
+                                          _server_interval, _org_id)
+    logging.info("Update location Config. User : %s, Pid : %s",
+                 current_user.email, _product_id)
+  else:
+    in_config_apis.create_location_config(_product_id, _client_interval,
+                                          _server_interval, _org_id)
+    logging.info("Create Suprema Config. User : %s, Pid : %s",
+                 current_user.email, _product_id)
+  return redirect("/dashboard/settings")
+
+
+@blueprint.route('/settings/suprema', methods=['POST'])
+@util.require_login
+def set_suprema_settings():
+  _id = request.form['supremaId']
+  _pw = request.form['supremaPassword']
+  _url = request.form['supremaBaseUrl']
+  _client_interval = int(request.form['supremaClientInterval'])
+  _server_interval = int(request.form['supremaServerInterval'])
+  _event_id = request.form['supremaEvent']
+  _org_id = current_user.organization_id
+
+  config_data = in_config_apis.get_suprema_config_by_org(_org_id)
+  if config_data:
+    in_config_apis.update_suprema_config(_url, _id, _pw, _event_id,
+                                         _client_interval, _server_interval,
+                                         _org_id)
+    logging.info("Update Suprema Config. User : %s, base url : %s",
+                 current_user.email, _url)
+  else:
+    in_config_apis.create_suprema_config(_url, _id, _pw, _event_id,
+                                         _client_interval, _server_interval,
+                                         _org_id)
+    logging.info("Create Suprema Config. User : %s, base url : %s",
+                 current_user.email, _url)
+  return redirect("/dashboard/settings")

@@ -42,7 +42,6 @@ from models import _ReferrerInfo as ReferrerInfo
 from models import _SubDomain as SubDomain
 from models import _Domain as Domain
 from models import _ForkProduct as ForkProduct
-from config_models import _SupremaConfig as SupremaConfig
 
 
 def get_datetime():
@@ -1135,39 +1134,3 @@ def has_domain_by_domain(domain_name):
 
 
 #}}}
-
-def create_suprema_config(base_url, suprema_id, suprema_pw,
-                          organization_id, last_data_id=None):
-  cur_time = get_datetime()
-  suprema_config = SupremaConfig(base_url=base_url,
-                                 suprema_id=suprema_id,
-                                 suprema_pw=suprema_pw,
-                                 last_updated_time=cur_time,
-                                 last_updated_user=current_user.email,
-                                 created_time=cur_time,
-                                 organization_id=organization_id,
-                                 last_data_id=last_data_id)
-  db.session.add(suprema_config)
-  db.session.commit()
-
-
-def get_suprema_config_by_org(organization_id):
-  suprema_config = SupremaConfig.query.\
-      filter_by(organization_id=organization_id).one_or_none()
-  return suprema_config
-
-
-def update_suprema_config_about_last_id(organization_id, last_data_id):
-  suprema_config = get_suprema_config_by_org(organization_id)
-  suprema_config.last_data_id = last_data_id
-  db.session.commit()
-
-
-def update_suprema_config_about_config_data(organization_id, id, pw, url):
-  suprema_config = get_suprema_config_by_org(organization_id)
-  suprema_config.suprema_id = id
-  suprema_config.suprema_pw = pw
-  suprema_config.base_url = url
-  suprema_config.last_updated_time = get_datetime()
-  suprema_config.last_updated_user = current_user.email
-  db.session.commit()

@@ -17,11 +17,24 @@ from flask_login import current_user
 import requests
 import apis
 
-#TODO : Change Structure and remove static data
 SESSION_ID = {}
 
+# Event
+IDENTIFY_SUCCESS_FINGERPRINT = "4865"
+IDENTIFY_SUCCESS_FACE = "4867"
 
-def login_sup_server(id, pw, base_url):
+
+def get_event_list():
+  event_list = [
+      {"id": IDENTIFY_SUCCESS_FACE,
+       "name": "Face"},
+      {"id": IDENTIFY_SUCCESS_FINGERPRINT,
+       "name": "Fingerprint"}
+  ]
+  return event_list
+
+
+def login_sup_server(_id, password, base_url):
   try:
     headers = {'Content-Type': 'application/json'}
     if apis.IS_DEV:
@@ -35,19 +48,19 @@ def login_sup_server(id, pw, base_url):
     else:
       data = {
         "User": {
-          "login_id": id,
-          "password": pw
+          "login_id": _id,
+          "password": password
         }
       }
       url = "{base}login".format(base=base_url)
     resp = requests.post(url, headers=headers, data=json.dumps(data))
     if resp.ok:
-      SESSION_ID[current_user.organization.id] = resp.headers['Bs-Session-Id']
+      SESSION_ID[current_user.organization_id] = resp.headers['Bs-Session-Id']
       return True
     else:
       logging.warning(
-        "Fail to login. Check your ID, Password.  ID : %s, Password : %s", id,
-        pw)
+        "Fail to login. Check your ID, Password.  ID : %s, Password : %s",
+        _id, password)
       return False
   except:
     logging.exception("Raise error while Log in to Server. ")
@@ -67,7 +80,7 @@ def get_event_logs(config_data, limit=None):
   try:
     url = "{base}events/search".format(base=config_data.base_url)
     headers = {'Content-Type': 'application/json',
-               'bs-session-id': SESSION_ID[current_user.organization.id]}
+               'bs-session-id': SESSION_ID[current_user.organization_id]}
     data = json.dumps({"Query": {"limit": _limit, "offset": "0"}})
     resp = requests.post(url=url, headers=headers, data=json.dumps(data))
     if resp.ok:
@@ -77,7 +90,7 @@ def get_event_logs(config_data, limit=None):
                                     config_data.suprema_pw,
                                     config_data.base_url)
       if login_resp:
-        headers['bs-session-id'] = SESSION_ID[current_user.organization.id]
+        headers['bs-session-id'] = SESSION_ID[current_user.organization_id]
       else:
         logging.warning(
           "Fail to login. Check your ID, Password.  ID : %s, Password : %s",

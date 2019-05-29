@@ -18,7 +18,7 @@
       if ($(".flat")[0]) {
         $(document).ready(function () {
           $('.flat').iCheck({
-            checkboxClass: 'icheckbox_flat-green custom_margin_bottom_5'
+            radioClass: 'iradio_flat-green custom_margin_bottom_5'
           });
         });
       }
@@ -45,7 +45,7 @@
                     <div id="scroll-style-1"
                          class="col-md-6 col-sm-6 col-xs-12 allow_list_height_150">
                       {% for model in model_list %}
-                        <input id="modelId" type="radio" class="fla"
+                        <input id="modelId" type="radio" class="flat"
                                name="modelId" value="{{ model.id }}" required="requried">
                         {{ model.name }}<br>
                       {% endfor %}

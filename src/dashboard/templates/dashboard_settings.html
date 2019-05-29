@@ -1,0 +1,225 @@
+{% extends "base_site.html" %}
+
+{% block title %} Settings {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_dashboard.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+  {{ super() }}
+  <!-- iCheck -->
+  <link
+      href="{{ url_for('static', filename='vendors/iCheck/skins/flat/green.css') }}"
+      rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block javascripts %}
+  {{ super() }}
+  <!-- iCheck -->
+  <script
+      src="{{ url_for('static', filename='vendors/iCheck/icheck.min.js') }}"></script>
+  <script>
+    $(document).ready(function () {
+      if ($(".fla")[0]) {
+        $(document).ready(function () {
+          $('.fla').iCheck({
+            radioClass: 'iradio_flat-green custom_margin_bottom_5'
+          });
+        });
+      }
+    });
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+      <div class="row">  <!-- Start row -->
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">  <!-- start x_panel -->
+            <div class="x_title">
+              <h3>Location Settings</h3>
+            </div>
+            <div class="x_content">  <!-- start x_content -->
+
+              <form id="location" action="/dashboard/settings/location"
+                class="form-horizontal form-label-left" method="post">
+                <div class="col-md-8">
+                  <div class="item form-group">
+                    <label class="control-label col-md-2">Product
+                    </label>
+                    <div id="scroll-style-1"
+                         class="col-md-10 allow_list_height_150">
+                      {# TODO: Handle checekd event id #}
+                      {% if locationConfig %}
+                        {% for prd in prd_list %}
+                          <input id="locationPrdId" type="radio" class="fla"
+                                name="locationPrdId" value="{{ prd.id }}" required="requried">
+                          {{ prd.name }}<br>
+                        {% endfor %}
+                      {% else %}
+                        {% for prd in prd_list %}
+                          <input id="locationPrdId" type="radio" class="fla"
+                                name="locationPrdId" value="{{ prd.id }}" required="requried">
+                          {{ prd.name }}<br>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2">Refresh Time
+                    </label>
+                    <div class="col-md-10">
+                      {% if locationConfig %}
+                        <input type="number" id="locationClientInterval" name="locationClientInterval"
+                            value="{{ locationConfig.client_interval}}" class="form-control col-md-6 col-xs-6">
+                      {% else %}
+                        <input type="number" id="locationClientInterval" name="locationClientInterval" value="10"
+                            class="form-control col-md-6 col-xs-6" min="10">
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2">Server Refresh Time
+                    </label>
+                    <div class="col-md-10">
+                      {% if locationConfig %}
+                        <input type="number" id="locationServerInterval" name="locationServerInterval"
+                            value="{{ locationConfig.server_interval}}" class="form-control col-md-6 col-xs-6">
+                      {% else %}
+                        <input type="number" id="locationServerInterval" name="locationServerInterval" value="10"
+                            class="form-control col-md-6 col-xs-6" min="10">
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div style="text-align: right">
+                    <button type="submit" class="btn btn-default">Save</button>
+                  </div>
+                </div>
+              </form>
+
+            </div>  <!-- End x_content -->
+
+          </div>  <!-- End x_panel -->
+        </div>
+      </div>  <!-- End row-->
+
+      <div class="row">  <!-- Start row -->
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">  <!-- start x_panel -->
+            <div class="x_title">
+              <h3>Biostar Settings</h3>
+            </div>
+            <div class="x_content">  <!-- start x_content -->
+
+              <form id="suprema" action="/dashboard/settings/suprema"
+                class="form-horizontal form-label-left" method="post">
+                <div class="col-md-8">
+                  <div class="item form-group">
+                    <label class="control-label col-md-2">ID
+                    </label>
+                    <div class="col-md-10">
+                      {% if suprema_config %}
+                        <input type="text" id="supremaId" name="supremaId" value="{{ suprema_config.suprema_id }}"
+                            class="form-control col-md-6 col-xs-6">
+                      {% else %}
+                        <input type="text" id="supremaId" name="supremaId" value=""
+                            class="form-control col-md-6 col-xs-6">
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2">Password
+                    </label>
+                    <div class="col-md-10">
+                      {% if suprema_config %}
+                        <input type="password" id="supremaPassword" name="supremaPassword"
+                            value="{{ suprema_config.suprema_pw }}" class="form-control col-md-6 col-xs-6">
+                      {% else %}
+                        <input type="password" id="supremaPassword" name="supremaPassword"
+                            value="" class="form-control col-md-6 col-xs-6">
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2">BaseUrl
+                    </label>
+                    <div class="col-md-10">
+                      {% if suprema_config %}
+                        <input type="text" id="supremaBaseUrl" name="supremaBaseUrl"
+                            value="{{ suprema_config.base_url }}" class="form-control col-md-6 col-xs-6">
+                      {% else %}
+                        <input type="text" id="supremaBaseUrl" name="supremaBaseUrl"
+                            value="" class="form-control col-md-6 col-xs-6">
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2">Refresh Time
+                    </label>
+                    <div class="col-md-10">
+                      {% if suprema_config %}
+                        <input type="number" id="supremaClientInterval" name="supremaClientInterval" min="10"
+                            value="{{ suprema_config.client_interval }}" class="form-control col-md-6 col-xs-6">
+                      {% else %}
+                        <input type="number" id="supremaClientInterval" name="supremaClientInterval" min="10"
+                            value="10" class="form-control col-md-6 col-xs-6">
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2">Server Refresh Time
+                    </label>
+                    <div class="col-md-10">
+                      {% if suprema_config %}
+                        <input type="number" id="supremaServerInterval" name="supremaServerInterval" min="10"
+                            value="{{ suprema_config.server_interval }}" class="form-control col-md-6 col-xs-6">
+                      {% else %}
+                        <input type="number" id="supremaServerInterval" name="supremaServerInterval" min="10"
+                            value="10" class="form-control col-md-6 col-xs-6">
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-2">Event
+                    </label>
+                    <div id="scroll-style-1"
+                         class="col-md-10 allow_list_height_150">
+                      {% if suprema_config %}
+                        {# TODO: Handle checekd event id #}
+                        {% for event in biostar_event_list %}
+                          {% if suprema_config.event_id == event.id %}
+                            <input id="supremaEvent" type="radio" class="fla"
+                                  name="supremaEvent" value="{{ event.id }}" required="requried">
+                            {{ event.name }}<br>
+                          {% else %}
+                            <input id="supremaEvent" type="radio" class="fla"
+                                  name="supremaEvent" value="{{ event.id }}" required="requried">
+                            {{ event.name }}<br>
+                          {% endif %}
+                        {% endfor %}
+                      {% else %}
+                        {% for event in biostar_event_list %}
+                          <input id="supremaEvent" type="radio" class="fla"
+                                name="supremaEvent" value="{{ event.id }}" required="requried">
+                          {{ event.name }}<br>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div style="text-align: right">
+                    <button type="submit" class="btn btn-default">Save</button>
+                  </div>
+                </div>
+              </form>
+
+            </div>  <!-- End x_content -->
+
+          </div>  <!-- End x_panel -->
+        </div>
+      </div>  <!-- End row-->
+  </div>
+
+{% endblock content %}
