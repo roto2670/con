@@ -108,10 +108,10 @@
             divEquip = document.getElementById("divEquip");
         divEquip.innerText = jsonData;
         setTotalCount();
-        setTimeout(getEquip, 1000 * 30);  // 30s
+        setTimeout(getEquip, 1000 * 60);  // 1m
       });
     }
-    //getEquip();
+    getEquip();
 
     function getWorker() {
       // TODO: total users?
