@@ -207,9 +207,11 @@ def set_event():
         in_apis.update_suprema_config_about_last_id(config_data.organization_id,
                                                     config_data.base_url,
                                                     chk_data['id'])
-        _set_worker_count(config_data.organization_id,
-                          chk_data['user_id']['user_id'], chk_data['user_id']['name'])
-        return json.dumps(True)
+        if chk_data['event_type_id']['code'] == IDENTIFY_SUCCESS_FINGERPRINT:
+          _set_worker_count(config_data.organization_id,
+                            chk_data['user_id']['user_id'],
+                            chk_data['user_id']['name'])
+          return json.dumps(True)
     else:
       logging.warning("No logs exist on the server.")
       return json.dumps(False)
