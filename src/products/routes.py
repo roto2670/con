@@ -75,7 +75,7 @@ def create():
       common.set_error_message(title, msg)
       return render_template("prd_create.html", referrer=referrer,
                              typ_dict=typ_dict)
-    has_product = in_apis.get_product(code)
+    has_product = in_apis.has_product(code)
     if has_product:
       title = common.get_msg("products.create.product.exists_product_title")
       msg = common.get_msg("products.create.product.exists_product_message")

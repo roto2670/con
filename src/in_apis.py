@@ -177,6 +177,11 @@ def get_product(product_id):
     abort(403)
 
 
+def has_product(product_id):
+  product = Product.query.filter_by(id=product_id).one_or_none()
+  return True if product else False
+
+
 def get_product_by_key(product_key):
   product = Product.query.filter_by(key=product_key).one_or_none()
   return product
