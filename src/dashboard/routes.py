@@ -20,6 +20,7 @@ import util
 import in_apis
 import in_config_apis
 from dashboard import blueprint
+import back_scheduler
 from third import suprema_apis
 
 
@@ -173,18 +174,26 @@ def set_suprema_settings():
   _event_id = request.form['supremaEvent']
   _org_id = current_user.organization_id
 
-  config_data = in_config_apis.get_suprema_config_by_org(_org_id)
-  if config_data:
-    in_config_apis.update_suprema_config(_url, _id, _pw, _event_id,
-                                         _client_interval, _server_interval,
-                                         _org_id)
-    logging.info("Update Suprema Config. User : %s, base url : %s",
-                 current_user.email, _url)
+  login_result = suprema_apis.login_sup_server(_id, _pw, _url, _org_id)
+  if login_result:
+    config_data = in_config_apis.get_suprema_config_by_org(_org_id)
+    if config_data:
+      in_config_apis.update_suprema_config(_url, _id, _pw, _event_id,
+                                           _client_interval, _server_interval,
+                                           _org_id)
+      logging.info("Update Suprema Config. User : %s, base url : %s",
+                   current_user.email, _url)
+      back_scheduler.scheduler_main_worker(_org_id, _server_interval, True)
+    else:
+      in_config_apis.create_suprema_config(_url, _id, _pw, _event_id,
+                                           _client_interval, _server_interval,
+                                           _org_id)
+      logging.info("Create Suprema Config. User : %s, base url : %s",
+                   current_user.email, _url)
+      back_scheduler.scheduler_main_worker(_org_id, _server_interval)
+    return redirect("/dashboard/settings")
   else:
-    in_config_apis.create_suprema_config(_url, _id, _pw, _event_id,
-                                         _client_interval, _server_interval,
-                                         _org_id)
-    logging.info("Create Suprema Config. User : %s, base url : %s",
-                 current_user.email, _url)
-  suprema_apis.login_sup_server(_id, _pw, _url)
-  return redirect("/dashboard/settings")
+    logging.warning(
+        "Fail to login. Check your ID, Password.  ID : %s, Password : %s",
+        _id, _pw)
+    return redirect("/dashboard/settings")

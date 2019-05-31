@@ -93,6 +93,11 @@ def get_suprema_config_by_org(organization_id):
   return suprema_config
 
 
+def get_all_suprema_config():
+  suprema_config_list = SupremaConfig.query.all()
+  return suprema_config_list
+
+
 def update_suprema_config_about_last_id(organization_id, last_data_id):
   suprema_config = get_suprema_config_by_org(organization_id)
   suprema_config.last_data_id = last_data_id

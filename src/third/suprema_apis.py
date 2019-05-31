@@ -12,10 +12,10 @@
 import json
 import logging
 
-from flask_login import current_user
-
 import requests
 import apis
+import in_config_apis
+from dash import routes as dash_routes
 
 SESSION_ID = {}
 
@@ -34,7 +34,7 @@ def get_event_list():
   return event_list
 
 
-def login_sup_server(_id, password, base_url):
+def login_sup_server(_id, password, base_url, org_id):
   try:
     headers = {'Content-Type': 'application/json'}
     if apis.IS_DEV:
@@ -55,7 +55,7 @@ def login_sup_server(_id, password, base_url):
       url = "{base}login".format(base=base_url)
     resp = requests.post(url, headers=headers, data=json.dumps(data))
     if resp.ok:
-      SESSION_ID[current_user.organization_id] = resp.headers['Bs-Session-Id']
+      SESSION_ID[org_id] = resp.headers['Bs-Session-Id']
       return True
     else:
       logging.warning(
@@ -80,17 +80,18 @@ def get_event_logs(config_data, limit=None):
   try:
     url = "{base}api/events/search".format(base=config_data.base_url)
     headers = {'Content-Type': 'application/json',
-               'bs-session-id': SESSION_ID[current_user.organization_id]}
-    data = json.dumps({"Query": {"limit": _limit, "offset": "0"}})
+               'bs-session-id': SESSION_ID[config_data.organization_id]}
+    data = {"Query": {"limit": _limit, "offset": "0"}}
     resp = requests.post(url=url, headers=headers, data=json.dumps(data))
     if resp.ok:
       return resp.json()
     elif resp.status_code == 401:
       login_resp = login_sup_server(config_data.suprema_id,
                                     config_data.suprema_pw,
-                                    config_data.base_url)
+                                    config_data.base_url,
+                                    config_data.organization_id)
       if login_resp:
-        headers['bs-session-id'] = SESSION_ID[current_user.organization_id]
+        headers['bs-session-id'] = SESSION_ID[config_data.organization_id]
       else:
         logging.warning(
           "Fail to login. Check your ID, Password.  ID : %s, Password : %s",
@@ -106,3 +107,50 @@ def get_event_logs(config_data, limit=None):
       return None
   except:
     return None
+
+
+def set_event(org_id):
+  config_data = in_config_apis.get_suprema_config_by_org(org_id)
+  if config_data:
+    evt_log_chk = get_event_logs(config_data, "1")
+    if evt_log_chk and evt_log_chk['EventCollection']['rows']:
+      chk_data = evt_log_chk['EventCollection']['rows'][0]
+      if config_data.last_data_id:
+        if int(chk_data['id']) > config_data.last_data_id:
+          limit = int(chk_data['id']) - config_data.last_data_id
+          rows = _extract_rows(config_data, limit)
+          for data in rows:
+            if data['event_type_id']['code'] == config_data.event_id:
+              user_info = data['user_id']
+              dash_routes.set_worker_count(config_data.organization_id,
+                                           user_info['user_id'],
+                                           user_info['name'])
+              last_id = data['id']
+          in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
+                                                             last_id)
+          return True
+        elif config_data.last_data_id == int(chk_data['id']):
+          logging.warning("Server has no more event. wait for next event")
+          return False
+        else:
+          logging.warning("Data Sync is not matched please check your log")
+          return False
+      else:
+        in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
+                                                           chk_data['id'])
+        logging.warning("Update of Last event ID completed successfully.")
+        return True
+    else:
+      logging.warning("No logs exist on the server.")
+      return False
+  else:
+    logging.warning("api login data is not exist please login first")
+    return False
+
+
+def _extract_rows(config_data, data_limit):
+  evt_log = get_event_logs(config_data, data_limit)
+  rows = evt_log['EventCollection']['rows']
+  rows = sorted(rows, key=lambda k: k['id'])
+  return rows
+

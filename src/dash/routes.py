@@ -10,7 +10,6 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import json
-import logging
 
 from flask import request
 from flask_login import current_user
@@ -18,9 +17,8 @@ from flask_login import current_user
 import apis
 import util
 import dash_apis
-import in_config_apis
 from dash import blueprint
-from third import suprema_apis
+import in_config_apis
 
 
 DETECTED_BEACONS = {}
@@ -135,26 +133,6 @@ def get_beacon_info(beacon_id):
   return json.dumps(ret)
 
 
-def _set_total_equip(org_id, hid, dist_data_list):
-  gid_set = set([dist_data['gid'] for dist_data in dist_data_list['data']])
-  if org_id in DETECTED_BEACONS:
-    DETECTED_BEACONS[org_id][hid] = list(gid_set)
-  else:
-    DETECTED_BEACONS[org_id] = {}
-    DETECTED_BEACONS[org_id][hid] = list(gid_set)
-
-
-def _set_worker_count(org_id, user_id, name):
-  if org_id in WORKER_COUNT:
-    if user_id in WORKER_COUNT[org_id]:
-      del WORKER_COUNT[org_id][user_id]
-    else:
-      WORKER_COUNT[org_id][user_id] = name
-  else:
-    WORKER_COUNT[org_id] = {}
-    WORKER_COUNT[org_id][user_id] = name
-
-
 @blueprint.route('/total_equip', methods=["GET"])
 @util.require_login
 def get_total_equip():
@@ -175,51 +153,21 @@ def get_total_worker():
   return json.dumps(0)
 
 
-@blueprint.route('/set_event', methods=["POST"])
-@util.require_login
-def set_event():
-  config_data = in_config_apis.get_suprema_config_by_org(current_user.organization_id)
-  if config_data:
-    evt_log_chk = suprema_apis.get_event_logs(config_data, "1")
-    if evt_log_chk and evt_log_chk['EventCollection']['rows']:
-      chk_data = evt_log_chk['EventCollection']['rows'][0]
-      if config_data.last_data_id:
-        if int(chk_data['id']) > int(config_data.last_data_id):
-          limit = int(chk_data['id']) - int(config_data.last_data_id)
-          rows = _extract_rows(config_data, limit)
-          for data in rows:
-            if data['event_type_id']['code'] == config_data.event_id:
-              user_info = data['user_id']
-              _set_worker_count(config_data.organization_id, user_info['user_id'],
-                                user_info['name'])
-              last_id = data['id']
-          in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
-                                                             last_id)
-          return json.dumps(True)
-        elif int(config_data.last_data_id) == int(chk_data['id']):
-          logging.warning("Server has no more event. wait for next event")
-          return json.dumps(False)
-        else:
-          logging.warning("Data Sync is not matched please check your log")
-          return json.dumps(None)
-      else:
-        in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
-                                                           chk_data['id'])
-        if chk_data['event_type_id']['code'] == config_data.event_id:
-          _set_worker_count(config_data.organization_id,
-                            chk_data['user_id']['user_id'],
-                            chk_data['user_id']['name'])
-          return json.dumps(True)
-    else:
-      logging.warning("No logs exist on the server.")
-      return json.dumps(False)
+def set_total_equip(org_id, hid, dist_data_list):
+  gid_set = set([dist_data['gid'] for dist_data in dist_data_list['data']])
+  if org_id in DETECTED_BEACONS:
+    DETECTED_BEACONS[org_id][hid] = list(gid_set)
   else:
-    logging.warning("api login data is not exist please login first")
-    return json.dumps(False)
+    DETECTED_BEACONS[org_id] = {}
+    DETECTED_BEACONS[org_id][hid] = list(gid_set)
 
 
-def _extract_rows(config_data, data_limit):
-  evt_log = suprema_apis.get_event_logs(config_data, data_limit)
-  rows = evt_log['EventCollection']['rows']
-  rows = sorted(rows, key=lambda k: k['id'])
-  return rows
+def set_worker_count(org_id, user_id, name):
+  if org_id in WORKER_COUNT:
+    if user_id in WORKER_COUNT[org_id]:
+      del WORKER_COUNT[org_id][user_id]
+    else:
+      WORKER_COUNT[org_id][user_id] = name
+  else:
+    WORKER_COUNT[org_id] = {}
+    WORKER_COUNT[org_id][user_id] = name
