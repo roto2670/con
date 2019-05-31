@@ -17,7 +17,7 @@ import requests
 from flask_login import current_user
 
 import apis
-import in_apis
+import in_config_apis
 import dash_api_mock
 
 
@@ -73,38 +73,18 @@ def update_scanner_location(hub_obj):
     return None
 
 
-def get_scanner_list():
-  """
-  :param : None
-  :return type : list of dict
-  :ret_content : noti key에 있는 kind를 확인하여 kind를 _get_scanner_list로 넘긴다.
-  """
-  if apis.IS_DEV:
-    return dash_api_mock.scanner_list()
-  else:
-    # TODO: Fixed this logic
-    kind_list = []
-    for noti_key in current_user.organization.noti_key:
-      kind_list.append(noti_key.name)
-
-    scanner_list = []
-    for kind in kind_list:
-      ret = _get_scanner_list(kind)
-      if ret:
-        scanner_list += ret
-    return scanner_list
-
-
-def _get_scanner_list(kind):
+def get_scanner_list(kind):
   """
   :param : kind
   :return type : list of dict
   :ret_content : get_scanner_list()에서 받은 kind로 cloud에 정보를 요청한다.
                       kind 가 일치하는 hub들의 data를 받는다.
   """
+  if apis.IS_DEV:
+    return dash_api_mock.scanner_list()
   try:
     url = "{base}hub-kinds/{kind}/hubs".format(base=THIRD_BASE_URL,
-                                              kind=kind)
+                                               kind=kind)
     headers = _get_user_header()
     params = {
         'kind': 0,

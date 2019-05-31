@@ -65,7 +65,8 @@ def get_scanner_list():
   :return : hubs list (list of dict)
   :content : noti_key db의 kind를 확인 하여 서버에 Request를 보내고 그에 맞는 Hublist를 가져온다
   """
-  ret = dash_apis.get_scanner_list()
+  config_data = in_config_apis.get_location_config_by_org(current_user.organization_id)
+  ret = dash_apis.get_scanner_list(config_data.kind)
   return json.dumps(ret)
 
 

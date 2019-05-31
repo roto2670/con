@@ -125,10 +125,11 @@ def update_suprema_config(base_url, suprema_id, suprema_pw, event_id,
 #{{{ location
 
 
-def create_location_config(product_id, client_interval, server_interval,
+def create_location_config(product_id, kind, client_interval, server_interval,
                            organization_id):
   cur_time = get_datetime()
   location_config = LocationConfig(product_id=product_id,
+                                   kind=kind,
                                    client_interval=client_interval,
                                    server_interval=server_interval,
                                    created_time=cur_time,
@@ -145,10 +146,16 @@ def get_location_config_by_org(organization_id):
   return location_config
 
 
-def update_location_config(product_id, client_interval, server_interval,
+def get_all_location_config():
+  location_config_list = LocationConfig.query.all()
+  return location_config_list
+
+
+def update_location_config(product_id, kind, client_interval, server_interval,
                            organization_id):
   location_config = get_location_config_by_org(organization_id)
   location_config.event_id = product_id
+  location_config.kind = kind
   location_config.client_interval = client_interval
   location_config.server_interval = server_interval
   location_config.last_updated_time = get_datetime()
