@@ -17,10 +17,8 @@ from flask_login import current_user
 
 import apis
 import util
-import models
-import in_apis
 import dash_apis
-import base.routes
+import in_config_apis
 from dash import blueprint
 from third import suprema_apis
 
@@ -180,7 +178,7 @@ def get_total_worker():
 @blueprint.route('/set_event', methods=["POST"])
 @util.require_login
 def set_event():
-  config_data = in_apis.get_suprema_config_by_org(current_user.organization_id)
+  config_data = in_config_apis.get_suprema_config_by_org(current_user.organization_id)
   if config_data:
     evt_log_chk = suprema_apis.get_event_logs(config_data, "1")
     if evt_log_chk and evt_log_chk['EventCollection']['rows']:
@@ -190,14 +188,13 @@ def set_event():
           limit = int(chk_data['id']) - int(config_data.last_data_id)
           rows = _extract_rows(config_data, limit)
           for data in rows:
-            if data['event_type_id']['code'] == suprema_apis.IDENTIFY_SUCCESS_FINGERPRINT:
+            if data['event_type_id']['code'] == config_data.event_id:
               user_info = data['user_id']
               _set_worker_count(config_data.organization_id, user_info['user_id'],
                                 user_info['name'])
               last_id = data['id']
-          in_apis.update_suprema_config_about_last_id(config_data.organization_id,
-                                                      config_data.base_url,
-                                                      last_id)
+          in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
+                                                             last_id)
           return json.dumps(True)
         elif int(config_data.last_data_id) == int(chk_data['id']):
           logging.warning("Server has no more event. wait for next event")
@@ -206,10 +203,9 @@ def set_event():
           logging.warning("Data Sync is not matched please check your log")
           return json.dumps(None)
       else:
-        in_apis.update_suprema_config_about_last_id(config_data.organization_id,
-                                                    config_data.base_url,
-                                                    chk_data['id'])
-        if chk_data['event_type_id']['code'] == suprema_apis.IDENTIFY_SUCCESS_FINGERPRINT:
+        in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
+                                                           chk_data['id'])
+        if chk_data['event_type_id']['code'] == config_data.event_id:
           _set_worker_count(config_data.organization_id,
                             chk_data['user_id']['user_id'],
                             chk_data['user_id']['name'])
