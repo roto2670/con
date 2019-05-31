@@ -37,8 +37,27 @@ class _SupremaConfig(db.Model):
   base_url = Column(String(75))
   suprema_id = Column(String(75))
   suprema_pw = Column(String(75))
+  event_id = Column(String(25))
+  client_interval = Column(Integer)
+  server_interval = Column(Integer)
   last_data_id = Column(Integer)
+  created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
+  organization_id = Column(String(75))
+
+
+class _LocationConfig(db.Model):
+  __tablename__ = '_location_config'
+
+  id = Column(Integer, primary_key=True)
+  client_interval = Column(Integer)
+  server_interval = Column(Integer)
+  product_id = Column(String(75))
+  file_path = Column(String(225))
+  file_names = Column(String(225))
+  image_uri = Column(Text)
   created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
   organization_id = Column(String(75))

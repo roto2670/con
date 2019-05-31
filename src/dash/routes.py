@@ -27,39 +27,37 @@ from third import suprema_apis
 
 DETECTED_BEACONS = {}
 WORKER_COUNT = {}
-IDENTIFY_SUCCESS_FINGERPRINT = "4865"
-IDENTIFY_SUCCESS_FACE = "4867"
 EQUIPMENT_EVENT = 1
 WORKER_EVENT = 2
 
 
-@blueprint.route('/info', methods=["GET"])
+@blueprint.route('/location/info', methods=["GET"])
 @util.require_login
-def get_inforamtion():
+def get_location_inforamtion():
   """
   :param : None
   :return : infomation of dict
   """
   if apis.IS_DEV:
     data = {
-        "product_id": "mibs"
+        "product_id": "mibs",
+        "interval": 60
     }
     return json.dumps(data)
   else:
-    prd = base.routes.get_current_product(current_user.id)
-    if not prd:
+    _org_id = current_user.organization_id
+    config_data = in_config_apis.get_location_config_by_org(_org_id)
+    if not config_data:
       data = {
-          "product_id": prd.id
+          "product_id": "",
+          "interval": 0
       }
       return json.dumps(data)
     else:
-      data = {}
-      prd_list = in_apis.get_product_list(current_user.organization.id)
-      for prd in prd_list:
-        if prd.typ == models.PRD_TYPE_BLE:
-          data["product_id"] = prd.id
-          base.routes.set_current_product(prd)
-          break
+      data = {
+          "product_id": config_data.product_id,
+          "interval": config_data.client_interval
+      }
       return json.dumps(data)
 
 
@@ -84,7 +82,7 @@ def get_detected_beacons_by_hub(hub_id):
   :content : hub_id를 기준으로 주변의 비콘을 스캔한 정보를 가져온다.
   """
   ret = dash_apis.get_detected_beacons(hub_id)
-  _set_total_equip(current_user.organization.id, hub_id, ret)
+  _set_total_equip(current_user.organization_id, hub_id, ret)
   return json.dumps(ret)
 
 
@@ -162,23 +160,27 @@ def _set_worker_count(org_id, user_id, name):
 @blueprint.route('/total_equip', methods=["GET"])
 @util.require_login
 def get_total_equip():
-  all_gids = list(set(sum(DETECTED_BEACONS[current_user.organization.id].\
-                          values(), [])))
-  count = len(all_gids)
-  return json.dumps(count)
+  if current_user.organization_id in DETECTED_BEACONS:
+    all_gids = list(set(sum(DETECTED_BEACONS[current_user.organization_id].\
+                            values(), [])))
+    count = len(all_gids)
+    return json.dumps(count)
+  return json.dumps(0)
 
 
 @blueprint.route('/total_worker', methods=["GET"])
 @util.require_login
 def get_total_worker():
-  count = len(WORKER_COUNT[current_user.organization.id])
-  return json.dumps(count)
+  if current_user.organization_id in WORKER_COUNT:
+    count = len(WORKER_COUNT[current_user.organization_id])
+    return json.dumps(count)
+  return json.dumps(0)
 
 
 @blueprint.route('/set_event', methods=["POST"])
 @util.require_login
 def set_event():
-  config_data = in_apis.get_suprema_config_by_org(current_user.organization.id)
+  config_data = in_apis.get_suprema_config_by_org(current_user.organization_id)
   if config_data:
     evt_log_chk = suprema_apis.get_event_logs(config_data, "1")
     if evt_log_chk and evt_log_chk['EventCollection']['rows']:
@@ -188,7 +190,7 @@ def set_event():
           limit = int(chk_data['id']) - int(config_data.last_data_id)
           rows = _extract_rows(config_data, limit)
           for data in rows:
-            if data['event_type_id']['code'] == IDENTIFY_SUCCESS_FINGERPRINT:
+            if data['event_type_id']['code'] == suprema_apis.IDENTIFY_SUCCESS_FINGERPRINT:
               user_info = data['user_id']
               _set_worker_count(config_data.organization_id, user_info['user_id'],
                                 user_info['name'])
@@ -207,7 +209,7 @@ def set_event():
         in_apis.update_suprema_config_about_last_id(config_data.organization_id,
                                                     config_data.base_url,
                                                     chk_data['id'])
-        if chk_data['event_type_id']['code'] == IDENTIFY_SUCCESS_FINGERPRINT:
+        if chk_data['event_type_id']['code'] == suprema_apis.IDENTIFY_SUCCESS_FINGERPRINT:
           _set_worker_count(config_data.organization_id,
                             chk_data['user_id']['user_id'],
                             chk_data['user_id']['name'])
@@ -225,68 +227,3 @@ def _extract_rows(config_data, data_limit):
   rows = evt_log['EventCollection']['rows']
   rows = sorted(rows, key=lambda k: k['id'])
   return rows
-
-
-@blueprint.route('/set_api_config', methods=["POST"])
-@util.require_login
-def set_api_config():
-  """
-  :request_body:
-  {
-    "value":
-        {
-          "id": "admin"
-          "pw": "adminadmin1"
-          "url": "http://skbs1.prota.space/api/"
-        }
-  }
-  """
-  value = request.form['value']
-  config_data = in_apis.get_suprema_config_by_org(current_user.organization.id)
-  if config_data:
-    logging.info("suprema api login data is already exist")
-    return json.dumps(True)
-  else:
-    base_url = value['url']
-    id = value['id']
-    pw = value['pw']
-  login_resp = suprema_apis.login_sup_server(id, pw, base_url)
-  if login_resp:
-    in_apis.create_suprema_config(base_url, id, pw,
-                                  current_user.organization.id)
-    return json.dumps(True)
-  else:
-    return json.dumps(False)
-
-
-@blueprint.route('/get_api_config', methods=["GET"])
-@util.require_login
-def get_api_config():
-  ret = {}
-  config_data = in_apis.get_suprema_config_by_org(current_user.organization.id)
-  ret['id'] = config_data.suprema_id
-  ret['pw'] = config_data.suprema_pw
-  ret['base_url'] = config_data.base_url
-  return json.dumps(ret)
-
-
-@blueprint.route('/update_api_config', methods=["POST"])
-@util.require_login
-def update_api_config():
-  """
-  :request_body:
-  {
-    "value":
-        {
-          "id": "admin"
-          "pw": "adminadmin1"
-          "url": "http://skbs1.prota.space/api/"
-        }
-  }
-  """
-  value = request.form['value']
-  in_apis.update_suprema_config_about_config_data(current_user.organization.id,
-                                                  value['id'],
-                                                  value['pw'],
-                                                  value['url'])
-  return json.dumps(True)

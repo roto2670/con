@@ -108,22 +108,21 @@
             divEquip = document.getElementById("divEquip");
         divEquip.innerText = jsonData;
         setTotalCount();
-        setTimeout(getEquip, 1000 * 60);  // 1m
+        setTimeout(getEquip, 1000 * {{ equip_interval }});
       });
     }
     getEquip();
 
     function getWorker() {
-      // TODO: total users?
-      jQuery.get("/dash/total_users").done(function(data){
+      jQuery.get("/dash/total_worker").done(function(data){
         var jsonData = JSON.parse(data),
             divWorker = document.getElementById("divWorker");
         divWorker.innerText = jsonData;
         setTotalCount();
-        setTimeout(getWorker, 1000 * 60);  // 1m
+        setTimeout(getWorker, 1000 * {{ worker_interval }});
       });
     }
-    //getWorker();
+    getWorker();
 
     function setTotalCount() {
       var divCount = document.getElementById("divCount"),
