@@ -186,4 +186,5 @@ def set_suprema_settings():
                                          _org_id)
     logging.info("Create Suprema Config. User : %s, base url : %s",
                  current_user.email, _url)
+  suprema_apis.login_sup_server(_id, _pw, _url)
   return redirect("/dashboard/settings")

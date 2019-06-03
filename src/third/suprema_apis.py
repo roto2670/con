@@ -78,7 +78,7 @@ def get_event_logs(config_data, limit=None):
   """
   _limit = limit if limit else "1"
   try:
-    url = "{base}events/search".format(base=config_data.base_url)
+    url = "{base}api/events/search".format(base=config_data.base_url)
     headers = {'Content-Type': 'application/json',
                'bs-session-id': SESSION_ID[current_user.organization_id]}
     data = json.dumps({"Query": {"limit": _limit, "offset": "0"}})
