@@ -24,6 +24,7 @@ import apis
 import dash_apis
 import common
 import base.routes
+import back_scheduler
 from base import db, auth, login_manager
 from config import DebugConfig, ProductionConfig
 
@@ -32,6 +33,7 @@ sys.dont_write_bytecode = True
 
 def register_extensions(app):
   db.init_app(app)
+  db.app = app
   auth.init_app(app)
   login_manager.init_app(app)
   # custom
@@ -64,13 +66,11 @@ def register_blueprints(app):
 
 
 def configure_database(app):
-  @app.before_first_request
-  def initialize_database():
-    db.create_all()
-
   @app.teardown_request
   def shutdown_session(exception=None):
     db.session.remove()
+
+  db.create_all()
 
 
 def configure_logs(app):
@@ -101,6 +101,7 @@ def create_app():
   register_extensions(app)
   register_blueprints(app)
   configure_database(app)
+  back_scheduler.init()
   common.start()
   return app
 
@@ -121,7 +122,7 @@ if  __name__ == '__main__':
     #dashboard.config.init_from(file="./config.cfg")
     #dashboard.bind(_app)
     CORS(_app)
-    _app.run(host='127.0.0.1', port=5000)
+    _app.run(host='127.0.0.1', port=5000, use_reloader=False)
   else:
     cur_path = os.path.dirname(os.path.abspath(__file__))
     ssl_path = os.path.join(cur_path, 'ssl')
