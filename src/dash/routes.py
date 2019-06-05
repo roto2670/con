@@ -78,7 +78,7 @@ def get_detected_beacons_by_hub(hub_id):
   :content : hub_id를 기준으로 주변의 비콘을 스캔한 정보를 가져온다.
   """
   ret = dash_apis.get_detected_beacons(hub_id)
-  _set_total_equip(current_user.organization_id, hub_id, ret)
+  set_total_equip(current_user.organization_id, hub_id, ret)
   return json.dumps(ret)
 
 
