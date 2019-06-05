@@ -22,12 +22,15 @@ SCHED = BackgroundScheduler()
 def init():
   config_data_list = get_worker_config()
   for config_data in config_data_list:
-    suprema_apis.login_sup_server(config_data.suprema_id,
-                                  config_data.suprema_pw,
-                                  config_data.base_url,
-                                  config_data.organization_id)
-    scheduler_main_worker(config_data.organization_id,
-                          config_data.server_interval)
+    ret = suprema_apis.login_sup_server(config_data.suprema_id,
+                                        config_data.suprema_pw,
+                                        config_data.base_url,
+                                        config_data.organization_id)
+    if ret:
+      logging.info("Start Scheduler of url : %s, org : %s",
+                   config_data.base_url, config_data.organization_id)
+      scheduler_main_worker(config_data.organization_id,
+                            config_data.server_interval)
   SCHED.start()
 
 

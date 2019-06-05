@@ -17,6 +17,7 @@ from flask import abort, render_template, request, redirect, url_for  # noqa : p
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import util
+import common
 import in_apis
 import in_config_apis
 from dashboard import blueprint
@@ -196,4 +197,7 @@ def set_suprema_settings():
     logging.warning(
         "Fail to login. Check your ID, Password.  ID : %s, Password : %s",
         _id, _pw)
+    title = common.get_msg("dashboard.biostar.failed_setting_title")
+    msg = common.get_msg("dashboard.biostar.failed_setting_message")
+    common.set_error_message(title, msg)
     return redirect("/dashboard/settings")

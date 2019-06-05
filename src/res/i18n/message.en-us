@@ -1,4 +1,10 @@
 {
+  "dashboard": {
+      "biostar": {
+          "failed_setting_title": "Setting Error",
+          "failed_setting_message": "Registration failed."
+      }
+  },
   "endpoints": {
       "upload" : {
           "success_title": "Upload successful",
