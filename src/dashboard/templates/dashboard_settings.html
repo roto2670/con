@@ -69,6 +69,26 @@
                     </div>
                   </div>
                   <div class="item form-group">
+                    <label class="control-label col-md-2">kind
+                    </label>
+                    <div id="scroll-style-1"
+                         class="col-md-10 allow_list_height_150">
+                      {% if locationConfig %}
+                        {% for noti_key in noti_key_list %}
+                          <input id="locationkindName" type="radio" class="fla"
+                                name="locationkindName" value="{{ noti_key.name }}" required="requried">
+                          {{ noti_key.name }}<br>
+                        {% endfor %}
+                      {% else %}
+                        {% for noti_key in noti_key_list %}
+                          <input id="locationkindName" type="radio" class="fla"
+                                name="locationkindName" value="{{ noti_key.name }}" required="requried">
+                          {{ noti_key.name }}<br>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="item form-group">
                     <label class="control-label col-md-2">Refresh Time
                     </label>
                     <div class="col-md-10">

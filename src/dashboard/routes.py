@@ -133,10 +133,12 @@ def upload_location_map():
 def dashboard_settings():
   _org_id = current_user.organization_id
   prd_list = in_apis.get_product_list(_org_id)
+  noti_key_list = in_apis.get_noti_key_list(_org_id)
   biostar_event_list = suprema_apis.get_event_list()
   suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
   location_config = in_config_apis.get_location_config_by_org(_org_id)
   return render_template("dashboard_settings.html", prd_list=prd_list,
+                         noti_key_list=noti_key_list,
                          biostar_event_list=biostar_event_list,
                          suprema_config=suprema_config,
                          location_config=location_config)
@@ -148,19 +150,22 @@ def set_location_settings():
   _product_id = request.form['locationPrdId']
   _client_interval = request.form['locationClientInterval']
   _server_interval = request.form['locationServerInterval']
+  _kind = request.form['locationkindName']
   _org_id = current_user.organization_id
 
   config_data = in_config_apis.get_location_config_by_org(_org_id)
   if config_data:
-    in_config_apis.update_location_config(_product_id, _client_interval,
+    in_config_apis.update_location_config(_product_id, _kind, _client_interval,
                                           _server_interval, _org_id)
     logging.info("Update location Config. User : %s, Pid : %s",
                  current_user.email, _product_id)
+    back_scheduler.scheduler_main_equip(_org_id, _kind, _server_interval, True)
   else:
-    in_config_apis.create_location_config(_product_id, _client_interval,
+    in_config_apis.create_location_config(_product_id, _kind, _client_interval,
                                           _server_interval, _org_id)
     logging.info("Create Suprema Config. User : %s, Pid : %s",
                  current_user.email, _product_id)
+    back_scheduler.scheduler_main_equip(_org_id, _kind, _server_interval)
   return redirect("/dashboard/settings")
 
 

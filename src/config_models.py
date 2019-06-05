@@ -54,6 +54,7 @@ class _LocationConfig(db.Model):
   client_interval = Column(Integer)
   server_interval = Column(Integer)
   product_id = Column(String(75))
+  kind = Column(String(75))
   file_path = Column(String(225))
   file_names = Column(String(225))
   image_uri = Column(Text)
