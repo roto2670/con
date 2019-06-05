@@ -94,18 +94,23 @@ def get_event_logs(config_data, limit=None):
         headers['bs-session-id'] = SESSION_ID[config_data.organization_id]
       else:
         logging.warning(
-          "Fail to login. Check your ID, Password.  ID : %s, Password : %s",
-          config_data.suprema_id, config_data.suprema_pw)
+            "Fail to login. Check your ID, Password.  ID : %s, Password : %s",
+            config_data.suprema_id, config_data.suprema_pw)
         return None
-      _resp = requests.get(url=url, headers=headers)
+      _resp = requests.get(url=url, headers=headers, data=json.dumps(data))
       if _resp.ok:
         return resp.json()
       else:
-        logging.warning("Fail to get users information cause fail to login")
+        logging.warning("Failed to retry get event logs. url : %s, code : %s, text : %s",
+                        url, _resp.status_code, _resp.text)
         return None
     else:
+      logging.warning("Failed to get event logs. url : %s, code : %s, text : %s",
+                      url, resp.status_code, resp.text)
       return None
   except:
+    logging.exception("Raise error while get event log. id : %s, base url : %s",
+                      config_data.suprema_id, config_data.base_url)
     return None
 
 
@@ -153,4 +158,3 @@ def _extract_rows(config_data, data_limit):
   rows = evt_log['EventCollection']['rows']
   rows = sorted(rows, key=lambda k: k['id'])
   return rows
-
