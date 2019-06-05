@@ -148,8 +148,8 @@ def dashboard_settings():
 @util.require_login
 def set_location_settings():
   _product_id = request.form['locationPrdId']
-  _client_interval = request.form['locationClientInterval']
-  _server_interval = request.form['locationServerInterval']
+  _client_interval = int(request.form['locationClientInterval'])
+  _server_interval = int(request.form['locationServerInterval'])
   _kind = request.form['locationkindName']
   _org_id = current_user.organization_id
 
