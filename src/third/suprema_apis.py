@@ -38,7 +38,8 @@ def login_sup_server(_id, password, base_url, org_id):
   try:
     headers = {'Content-Type': 'application/json'}
     if apis.IS_DEV:
-      url = "{base}login".format(base="http://skbs1.prota.space/api/")
+      base_url = base_url + "api/" if base_url else "http://skbs1.prota.space/api/"
+      url = "{base}login".format(base=base_url)
       data = {
         "User": {
           "login_id": "admin",
@@ -131,8 +132,9 @@ def set_event(org_id):
                                            user_info['user_id'],
                                            user_info['name'])
               last_id = data['id']
-          in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
-                                                             last_id)
+          if rows:
+            in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
+                                                               last_id)
           return True
         elif config_data.last_data_id == int(chk_data['id']):
           logging.warning("Server has no more event. wait for next event")
