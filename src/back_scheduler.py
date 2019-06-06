@@ -86,13 +86,14 @@ def get_all_equip_config():
 def beacon_detect_scheduler(kind, org_id):
   scanner_list = dash_apis.get_scanner_list(kind)
   for scanner in scanner_list:
-    get_detcted_data(scanner, org_id, None)
+    get_detected_data(scanner, org_id)
 
 
-def get_detcted_data(scanner, org_id, query_id=None):
+def get_detected_data(scanner, org_id, query_id=None, extend_data=[]):
   detect_result = dash_apis.get_detected_beacons(scanner['id'], query_id)
-  dash_routes.set_total_equip(org_id, scanner['id'], detect_result)
+  result_data = extend_data + detect_result['data']
   if len(detect_result['data']) >= 30:
-    get_detcted_data(scanner, org_id, detect_result['query_id'])
+    get_detected_data(scanner, org_id, detect_result['query_id'], detect_result['data'])
   else:
     logging.info("Server has no more Detected data")
+    dash_routes.set_total_equip(org_id, scanner['id'], result_data)

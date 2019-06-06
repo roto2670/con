@@ -79,7 +79,7 @@ def get_detected_beacons_by_hub(hub_id):
   :content : hub_id를 기준으로 주변의 비콘을 스캔한 정보를 가져온다.
   """
   ret = dash_apis.get_detected_beacons(hub_id)
-  set_total_equip(current_user.organization_id, hub_id, ret)
+  set_total_equip(current_user.organization_id, hub_id, ret['data'])
   return json.dumps(ret)
 
 
@@ -155,7 +155,7 @@ def get_total_worker():
 
 
 def set_total_equip(org_id, hid, dist_data_list):
-  gid_set = set([dist_data['gid'] for dist_data in dist_data_list['data']])
+  gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
   if org_id in DETECTED_BEACONS:
     DETECTED_BEACONS[org_id][hid] = list(gid_set)
   else:
