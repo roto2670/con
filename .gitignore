@@ -67,4 +67,6 @@ maint/prota_addr
 .vscode
 
 src/base/static/dashboard/workschedule/
-
+src/base/static/footer/
+src/base/static/images/ac983bfaa401d89475a45952e0a642cf/
+src/dashboard/static/location/ac983bfaa401d89475a45952e0a642cf/
