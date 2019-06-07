@@ -34,7 +34,7 @@ def init(app):
 def _get_user_header(is_json=False, org_id=None):
   if org_id:
     _org = in_apis.get_organization(org_id)
-    tokens = json.loads(_org.organization.tokens)
+    tokens = json.loads(_org.tokens)
   else:
     tokens = json.loads(current_user.organization.tokens)
   token = tokens['access'] if 'access' in tokens else ""
