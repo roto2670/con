@@ -53,7 +53,7 @@
                     <div id="scroll-style-1"
                          class="col-md-10 allow_list_height_150">
                       {# TODO: Handle checekd event id #}
-                      {% if locationConfig %}
+                      {% if location_config %}
                         {% for prd in prd_list %}
                           <input id="locationPrdId" type="radio" class="fla"
                                 name="locationPrdId" value="{{ prd.id }}" required="requried">
@@ -73,7 +73,7 @@
                     </label>
                     <div id="scroll-style-1"
                          class="col-md-10 allow_list_height_150">
-                      {% if locationConfig %}
+                      {% if location_config %}
                         {% for noti_key in noti_key_list %}
                           <input id="locationkindName" type="radio" class="fla"
                                 name="locationkindName" value="{{ noti_key.name }}" required="requried">
@@ -92,9 +92,9 @@
                     <label class="control-label col-md-2">Refresh Time
                     </label>
                     <div class="col-md-10">
-                      {% if locationConfig %}
+                      {% if location_config %}
                         <input type="number" id="locationClientInterval" name="locationClientInterval"
-                            value="{{ locationConfig.client_interval}}" class="form-control col-md-6 col-xs-6">
+                            value="{{ location_config.client_interval}}" class="form-control col-md-6 col-xs-6">
                       {% else %}
                         <input type="number" id="locationClientInterval" name="locationClientInterval" value="10"
                             class="form-control col-md-6 col-xs-6" min="10">
@@ -105,9 +105,9 @@
                     <label class="control-label col-md-2">Server Refresh Time
                     </label>
                     <div class="col-md-10">
-                      {% if locationConfig %}
+                      {% if location_config %}
                         <input type="number" id="locationServerInterval" name="locationServerInterval"
-                            value="{{ locationConfig.server_interval}}" class="form-control col-md-6 col-xs-6">
+                            value="{{ location_config.server_interval}}" class="form-control col-md-6 col-xs-6">
                       {% else %}
                         <input type="number" id="locationServerInterval" name="locationServerInterval" value="10"
                             class="form-control col-md-6 col-xs-6" min="10">

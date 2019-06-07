@@ -17,6 +17,7 @@ import requests
 from flask_login import current_user
 
 import apis
+import in_apis
 import in_config_apis
 import dash_api_mock
 
@@ -30,8 +31,12 @@ def init(app):
   pass
 
 
-def _get_user_header(is_json=False):
-  tokens = json.loads(current_user.organization.tokens)
+def _get_user_header(is_json=False, org_id=None):
+  if org_id:
+    _org = in_apis.get_organization(org_id)
+    tokens = json.loads(_org.organization.tokens)
+  else:
+    tokens = json.loads(current_user.organization.tokens)
   token = tokens['access'] if 'access' in tokens else ""
   headers = {
     'Authorization': 'Bearer {}'.format(token)
@@ -73,7 +78,7 @@ def update_scanner_location(hub_obj):
     return None
 
 
-def get_scanner_list(kind):
+def get_scanner_list(kind, org_id=None):
   """
   :param : kind
   :return type : list of dict
@@ -85,7 +90,7 @@ def get_scanner_list(kind):
   try:
     url = "{base}hub-kinds/{kind}/hubs".format(base=THIRD_BASE_URL,
                                                kind=kind)
-    headers = _get_user_header()
+    headers = _get_user_header(org_id=org_id)
     params = {
         'kind': 0,
         'issuer': 1
@@ -101,8 +106,7 @@ def get_scanner_list(kind):
                       resp.status_code, resp.text)
       return []
   except:
-    logging.exception("Raise error while get scanner list. url : %s, params : %s",
-                      url, params)
+    logging.exception("Raise error while get scanner list. url : %s", url)
     return None
 
 
@@ -218,7 +222,7 @@ def get_detected_hubs(gadget_id, query_id=None):
     return None
 
 
-def get_detected_beacons(hub_id, query_id=None):
+def get_detected_beacons(hub_id, query_id=None, org_id=None):
   """
   :param : hub_id, query_id
   :return type : dict
@@ -235,7 +239,7 @@ def get_detected_beacons(hub_id, query_id=None):
       'start_ts': start_ts,
       'end_ts': end_ts
   }
-  headers = _get_user_header()
+  headers = _get_user_header(org_id=org_id)
   try:
     if not query_id:
       logging.info("Get detected beacons request. url : %s, params : %s",
