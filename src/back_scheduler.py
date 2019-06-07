@@ -38,6 +38,8 @@ def worker_count_init(worker_config_list):
     if ret:
       logging.info("Start Scheduler of url : %s, org : %s",
                    config_data.base_url, config_data.organization_id)
+      suprema_apis.set_last_id_cache(config_data.organization_id,
+                                     config_data.last_data_id)
       scheduler_main_worker(config_data.organization_id,
                             config_data.server_interval)
 

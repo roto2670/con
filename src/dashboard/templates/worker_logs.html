@@ -1,0 +1,73 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_dashboard.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block title %} Worker Enterence Logs {% endblock title %}
+{% block javascripts %}
+
+  {{ super() }}
+{% endblock javascripts %}
+{% block stylesheets %}
+    <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js') }}"></script>
+  {{ super() }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+      <!-- start row -->
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_content">
+              <div class="accordion" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
+              </div>
+              <div id="pageMore" style="cursor: pointer;margin-left:100px;margin-top:10px; margin-bottom: 10px;">More</div>
+                <script>
+                  var nextPageNum = 1;
+
+                  function setNextPageNumber() {
+                    nextPageNum += 1;
+                  }
+
+                  function getNextPageNumber() {
+                    return nextPageNum;
+                  }
+
+                  function getLogs(){
+                    url = "/dash/worker_log";
+                    jQuery.get(url, { 'page_num': getNextPageNumber()})
+                      .done(function (data) {
+                        var logList = JSON.parse(data);
+                        logList.forEach(function (log) {
+                          var logId = log.id,
+                              timestamp = log.event_time,
+                              payLoad = log.text;
+                          var addObj= "<div class=''>" +
+                                          "<h3 class='panel-title'>" + timestamp + "     " + payLoad + "</h3>" +
+                                      "</div>"
+
+                          $(".accordion").append(addObj);
+                        });
+
+                        setNextPageNumber();
+                      });
+                  }
+
+                $("#pageMore").click(function(){
+                    getLogs();
+                });
+                getLogs();
+              </script>
+          </div>
+        </div> <!-- end x_content -->
+      </div> <!-- end x_panel -->
+    </div> <!-- End row -->
+  </div>
+</div>
+
+{% endblock content %}

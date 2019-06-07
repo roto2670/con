@@ -7,6 +7,11 @@
   </div>
 {% endblock sidebar %}
 
+{% block stylesheets %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js') }}"></script>
+{% endblock stylesheets %}
+
 {% block content %}
   <div id="scroll-style-hidden" class="right_col" role="main">
     <!-- top tiles -->
@@ -53,11 +58,40 @@
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
-            <!--
-              <div class="mapView">
-                {% include "location/index.html" %}
+              <div class="accordion" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
               </div>
-            -->
+              <script>
+                var nextPageNum = 1,
+                    limit = 15;
+
+                function setNextPageNumber() {
+                  nextPageNum += 1;
+                }
+
+                function getNextPageNumber() {
+                  return nextPageNum;
+                }
+
+                function getLogs(){
+                  url = "/dash/worker_log";
+                  jQuery.get(url, { 'page_num': getNextPageNumber(), 'limit': limit})
+                    .done(function (data) {
+                      var logList = JSON.parse(data);
+                      logList.forEach(function (log) {
+                        var logId = log.id,
+                            timestamp = log.event_time,
+                            payLoad = log.text;
+                        var addObj= "<div class=''>" +
+                                        "<h3 class='panel-title'>" + timestamp + "     " + payLoad + "</h3>" +
+                                    "</div>"
+                        $(".accordion").append(addObj);
+                      });
+
+                      setNextPageNumber();
+                    });
+                }
+                getLogs();
+              </script>
             </div>
           </div>
         </div>

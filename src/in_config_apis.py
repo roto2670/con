@@ -22,6 +22,7 @@ from base import db
 from config_models import _Footer as Footer
 from config_models import _SupremaConfig as SupremaConfig
 from config_models import _LocationConfig as LocationConfig
+from config_models import _EnterenceWorkerLog as EnterenceWorkerLog
 
 
 
@@ -101,6 +102,7 @@ def get_all_suprema_config():
 def update_suprema_config_about_last_id(organization_id, last_data_id):
   suprema_config = get_suprema_config_by_org(organization_id)
   suprema_config.last_data_id = last_data_id
+  suprema_config.last_updated_time = get_datetime()
   db.session.commit()
 
 
@@ -164,3 +166,28 @@ def update_location_config(product_id, kind, client_interval, server_interval,
 
 
 # }}}
+
+
+def create_enterence_worker_log(data, text, organization_id):
+  cur_time = get_datetime()
+  event_time = datetime.datetime.strptime(data['datetime'],
+                                          "%Y-%m-%dT%H:%M:%S.%fZ")
+  log = EnterenceWorkerLog(event_type=data['event_type_id']['code'],
+                           event_time=event_time,
+                           created_time=cur_time,
+                           worker_id=data['user_id']['user_id'],
+                           worker_name=data['user_id']['name'],
+                           device_id=data['device_id']['id'],
+                           device_name=data['device_id']['name'],
+                           text=text,
+                           organization_id=organization_id)
+  db.session.add(log)
+  db.session.commit()
+
+
+def get_enterence_worker_log_list(organization_id, page_num=1, limit=None):
+  _limit = limit if limit else 30
+  log_list = EnterenceWorkerLog.query.filter_by(organization_id=organization_id).\
+      order_by(desc(EnterenceWorkerLog.created_time)).paginate(page_num, _limit, False)
+  return log_list
+

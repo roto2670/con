@@ -18,6 +18,7 @@ from flask_login import current_user
 import apis
 import util
 import dash_apis
+import base.routes
 from dash import blueprint
 import in_config_apis
 from util import RedisStore
@@ -164,13 +165,43 @@ def set_total_equip(org_id, hid, dist_data_list):
   gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
   if org_id in DETECTED_BEACONS:
     DETECTED_BEACONS[org_id][hid] = list(gid_set)
+    # TODO: enter log
   else:
     DETECTED_BEACONS[org_id] = {}
     DETECTED_BEACONS[org_id][hid] = list(gid_set)
+  # TODO: Exit log
 
 
-def set_worker_count(org_id, user_id, name):
+WORKER_ENTER_TEXT = "{} Enter"
+WORKER_EXIT_TEXT = "{} Exit"
+
+
+def set_worker_count(org_id, user_id, name, event_data):
   if WORKER_COUNT.has_data(org_id, user_id):
-    ret = WORKER_COUNT.delete_data(org_id, user_id)
+     ret = WORKER_COUNT.delete_data(org_id, user_id)
+     text = WORKER_EXIT_TEXT.format(name)
+     in_config_apis.create_enterence_worker_log(event_data, text, org_id)
   else:
     ret = WORKER_COUNT.set_data(org_id, user_id, name)
+    text = WORKER_ENTER_TEXT.format(name)
+    in_config_apis.create_enterence_worker_log(event_data, text, org_id)
+
+
+@blueprint.route('/worker_log', methods=["GET"])
+@util.require_login
+def get_enterence_worker_log():
+  org_id = current_user.organization_id
+  _page_num = request.args.get('page_num')
+  _limit = request.args.get('limit', 30)
+  log_list = in_config_apis.get_enterence_worker_log_list(org_id,
+                                                          page_num=int(_page_num),
+                                                          limit=int(_limit))
+  new_list = []
+  for log in log_list.items:
+    trans_dict = log.__dict__
+    if '_sa_instance_state' in trans_dict:
+      del trans_dict['_sa_instance_state']
+    trans_dict['event_time'] = str(base.routes.datetime_filter(trans_dict['event_time']))
+    trans_dict['created_time'] = str(base.routes.datetime_filter(trans_dict['created_time']))
+    new_list.append(trans_dict)
+  return json.dumps(new_list)

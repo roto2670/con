@@ -18,6 +18,7 @@ import in_config_apis
 from dash import routes as dash_routes
 
 SESSION_ID = {}
+LAST_ID_CACHE = {}
 
 # Event
 IDENTIFY_SUCCESS_FINGERPRINT = "4865"
@@ -117,27 +118,34 @@ def get_event_logs(config_data, limit=None):
     return None
 
 
+def set_last_id_cache(org_id, last_id):
+  LAST_ID_CACHE[org_id] = last_id
+
+
 def set_event(org_id):
-  config_data = in_config_apis.get_suprema_config_by_org(org_id)
-  if config_data:
+  if org_id in LAST_ID_CACHE:
+    last_data_id = LAST_ID_CACHE[org_id]
+    config_data = in_config_apis.get_suprema_config_by_org(org_id)
     evt_log_chk = get_event_logs(config_data, "1")
     if evt_log_chk and evt_log_chk['EventCollection']['rows']:
       chk_data = evt_log_chk['EventCollection']['rows'][0]
-      if config_data.last_data_id:
-        if int(chk_data['id']) > config_data.last_data_id:
-          limit = int(chk_data['id']) - config_data.last_data_id
+      if last_data_id:
+        if int(chk_data['id']) > last_data_id:
+          limit = int(chk_data['id']) - last_data_id
           rows = _extract_rows(config_data, limit)
           last_id = None
           for data in rows:
             if data['event_type_id']['code'] == config_data.event_id:
               user_info = data['user_id']
-              dash_routes.set_worker_count(config_data.organization_id,
+              dash_routes.set_worker_count(org_id,
                                            user_info['user_id'],
-                                           user_info['name'])
+                                           user_info['name'],
+                                           data)
             last_id = data['id']
           if last_id:
-            in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
-                                                               last_id)
+            set_last_id_cache(org_id, int(last_id))
+            in_config_apis.update_suprema_config_about_last_id(org_id,
+                                                               int(last_id))
           return True
         elif config_data.last_data_id == int(chk_data['id']):
           logging.warning("Server has no more event. wait for next event")
@@ -146,8 +154,10 @@ def set_event(org_id):
           logging.warning("Data Sync is not matched please check your log")
           return False
       else:
-        in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
-                                                           chk_data['id'])
+        # TODO: last_id_data is 0?
+        set_last_id_cache(org_id, int(chk_data['id']))
+        in_config_apis.update_suprema_config_about_last_id(org_id,
+                                                           int(chk_data['id']))
         logging.warning("Update of Last event ID completed successfully.")
         return True
     else:
