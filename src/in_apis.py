@@ -964,7 +964,8 @@ def release(product_id, model_id_list):
     for _info in no_update_info_list:
       _info.product_stage_id = new_release_id
     db.session.commit()
-    remove_product_stage(_release.id)
+    if _release:
+      remove_product_stage(_release.id)
     return True
   else:
     return False
