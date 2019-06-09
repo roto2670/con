@@ -1,7 +1,8 @@
 # MicroBot Console
 
 ## Requirment
-    upper Python3.6
+    upper Python3.7
+    redis
 
 # 1. Develop Installation
 
@@ -17,13 +18,20 @@
 ### 3. Install requirements
     pip install -r requirements.txt
 
-### 4. Run the console
+### 4. Install docker
+  * docker install referrence : https://subicura.com/2017/01/19/docker-guide-for-beginners-2.html
+
+### 5. redis install and run
+    docker pull redis
+    docker run --name some-redis redis -p 6379:6379 redis
+
+### 6. Run the console
     cd src
     python run.py
 
-### 5. Go the http://127.0.0.1:16000
+### 7. Go the http://127.0.0.1:16000
 
-### 6. Quit
+### 8. Quit
     ctrl + c
     deactivate
 

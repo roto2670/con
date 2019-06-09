@@ -10,6 +10,7 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import json
+import logging
 
 from flask import request
 from flask_login import current_user
@@ -19,10 +20,17 @@ import util
 import dash_apis
 from dash import blueprint
 import in_config_apis
+from util import RedisStore
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
+BEACONS_REDIS_DB = 1
+WORKER_REDIS_DB = 2
 
 
+# DETECTED_BEACONS = RedisStore(REDIS_HOST, REDIS_PORT, BEACONS_REDIS_DB)
 DETECTED_BEACONS = {}
-WORKER_COUNT = {}
+WORKER_COUNT = RedisStore(REDIS_HOST, REDIS_PORT, WORKER_REDIS_DB)
 EQUIPMENT_EVENT = 1
 WORKER_EVENT = 2
 
@@ -148,10 +156,8 @@ def get_total_equip():
 @blueprint.route('/total_worker', methods=["GET"])
 @util.require_login
 def get_total_worker():
-  if current_user.organization_id in WORKER_COUNT:
-    count = len(WORKER_COUNT[current_user.organization_id])
-    return json.dumps(count)
-  return json.dumps(0)
+  worker_count = WORKER_COUNT.get_data_size(current_user.organization_id)
+  return json.dumps(worker_count)
 
 
 def set_total_equip(org_id, hid, dist_data_list):
@@ -164,11 +170,7 @@ def set_total_equip(org_id, hid, dist_data_list):
 
 
 def set_worker_count(org_id, user_id, name):
-  if org_id in WORKER_COUNT:
-    if user_id in WORKER_COUNT[org_id]:
-      del WORKER_COUNT[org_id][user_id]
-    else:
-      WORKER_COUNT[org_id][user_id] = name
+  if WORKER_COUNT.has_data(org_id, user_id):
+    ret = WORKER_COUNT.delete_data(org_id, user_id)
   else:
-    WORKER_COUNT[org_id] = {}
-    WORKER_COUNT[org_id][user_id] = name
+    ret = WORKER_COUNT.set_data(org_id, user_id, name)

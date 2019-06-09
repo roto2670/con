@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2019 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -19,6 +19,7 @@ import logging
 from copy import deepcopy
 from functools import wraps
 
+import redis
 from flask import redirect, request, session, url_for
 from flask_login import current_user
 
@@ -283,3 +284,46 @@ def require_login(f):
     #  return redirect(url_for('login_blueprint.login', next=request.url))
     return f(*args, **kwargs)
   return check_email_auth
+
+
+class RedisStore(object):
+  def __init__(self, host, port, db):
+    self.store = redis.StrictRedis(host=host, port=port, db=db)
+
+  def set_data(self, name, key, value):
+    try:
+      return True if self.store.hset(name, key, json.dumps(value)) else False
+    except:
+      logging.exception("Raise error while set data. key : %s, data : %s",
+                        key, value)
+
+  def get_data(self, name, key):
+    if self.has_data(name, key):
+      return json.loads(self.store.hget(name, key))
+    else:
+      return None
+
+  def get_data_of_values(self, name):
+    values = self.store.hvals(name)
+    if values:
+      value_list = []
+      for value in values:
+        value_list += json.loads(value)
+      return list(set(value_list))
+    else:
+      return []
+
+  def has_data(self, name, key):
+    return True if self.store.hexists(name, key) else False
+
+  def delete_data(self, name, key):
+    return True if self.store.hdel(name, key) else False
+
+  def clear_all_data(self):
+    return True if self.store.flushdb() else False
+
+  def get_data_size(self, name):
+    return self.store.hlen(name)
+
+  def get_all_data_size(self):
+    return self.store.dbsize()
