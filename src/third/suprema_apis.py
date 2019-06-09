@@ -22,6 +22,8 @@ SESSION_ID = {}
 # Event
 IDENTIFY_SUCCESS_FINGERPRINT = "4865"
 IDENTIFY_SUCCESS_FACE = "4867"
+IDENTIFY_FAIL_FINGERPRINT = "5124"
+IDENTIFY_FAIL_FACE = "5125"
 
 
 def get_event_list():
@@ -125,14 +127,15 @@ def set_event(org_id):
         if int(chk_data['id']) > config_data.last_data_id:
           limit = int(chk_data['id']) - config_data.last_data_id
           rows = _extract_rows(config_data, limit)
+          last_id = None
           for data in rows:
             if data['event_type_id']['code'] == config_data.event_id:
               user_info = data['user_id']
               dash_routes.set_worker_count(config_data.organization_id,
                                            user_info['user_id'],
                                            user_info['name'])
-              last_id = data['id']
-          if rows:
+            last_id = data['id']
+          if last_id:
             in_config_apis.update_suprema_config_about_last_id(config_data.organization_id,
                                                                last_id)
           return True
