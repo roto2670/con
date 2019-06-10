@@ -194,6 +194,7 @@ def set_suprema_settings():
       in_config_apis.create_suprema_config(_url, _id, _pw, _event_id,
                                            _client_interval, _server_interval,
                                            _org_id)
+      suprema_apis.set_last_id_cache(_org_id, 0)
       logging.info("Create Suprema Config. User : %s, base url : %s",
                    current_user.email, _url)
       back_scheduler.scheduler_main_worker(_org_id, _server_interval)
@@ -206,3 +207,9 @@ def set_suprema_settings():
     msg = common.get_msg("dashboard.biostar.failed_setting_message")
     common.set_error_message(title, msg)
     return redirect("/dashboard/settings")
+
+
+@blueprint.route('/worker_logs', methods=["GET"])
+@util.require_login
+def get_enterence_worker_log():
+  return render_template("worker_logs.html")
