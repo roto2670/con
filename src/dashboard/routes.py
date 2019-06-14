@@ -229,3 +229,4 @@ def set_suprema_settings():
 @util.require_login
 def get_enterence_worker_log():
   return render_template("worker_logs.html")
+

@@ -117,6 +117,13 @@ def get_beacon_list(product_id):
   return json.dumps(ret)
 
 
+@blueprint.route('/cam/list/<product_id>', methods=["GET"])
+@util.require_login
+def get_cam_list(product_id):
+  ret = dash_apis.get_cam_list(product_id)
+  return json.dumps(ret)
+
+
 @blueprint.route('/hubs/location', methods=["POST"])
 @util.require_login
 def update_scanner_location():
@@ -128,6 +135,15 @@ def update_scanner_location():
   json_data = request.get_json()
   hub_data = json_data['hub']
   ret = dash_apis.update_scanner_location(hub_data)
+  return json.dumps(ret)
+
+
+@blueprint.route('/cam/location', methods=["POST"])
+@util.require_login
+def update_cam_location():
+  json_data = request.get_json()
+  cam_data = json_data['cam']
+  ret = dash_apis.update_cam_location(cam_data)
   return json.dumps(ret)
 
 
