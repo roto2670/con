@@ -101,7 +101,7 @@ def get_event_logs(config_data, limit=None):
             "Fail to login. Check your ID, Password.  ID : %s, Password : %s",
             config_data.suprema_id, config_data.suprema_pw)
         return None
-      _resp = requests.get(url=url, headers=headers, data=json.dumps(data))
+      _resp = requests.post(url=url, headers=headers, data=json.dumps(data))
       if _resp.ok:
         return resp.json()
       else:
@@ -173,3 +173,40 @@ def _extract_rows(config_data, data_limit):
   rows = evt_log['EventCollection']['rows']
   rows = sorted(rows, key=lambda k: k['id'])
   return rows
+
+
+def get_device_list(config_data):
+  try:
+    url = "{base}api/devices".format(base=config_data.base_url)
+    headers = {'Content-Type': 'application/json',
+               'bs-session-id': SESSION_ID[config_data.organization_id]}
+    resp = requests.get(url=url, headers=headers)
+    if resp.ok:
+      return resp.json()
+    elif resp.status_code == 401:
+      login_resp = login_sup_server(config_data.suprema_id,
+                                    config_data.suprema_pw,
+                                    config_data.base_url,
+                                    config_data.organization_id)
+      if login_resp:
+        headers['bs-session-id'] = SESSION_ID[config_data.organization_id]
+      else:
+        logging.warning(
+            "Fail to login. Check your ID, Password.  ID : %s, Password : %s",
+            config_data.suprema_id, config_data.suprema_pw)
+        return None
+      _resp = requests.get(url=url, headers=headers)
+      if _resp.ok:
+        return resp.json()
+      else:
+        logging.warning("Failed to retry get device list. url : %s, code : %s, text : %s",
+                        url, _resp.status_code, _resp.text)
+        return None
+    else:
+      logging.warning("Failed to get device list. url : %s, code : %s, text : %s",
+                      url, resp.status_code, resp.text)
+      return None
+  except:
+    logging.exception("Raise error while get device list. id : %s, base url : %s",
+                      config_data.suprema_id, config_data.base_url)
+    return None
