@@ -202,7 +202,7 @@ def get_enterence_worker_log():
     trans_dict = log.__dict__
     if '_sa_instance_state' in trans_dict:
       del trans_dict['_sa_instance_state']
-    trans_dict['event_time'] = str(base.routes.datetime_filter(trans_dict['event_time']))
-    trans_dict['created_time'] = str(base.routes.datetime_filter(trans_dict['created_time']))
+    trans_dict['event_time'] = str(trans_dict['event_time'])
+    trans_dict['created_time'] = str(trans_dict['created_time'])
     new_list.append(trans_dict)
   return json.dumps(new_list)

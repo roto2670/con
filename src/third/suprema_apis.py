@@ -56,7 +56,7 @@ def login_sup_server(_id, password, base_url, org_id):
           "password": password
         }
       }
-      url = "{base}login".format(base=base_url)
+      url = "{base}api/login".format(base=base_url)
     resp = requests.post(url, headers=headers, data=json.dumps(data))
     if resp.ok:
       SESSION_ID[org_id] = resp.headers['Bs-Session-Id']
