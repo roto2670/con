@@ -82,7 +82,9 @@
                             timestamp = log.event_time,
                             payLoad = log.text;
                         var addObj= "<div class=''>" +
-                                        "<h3 class='panel-title'>" + timestamp + "     " + payLoad + "</h3>" +
+                                        "<h3 class='panel-title'>" + timestamp +
+                                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                        payLoad + "</h3>" +
                                     "</div>"
                         $(".accordion").append(addObj);
                       });
