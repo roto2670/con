@@ -48,10 +48,10 @@
                 class="form-horizontal form-label-left" method="post">
                 <div class="col-md-12">
                   <div class="item form-group">
-                    <label class="control-label col-md-2">Product
+                    <label class="control-label col-md-4">Product
                     </label>
                     <div id="scroll-style-1"
-                         class="col-md-10 allow_list_height_150">
+                         class="col-md-8 allow_list_height_150">
                       {# TODO: Handle checekd event id #}
                       {% if location_config %}
                         {% for prd in prd_list %}
@@ -69,10 +69,10 @@
                     </div>
                   </div>
                   <div class="item form-group">
-                    <label class="control-label col-md-2">kind
+                    <label class="control-label col-md-4">kind
                     </label>
                     <div id="scroll-style-1"
-                         class="col-md-10 allow_list_height_150">
+                         class="col-md-8 allow_list_height_150">
                       {% if location_config %}
                         {% for noti_key in noti_key_list %}
                           <input id="locationkindName" type="radio" class="fla"
@@ -89,9 +89,9 @@
                     </div>
                   </div>
                   <div class="item form-group">
-                    <label class="control-label col-md-2">Refresh Time
+                    <label class="control-label col-md-4">Refresh Time
                     </label>
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                       {% if location_config %}
                         <input type="number" id="locationClientInterval" name="locationClientInterval"
                             value="{{ location_config.client_interval}}" class="form-control col-md-6 col-xs-6">
@@ -102,9 +102,9 @@
                     </div>
                   </div>
                   <div class="item form-group">
-                    <label class="control-label col-md-2">Server Refresh Time
+                    <label class="control-label col-md-4">Server Refresh Time
                     </label>
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                       {% if location_config %}
                         <input type="number" id="locationServerInterval" name="locationServerInterval"
                             value="{{ location_config.server_interval}}" class="form-control col-md-6 col-xs-6">
@@ -136,9 +136,9 @@
                 class="form-horizontal form-label-left" method="post">
                 <div class="col-md-12">
                   <div class="item form-group">
-                    <label class="control-label col-md-2">ID
+                    <label class="control-label col-md-4">ID
                     </label>
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                       {% if suprema_config %}
                         <input type="text" id="supremaId" name="supremaId" value="{{ suprema_config.suprema_id }}"
                             class="form-control col-md-6 col-xs-6">
@@ -149,9 +149,9 @@
                     </div>
                   </div>
                   <div class="item form-group">
-                    <label class="control-label col-md-2">Password
+                    <label class="control-label col-md-4">Password
                     </label>
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                       {% if suprema_config %}
                         <input type="password" id="supremaPassword" name="supremaPassword"
                             value="{{ suprema_config.suprema_pw }}" class="form-control col-md-6 col-xs-6">
@@ -162,9 +162,9 @@
                     </div>
                   </div>
                   <div class="item form-group">
-                    <label class="control-label col-md-2">BaseUrl
+                    <label class="control-label col-md-4">BaseUrl
                     </label>
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                       {% if suprema_config %}
                         <input type="text" id="supremaBaseUrl" name="supremaBaseUrl"
                             value="{{ suprema_config.base_url }}" class="form-control col-md-6 col-xs-6">
@@ -175,9 +175,9 @@
                     </div>
                   </div>
                   <div class="item form-group">
-                    <label class="control-label col-md-2">Refresh Time
+                    <label class="control-label col-md-4">Refresh Time
                     </label>
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                       {% if suprema_config %}
                         <input type="number" id="supremaClientInterval" name="supremaClientInterval" min="10"
                             value="{{ suprema_config.client_interval }}" class="form-control col-md-6 col-xs-6">
@@ -188,9 +188,9 @@
                     </div>
                   </div>
                   <div class="item form-group">
-                    <label class="control-label col-md-2">Server Refresh Time
+                    <label class="control-label col-md-4">Server Refresh Time
                     </label>
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                       {% if suprema_config %}
                         <input type="number" id="supremaServerInterval" name="supremaServerInterval" min="10"
                             value="{{ suprema_config.server_interval }}" class="form-control col-md-6 col-xs-6">
@@ -201,10 +201,10 @@
                     </div>
                   </div>
                   <div class="item form-group">
-                    <label class="control-label col-md-2">Event
+                    <label class="control-label col-md-4">Event
                     </label>
                     <div id="scroll-style-1"
-                         class="col-md-10 allow_list_height_150">
+                         class="col-md-8 allow_list_height_150">
                       {% if suprema_config %}
                         {# TODO: Handle checekd event id #}
                         {% for event in biostar_event_list %}

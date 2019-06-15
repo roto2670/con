@@ -172,18 +172,19 @@ def set_total_equip(org_id, hid, dist_data_list):
   # TODO: Exit log
 
 
-WORKER_ENTER_TEXT = "{} Enter"
-WORKER_EXIT_TEXT = "{} Exit"
+WORKER_ENTER_TEXT = "{} entered {}"
+WORKER_EXIT_TEXT = "{} came out {}"
 
 
 def set_worker_count(org_id, user_id, name, event_data):
+  device_name = event_data['device_id']['name']
   if WORKER_COUNT.has_data(org_id, user_id):
-     ret = WORKER_COUNT.delete_data(org_id, user_id)
-     text = WORKER_EXIT_TEXT.format(name)
-     in_config_apis.create_enterence_worker_log(event_data, text, org_id)
+    ret = WORKER_COUNT.delete_data(org_id, user_id)
+    text = WORKER_EXIT_TEXT.format(name, device_name)
+    in_config_apis.create_enterence_worker_log(event_data, text, org_id)
   else:
     ret = WORKER_COUNT.set_data(org_id, user_id, name)
-    text = WORKER_ENTER_TEXT.format(name)
+    text = WORKER_ENTER_TEXT.format(name, device_name)
     in_config_apis.create_enterence_worker_log(event_data, text, org_id)
 
 

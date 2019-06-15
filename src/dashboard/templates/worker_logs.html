@@ -6,7 +6,7 @@
   </div>
 {% endblock sidebar %}
 
-{% block title %} Worker Enterence Logs {% endblock title %}
+{% block title %} Enterence Logs {% endblock title %}
 {% block javascripts %}
 
   {{ super() }}
@@ -22,11 +22,14 @@
       <!-- start row -->
       <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
-          <div class="x_panel">
+          <div class="x_panel tile">
+            <div class="x_title">
+              <h3>Logs</h3>
+            </div>
             <div class="x_content">
-              <div class="accordion" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
+              <div class="accordion" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;padding-left: 30px;">
               </div>
-              <div id="pageMore" style="cursor: pointer;margin-left:100px;margin-top:10px; margin-bottom: 10px;">More</div>
+              <div id="pageMore" style="cursor: pointer;text-align: center;margin-top:10px; margin-bottom: 10px;">More</div>
                 <script>
                   var nextPageNum = 1;
 
@@ -43,31 +46,37 @@
                     jQuery.get(url, { 'page_num': getNextPageNumber()})
                       .done(function (data) {
                         var logList = JSON.parse(data);
-                        logList.forEach(function (log) {
-                          var logId = log.id,
-                              timestamp = log.event_time,
-                              payLoad = log.text;
-                          var addObj= "<div class=''>" +
-                                          "<h3 class='panel-title'>" + timestamp + "     " + payLoad + "</h3>" +
-                                      "</div>"
+                        if (logList) {
+                          logList.forEach(function (log) {
+                            var logId = log.id,
+                                timestamp = log.event_time,
+                                payLoad = log.text;
+                            var addObj= "<div class=''>" +
+                                            "<h3 class='panel-title'>" + timestamp +
+                                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                            payLoad + "</h3>" +
+                                        "</div>"
 
-                          $(".accordion").append(addObj);
-                        });
-
+                            $(".accordion").append(addObj);
+                          });
+                        } else {
+                          $("#pageMore").remove();
+                        }
                         setNextPageNumber();
                       });
                   }
 
-                $("#pageMore").click(function(){
-                    getLogs();
-                });
-                getLogs();
-              </script>
-          </div>
-        </div> <!-- end x_content -->
-      </div> <!-- end x_panel -->
-    </div> <!-- End row -->
+                  $("#pageMore").click(function(){
+                      getLogs();
+                  });
+                  getLogs();
+                </script>
+              </div>
+            </div> <!-- end x_content -->
+          </div> <!-- end x_panel -->
+        </div>
+      </div> <!-- End row -->
+    </div>
   </div>
-</div>
 
 {% endblock content %}
