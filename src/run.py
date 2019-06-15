@@ -25,7 +25,7 @@ import dash_apis
 import common
 import base.routes
 import back_scheduler
-from base import db, auth, login_manager
+from base import db, auth, login_manager, cache
 from config import DebugConfig, ProductionConfig
 
 sys.dont_write_bytecode = True
@@ -38,7 +38,6 @@ def register_extensions(app):
   login_manager.init_app(app)
   # custom
   app.context_processor(base.routes.about_product)
-  app.context_processor(base.routes.about_organization)
   app.context_processor(common.get_message)
   # jinja
   app.jinja_env.filters['datetimeFilter'] = base.routes.datetime_filter
@@ -95,6 +94,7 @@ def create_app():
     app.config.from_object(DebugConfig)
   else:
     app.config.from_object(ProductionConfig)
+  cache.init_app(app)
   apis.init(app)
   dash_apis.init(app)
   configure_logs(app)

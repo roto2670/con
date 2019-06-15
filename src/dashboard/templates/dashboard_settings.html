@@ -179,11 +179,11 @@
                     </label>
                     <div class="col-md-8">
                       {% if suprema_config %}
-                        <input type="number" id="supremaClientInterval" name="supremaClientInterval" min="10"
+                        <input type="number" id="supremaClientInterval" name="supremaClientInterval" min="1"
                             value="{{ suprema_config.client_interval }}" class="form-control col-md-6 col-xs-6">
                       {% else %}
-                        <input type="number" id="supremaClientInterval" name="supremaClientInterval" min="10"
-                            value="10" class="form-control col-md-6 col-xs-6">
+                        <input type="number" id="supremaClientInterval" name="supremaClientInterval" min="1"
+                            value="5" class="form-control col-md-6 col-xs-6">
                       {% endif %}
                     </div>
                   </div>
@@ -192,11 +192,11 @@
                     </label>
                     <div class="col-md-8">
                       {% if suprema_config %}
-                        <input type="number" id="supremaServerInterval" name="supremaServerInterval" min="10"
+                        <input type="number" id="supremaServerInterval" name="supremaServerInterval" min="3"
                             value="{{ suprema_config.server_interval }}" class="form-control col-md-6 col-xs-6">
                       {% else %}
-                        <input type="number" id="supremaServerInterval" name="supremaServerInterval" min="10"
-                            value="10" class="form-control col-md-6 col-xs-6">
+                        <input type="number" id="supremaServerInterval" name="supremaServerInterval" min="3"
+                            value="5" class="form-control col-md-6 col-xs-6">
                       {% endif %}
                     </div>
                   </div>
@@ -240,6 +240,9 @@
       </div>  <!-- End row-->
 
       <div class="row">  <!-- Start row -->
+      <!--
+        <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms" src='https://172.16.5.10'></iframe>
+      -->
       </div>  <!-- End row-->
   </div>
 

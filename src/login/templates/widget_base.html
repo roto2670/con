@@ -7,12 +7,15 @@
     <script src="https://cdn.firebase.com/libs/firebaseui/3.4.1/firebaseui.js"></script>
     {% block scripts %}
     {% endblock %}
+    <title>Smart Control System</title>
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.css" />
     {% if default %}
       <link type="text/css" rel="stylesheet" href="/static/build/css/custom-auth.css">
     {% else %}
       <link type="text/css" rel="stylesheet" href="/static/build/css/custom-auth-1.css">
     {% endif %}
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
     {% block styles %}
     {% endblock %}
     {% if firebase_auth.api_key %}
@@ -53,34 +56,16 @@
     {% block header %}
     {% endblock %}
       <div id="firebaseui-auth-container" class="auth-content">
-        {% if default %}
-          <div class="header-container">
-            <div class="logo-container">
-              <img src="{{ logo_uri }}" />
-            </div>
-            <div class="messege-container">
-              <strong>Hi there!</strong>
-              <p>Get started with a free MiB Console account. No credit card required.</p>
-              <p style="color: #888; font-size: 11px; opacity: .75;">By clicking the button, you agree to our <a href="//microbot.is/privacy-policy/" target="_blank">legal policies</a>.</p>
-            </div>
+        <div class="top-container">
+          <div class="logo-container">
+              <img class="logo" src="{{ logo_uri }}" />
           </div>
-        {% else %}
-          <div class="top-container">
-            <div class="logo-container">
-                <img class="logo" src="{{ logo_uri }}" />
-            </div>
+        </div>
+        <div class="header-container">
+          <div class="messege-container">
           </div>
-          <div class="header-container">
-            <div class="messege-container">
-              <strong>Hi there!</strong>
-              <p>Get started with a free MiB Console account.</p>
-              <p>No credit card required.</p>
-              <p style="color: #888; font-size: 11px; opacity: .75;">By clicking the button, you agree to our <a href="//microbot.is/privacy-policy/" target="_blank">legal policies</a>.</p>
-            </div>
-          </div>
-        {% endif %}
+        </div>
       </div>
-      {# TODO: Default text explaining that you sign up by signing in. #}
     {% block footer %}
     {% endblock %}
   </body>

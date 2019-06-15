@@ -75,8 +75,15 @@ def get_scanner_list():
   :content : noti_key db의 kind를 확인 하여 서버에 Request를 보내고 그에 맞는 Hublist를 가져온다
   """
   config_data = in_config_apis.get_location_config_by_org(current_user.organization_id)
+  # TODO: Not config data.... is not get scanner list
+  if not config_data:
+    return json.dumps([])
   ret = dash_apis.get_scanner_list(config_data.kind)
-  return json.dumps(ret)
+  new_ret = []
+  for scanner in ret:
+    if scanner['kind'] == "com.thenaran.rtos.m":
+      new_ret.append(scanner)
+  return json.dumps(new_ret)
 
 
 @blueprint.route('/beacons/detected/<hub_id>', methods=["GET"])

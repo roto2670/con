@@ -170,7 +170,7 @@ def update_location_config(product_id, kind, client_interval, server_interval,
 
 def create_enterence_worker_log(data, text, organization_id):
   cur_time = get_datetime()
-  event_time = datetime.datetime.strptime(data['datetime'],
+  event_time = datetime.datetime.strptime(data['server_datetime'],
                                           "%Y-%m-%dT%H:%M:%S.%fZ")
   log = EnterenceWorkerLog(event_type=data['event_type_id']['code'],
                            event_time=event_time,

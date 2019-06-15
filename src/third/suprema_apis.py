@@ -46,7 +46,8 @@ def login_sup_server(_id, password, base_url, org_id):
       data = {
         "User": {
           "login_id": "admin",
-          "password": "adminadmin1"
+          "password": "mproject1"
+          #"password": "adminadmin1"
         }
       }
     else:
@@ -127,6 +128,7 @@ def set_event(org_id):
     last_data_id = LAST_ID_CACHE[org_id]
     config_data = in_config_apis.get_suprema_config_by_org(org_id)
     evt_log_chk = get_event_logs(config_data, "1")
+    logging.info("### evt log chk : %s", evt_log_chk)
     if evt_log_chk and evt_log_chk['EventCollection']['rows']:
       chk_data = evt_log_chk['EventCollection']['rows'][0]
       if last_data_id:

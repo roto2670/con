@@ -23,6 +23,7 @@ import in_config_apis
 from dashboard import blueprint
 import back_scheduler
 from third import suprema_apis
+from base import cache
 
 
 SCHEDULE_COMMON_FILE_NAME = '''schedule'''
@@ -31,6 +32,7 @@ LOCATION_MAP_URI = "/dashboard/static/location/{org_id}/{file_name}"
 
 
 @blueprint.route('/', methods=['GET'])
+@cache.cached(timeout=60)
 @util.require_login
 def default_route():
   _org_id = current_user.organization_id
@@ -63,6 +65,7 @@ def default_counte():
 
 
 @blueprint.route('/workschedule', methods=['GET'])
+@cache.cached(timeout=60)
 @util.require_login
 def default_workschedule():
   return render_template("workschedule.html")
@@ -103,6 +106,7 @@ def upload_workschedule():
 
 
 @blueprint.route('/location', methods=['GET'])
+@cache.cached(timeout=60)
 @util.require_login
 def default_location():
   return render_template("location.html")
@@ -145,6 +149,7 @@ def upload_location_map():
 
 
 @blueprint.route('/settings', methods=['GET'])
+@cache.cached(timeout=60)
 @util.require_login
 def dashboard_settings():
   _org_id = current_user.organization_id
@@ -226,6 +231,7 @@ def set_suprema_settings():
 
 
 @blueprint.route('/worker_logs', methods=["GET"])
+@cache.cached(timeout=60)
 @util.require_login
 def get_enterence_worker_log():
   return render_template("worker_logs.html")

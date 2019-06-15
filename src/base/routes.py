@@ -280,24 +280,6 @@ def about_product():
               product_list=_get_product_list())
 
 
-def _get_footer():
-  if current_user and current_user.is_authenticated:
-    if current_user.organization_id:
-      footer = in_config_apis.get_footer_by_organization(current_user.organization_id)
-      if footer:
-        data = {
-            "text": footer.text,
-            "image_uri": footer.image_uri,
-            "file_names": json.loads(footer.file_names)
-        }
-        return data
-  return {}
-
-
-def about_organization():
-  return dict(footer=_get_footer())
-
-
 ## Jinja template
 
 

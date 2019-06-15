@@ -52,15 +52,7 @@ def _check_time():
 
 
 def check_onboarding(organization_id=None, product_id=None):
-  if _check_time():
-    check_release(product_id)
-    check_test()
-    check_tester(product_id, organization_id)
-    check_firmware(product_id)
-    check_header_file()
-    check_ep(product_id)
-    check_download_file()
-    check_model(product_id)
+  return True
 
 
 def check_model(product_id):
