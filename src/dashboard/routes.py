@@ -46,6 +46,22 @@ def default_route():
                          equip_interval=equip_interval)
 
 
+@blueprint.route('/count', methods=['GET'])
+@util.require_login
+def default_counte():
+  _org_id = current_user.organization_id
+  worker_interval = 10
+  equip_interval = 10
+  suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
+  location_config = in_config_apis.get_location_config_by_org(_org_id)
+  if suprema_config:
+    worker_interval = suprema_config.client_interval
+  if location_config:
+    equip_interval = location_config.client_interval
+  return render_template("dashboard_count.html", worker_interval=worker_interval,
+                         equip_interval=equip_interval)
+
+
 @blueprint.route('/workschedule', methods=['GET'])
 @util.require_login
 def default_workschedule():
