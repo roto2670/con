@@ -55,13 +55,13 @@
                       {# TODO: Handle checekd event id #}
                       {% if location_config %}
                         {% for prd in prd_list %}
-                          <input id="locationPrdId" type="radio" class="fla"
+                          <input id="{{ prd.id }}" type="radio" class="fla"
                                 name="locationPrdId" value="{{ prd.id }}" required="requried">
                           {{ prd.name }}<br>
                         {% endfor %}
                       {% else %}
                         {% for prd in prd_list %}
-                          <input id="locationPrdId" type="radio" class="fla"
+                          <input id="{{ prd.id }}" type="radio" class="fla"
                                 name="locationPrdId" value="{{ prd.id }}" required="requried">
                           {{ prd.name }}<br>
                         {% endfor %}
@@ -75,13 +75,13 @@
                          class="col-md-8 allow_list_height_150">
                       {% if location_config %}
                         {% for noti_key in noti_key_list %}
-                          <input id="locationkindName" type="radio" class="fla"
+                          <input id="{{ noti_key.id }}" type="radio" class="fla"
                                 name="locationkindName" value="{{ noti_key.name }}" required="requried">
                           {{ noti_key.name }}<br>
                         {% endfor %}
                       {% else %}
                         {% for noti_key in noti_key_list %}
-                          <input id="locationkindName" type="radio" class="fla"
+                          <input id="{{ noti_key.id }}" type="radio" class="fla"
                                 name="locationkindName" value="{{ noti_key.name }}" required="requried">
                           {{ noti_key.name }}<br>
                         {% endfor %}
@@ -209,18 +209,18 @@
                         {# TODO: Handle checekd event id #}
                         {% for event in biostar_event_list %}
                           {% if suprema_config.event_id == event.id %}
-                            <input id="supremaEvent" type="radio" class="fla"
+                            <input id="{{ event.id }}" type="radio" class="fla"
                                   name="supremaEvent" value="{{ event.id }}" required="requried">
                             {{ event.name }}<br>
                           {% else %}
-                            <input id="supremaEvent" type="radio" class="fla"
+                            <input id="{{ event.id }}" type="radio" class="fla"
                                   name="supremaEvent" value="{{ event.id }}" required="requried">
                             {{ event.name }}<br>
                           {% endif %}
                         {% endfor %}
                       {% else %}
                         {% for event in biostar_event_list %}
-                          <input id="supremaEvent" type="radio" class="fla"
+                          <input id="{{ event.id }}" type="radio" class="fla"
                                 name="supremaEvent" value="{{ event.id }}" required="requried">
                           {{ event.name }}<br>
                         {% endfor %}
