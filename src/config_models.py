@@ -64,6 +64,17 @@ class _LocationConfig(db.Model):
   organization_id = Column(String(75))
 
 
+class _DeviceData(db.Model):
+  __tablename__ = '_device_data'
+
+  id = Column(String(75), primary_key=True)
+  name = Column(String(75))
+  kind = Column(String(75))
+  custom = Column(Text)
+  update_time = Column(DateTime)
+  organization_id = Column(String(75))
+
+
 class _EnterenceWorkerLog(db.Model):
   __tablename__ = '_enterence_worker_log'
 
@@ -99,3 +110,23 @@ class _CountDeviceSetting(db.Model):
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   organization_id = Column(String(75))
+
+
+class _DetectedEquipLog(db.Model):
+  __tablename__ = '_detected_equip_log'
+
+  id = Column(Integer, primary_key=True)
+  event_time = Column(DateTime)
+  created_time = Column(DateTime)
+  hub_id = Column(String(75))
+  hub_name = Column(String(75))
+  gadget_id = Column(String(75))
+  gadget_name = Column(String(75))
+  text = Column(Text)
+  organization_id = Column(String(75))
+
+  def __init__(self, **kwargs):
+    for property, value in kwargs.items():
+      if hasattr(value, '__iter__') and not isinstance(value, str):
+        value = value[0]
+      setattr(self, property, value)

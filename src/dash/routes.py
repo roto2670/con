@@ -46,7 +46,7 @@ def get_location_inforamtion():
   """
   if apis.IS_DEV:
     data = {
-        "product_id": "mibs",
+        "product_id": "mibsskec",
         "interval": 60
     }
     return json.dumps(data)
@@ -132,9 +132,9 @@ def get_cam_list(product_id):
   return json.dumps(ret)
 
 
-@blueprint.route('/hubs/location', methods=["POST"])
+@blueprint.route('/hubs/update', methods=["POST"])
 @util.require_login
-def update_scanner_location():
+def update_scanner():
   """
   :param : None
   :return : bool
@@ -142,7 +142,7 @@ def update_scanner_location():
   """
   json_data = request.get_json()
   hub_data = json_data['hub']
-  ret = dash_apis.update_scanner_location(hub_data)
+  ret = dash_apis.update_scanner(hub_data)
   return json.dumps(ret)
 
 
@@ -179,14 +179,43 @@ def get_total_equip():
 
 
 def set_total_equip(org_id, hid, dist_data_list):
-  gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
-  if org_id in DETECTED_BEACONS:
-    DETECTED_BEACONS[org_id][hid] = list(gid_set)
-    # TODO: enter log
+  device_data = in_config_apis.get_device_data(hid, org_id)
+  custom = json.loads(device_data.custom)
+  if "is_counted_hub" and 'map_location' in custom:
+    if custom['is_counted_hub']:
+      gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
+      if org_id in DETECTED_BEACONS:
+        DETECTED_BEACONS[org_id][hid] = list(gid_set)
+      else:
+        DETECTED_BEACONS[org_id] = {}
+        DETECTED_BEACONS[org_id][hid] = list(gid_set)
+      set_equip_log(org_id, hid, dist_data_list)
+    else:
+      if org_id in DETECTED_BEACONS and hid in DETECTED_BEACONS[org_id]:
+        DETECTED_BEACONS[org_id][hid] = []
+      logging.warning("this scanner can not set count about detected data")
   else:
-    DETECTED_BEACONS[org_id] = {}
-    DETECTED_BEACONS[org_id][hid] = list(gid_set)
-  # TODO: Exit log
+    DETECTED_BEACONS[org_id][hid] = []
+    logging.warning("The scanner does not have custom data, Please add the "
+                    "scanner to the map first. ")
+
+
+EQUIP_DETECTED_TEXT = "{} has detected {}"
+
+
+def set_equip_log(org_id, hid, dist_data_list):
+  hub_data = in_config_apis.get_device_data(hid, org_id)
+  for dist_data in dist_data_list:
+    gadget_data = in_config_apis.get_device_data(dist_data['gid'], org_id)
+    text = EQUIP_DETECTED_TEXT.format(hub_data.name, gadget_data.name)
+    data_exist = in_config_apis.get_detected_equip_log_data(hid, dist_data['gid'],
+                                                            dist_data['_t'])
+    if not data_exist:
+      in_config_apis.create_detected_equip_log(dist_data['_t'], hid, hub_data.name,
+                                               dist_data['gid'], gadget_data.name,
+                                               text, org_id)
+    else:
+      logging.warning("equip detected log is already exist")
 
 
 @blueprint.route('/worker_log', methods=["GET"])
@@ -198,6 +227,26 @@ def get_enterence_worker_log():
   log_list = in_config_apis.get_enterence_worker_log_list(org_id,
                                                           page_num=int(_page_num),
                                                           limit=int(_limit))
+  new_list = []
+  for log in log_list.items:
+    trans_dict = log.__dict__
+    if '_sa_instance_state' in trans_dict:
+      del trans_dict['_sa_instance_state']
+    trans_dict['event_time'] = str(trans_dict['event_time'])
+    trans_dict['created_time'] = str(trans_dict['created_time'])
+    new_list.append(trans_dict)
+  return json.dumps(new_list)
+
+
+@blueprint.route('/equip_log', methods=["GET"])
+@util.require_login
+def get_detected_equip_log():
+  org_id = current_user.organization_id
+  _page_num = request.args.get('page_num')
+  _limit = request.args.get('limit', 30)
+  log_list = in_config_apis.get_detected_equip_log_list(org_id,
+                                                        page_num=int(_page_num),
+                                                        limit=int(_limit))
   new_list = []
   for log in log_list.items:
     trans_dict = log.__dict__
