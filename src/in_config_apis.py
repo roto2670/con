@@ -189,7 +189,7 @@ def create_enterence_worker_log(data, text, organization_id):
 def get_enterence_worker_log_list(organization_id, page_num=1, limit=None):
   _limit = limit if limit else 30
   log_list = EnterenceWorkerLog.query.filter_by(organization_id=organization_id).\
-      order_by(desc(EnterenceWorkerLog.created_time)).paginate(page_num, _limit, False)
+      order_by(desc(EnterenceWorkerLog.id)).paginate(page_num, _limit, False)
   return log_list
 
 
