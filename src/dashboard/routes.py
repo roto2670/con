@@ -12,6 +12,7 @@
 
 import os, stat
 import logging
+import json
 
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
@@ -20,10 +21,10 @@ import util
 import common
 import in_apis
 import in_config_apis
+from dashboard import count
 from dashboard import blueprint
 import back_scheduler
 from third import suprema_apis
-from base import cache
 
 
 SCHEDULE_COMMON_FILE_NAME = '''schedule'''
@@ -32,7 +33,6 @@ LOCATION_MAP_URI = "/dashboard/static/location/{org_id}/{file_name}"
 
 
 @blueprint.route('/', methods=['GET'])
-@cache.cached(timeout=60)
 @util.require_login
 def default_route():
   _org_id = current_user.organization_id
@@ -50,25 +50,46 @@ def default_route():
 
 @blueprint.route('/count', methods=['GET'])
 @util.require_login
-def default_counte():
-  _org_id = current_user.organization_id
-  worker_interval = 10
-  equip_interval = 10
-  suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
-  location_config = in_config_apis.get_location_config_by_org(_org_id)
-  if suprema_config:
-    worker_interval = suprema_config.client_interval
-  if location_config:
-    equip_interval = location_config.client_interval
-  return render_template("dashboard_count.html", worker_interval=worker_interval,
-                         equip_interval=equip_interval)
+def default_count():
+  return count.default_count()
 
 
 @blueprint.route('/workschedule', methods=['GET'])
-@cache.cached(timeout=60)
 @util.require_login
 def default_workschedule():
   return render_template("workschedule.html")
+
+
+@blueprint.route('/count/settings', methods=['GET'])
+@util.require_login
+def default_count_setting_page():
+  return count.device_list()
+
+
+@blueprint.route('/count/settings/<device_id>', methods=['POST'])
+@util.require_login
+def default_count_setting(device_id):
+  return count.set_device(device_id)
+
+
+@blueprint.route('/count/settings/delete/<device_id>', methods=['GET'])
+@util.require_login
+def default_count_delete(device_id):
+  return count.delete_device(device_id)
+
+
+@blueprint.route('/count/worker/counting/<key>', methods=['GET'])
+@util.require_login
+def get_worker_count(key):
+  worker_count = count.get_worker_count(int(key))
+  return json.dumps(worker_count)
+
+
+@blueprint.route('/count/worker/counting/total', methods=['GET'])
+@util.require_login
+def get_total_worker_count():
+  total_worker_count = count.get_total_worker()
+  return json.dumps(total_worker_count)
 
 
 @blueprint.route('/workschedule/view', methods=['GET'])
@@ -106,7 +127,6 @@ def upload_workschedule():
 
 
 @blueprint.route('/location', methods=['GET'])
-@cache.cached(timeout=60)
 @util.require_login
 def default_location():
   return render_template("location.html")
@@ -149,7 +169,6 @@ def upload_location_map():
 
 
 @blueprint.route('/settings', methods=['GET'])
-@cache.cached(timeout=60)
 @util.require_login
 def dashboard_settings():
   _org_id = current_user.organization_id
@@ -231,7 +250,6 @@ def set_suprema_settings():
 
 
 @blueprint.route('/worker_logs', methods=["GET"])
-@cache.cached(timeout=60)
 @util.require_login
 def get_enterence_worker_log():
   return render_template("worker_logs.html")

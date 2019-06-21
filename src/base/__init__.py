@@ -12,7 +12,6 @@
 from flask import Blueprint  # noqa : pylint: disable=import-error
 from flask_login import LoginManager  # noqa : pylint: disable=import-error
 from flask_sqlalchemy import SQLAlchemy  # noqa : pylint: disable=import-error
-from flask_caching import Cache
 
 from login import FirebaseAuth
 
@@ -27,4 +26,3 @@ blueprint = Blueprint(
 db = SQLAlchemy()
 auth = FirebaseAuth()
 login_manager = LoginManager()
-cache = Cache(config={'CACHE_TYPE': 'filesystem', 'CACHE_DIR': '/tmp'})

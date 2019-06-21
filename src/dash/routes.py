@@ -19,6 +19,7 @@ import apis
 import util
 import dash_apis
 import base.routes
+import dashboard
 from dash import blueprint
 import in_config_apis
 from util import RedisStore
@@ -177,13 +178,6 @@ def get_total_equip():
   return json.dumps(0)
 
 
-@blueprint.route('/total_worker', methods=["GET"])
-@util.require_login
-def get_total_worker():
-  worker_count = WORKER_COUNT.get_data_size(current_user.organization_id)
-  return json.dumps(worker_count)
-
-
 def set_total_equip(org_id, hid, dist_data_list):
   gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
   if org_id in DETECTED_BEACONS:
@@ -193,22 +187,6 @@ def set_total_equip(org_id, hid, dist_data_list):
     DETECTED_BEACONS[org_id] = {}
     DETECTED_BEACONS[org_id][hid] = list(gid_set)
   # TODO: Exit log
-
-
-WORKER_ENTER_TEXT = "{} entered {}"
-WORKER_EXIT_TEXT = "{} came out {}"
-
-
-def set_worker_count(org_id, user_id, name, event_data):
-  device_name = event_data['device_id']['name']
-  if WORKER_COUNT.has_data(org_id, user_id):
-    ret = WORKER_COUNT.delete_data(org_id, user_id)
-    text = WORKER_EXIT_TEXT.format(name, device_name)
-    in_config_apis.create_enterence_worker_log(event_data, text, org_id)
-  else:
-    ret = WORKER_COUNT.set_data(org_id, user_id, name)
-    text = WORKER_ENTER_TEXT.format(name, device_name)
-    in_config_apis.create_enterence_worker_log(event_data, text, org_id)
 
 
 @blueprint.route('/worker_log', methods=["GET"])

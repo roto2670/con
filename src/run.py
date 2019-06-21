@@ -25,7 +25,7 @@ import dash_apis
 import common
 import base.routes
 import back_scheduler
-from base import db, auth, login_manager, cache
+from base import db, auth, login_manager
 from config import DebugConfig, ProductionConfig
 
 sys.dont_write_bytecode = True
@@ -94,7 +94,6 @@ def create_app():
     app.config.from_object(DebugConfig)
   else:
     app.config.from_object(ProductionConfig)
-  cache.init_app(app)
   apis.init(app)
   dash_apis.init(app)
   configure_logs(app)
