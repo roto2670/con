@@ -87,8 +87,10 @@ def get_all_equip_config():
 
 def beacon_detect_scheduler(kind, org_id):
   scanner_list = dash_apis.get_scanner_list(kind, org_id)
-  for scanner in scanner_list:
-    get_detected_data(scanner, org_id)
+  if scanner_list:
+    for scanner in scanner_list:
+      if scanner['kind'] == "com.thenaran.rtos.m":
+        get_detected_data(scanner, org_id)
 
 
 def get_detected_data(scanner, org_id, query_id=None, extend_data=[]):

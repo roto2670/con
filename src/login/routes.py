@@ -19,8 +19,7 @@ from base import db
 from login import blueprint
 
 
-BASE_LOGO_URI = '''/static/images/logo--mib_console-color.svg'''
-SK_LOGO_URI = '''/static/images/logo-scs-temp.png'''
+SK_LOGO_URI = '''/static/images/logo.png'''
 
 
 @blueprint.route('/login', methods={'GET', 'POST'})
@@ -28,8 +27,7 @@ def login():
   if not current_user.is_authenticated:
     referrer = request.args['ref'] if 'ref' in request.args else None
     return current_app.extensions['firebase_auth'].login(referrer=referrer,
-                                                         logo_uri=BASE_LOGO_URI,
-                                                         default=True)
+                                                         logo_uri=SK_LOGO_URI)
   else:
     user = in_apis.get_user(current_user.id)
     user.last_access_time = in_apis.get_datetime()
@@ -39,7 +37,7 @@ def login():
       if not current_user.organization_id:
         return redirect(url_for('management_blueprint.create'))
       else:
-        return redirect(url_for('home_blueprint.index'))
+        return redirect(url_for('dashboard_blueprint.default_route'))
     else:
       return redirect(url_for('base_blueprint.route_verified'))
 

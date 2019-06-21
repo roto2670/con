@@ -78,6 +78,29 @@ def update_scanner_location(hub_obj):
     return None
 
 
+def update_cam_location(cam_data):
+  try:
+    url = "{base}gadgets/{cam_data}".format(base=THIRD_BASE_URL,
+                                            cam_data=cam_data['id'])
+    headers = _get_user_header(is_json=True)
+    data = json.dumps({"custom": cam_data['custom']})
+    logging.info("Update cam location request. url : %s, data : %s",
+                 url, data)
+    resp = requests.post(url, headers=headers, data=data)
+    if resp.ok:
+      logging.info("update cam location successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed update cam location. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while update cam location.",
+                      cam_data)
+    return None
+
+
 def get_scanner_list(kind, org_id=None):
   """
   :param : kind
@@ -134,6 +157,30 @@ def get_beacon_list(product_id):
         logging.warning("Failed to get beacon list. Code : %s, Text : %s",
                         resp.status_code, resp.text)
         return []
+  except:
+    logging.exception("Raise error while get beacon list. url : %s", url)
+    return None
+
+
+def get_cam_list(product_id):
+  try:
+    url = "{base}products/{pid}/gadgets".format(base=THIRD_BASE_URL,
+                                                pid=product_id)
+    headers = _get_user_header()
+    logging.info("Get beacon list request. url : %s", url)
+    resp = requests.get(url, headers=headers)
+    if resp.ok:
+      ret_list = []
+      gadgets = resp.json()
+      for gadget in gadgets:
+        if gadget['hub_id']:
+          ret_list.append(gadget)
+      logging.info("Get beacon list resp : %s", ret_list)
+      return ret_list
+    else:
+      logging.warning("Failed to get beacon list. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return []
   except:
     logging.exception("Raise error while get beacon list. url : %s", url)
     return None

@@ -4,17 +4,19 @@
     {% block head %} {% block meta %}
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <!-- Meta, title, CSS, favicons, etc. -->
-        <link rel="shortcut icon" href="#" />
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
       {% endblock meta %}
 
-      <title>MiB Console | {% block title %}{% endblock %}</title>
+      <title>Smart Control System</title>
 
       {% block stylesheets %}
         <!-- Favicon -->
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
         <!-- Bootstrap -->
         <link href="{{ url_for('static', filename='vendors/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
         <!-- Font Awesome -->
@@ -109,20 +111,14 @@
           {% block footer %}
             <div class="custom-footer">
               <div class="left-container">
-                {% if footer %}
-                  <div class="text-container">
-                    {{ footer.text }}
-                  </div>
-                  <div class="image-container" style="display:inline-block;">
-                    {% for file_name in footer.file_names %}
-                      <img src="{{footer.image_uri}}{{file_name}}">
-                    {% endfor %}
-                  </div>
-                {% endif %}
+                <div class="text-container">
+                </div>
               </div>
               <div class="right-container">
-                <div class="text-container">
-                  <a href="https://thenaran.com" target="_blank" style="cursor:pointer;">Naran</a> Inc.
+                <div class="image-container" style="display:inline-block;">
+                  <img src="/static/images/logo--adnoc.png">
+                  <img src="/static/images/logo--sk_enc.png">
+                  <img src="/static/images/logo--mproject.png">
                 </div>
               </div>
             </div>

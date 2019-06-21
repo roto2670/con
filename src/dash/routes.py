@@ -75,8 +75,15 @@ def get_scanner_list():
   :content : noti_key db의 kind를 확인 하여 서버에 Request를 보내고 그에 맞는 Hublist를 가져온다
   """
   config_data = in_config_apis.get_location_config_by_org(current_user.organization_id)
+  # TODO: Not config data.... is not get scanner list
+  if not config_data:
+    return json.dumps([])
   ret = dash_apis.get_scanner_list(config_data.kind)
-  return json.dumps(ret)
+  new_ret = []
+  for scanner in ret:
+    if scanner['kind'] == "com.thenaran.rtos.m":
+      new_ret.append(scanner)
+  return json.dumps(new_ret)
 
 
 @blueprint.route('/beacons/detected/<hub_id>', methods=["GET"])
@@ -117,6 +124,13 @@ def get_beacon_list(product_id):
   return json.dumps(ret)
 
 
+@blueprint.route('/cam/list/<product_id>', methods=["GET"])
+@util.require_login
+def get_cam_list(product_id):
+  ret = dash_apis.get_cam_list(product_id)
+  return json.dumps(ret)
+
+
 @blueprint.route('/hubs/location', methods=["POST"])
 @util.require_login
 def update_scanner_location():
@@ -128,6 +142,15 @@ def update_scanner_location():
   json_data = request.get_json()
   hub_data = json_data['hub']
   ret = dash_apis.update_scanner_location(hub_data)
+  return json.dumps(ret)
+
+
+@blueprint.route('/cam/location', methods=["POST"])
+@util.require_login
+def update_cam_location():
+  json_data = request.get_json()
+  cam_data = json_data['cam']
+  ret = dash_apis.update_cam_location(cam_data)
   return json.dumps(ret)
 
 

@@ -61,6 +61,18 @@ def default_organization_member():
   return organization.member()
 
 
+@blueprint.route('/organization/member/<user_id>/accept', methods=['POST'])
+@util.require_login
+def member_accept(user_id):
+  return organization.member_accept(user_id)
+
+
+@blueprint.route('/organization/member/<user_id>/delete', methods=['POST'])
+@util.require_login
+def member_delete(user_id):
+  return organization.member_delete(user_id)
+
+
 @blueprint.route('/organization/product', methods=['GET'])
 @util.require_login
 def default_organization_product():

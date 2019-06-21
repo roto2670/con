@@ -24,7 +24,7 @@
                   <th>Email</th>
                   <th>Level</th>
                   <th>last_access</th>
-                  <th>Delete</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>
@@ -43,8 +43,81 @@
                     {% else %}
                       {% if current_user.level == 0 %}
                         <td>
-                          <a href="#" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i> Delete</a>
+                          {% if not user.email_verified %}
+                            <button type="button" class="btn-danger btn-xs" data-toggle="modal"
+                                data-target=".accept-modal-{{ user.id }}">
+                              <i class="fa fa-edit"> Accept</i>
+                            </button>
+                          {% endif %}
+                          <button type="button" class="btn-danger btn-xs" data-toggle="modal"
+                              data-target=".delete-modal-{{ user.id }}">
+                            <i class="fa fa-remove"> Delete</i>
+                          </button>
                         </td>
+
+                        <!-- Accept modal-->
+                        <div class="modal fade accept-modal-{{ user.id }}"
+                            tabindex="-1" role="dialog" aria-hidden="true">
+                          <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">×</span>
+                                </button>
+                                <h4 class="modal-title" id="accept">Accept</h4>
+                              </div>
+                              <div>
+                                <form id="deprecated" method="post" action="/management/organization/member/{{ user.id }}/accept">
+                                  <div class="modal-body">
+                                    <h4>Are you sure you want to Acccept {{ user.email }}</h4>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                      Cancel
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                      Ok
+                                    </button>
+                                  </div>
+                                </form>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>  <!-- End modal-->
+
+                        <!-- Delete modal-->
+                        <div class="modal fade delete-modal-{{ user.id }}"
+                            tabindex="-1" role="dialog" aria-hidden="true">
+                          <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">×</span>
+                                </button>
+                                <h4 class="modal-title" id="delete">Delete</h4>
+                              </div>
+                              <div>
+                                <form id="deprecated" method="post" action="/management/organization/member/{{ user.id }}/delete">
+                                  <div class="modal-body">
+                                    <h4>Are you sure you want to delete {{ user.email }}</h4>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                      Cancel
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                      Ok
+                                    </button>
+                                  </div>
+                                </form>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>  <!-- End modal-->
                       {% else %}
                         <td></td>
                       {% endif %}

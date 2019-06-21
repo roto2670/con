@@ -27,7 +27,7 @@ class Config(object):
   FIREBASE_PROJECT_ID = 'console-4196c'
   #FIREBASE_API_KEY = 'AIzaSyAFCsjXR0KPVcUGvjWvyZgfKuh_e5aaD8U' # test
   #FIREBASE_PROJECT_ID = 'console-test-4fdb2' # test
-  FIREBASE_AUTH_SIGN_IN_OPTIONS = 'email,google'
+  FIREBASE_AUTH_SIGN_IN_OPTIONS = 'email'
   if apis.IS_DEV:
     LOG_PATH = '/tmp/console.log'
   else:
