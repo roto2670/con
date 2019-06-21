@@ -71,7 +71,8 @@ class _DeviceData(db.Model):
   name = Column(String(75))
   kind = Column(String(75))
   custom = Column(Text)
-  update_time = Column(DateTime)
+  tags = Column(Text)
+  last_updated_time = Column(DateTime)
   organization_id = Column(String(75))
 
 
@@ -112,10 +113,13 @@ class _CountDeviceSetting(db.Model):
   organization_id = Column(String(75))
 
 
-class _DetectedEquipLog(db.Model):
-  __tablename__ = '_detected_equip_log'
+class _EntranceEquipLog(db.Model):
+  __tablename__ = '_entrance_equip_log'
 
   id = Column(Integer, primary_key=True)
+  inout = Column(Integer)
+  access_point = Column(Integer)
+  kind = Column(String(25))
   event_time = Column(DateTime)
   created_time = Column(DateTime)
   hub_id = Column(String(75))
@@ -124,6 +128,7 @@ class _DetectedEquipLog(db.Model):
   gadget_name = Column(String(75))
   text = Column(Text)
   organization_id = Column(String(75))
+
 
   def __init__(self, **kwargs):
     for property, value in kwargs.items():

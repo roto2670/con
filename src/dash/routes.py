@@ -20,21 +20,13 @@ import util
 import dash_apis
 import base.routes
 import dashboard
+import dashboard.count
 from dash import blueprint
 import in_config_apis
-from util import RedisStore
-
-REDIS_HOST = '127.0.0.1'
-REDIS_PORT = 6379
-BEACONS_REDIS_DB = 1
-WORKER_REDIS_DB = 2
+from config_models import SCANNER_TYPE
 
 
-# DETECTED_BEACONS = RedisStore(REDIS_HOST, REDIS_PORT, BEACONS_REDIS_DB)
 DETECTED_BEACONS = {}
-WORKER_COUNT = RedisStore(REDIS_HOST, REDIS_PORT, WORKER_REDIS_DB)
-EQUIPMENT_EVENT = 1
-WORKER_EVENT = 2
 
 
 @blueprint.route('/location/info', methods=["GET"])
@@ -96,7 +88,8 @@ def get_detected_beacons_by_hub(hub_id):
   :content : hub_id를 기준으로 주변의 비콘을 스캔한 정보를 가져온다.
   """
   ret = dash_apis.get_detected_beacons(hub_id)
-  set_total_equip(current_user.organization_id, hub_id, ret['data'])
+  dashboard.count.set_equip_count(current_user.organization_id, hub_id,
+                                  ret['data'])
   return json.dumps(ret)
 
 
@@ -143,6 +136,18 @@ def update_scanner():
   json_data = request.get_json()
   hub_data = json_data['hub']
   ret = dash_apis.update_scanner(hub_data)
+  if ret:
+    custom = hub_data['custom']
+    print(custom)
+    if 'is_counted_hub' in custom and custom['is_counted_hub']:
+      # 0, 0 is none -> default
+      in_config_apis.create_or_update_count_device_setting(hub_data['id'],
+                                                           SCANNER_TYPE,
+                                                           0, 0)
+      # TODO: add redis
+    elif 'is_counted_hub' in custom and not custom['is_counted_hub']:
+      # TODO: delete count setting and delete redis ...
+      dashboard.count.delete_device(hub_data['id'], SCANNER_TYPE)
   return json.dumps(ret)
 
 
@@ -200,27 +205,9 @@ def set_total_equip(org_id, hid, dist_data_list):
                     "scanner to the map first. ")
 
 
-EQUIP_DETECTED_TEXT = "{} has detected {}"
-
-
-def set_equip_log(org_id, hid, dist_data_list):
-  hub_data = in_config_apis.get_device_data(hid, org_id)
-  for dist_data in dist_data_list:
-    gadget_data = in_config_apis.get_device_data(dist_data['gid'], org_id)
-    text = EQUIP_DETECTED_TEXT.format(hub_data.name, gadget_data.name)
-    data_exist = in_config_apis.get_detected_equip_log_data(hid, dist_data['gid'],
-                                                            dist_data['_t'])
-    if not data_exist:
-      in_config_apis.create_detected_equip_log(dist_data['_t'], hid, hub_data.name,
-                                               dist_data['gid'], gadget_data.name,
-                                               text, org_id)
-    else:
-      logging.warning("equip detected log is already exist")
-
-
 @blueprint.route('/worker_log', methods=["GET"])
 @util.require_login
-def get_enterence_worker_log():
+def get_entrance_worker_log():
   org_id = current_user.organization_id
   _page_num = request.args.get('page_num')
   _limit = request.args.get('limit', 30)
@@ -240,11 +227,11 @@ def get_enterence_worker_log():
 
 @blueprint.route('/equip_log', methods=["GET"])
 @util.require_login
-def get_detected_equip_log():
+def get_entrance_equip_log():
   org_id = current_user.organization_id
   _page_num = request.args.get('page_num')
   _limit = request.args.get('limit', 30)
-  log_list = in_config_apis.get_detected_equip_log_list(org_id,
+  log_list = in_config_apis.get_entrance_equip_log_list(org_id,
                                                         page_num=int(_page_num),
                                                         limit=int(_limit))
   new_list = []

@@ -327,3 +327,8 @@ class RedisStore(object):
 
   def get_all_data_size(self):
     return self.store.dbsize()
+
+  def get_all(self, name):
+    datas = self.store.hgetall(name)
+    ret = {k.decode("utf-8"): json.loads(v.decode("utf-8")) for k, v in datas.items()}
+    return ret

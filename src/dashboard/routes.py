@@ -78,6 +78,13 @@ def default_count_delete(device_id, typ):
   return count.delete_device(device_id, int(typ))
 
 
+@blueprint.route('/count/settings/equip/kind/<equip_key>', methods=['POST'])
+@util.require_login
+def default_equip_operator_count_setting(equip_key):
+  value = request.form.get('equip_worker_count')
+  return count.set_equip_operator_count(equip_key, value)
+
+
 @blueprint.route('/count/worker/counting/<key>', methods=['GET'])
 @util.require_login
 def get_worker_count(key):
@@ -90,6 +97,20 @@ def get_worker_count(key):
 def get_total_worker_count():
   total_worker_count = count.get_total_worker()
   return json.dumps(total_worker_count)
+
+
+@blueprint.route('/count/equip/counting/<key>', methods=['GET'])
+@util.require_login
+def get_equip_count(key):
+  equip_count = count.get_equip_count(int(key))
+  return json.dumps(equip_count)
+
+
+@blueprint.route('/count/equip/counting/total', methods=['GET'])
+@util.require_login
+def get_total_equip_count():
+  total_equip_count = count.get_total_equip()
+  return json.dumps(total_equip_count)
 
 
 @blueprint.route('/workschedule/view', methods=['GET'])

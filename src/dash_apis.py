@@ -12,7 +12,6 @@
 import json
 import time
 import logging
-import ast
 
 import requests
 from flask_login import current_user
@@ -20,6 +19,7 @@ from flask_login import current_user
 import apis
 import in_apis
 import in_config_apis
+import dashboard.count
 import dash_api_mock
 
 
@@ -57,10 +57,7 @@ def update_scanner(hub_obj):
   try:
     if apis.IS_DEV:
       ret = dash_api_mock.update_hub_location_mock(hub_obj)
-      in_config_apis.update_device_data(hub_obj['id'], hub_obj['name'],
-                                        hub_obj['kind'],
-                                        json.dumps(hub_obj['custom']),
-                                        current_user.organization_id)
+      set_device_data([hub_obj], current_user.organization_id)
       return ret
     else:
       url = "{base}hubs/{hub_id}".format(base=THIRD_BASE_URL,
@@ -73,10 +70,7 @@ def update_scanner(hub_obj):
       if resp.ok:
         logging.info("update scanner location successful. Code : %s, Text : %s",
                      resp.status_code, resp.text)
-        in_config_apis.update_device_data(hub_obj['id'], hub_obj['name'],
-                                          hub_obj['kind'],
-                                          json.dumps(hub_obj['custom']),
-                                          current_user.organization_id)
+        set_device_data([hub_obj], current_user.organization_id)
         return True
       else:
         logging.warning("Failed update scanner location. Code : %s, Text : %s",
@@ -345,13 +339,6 @@ def get_detected_beacons(hub_id, query_id=None, org_id=None):
 
 def set_device_data(data, org_id):
   for device in data:
-    data_exist = in_config_apis.get_device_data(device['id'], org_id)
-    if data_exist:
-      in_config_apis.update_device_data(device['id'], device['name'], device['kind'],
-                                        json.dumps(device['custom']), org_id)
-    else:
-      in_config_apis.create_device_data(device['id'],
-                                        device['name'],
-                                        device['kind'],
-                                        json.dumps(device['custom']))
+    in_config_apis.create_or_update_device_data(org_id, device)
+    dashboard.count.set_device_data_info(device['id'], device)
   return True
