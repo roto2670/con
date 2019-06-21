@@ -420,6 +420,21 @@ def update_user_by_confirm(user_id):
   db.session.commit()
 
 
+def update_user_by_accept(user_id):
+  user = User.query.filter_by(id=user_id).one_or_none()
+  user.email_verified = True
+  db.session.commit()
+
+
+def delete_user_by_id(user_id):
+  user = User.query.filter_by(id=user_id).one_or_none()
+  if user:
+    db.session.delete(user)
+    db.session.commit()
+    return True
+  return False
+
+
 # }}}
 
 

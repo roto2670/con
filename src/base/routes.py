@@ -22,6 +22,7 @@ from flask import send_from_directory  # noqa : pylint: disable=import-error
 from flask import render_template, redirect, request, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user, login_user, logout_user  # noqa : pylint: disable=import-error
 
+import apis
 import mail
 import util
 import common
@@ -65,8 +66,8 @@ def route_verified():
   elif current_user.email_verified:
     return redirect(url_for('login_blueprint.login'))
   else:
-    send_verified_email()
-    return render_template('verified.html', user_email=current_user.email)
+    #send_verified_email()
+    return render_template('confirm_wait.html', user_email=current_user.email)
 
 
 @blueprint.route('/verified/send')
@@ -174,12 +175,19 @@ def production_sign_in(token):
   user.last_access_time = in_apis.get_datetime()
   user.ip_address = util.get_ip_addr()
   invite = in_apis.get_invite_by_email(token['email'])
-  if not user.organization_id and invite:
-    user.organization_id = invite.organization_id
-    org = in_apis.get_organization(invite.organization_id)
-    users = json.loads(org.users)
-    users.append(token['email'])
-    org.users = json.dumps(users)
+  # TODO: Auto set org_id
+  if not user.organization_id:
+    if apis.IS_DEV:
+      org_id = "993a39cdeed84d72851efe581b9a74ed"
+    else:
+      org_id = "ac983bfaa401d89475a45952e0a642cf"  # default skec
+  else:
+    org_id = user.organization_id
+  user.organization_id = org_id
+  org = in_apis.get_organization(org_id)
+  users = json.loads(org.users)
+  users.append(token['email'])
+  org.users = json.dumps(users)
   db.session.commit()
   if not user.permission:
     permission = Permission(id=uuid.uuid4().hex,

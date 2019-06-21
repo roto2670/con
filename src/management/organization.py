@@ -101,6 +101,16 @@ def member():
     return redirect("/management/organization/create")
 
 
+def member_accept(user_id):
+  in_apis.update_user_by_accept(user_id)
+  return redirect("/management/organization/member")
+
+
+def member_delete(user_id):
+  in_apis.delete_user_by_id(user_id)
+  return redirect("/management/organization/member")
+
+
 def product():
   if current_user.organization_id:
     product_list = in_apis.get_product_list(current_user.organization_id)
