@@ -23,6 +23,7 @@ from config_models import _Footer as Footer
 from config_models import _SupremaConfig as SupremaConfig
 from config_models import _LocationConfig as LocationConfig
 from config_models import _EnterenceWorkerLog as EnterenceWorkerLog
+from config_models import _CountDeviceSetting as CountDeviceSetting
 
 
 
@@ -191,3 +192,39 @@ def get_enterence_worker_log_list(organization_id, page_num=1, limit=None):
       order_by(desc(EnterenceWorkerLog.created_time)).paginate(page_num, _limit, False)
   return log_list
 
+
+
+def create_or_update_count_device_setting(device_id, inout, access_point):
+  cur_time = get_datetime()
+  setting = get_count_device(device_id)
+  if setting:
+    setting.inout = inout
+    setting.access_point = access_point
+    last_updated_time = cur_time
+    last_updated_user = current_user.email
+  else:
+    device_setting = CountDeviceSetting(device_id=device_id,
+                                        inout=inout,
+                                        access_point=access_point,
+                                        last_updated_time=cur_time,
+                                        last_updated_user=current_user.email,
+                                        organization_id=current_user.organization_id)
+    db.session.add(device_setting)
+  db.session.commit()
+
+
+def get_count_device_setting():
+  _list = CountDeviceSetting.query.filter_by(organization_id=current_user.organization_id).all()
+  return _list
+
+
+def get_count_device(device_id):
+  c_device = CountDeviceSetting.query.filter_by(device_id=device_id).one_or_none()
+  return c_device
+
+
+def delete_count_device_setting(device_id):
+  device_setting = get_count_device(device_id)
+  if device_setting:
+    db.session.delete(device_setting)
+    db.session.commit()

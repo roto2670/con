@@ -150,7 +150,7 @@
     getEquip();
 
     function getWorker() {
-      jQuery.get("/dash/total_worker").done(function(data){
+      jQuery.get("/dashboard/count/worker/counting/total").done(function(data){
         var jsonData = JSON.parse(data),
             divWorker = document.getElementById("divWorker");
         divWorker.innerText = jsonData;

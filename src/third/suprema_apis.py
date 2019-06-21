@@ -14,6 +14,7 @@ import logging
 
 import requests
 import apis
+import dashboard
 import in_config_apis
 from dash import routes as dash_routes
 
@@ -139,10 +140,10 @@ def set_event(org_id):
           for data in rows:
             if data['event_type_id']['code'] == config_data.event_id:
               user_info = data['user_id']
-              dash_routes.set_worker_count(org_id,
-                                           user_info['user_id'],
-                                           user_info['name'],
-                                           data)
+              dashboard.count.set_worker_count(org_id,
+                                               user_info['user_id'],
+                                               user_info['name'],
+                                               data)
             last_id = data['id']
           if last_id:
             set_last_id_cache(org_id, int(last_id))

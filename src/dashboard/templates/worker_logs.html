@@ -29,7 +29,7 @@
             <div class="x_content">
               <div class="accordion" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;padding-left: 30px;">
               </div>
-              <div id="pageMore" style="cursor: pointer;text-align: center;margin-top:10px; margin-bottom: 10px;">More</div>
+              <div id="pageMore" class="pageMore" style="cursor: pointer;text-align: center;margin-top:10px; margin-bottom: 10px;">More</div>
                 <script>
                   var nextPageNum = 1;
 
@@ -46,7 +46,7 @@
                     jQuery.get(url, { 'page_num': getNextPageNumber()})
                       .done(function (data) {
                         var logList = JSON.parse(data);
-                        if (logList) {
+                        if (!logList) {
                           logList.forEach(function (log) {
                             var logId = log.id,
                                 timestamp = log.event_time,
@@ -60,7 +60,7 @@
                             $(".accordion").append(addObj);
                           });
                         } else {
-                          $("#pageMore").remove();
+                          $(".pageMore").remove();
                         }
                         setNextPageNumber();
                       });

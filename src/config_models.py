@@ -83,3 +83,15 @@ class _EnterenceWorkerLog(db.Model):
       if hasattr(value, '__iter__') and not isinstance(value, str):
         value = value[0]
       setattr(self, property, value)
+
+
+class _CountDeviceSetting(db.Model):
+  __tablename__ = '_count_device_setting'
+
+  id = Column(Integer, primary_key=True)
+  device_id = Column(String(75))
+  inout = Column(Integer)
+  access_point = Column(Integer)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  organization_id = Column(String(75))
