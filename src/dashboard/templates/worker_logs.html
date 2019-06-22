@@ -46,7 +46,7 @@
                     jQuery.get(url, { 'page_num': getNextPageNumber()})
                       .done(function (data) {
                         var logList = JSON.parse(data);
-                        if (!logList) {
+                        if (logList) {
                           logList.forEach(function (log) {
                             var logId = log.id,
                                 timestamp = log.event_time,
