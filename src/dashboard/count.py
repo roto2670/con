@@ -120,10 +120,12 @@ def set_device(device_id):
   else:
     if device_id in AT_1_DEVICE_LIST:
       AT_1_DEVICE_LIST.remove(device_id)
-      clear_keys(ACCESS_1_ID)
+      if not AT_1_DEVICE_LIST:
+        clear_keys(ACCESS_1_ID)
     else:
       AT_2_DEVICE_LIST.remove(device_id)
-      clear_keys(ACCESS_2_ID)
+      if not AT_2_DEVICE_LIST:
+        clear_keys(ACCESS_2_ID)
   return redirect("/dashboard/count/settings")
 
 
