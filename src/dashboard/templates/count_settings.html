@@ -40,7 +40,7 @@
                     {% for device in device_list %}
                       <tr>
                         <form class="right-align" id="upload-{{ device['id'] }}" action="/dashboard/count/settings/{{ device['id'] }}" method="POST">
-                          <td>{{ device['device_type_id']['name'] }}</td>
+                          <td>{{ device['name'] }}</td>
                           <!-- TODO:
                           <td>
                             <select id="inout" name="inout">
