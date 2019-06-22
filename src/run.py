@@ -24,6 +24,7 @@ import apis
 import dash_apis
 import common
 import base.routes
+import dashboard.count
 import back_scheduler
 from base import db, auth, login_manager
 from config import DebugConfig, ProductionConfig
@@ -100,6 +101,7 @@ def create_app():
   register_extensions(app)
   register_blueprints(app)
   configure_database(app)
+  dashboard.count.init()
   back_scheduler.init()
   common.start()
   return app

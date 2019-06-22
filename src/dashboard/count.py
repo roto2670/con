@@ -198,3 +198,16 @@ def get_total_worker():
 def get_worker_count(key):
   worker_count = WORKER_COUNT.get_data_size(key)
   return worker_count
+
+
+def init():
+  settings = in_config_apis.get_count_device_setting()
+  for setting in settings:
+    device_id = setting.device_id
+    access_point = setting.access_point
+    if access_point == ACCESS_1_ID:
+      CHECKING_DEVICE_LIST.add(device_id)
+      AT_1_DEVICE_LIST.add(device_id)
+    elif access_point == ACCESS_2_ID:
+      CHECKING_DEVICE_LIST.add(device_id)
+      AT_2_DEVICE_LIST.add(device_id)
