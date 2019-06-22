@@ -25,18 +25,27 @@ REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 BEACONS_REDIS_DB = 1
 WORKER_REDIS_DB = 2
+EXPIRE_REDIS_DB = 3
 
 # DETECTED_BEACONS = RedisStore(REDIS_HOST, REDIS_PORT, BEACONS_REDIS_DB)
 WORKER_COUNT = RedisStore(REDIS_HOST, REDIS_PORT, WORKER_REDIS_DB)
+EXPIRE_CACHE = RedisStore(REDIS_HOST, REDIS_PORT, EXPIRE_REDIS_DB)
 EQUIPMENT_EVENT = 1
 WORKER_EVENT = 2
 
+EXPIRE_TIME = 15
 
-IN_OUT_SETTING = {
-  1: "In",
-  2: "Out",
+IN_SETTING_ID = 1
+OUT_SETTING_ID = 2
+
+IN_OUT_SETTING_ID = {
+  IN_SETTING_ID: "In",
+  OUT_SETTING_ID: "Out",
   0: "None"
 }
+
+IN_LIST = set([])  # [device_id, ..]
+OUT_LIST = set([])   # [device_id, ..]
 
 ACCESS_1_ID = 1
 ACCESS_2_ID = 2
@@ -101,16 +110,25 @@ def device_list():
     else:
       device_list = _get_device_list(suprema_config, _org_id)
   return render_template("count_settings.html", device_list=device_list,
-                         in_out_setting=IN_OUT_SETTING,
+                         in_out_setting=IN_OUT_SETTING_ID,
                          access_point=ACCESS_POINT,
                          setting_id_list=setting_id_list,
                          settings_dict=settings_dict)
 
 
-def set_device(device_id):
-  inout = int(request.form.get('inout', 0))
-  ap = int(request.form.get('ap'))
-  in_config_apis.create_or_update_count_device_setting(device_id, inout, ap)
+def __set_inout(inout, device_id):
+  if inout == IN_SETTING_ID:
+    IN_LIST.add(device_id)
+  elif inout == OUT_SETTING_ID:
+    OUT_LIST.add(device_id)
+  else:
+    if device_id in IN_LIST:
+      IN_LIST.remove(device_id)
+    else:
+      OUT_LIST.remove(device_id)
+
+
+def __set_access_point(ap, device_id):
   if ap == ACCESS_1_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     AT_1_DEVICE_LIST.add(device_id)
@@ -126,6 +144,14 @@ def set_device(device_id):
       AT_2_DEVICE_LIST.remove(device_id)
       if not AT_2_DEVICE_LIST:
         clear_keys(ACCESS_2_ID)
+
+
+def set_device(device_id):
+  inout = int(request.form.get('inout', 0))
+  ap = int(request.form.get('ap'))
+  in_config_apis.create_or_update_count_device_setting(device_id, inout, ap)
+  __set_inout(inout, device_id)
+  __set_access_point(ap, device_id)
   return redirect("/dashboard/count/settings")
 
 
@@ -137,13 +163,17 @@ def delete_device(device_id):
     AT_1_DEVICE_LIST.remove(device_id)
   if device_id in AT_2_DEVICE_LIST:
     AT_2_DEVICE_LIST.remove(device_id)
+  if device_id in IN_LIST:
+    IN_LIST.remove(device_id)
+  if device_id in OUT_LIST:
+    OUT_LIST.remove(device_id)
   return redirect("/dashboard/count/settings")
 
 
 def clear_keys(key):
   keys = WORKER_COUNT.hkeys(key)
   _org_id = current_user.organization_id
-  WOREKR_COUNT.hdel(key, *keys)
+  WORKER_COUNT.hdel(key, *keys)
   WORKER_COUNT.hdel(_org_id, *keys)
 
 
@@ -157,36 +187,58 @@ WORKER_EXIT_TEXT = "{} came out {}"
 WORKER_EXIT_TEXT_2 = "{} came out {}. But it entered {}"
 
 
-def _set_worker_count(key, user_id, user_name, event_data, org_id):
+def _set_expire_cache(user_id, user_name):
+  EXPIRE_CACHE.set(user_id, user_name, EXPIRE_TIME)
+
+
+def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
   if WORKER_COUNT.has_data(org_id, user_id):
     # User exit
-    if WORKER_COUNT.has_data(key, user_id):
-      ret = WORKER_COUNT.delete_data(key, user_id)
-      ret = WORKER_COUNT.delete_data(org_id, user_id)
-      text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
-      in_config_apis.create_enterence_worker_log(event_data, text, org_id)
-    elif WORKER_COUNT.has_data(REVERSE_ACCESS_POINT[key], user_id):
-      reverse_key = REVERSE_ACCESS_POINT[key]
-      ret = WORKER_COUNT.delete_data(reverse_key, user_id)
-      ret = WORKER_COUNT.delete_data(org_id, user_id)
-      text = WORKER_EXIT_TEXT_2.format(user_name, ACCESS_POINT[key],
-                                       ACCESS_POINT[reverse_key])
-      in_config_apis.create_enterence_worker_log(event_data, text, org_id)
+    if device_id in OUT_LIST:
+      if WORKER_COUNT.has_data(key, user_id):
+        ret = WORKER_COUNT.delete_data(key, user_id)
+        ret = WORKER_COUNT.delete_data(org_id, user_id)
+        text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
+        in_config_apis.create_enterence_worker_log(event_data, text, org_id)
+        _set_expire_cache(user_id, user_name)
+      elif WORKER_COUNT.has_data(REVERSE_ACCESS_POINT[key], user_id):
+        reverse_key = REVERSE_ACCESS_POINT[key]
+        ret = WORKER_COUNT.delete_data(reverse_key, user_id)
+        ret = WORKER_COUNT.delete_data(org_id, user_id)
+        text = WORKER_EXIT_TEXT_2.format(user_name, ACCESS_POINT[key],
+                                        ACCESS_POINT[reverse_key])
+        in_config_apis.create_enterence_worker_log(event_data, text, org_id)
+        _set_expire_cache(user_id, user_name)
+    else:
+      logging.debug("%s device_id is IN type device. user name : %s",
+                    device_id, user_name)
   else:
     # User enter
-    ret = WORKER_COUNT.set_data(key, user_id, user_name)
-    ret = WORKER_COUNT.set_data(org_id, user_id, user_name)
-    text = WORKER_ENTER_TEXT.format(user_name, ACCESS_POINT[key])
-    in_config_apis.create_enterence_worker_log(event_data, text, org_id)
+    if device_id in IN_LIST:
+      ret = WORKER_COUNT.set_data(key, user_id, user_name)
+      ret = WORKER_COUNT.set_data(org_id, user_id, user_name)
+      text = WORKER_ENTER_TEXT.format(user_name, ACCESS_POINT[key])
+      in_config_apis.create_enterence_worker_log(event_data, text, org_id)
+      _set_expire_cache(user_id, user_name)
+    else:
+      logging.debug("%s device_id is OUT type device. user name : %s",
+                    device_id, user_name)
 
 
 def set_worker_count(org_id, user_id, name, event_data):
   device_id = event_data['device_id']['id']
-  if device_id in CHECKING_DEVICE_LIST:
+  if device_id in CHECKING_DEVICE_LIST and not EXPIRE_CACHE.exists(user_id):
     if device_id in AT_1_DEVICE_LIST:
-      _set_worker_count(ACCESS_1_ID, user_id, name, event_data, org_id)
+      _set_worker_count(device_id, ACCESS_1_ID, user_id, name, event_data,
+                        org_id)
     elif device_id in AT_2_DEVICE_LIST:
-      _set_worker_count(ACCESS_2_ID, user_id, name, event_data, org_id)
+      _set_worker_count(device_id, ACCESS_2_ID, user_id, name, event_data,
+                        org_id)
+  else:
+    has_checking = device_id in CHECKING_DEVICE_LIST
+    has_expire = EXPIRE_CACHE.exists(user_id)
+    logging.debug("Checking Device : %s, Expire Cache : %s, Device : %s, name : %s",
+                  has_checking, has_expire, device_id, name)
 
 
 def get_total_worker():
@@ -200,15 +252,28 @@ def get_worker_count(key):
   return worker_count
 
 
+def _set_access_point(access_point, device_id):
+  if access_point == ACCESS_1_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    AT_1_DEVICE_LIST.add(device_id)
+  elif access_point == ACCESS_2_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    AT_2_DEVICE_LIST.add(device_id)
+
+
+def _set_in_out_setting(inout, device_id):
+  if inout == IN_SETTING_ID:
+    IN_LIST.add(device_id)
+  elif inout == OUT_SETTING_ID:
+    OUT_LIST.add(device_id)
+
+
 def init():
   org_id = '''ac983bfaa401d89475a45952e0a642cf'''
   settings = in_config_apis.get_count_device_setting(org_id)
   for setting in settings:
     device_id = setting.device_id
     access_point = setting.access_point
-    if access_point == ACCESS_1_ID:
-      CHECKING_DEVICE_LIST.add(device_id)
-      AT_1_DEVICE_LIST.add(device_id)
-    elif access_point == ACCESS_2_ID:
-      CHECKING_DEVICE_LIST.add(device_id)
-      AT_2_DEVICE_LIST.add(device_id)
+    inout = setting.inout
+    _set_access_point(access_point, device_id)
+    _set_in_out_setting(inout, device_id)

@@ -29,9 +29,7 @@
                   <thead>
                     <tr>
                       <th>Device Name</th>
-                      <!-- TODO:
                       <th>In/Out</th>
-                      -->
                       <th>Location</th>
                       <th>Edit</th>
                     </tr>
@@ -41,7 +39,6 @@
                       <tr>
                         <form class="right-align" id="upload-{{ device['id'] }}" action="/dashboard/count/settings/{{ device['id'] }}" method="POST">
                           <td>{{ device['name'] }}</td>
-                          <!-- TODO:
                           <td>
                             <select id="inout" name="inout">
                               {% if device['id'] in setting_id_list %}
@@ -59,7 +56,6 @@
                               {% endif %}
                             </select>
                           </td>
-                          -->
                           <td>
                             {% if device['id'] in setting_id_list %}
                               <select id="ap" name="ap" disabled>
