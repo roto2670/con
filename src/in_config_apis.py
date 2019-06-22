@@ -213,8 +213,9 @@ def create_or_update_count_device_setting(device_id, inout, access_point):
   db.session.commit()
 
 
-def get_count_device_setting():
-  _list = CountDeviceSetting.query.filter_by(organization_id=current_user.organization_id).all()
+def get_count_device_setting(org_id=None):
+  _org_id = org_id if org_id else current_user.organization_id
+  _list = CountDeviceSetting.query.filter_by(organization_id=_org_id).all()
   return _list
 
 

@@ -201,7 +201,8 @@ def get_worker_count(key):
 
 
 def init():
-  settings = in_config_apis.get_count_device_setting()
+  org_id = '''ac983bfaa401d89475a45952e0a642cf'''
+  settings = in_config_apis.get_count_device_setting(org_id)
   for setting in settings:
     device_id = setting.device_id
     access_point = setting.access_point
