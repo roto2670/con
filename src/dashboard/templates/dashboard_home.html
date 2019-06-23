@@ -92,7 +92,7 @@
     showClock();
 
     function getEquip() {
-      jQuery.get("/dash/total_equip").done(function(data){
+      jQuery.get("/dashboard/count/equip/counting/total").done(function(data){
         var jsonData = JSON.parse(data),
             divEquip = document.getElementById("divEquip");
         divEquip.innerText = jsonData;

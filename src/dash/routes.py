@@ -39,7 +39,7 @@ def get_location_inforamtion():
   if apis.IS_DEV:
     data = {
         "product_id": "mibsskec",
-        "interval": 60
+        "interval": 10
     }
     return json.dumps(data)
   else:
@@ -138,13 +138,12 @@ def update_scanner():
   ret = dash_apis.update_scanner(hub_data)
   if ret:
     custom = hub_data['custom']
-    print(custom)
     if 'is_counted_hub' in custom and custom['is_counted_hub']:
       # 0, 0 is none -> default
       in_config_apis.create_or_update_count_device_setting(hub_data['id'],
                                                            SCANNER_TYPE,
-                                                           0, 0)
-      # TODO: add redis
+                                                           0, 0,
+                                                           name=hub_data['name'])
     elif 'is_counted_hub' in custom and not custom['is_counted_hub']:
       # TODO: delete count setting and delete redis ...
       dashboard.count.delete_device(hub_data['id'], SCANNER_TYPE)

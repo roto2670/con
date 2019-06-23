@@ -332,3 +332,9 @@ class RedisStore(object):
     datas = self.store.hgetall(name)
     ret = {k.decode("utf-8"): json.loads(v.decode("utf-8")) for k, v in datas.items()}
     return ret
+
+  def exists(self, name):
+    return self.store.exists(name)
+
+  def set(self, name, value, expire_time):
+    self.store.set(name, value, expire_time)

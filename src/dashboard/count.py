@@ -157,11 +157,16 @@ def device_list():
     else:
       device_list = _get_device_list(suprema_config, _org_id)
   equip_kind_settings = get_equip_operator_count_settings()
+  scanners = in_config_apis.get_count_device_setting(SCANNER_TYPE)
+  for scanner in scanners:
+    setting_id_list.append(scanner.device_id)
+    settings_dict[scanner.device_id] = scanner
   return render_template("count_settings.html", device_list=device_list,
                          in_out_setting=IN_OUT_SETTING_ID,
                          access_point=ACCESS_POINT,
                          setting_id_list=setting_id_list,
                          settings_dict=settings_dict,
+                         scanner_list=scanners,
                          equip_kind_list=GADGET_INFO,
                          equip_kind_settings=equip_kind_settings)
 
@@ -250,10 +255,11 @@ def _delete_device_of_scanner(device_id):
 
 
 def delete_device(device_id, typ):
-  in_config_apis.delete_count_device_setting(device_id)
   if typ == FACE_STATION_TYPE:
+    in_config_apis.delete_count_device_setting(device_id)
     _delete_device_of_facestation(device_id)
   elif typ == SCANNER_TYPE:
+    in_config_apis.reset_count_device_setting(device_id)
     _delete_device_of_scanner(device_id)
   return redirect("/dashboard/count/settings")
 
@@ -441,9 +447,9 @@ def set_equip_count(org_id, hid, dist_data_list):
   if hid in S_CHECKING_DEVICE_LIST:
     gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
     for gid in gid_set:
-      if not EXPIRE_CACHE.exists(gid) and gid in S_AT_1_DEVICE_LIST:
+      if not EXPIRE_CACHE.exists(gid) and hid in S_AT_1_DEVICE_LIST:
         _set_equip_count(ACCESS_1_ID, org_id, gid, hid)
-      elif not EXPIRE_CACHE.exists(gid) and gid in S_AT_2_DEVICE_LIST:
+      elif not EXPIRE_CACHE.exists(gid) and hid in S_AT_2_DEVICE_LIST:
         _set_equip_count(ACCESS_2_ID, org_id, gid, hid)
 
 

@@ -106,6 +106,7 @@ class _CountDeviceSetting(db.Model):
   id = Column(Integer, primary_key=True)
   typ = Column(Integer)
   device_id = Column(String(75))
+  name = Column(String(75))  # Scanner only
   inout = Column(Integer)
   access_point = Column(Integer)
   last_updated_time = Column(DateTime)
