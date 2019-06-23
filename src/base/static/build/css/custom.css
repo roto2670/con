@@ -4431,7 +4431,7 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     text-align: center;
     height: 60px;
     padding: 10px;
-    font-size: 30px;
+    font-size: 26px;
     color: #FFFFFF;
 }
 
@@ -4570,7 +4570,7 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 }
 
 .custom-footer .right-container .image-container > img{
-    width: 46px;
+    width: 60px;
     margin-left: 4px;
     margin-right: 4px;
     padding-bottom: 4px;
@@ -4580,6 +4580,18 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 }
 .width-96-per {
     width: 96% !important;
+}
+
+.x_title_left_div {
+    width:50%;
+    display:inline-block;
+}
+.x_title_right_div {
+    width:50%;
+    display: inline-block;
+    position: absolute;
+    text-align: right;
+    padding-right:30px;
 }
 
 /* keyser custom */
