@@ -85,10 +85,14 @@ class _EnterenceWorkerLog(db.Model):
       setattr(self, property, value)
 
 
+FACE_STATION_TYPE = 1
+SCANNER_TYPE = 2
+
 class _CountDeviceSetting(db.Model):
   __tablename__ = '_count_device_setting'
 
   id = Column(Integer, primary_key=True)
+  typ = Column(Integer)
   device_id = Column(String(75))
   inout = Column(Integer)
   access_point = Column(Integer)

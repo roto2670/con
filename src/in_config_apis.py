@@ -194,7 +194,7 @@ def get_enterence_worker_log_list(organization_id, page_num=1, limit=None):
 
 
 
-def create_or_update_count_device_setting(device_id, inout, access_point):
+def create_or_update_count_device_setting(device_id, typ, inout, access_point):
   cur_time = get_datetime()
   setting = get_count_device(device_id)
   if setting:
@@ -204,6 +204,7 @@ def create_or_update_count_device_setting(device_id, inout, access_point):
     last_updated_user = current_user.email
   else:
     device_setting = CountDeviceSetting(device_id=device_id,
+                                        typ=typ,
                                         inout=inout,
                                         access_point=access_point,
                                         last_updated_time=cur_time,
@@ -213,9 +214,10 @@ def create_or_update_count_device_setting(device_id, inout, access_point):
   db.session.commit()
 
 
-def get_count_device_setting(org_id=None):
+def get_count_device_setting(typ, org_id=None):
   _org_id = org_id if org_id else current_user.organization_id
-  _list = CountDeviceSetting.query.filter_by(organization_id=_org_id).all()
+  _list = CountDeviceSetting.query.filter_by(typ=typ,
+                                             organization_id=_org_id).all()
   return _list
 
 

@@ -35,6 +35,7 @@
                     </tr>
                   </thead>
                   <tbody>
+                    <!-- Face Station -->
                     {% for device in device_list %}
                       <tr>
                         <form class="right-align" id="upload-{{ device['id'] }}" action="/dashboard/count/settings/{{ device['id'] }}" method="POST">
@@ -78,14 +79,19 @@
                           <td>
                             <button type="submit" class="btn btn-info btn-xs">Save</button>
                             {% if device['id'] in setting_id_list %}
-                              <a href="/dashboard/count/settings/delete/{{ device['id'] }}" class="btn btn-danger btn-xs">
+                              <!-- 1 is FaceStation Type -->
+                              <a href="/dashboard/count/settings/delete/{{ device['id'] }}/typ/1"
+                                  class="btn btn-danger btn-xs">
                                 <i class="fa fa-remove"></i> Reset
                               </a>
                             {% endif %}
                           </td>
+                          <!-- 1 is FaceStation Type -->
+                          <input type="hidden" name="typ" value="1">
                         </form>
                       </tr>
                     {% endfor %}
+                    <!-- Face Station -->
                   </tbody>
                 </table>
 

@@ -72,10 +72,10 @@ def default_count_setting(device_id):
   return count.set_device(device_id)
 
 
-@blueprint.route('/count/settings/delete/<device_id>', methods=['GET'])
+@blueprint.route('/count/settings/delete/<device_id>/typ/<typ>', methods=['GET'])
 @util.require_login
-def default_count_delete(device_id):
-  return count.delete_device(device_id)
+def default_count_delete(device_id, typ):
+  return count.delete_device(device_id, int(typ))
 
 
 @blueprint.route('/count/worker/counting/<key>', methods=['GET'])

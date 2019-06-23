@@ -19,6 +19,7 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 import in_config_apis
 from util import RedisStore
 from third import suprema_apis
+from config_models import FACE_STATION_TYPE
 
 
 REDIS_HOST = '127.0.0.1'
@@ -96,7 +97,7 @@ def device_list():
   device_list = []
   setting_id_list = []
   settings_dict = {}
-  settings = in_config_apis.get_count_device_setting()
+  settings = in_config_apis.get_count_device_setting(FACE_STATION_TYPE)
   for setting in settings:
     setting_id_list.append(setting.device_id)
     settings_dict[setting.device_id] = setting
@@ -149,14 +150,14 @@ def __set_access_point(ap, device_id):
 def set_device(device_id):
   inout = int(request.form.get('inout', 0))
   ap = int(request.form.get('ap'))
-  in_config_apis.create_or_update_count_device_setting(device_id, inout, ap)
+  typ = int(request.form.get('typ'))
+  in_config_apis.create_or_update_count_device_setting(device_id, typ, inout, ap)
   __set_inout(inout, device_id)
   __set_access_point(ap, device_id)
   return redirect("/dashboard/count/settings")
 
 
-def delete_device(device_id):
-  in_config_apis.delete_count_device_setting(device_id)
+def _delete_device_of_facestation(device_id):
   if device_id in CHECKING_DEVICE_LIST:
     CHECKING_DEVICE_LIST.remove(device_id)
   if device_id in AT_1_DEVICE_LIST:
@@ -167,6 +168,12 @@ def delete_device(device_id):
     IN_LIST.remove(device_id)
   if device_id in OUT_LIST:
     OUT_LIST.remove(device_id)
+
+
+def delete_device(device_id, typ):
+  in_config_apis.delete_count_device_setting(device_id)
+  if typ == FACE_STATION_TYPE:
+    _delete_device_of_facestation(device_id)
   return redirect("/dashboard/count/settings")
 
 
@@ -270,7 +277,7 @@ def _set_in_out_setting(inout, device_id):
 
 def init():
   org_id = '''ac983bfaa401d89475a45952e0a642cf'''
-  settings = in_config_apis.get_count_device_setting(org_id)
+  settings = in_config_apis.get_count_device_setting(FACE_STATION_TYPE, org_id)
   for setting in settings:
     device_id = setting.device_id
     access_point = setting.access_point
