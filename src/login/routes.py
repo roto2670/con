@@ -19,7 +19,7 @@ from base import db
 from login import blueprint
 
 
-SK_LOGO_URI = '''/static/images/logo.png'''
+SK_LOGO_URI = '''/static/images/logo-login_page.png'''
 
 
 @blueprint.route('/login', methods={'GET', 'POST'})

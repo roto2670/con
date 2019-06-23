@@ -4448,7 +4448,7 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 }
 
 .logo_img_div {
-    height: 70px;
+    height: 126px;
 }
 
 .logo_img_middle {
@@ -4542,14 +4542,14 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 
 .custom-footer .left-container .image-container {
     display:inline-block;
-    margin-top: 7px;
+    margin-top: 5px;
     margin-bottom: 2px;
     margin-left: 5px;
     margin-right: 5px;
 }
 
 .custom-footer .left-container .image-container > img{
-    width: 46px;
+    width: 180px;
     margin-left: 4px;
     margin-right: 4px;
     padding-bottom: 4px;
