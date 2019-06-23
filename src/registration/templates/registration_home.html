@@ -1,0 +1,38 @@
+{% extends "base_site.html" %}
+
+{% block title %}  {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_registration.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+  {{ super()}}
+{% endblock stylesheets %}
+
+{% block javascripts %}
+  {{ super()}}
+{% endblock javascripts %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+
+      <!-- start row -->
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_content">
+            </div><!-- End x_content-->
+          </div><!-- End x_panel-->
+        </div>
+
+      </div>
+      <!-- End row -->
+
+    </div>
+  </div>
+
+{% endblock content %}

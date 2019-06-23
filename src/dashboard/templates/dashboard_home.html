@@ -17,7 +17,7 @@
     <!-- top tiles -->
     <div class="row tile_count">
       <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Worker </span>
+        <span class="count_top"><i class="fa fa-user"></i> Total Man Power </span>
         <div id="divWorker" class="count">0</div>
       </div>
       <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
@@ -47,53 +47,6 @@
               <div class="mapView">
                 {% include "location/index.html" %}
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6 col-sm-6 col-xs-12">
-          <div class="x_panel tile">
-            <div class="x_title">
-              <h3>Logs</h3>
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-              <div class="accordion" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
-              </div>
-              <script>
-                var nextPageNum = 1,
-                    limit = 15;
-
-                function setNextPageNumber() {
-                  nextPageNum += 1;
-                }
-
-                function getNextPageNumber() {
-                  return nextPageNum;
-                }
-
-                function getLogs(){
-                  url = "/dash/worker_log";
-                  jQuery.get(url, { 'page_num': getNextPageNumber(), 'limit': limit})
-                    .done(function (data) {
-                      var logList = JSON.parse(data);
-                      logList.forEach(function (log) {
-                        var logId = log.id,
-                            timestamp = log.event_time,
-                            payLoad = log.text;
-                        var addObj= "<div class=''>" +
-                                        "<h3 class='panel-title'>" + timestamp +
-                                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                        payLoad + "</h3>" +
-                                    "</div>"
-                        $(".accordion").append(addObj);
-                      });
-
-                      setNextPageNumber();
-                    });
-                }
-                getLogs();
-              </script>
             </div>
           </div>
         </div>
