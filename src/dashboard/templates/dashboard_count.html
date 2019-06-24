@@ -23,19 +23,25 @@
     </div>
     <div class="row tile_count">
       <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> AT1 Worker </span>
+        <span class="count_top"><i class="fa fa-user"></i> AT1 Man Power </span>
         <div id="divWorkerAt1" class="count">0</div>
       </div>
       <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> AT2 Worker </span>
+        <span class="count_top"><i class="fa fa-user"></i> AT2 Man Power </span>
         <div id="divWorkerAt2" class="count">0</div>
       </div>
     </div>
     <div class="row tile_count">
       <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Equipment </span>
-        <div id="divEquip" class="count">0</div>
+        <span class="count_top"><i class="fa fa-user"></i> AT1 Equipment </span>
+        <div id="divEquipAt1" class="count">0</div>
       </div>
+      <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> AT2 Equipment </span>
+        <div id="divEquipAt2" class="count">0</div>
+      </div>
+    </div>
+    <div class="row tile_count">
       <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count">
         <span class="count_top"><i class="fa fa-user"></i> Total Count </span>
         <div id="divCount" class="count">0</div>
@@ -69,16 +75,26 @@
     }
     showClock();
 
-    function getEquip() {
-      jQuery.get("/dash/total_equip").done(function(data){
+    function getAT1Equip() {
+      jQuery.get("/dashboard/count/equip/counting/1").done(function(data){
         var jsonData = JSON.parse(data),
-            divEquip = document.getElementById("divEquip");
+            divEquip = document.getElementById("divEquipAt1");
         divEquip.innerText = jsonData;
         setTotalCount();
-        setTimeout(getEquip, 1000 * {{ equip_interval }});
+        setTimeout(getAT1Equip, 1000 * {{ equip_interval }});
       });
     }
-    getEquip();
+    function getAT2Equip() {
+      jQuery.get("/dashboard/count/equip/counting/2").done(function(data){
+        var jsonData = JSON.parse(data),
+            divEquip = document.getElementById("divEquipAt2");
+        divEquip.innerText = jsonData;
+        setTotalCount();
+        setTimeout(getAT2Equip, 1000 * {{ equip_interval }});
+      });
+    }
+    getAT1Equip();
+    getAT2Equip();
 
     function getAT1Worker() {
       // AT 1 key -> 1
@@ -108,7 +124,10 @@
           divEquip = document.getElementById("divEquip"),
           divWorkerAt1 = document.getElementById("divWorkerAt1");
           divWorkerAt2 = document.getElementById("divWorkerAt2");
-      divCount.innerText = parseInt(divEquip.innerText) + parseInt(divWorkerAt1.innerText) + parseInt(divWorkerAt2.innerText);
+          divEquipAt1 = document.getElementById("divEquipAt1");
+          divEquipAt2 = document.getElementById("divEquipAt2");
+      divCount.innerText = parseInt(divEquip.innerText) + parseInt(divWorkerAt1.innerText) + parseInt(divWorkerAt2.innerText) +
+          parseInt(divEquipAt1.innerText) + parseInt(divEquipAt2.innerText);
     }
 
   </script>

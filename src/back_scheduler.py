@@ -14,8 +14,8 @@ import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from third import suprema_apis
-from dash import routes as dash_routes
 import dash_apis
+import dashboard.count
 import in_config_apis
 
 SCHED = BackgroundScheduler()
@@ -103,4 +103,4 @@ def get_detected_data(scanner, org_id, query_id=None, extend_data=[]):
                       detect_result['data'])
   else:
     logging.info("Server has no more Detected data")
-    dash_routes.set_total_equip(org_id, scanner['id'], result_data)
+    dashboard.count.set_equip_count(org_id, scanner['id'], result_data)

@@ -20,21 +20,13 @@ import util
 import dash_apis
 import base.routes
 import dashboard
+import dashboard.count
 from dash import blueprint
 import in_config_apis
-from util import RedisStore
-
-REDIS_HOST = '127.0.0.1'
-REDIS_PORT = 6379
-BEACONS_REDIS_DB = 1
-WORKER_REDIS_DB = 2
+from config_models import SCANNER_TYPE
 
 
-# DETECTED_BEACONS = RedisStore(REDIS_HOST, REDIS_PORT, BEACONS_REDIS_DB)
 DETECTED_BEACONS = {}
-WORKER_COUNT = RedisStore(REDIS_HOST, REDIS_PORT, WORKER_REDIS_DB)
-EQUIPMENT_EVENT = 1
-WORKER_EVENT = 2
 
 
 @blueprint.route('/location/info', methods=["GET"])
@@ -46,8 +38,8 @@ def get_location_inforamtion():
   """
   if apis.IS_DEV:
     data = {
-        "product_id": "mibs",
-        "interval": 60
+        "product_id": "mibsskec",
+        "interval": 10
     }
     return json.dumps(data)
   else:
@@ -96,7 +88,8 @@ def get_detected_beacons_by_hub(hub_id):
   :content : hub_id를 기준으로 주변의 비콘을 스캔한 정보를 가져온다.
   """
   ret = dash_apis.get_detected_beacons(hub_id)
-  set_total_equip(current_user.organization_id, hub_id, ret['data'])
+  dashboard.count.set_equip_count(current_user.organization_id, hub_id,
+                                  ret['data'])
   return json.dumps(ret)
 
 
@@ -132,9 +125,9 @@ def get_cam_list(product_id):
   return json.dumps(ret)
 
 
-@blueprint.route('/hubs/location', methods=["POST"])
+@blueprint.route('/hubs/update', methods=["POST"])
 @util.require_login
-def update_scanner_location():
+def update_scanner():
   """
   :param : None
   :return : bool
@@ -142,7 +135,18 @@ def update_scanner_location():
   """
   json_data = request.get_json()
   hub_data = json_data['hub']
-  ret = dash_apis.update_scanner_location(hub_data)
+  ret = dash_apis.update_scanner(hub_data)
+  if ret:
+    custom = hub_data['custom']
+    if 'is_counted_hub' in custom and custom['is_counted_hub']:
+      # 0, 0 is none -> default
+      in_config_apis.create_or_update_count_device_setting(hub_data['id'],
+                                                           SCANNER_TYPE,
+                                                           0, 0,
+                                                           name=hub_data['name'])
+    elif 'is_counted_hub' in custom and not custom['is_counted_hub']:
+      # TODO: delete count setting and delete redis ...
+      dashboard.count.delete_device(hub_data['id'], SCANNER_TYPE)
   return json.dumps(ret)
 
 
@@ -179,25 +183,56 @@ def get_total_equip():
 
 
 def set_total_equip(org_id, hid, dist_data_list):
-  gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
-  if org_id in DETECTED_BEACONS:
-    DETECTED_BEACONS[org_id][hid] = list(gid_set)
-    # TODO: enter log
+  device_data = in_config_apis.get_device_data(hid, org_id)
+  custom = json.loads(device_data.custom)
+  if "is_counted_hub" and 'map_location' in custom:
+    if custom['is_counted_hub']:
+      gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
+      if org_id in DETECTED_BEACONS:
+        DETECTED_BEACONS[org_id][hid] = list(gid_set)
+      else:
+        DETECTED_BEACONS[org_id] = {}
+        DETECTED_BEACONS[org_id][hid] = list(gid_set)
+      set_equip_log(org_id, hid, dist_data_list)
+    else:
+      if org_id in DETECTED_BEACONS and hid in DETECTED_BEACONS[org_id]:
+        DETECTED_BEACONS[org_id][hid] = []
+      logging.warning("this scanner can not set count about detected data")
   else:
-    DETECTED_BEACONS[org_id] = {}
-    DETECTED_BEACONS[org_id][hid] = list(gid_set)
-  # TODO: Exit log
+    DETECTED_BEACONS[org_id][hid] = []
+    logging.warning("The scanner does not have custom data, Please add the "
+                    "scanner to the map first. ")
 
 
 @blueprint.route('/worker_log', methods=["GET"])
 @util.require_login
-def get_enterence_worker_log():
+def get_entrance_worker_log():
   org_id = current_user.organization_id
   _page_num = request.args.get('page_num')
   _limit = request.args.get('limit', 30)
   log_list = in_config_apis.get_enterence_worker_log_list(org_id,
                                                           page_num=int(_page_num),
                                                           limit=int(_limit))
+  new_list = []
+  for log in log_list.items:
+    trans_dict = log.__dict__
+    if '_sa_instance_state' in trans_dict:
+      del trans_dict['_sa_instance_state']
+    trans_dict['event_time'] = str(trans_dict['event_time'])
+    trans_dict['created_time'] = str(trans_dict['created_time'])
+    new_list.append(trans_dict)
+  return json.dumps(new_list)
+
+
+@blueprint.route('/equip_log', methods=["GET"])
+@util.require_login
+def get_entrance_equip_log():
+  org_id = current_user.organization_id
+  _page_num = request.args.get('page_num')
+  _limit = request.args.get('limit', 30)
+  log_list = in_config_apis.get_entrance_equip_log_list(org_id,
+                                                        page_num=int(_page_num),
+                                                        limit=int(_limit))
   new_list = []
   for log in log_list.items:
     trans_dict = log.__dict__

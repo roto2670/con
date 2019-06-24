@@ -19,6 +19,7 @@ from flask_login import current_user
 import apis
 import in_apis
 import in_config_apis
+import dashboard.count
 import dash_api_mock
 
 
@@ -46,7 +47,7 @@ def _get_user_header(is_json=False, org_id=None):
   return headers
 
 
-def update_scanner_location(hub_obj):
+def update_scanner(hub_obj):
   """
   :param : hub data (dict)
   :return type : bool
@@ -55,7 +56,9 @@ def update_scanner_location(hub_obj):
   """
   try:
     if apis.IS_DEV:
-      return dash_api_mock.update_hub_location_mock(hub_obj)
+      ret = dash_api_mock.update_hub_location_mock(hub_obj)
+      set_device_data([hub_obj], current_user.organization_id)
+      return ret
     else:
       url = "{base}hubs/{hub_id}".format(base=THIRD_BASE_URL,
                                          hub_id=hub_obj['id'])
@@ -67,6 +70,7 @@ def update_scanner_location(hub_obj):
       if resp.ok:
         logging.info("update scanner location successful. Code : %s, Text : %s",
                      resp.status_code, resp.text)
+        set_device_data([hub_obj], current_user.organization_id)
         return True
       else:
         logging.warning("Failed update scanner location. Code : %s, Text : %s",
@@ -108,8 +112,11 @@ def get_scanner_list(kind, org_id=None):
   :ret_content : get_scanner_list()에서 받은 kind로 cloud에 정보를 요청한다.
                       kind 가 일치하는 hub들의 data를 받는다.
   """
+  _org_id = org_id if org_id else current_user.organization_id
   if apis.IS_DEV:
-    return dash_api_mock.scanner_list()
+    ret = dash_api_mock.scanner_list()
+    set_device_data(ret, _org_id)
+    return ret
   try:
     url = "{base}hub-kinds/{kind}/hubs".format(base=THIRD_BASE_URL,
                                                kind=kind)
@@ -123,6 +130,7 @@ def get_scanner_list(kind, org_id=None):
     if resp.ok:
       scanners = resp.json()
       logging.info("Get scanner list resp : %s", scanners)
+      set_device_data(scanners, _org_id)
       return scanners
     else:
       logging.warning("Failed get scanner list. Code : %s, Text : %s",
@@ -142,7 +150,9 @@ def get_beacon_list(product_id):
   """
   try:
     if apis.IS_DEV:
-      return dash_api_mock.beacon_list()
+      ret = dash_api_mock.beacon_list()
+      set_device_data(ret, current_user.organization_id)
+      return ret
     else:
       url = "{base}products/{pid}/gadgets".format(base=THIRD_BASE_URL,
                                                   pid=product_id)
@@ -152,6 +162,7 @@ def get_beacon_list(product_id):
       if resp.ok:
         gadgets = resp.json()
         logging.info("Get beacon list resp : %s", gadgets)
+        set_device_data(gadgets, current_user.organization_id)
         return gadgets
       else:
         logging.warning("Failed to get beacon list. Code : %s, Text : %s",
@@ -176,6 +187,7 @@ def get_cam_list(product_id):
         if gadget['hub_id']:
           ret_list.append(gadget)
       logging.info("Get beacon list resp : %s", ret_list)
+      set_device_data(ret_list, current_user.organization_id)
       return ret_list
     else:
       logging.warning("Failed to get beacon list. Code : %s, Text : %s",
@@ -323,3 +335,10 @@ def get_detected_beacons(hub_id, query_id=None, org_id=None):
     logging.exception("Raise error while get detected beacons. url : %s, params : %s",
                       url, params)
     return None
+
+
+def set_device_data(data, org_id):
+  for device in data:
+    in_config_apis.create_or_update_device_data(org_id, device)
+    dashboard.count.set_device_data_info(device['id'], device)
+  return True

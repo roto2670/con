@@ -11,7 +11,6 @@
 
 import json
 import uuid
-import logging
 import datetime
 
 import pytz
@@ -24,7 +23,8 @@ from config_models import _SupremaConfig as SupremaConfig
 from config_models import _LocationConfig as LocationConfig
 from config_models import _EnterenceWorkerLog as EnterenceWorkerLog
 from config_models import _CountDeviceSetting as CountDeviceSetting
-
+from config_models import _EntranceEquipLog as EntranceEquipLog
+from config_models import _DeviceData as DeviceData
 
 
 def get_datetime():
@@ -193,17 +193,20 @@ def get_enterence_worker_log_list(organization_id, page_num=1, limit=None):
   return log_list
 
 
-
-def create_or_update_count_device_setting(device_id, typ, inout, access_point):
+def create_or_update_count_device_setting(device_id, typ, inout, access_point,
+                                          name=""):
   cur_time = get_datetime()
   setting = get_count_device(device_id)
   if setting:
+    if name:
+      setting.name = name
     setting.inout = inout
     setting.access_point = access_point
     last_updated_time = cur_time
     last_updated_user = current_user.email
   else:
     device_setting = CountDeviceSetting(device_id=device_id,
+                                        name=name,
                                         typ=typ,
                                         inout=inout,
                                         access_point=access_point,
@@ -231,3 +234,87 @@ def delete_count_device_setting(device_id):
   if device_setting:
     db.session.delete(device_setting)
     db.session.commit()
+
+
+def reset_count_device_setting(device_id):
+  device_setting = get_count_device(device_id)
+  if device_setting:
+    device_setting.inout = 0
+    device_setting.access_point = 0
+    device_setting.last_update_user = current_user.email
+    device_setting.last_updated_time = get_datetime()
+    db.session.commit()
+
+
+
+def create_entrance_equip_log(inout, access_point, kind, hub_id,
+                              hub_name, gadget_id, gadget_name, text,
+                              organization_id):
+  cur_time = get_datetime()
+  log = EntranceEquipLog(inout=inout,
+                         access_point=access_point,
+                         kind=kind,
+                         event_time=cur_time,
+                         created_time=cur_time,
+                         hub_id=hub_id,
+                         hub_name=hub_name,
+                         gadget_id=gadget_id,
+                         gadget_name=gadget_name,
+                         text=text,
+                         organization_id=organization_id)
+  db.session.add(log)
+  db.session.commit()
+
+
+def get_entrance_equip_log_list(organization_id, page_num=1, limit=None):
+  _limit = limit if limit else 30
+  log_list = EnterenceWorkerLog.query.filter_by(organization_id=organization_id).\
+    order_by(desc(EnterenceWorkerLog.created_time)).paginate(page_num, _limit, False)
+  return log_list
+
+
+def create_device_data(id, name, kind, custom, tags):
+  device = DeviceData(id=id,
+                      name=name,
+                      kind=kind,
+                      custom=custom,
+                      tags=tags,
+                      last_updated_time=get_datetime(),
+                      organization_id=current_user.organization_id)
+  db.session.add(device)
+  db.session.commit()
+
+
+def get_device_data(id, org_id):
+  device = DeviceData.query.filter_by(id=id, organization_id=org_id).one_or_none()
+  return device
+
+
+def update_device_data(id, name, kind, custom, tags, org_id):
+  device = get_device_data(id, org_id)
+  device.name = name
+  device.kind = kind
+  device.custom = custom
+  device.tags = tags
+  device.last_updated_time = get_datetime()
+  db.session.commit()
+
+
+def create_or_update_device_data(org_id, device_data):
+  ret = get_device_data(device_data['id'], org_id)
+  if ret:
+    ret.name = device_data['name']
+    ret.kind = device_data['kind']
+    ret.custom = json.dumps(device_data['custom'])
+    ret.tags = json.dumps(device_data['tags'])
+    ret.last_updated_time = get_datetime()
+  else:
+    device = DeviceData(id=device_data['id'],
+                        name=device_data['name'],
+                        kind=device_data['kind'],
+                        custom=json.dumps(device_data['custom']),
+                        tags=json.dumps(device_data['tags']),
+                        last_updated_time=get_datetime(),
+                        organization_id=org_id)
+    db.session.add(device)
+  db.session.commit()

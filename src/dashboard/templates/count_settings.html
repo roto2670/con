@@ -18,9 +18,12 @@
 
 {% block content %}
   <div id="scroll-style-hidden" class="right_col" role="main">
-      <div class="row">  <!-- Start row -->
-      </div>  <!-- End row-->
+      <div class="row">  <!-- Start row --> <!-- FaceStation -->
           <div class="x_panel tile">
+            <div class="x_title">
+              <h3>FaceStation</h3>
+              <div class="clearfix"></div>
+            </div>
 
             <div class="x_content">
               <div class="col-md-12 col-sm-12 col-xs-12">
@@ -98,9 +101,120 @@
               </div>
             </div><!-- End x_content -->
           </div><!-- End x_panel-->
-        </div>
+      </div>  <!-- End row-->
 
-      <div class="row">  <!-- Start row -->
+
+      <div class="row">  <!-- Start row --> <!-- Beacon Scanner -->
+          <div class="x_panel tile">
+            <div class="x_title">
+              <h3>Beacon Scanner</h3>
+              <div class="clearfix"></div>
+            </div>
+
+            <div class="x_content">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+
+                <table class="table table-striped projects">
+                  <thead>
+                    <tr>
+                      <th>Device Name</th>
+                      <th>Location</th>
+                      <th>Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Scanner -->
+                    {% for scanner in scanner_list %}
+                      <tr>
+                        <form class="right-align" id="upload-{{ scanner.device_id }}"
+                            action="/dashboard/count/settings/{{ scanner.device_id }}" method="POST">
+                          <td>{{ scanner.name }}</td>
+                          <td>
+                            <select id="ap" name="ap">
+                              {% for k, v in access_point.items() %}
+                                {% if k == scanner.access_point %}
+                                  <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
+                                {% else %}
+                                  <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
+                                {% endif %}
+                              {% endfor %}
+                            </select>
+                          </td>
+                          <td>
+                            <button type="submit" class="btn btn-info btn-xs">Save</button>
+                            {% if scanner.device_id in setting_id_list %}
+                              <!-- 2 is Scanner Type -->
+                              <a href="/dashboard/count/settings/delete/{{ scanner.device_id }}/typ/2"
+                                  class="btn btn-danger btn-xs">
+                                <i class="fa fa-remove"></i> Reset
+                              </a>
+                            {% endif %}
+                          </td>
+                          <!-- 2 is Scanner Type -->
+                          <input type="hidden" name="typ" value="2">
+                        </form>
+                      </tr>
+                    {% endfor %}
+                    <!-- Scanner -->
+                  </tbody>
+                </table>
+
+              </div>
+            </div><!-- End x_content -->
+          </div><!-- End x_panel-->
+      </div>  <!-- End row-->
+
+
+      <div class="row">  <!-- Start row --> <!-- Equip kind -->
+          <div class="x_panel tile">
+            <div class="x_title">
+              <h3>Equipment count with operator</h3>
+              <div class="clearfix"></div>
+            </div>
+
+            <div class="x_content">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+
+                <table class="table table-striped projects">
+                  <thead>
+                    <tr>
+                      <th>Kind</th>
+                      <th>Count</th>
+                      <th>Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Kind Setting(equip worker_count) -->
+                    {% for equip_key, equip_value in equip_kind_list.items() %}
+                      <tr>
+                        <form class="right-align" id="equip-worker" action="/dashboard/count/settings/equip/kind/{{ equip_key }}" method="POST">
+                          <td>{{ equip_value }}</td>
+                          <td>
+                            <select id="equip_worker_count" name="equip_worker_count">
+                              {% if equip_key in equip_kind_settings %}
+                                <option id="yes" value="1" selected>Yes</option>
+                                <option id="no" value="0">No</option>
+                              {% else %}
+                                <option id="yes" value="1">Yes</option>
+                                <option id="no" value="0" selected>No</option>
+                              {% endif %}
+                            </select>
+                          </td>
+                          <td>
+                            <button type="submit" class="btn btn-info btn-xs">Save</button>
+                          </td>
+                          <!-- 1 is FaceStation Type -->
+                          <input type="hidden" name="kind" value="1">
+                        </form>
+                      </tr>
+                    {% endfor %}
+                    <!-- Kind Setting -->
+                  </tbody>
+                </table>
+              </div>
+            </div><!-- End x_content -->
+          </div><!-- End x_panel-->
+
       </div>  <!-- End row-->
   </div>
 
