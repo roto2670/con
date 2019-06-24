@@ -60,6 +60,12 @@ def default_workschedule():
   return render_template("workschedule.html")
 
 
+@blueprint.route('/workschedule/detail', methods=['GET'])
+@util.require_login
+def default_workschedule_detail():
+  return render_template("workschedule_detail.html")
+
+
 @blueprint.route('/count/settings', methods=['GET'])
 @util.require_login
 def default_count_setting_page():
@@ -144,6 +150,40 @@ def upload_workschedule():
     f.write(content)
   os.chmod(file_path, stat.S_IREAD)
   return '/static/dashboard/workschedule/' + current_user.organization_id + \
+      "/" + SCHEDULE_COMMON_FILE_NAME
+
+
+@blueprint.route('/workschedule/detail/view', methods=['GET'])
+@util.require_login
+def get_workschedule_detail():
+  base_path = util.get_static_path()
+  org_path = os.path.join(base_path, 'dashboard', 'workschedule_d',
+                          current_user.organization_id)
+  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
+  if os.path.exists(file_path):
+    return '/static/dashboard/workschedule_d/' + current_user.organization_id + \
+         "/" + SCHEDULE_COMMON_FILE_NAME
+  else:
+    return ""
+
+
+@blueprint.route('/workschedule/detail/upload', methods=['POST'])
+@util.require_login
+def upload_workschedule_detail():
+  upload_file = request.files['file']
+  content = upload_file.read()
+  base_path = util.get_static_path()
+  org_path = os.path.join(base_path, 'dashboard', 'workschedule_d',
+                          current_user.organization_id)
+  if not os.path.exists(org_path):
+    os.makedirs(org_path)
+  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
+  if os.path.exists(file_path):
+    os.remove(file_path)
+  with open(file_path, 'wb') as f:
+    f.write(content)
+  os.chmod(file_path, stat.S_IREAD)
+  return '/static/dashboard/workschedule_d/' + current_user.organization_id + \
       "/" + SCHEDULE_COMMON_FILE_NAME
 
 
