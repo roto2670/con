@@ -121,13 +121,11 @@
 
     function setTotalCount() {
       var divCount = document.getElementById("divCount"),
-          divEquip = document.getElementById("divEquip"),
           divWorkerAt1 = document.getElementById("divWorkerAt1");
           divWorkerAt2 = document.getElementById("divWorkerAt2");
           divEquipAt1 = document.getElementById("divEquipAt1");
           divEquipAt2 = document.getElementById("divEquipAt2");
-      divCount.innerText = parseInt(divEquip.innerText) + parseInt(divWorkerAt1.innerText) + parseInt(divWorkerAt2.innerText) +
-          parseInt(divEquipAt1.innerText) + parseInt(divEquipAt2.innerText);
+      divCount.innerText = parseInt(divWorkerAt1.innerText) + parseInt(divWorkerAt2.innerText) + parseInt(divEquipAt1.innerText) + parseInt(divEquipAt2.innerText);
     }
 
   </script>
