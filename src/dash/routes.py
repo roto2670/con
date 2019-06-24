@@ -10,7 +10,6 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import json
-import logging
 
 from flask import request
 from flask_login import current_user
@@ -18,15 +17,11 @@ from flask_login import current_user
 import apis
 import util
 import dash_apis
-import base.routes
 import dashboard
 import dashboard.count
 from dash import blueprint
 import in_config_apis
 from config_models import SCANNER_TYPE
-
-
-DETECTED_BEACONS = {}
 
 
 @blueprint.route('/location/info', methods=["GET"])
@@ -140,9 +135,11 @@ def update_scanner():
     custom = hub_data['custom']
     if 'is_counted_hub' in custom and custom['is_counted_hub']:
       # 0, 0 is none -> default
+      device_setting = in_config_apis.get_count_device(hub_data['id'])
+      access_point = device_setting.access_point if device_setting else 0
       in_config_apis.create_or_update_count_device_setting(hub_data['id'],
                                                            SCANNER_TYPE,
-                                                           0, 0,
+                                                           0, access_point,
                                                            name=hub_data['name'])
     elif 'is_counted_hub' in custom and not custom['is_counted_hub']:
       # TODO: delete count setting and delete redis ...
@@ -169,39 +166,6 @@ def get_beacon_info(beacon_id):
   """
   ret = dash_apis.get_beacon_info(beacon_id)
   return json.dumps(ret)
-
-
-@blueprint.route('/total_equip', methods=["GET"])
-@util.require_login
-def get_total_equip():
-  if current_user.organization_id in DETECTED_BEACONS:
-    all_gids = list(set(sum(DETECTED_BEACONS[current_user.organization_id].\
-                            values(), [])))
-    count = len(all_gids)
-    return json.dumps(count)
-  return json.dumps(0)
-
-
-def set_total_equip(org_id, hid, dist_data_list):
-  device_data = in_config_apis.get_device_data(hid, org_id)
-  custom = json.loads(device_data.custom)
-  if "is_counted_hub" and 'map_location' in custom:
-    if custom['is_counted_hub']:
-      gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
-      if org_id in DETECTED_BEACONS:
-        DETECTED_BEACONS[org_id][hid] = list(gid_set)
-      else:
-        DETECTED_BEACONS[org_id] = {}
-        DETECTED_BEACONS[org_id][hid] = list(gid_set)
-      set_equip_log(org_id, hid, dist_data_list)
-    else:
-      if org_id in DETECTED_BEACONS and hid in DETECTED_BEACONS[org_id]:
-        DETECTED_BEACONS[org_id][hid] = []
-      logging.warning("this scanner can not set count about detected data")
-  else:
-    DETECTED_BEACONS[org_id][hid] = []
-    logging.warning("The scanner does not have custom data, Please add the "
-                    "scanner to the map first. ")
 
 
 @blueprint.route('/worker_log', methods=["GET"])
