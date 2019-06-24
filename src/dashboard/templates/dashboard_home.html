@@ -15,6 +15,14 @@
 {% block content %}
   <div id="scroll-style-hidden" class="right_col" role="main">
     <!-- top tiles -->
+    <div class="row">
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel tile" style="border:0;">
+          <div class="x_title">
+            <h3>Tunnel Entrance Control System</h3>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
     <div class="row tile_count">
       <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
         <span class="count_top"><i class="fa fa-user"></i> Total Man Power </span>
@@ -33,12 +41,36 @@
         <div id="divTime" class="count right-align"></div>
       </div>
     </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--
+    <div class="row tile_count">
+      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> Total Man Power </span>
+        <div id="divWorker" class="count">0</div>
+      </div>
+      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> Total Equipment </span>
+        <div id="divEquip" class="count">0</div>
+      </div>
+      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> Total Count </span>
+        <div id="divCount" class="count">0</div>
+      </div>
+      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+        <span><div id="divDate" class="count_top right-align"></div></span>
+        <div id="divTime" class="count right-align"></div>
+      </div>
+    </div>
+    -->
 
     <!-- start row -->
     <div class="row">
 
         <div class="col-md-6 col-sm-6 col-xs-12">
-          <div class="x_panel tile">
+          <div class="x_panel tile" style="height: 840px">
             <div class="x_title">
               <h3>Location Tracking</h3>
               <div class="clearfix"></div>
@@ -52,13 +84,25 @@
         </div>
 
         <div class="col-md-6 col-sm-6 col-xs-12">
-          <div class="x_panel tile">
+          <div class="x_panel tile" style="height: 410px;">
             <div class="x_title">
-              <h3>Work Schedule</h3>
+              <h3>Work Schedule - Summary</h3>
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
               <img src="" id="workSchedule" class="col-md-12 col-sm-12">
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <div class="x_panel tile" style="height: 410px;">
+            <div class="x_title">
+              <h3>Work Schedule - Detail</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <img src="" id="workSchedule-detail" class="col-md-12 col-sm-12">
             </div>
           </div>
         </div>
@@ -127,6 +171,14 @@
       });
     }
     getWorkSchedule();
+
+    function getWorkScheduleDetail() {
+      jQuery.get("/dashboard/workschedule/detail/view").done(function(data){
+        var divWorkSchedule = document.getElementById("workSchedule-detail");
+        divWorkSchedule.src = data;
+      });
+    }
+    getWorkScheduleDetail();
 
   </script>
 {% endblock javascripts %}

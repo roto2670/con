@@ -1,0 +1,108 @@
+
+{% extends "base_site.html" %}
+
+{% block title %} Work Schedule - Detail {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_dashboard.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block javascripts %}
+  {{ super() }}
+  <script>
+      var isExpand = false,
+          $BODY = $('body'),
+          $SIDEBAR_MENU = $('#sidebar-menu');
+      function onExpand() {
+        if (isExpand) {
+          exitFullScreen();
+        } else {
+          enterFullScreen();
+        }
+      }
+      function enterFullScreen() {
+          var docV = document.documentElement;
+          if (docV.requestFullscreen) {
+              docV.requestFullscreen();
+          } else if (docV.webkitRequestFullscreen) { // Chrome, Safari (webkit)
+              docV.webkitRequestFullscreen();
+          } else if (docV.mozRequestFullScreen) { // Firefox
+              docV.mozRequestFullScreen();
+          } else if (docV.msRequestFullscreen) { // IE or Edge
+              docV.msRequestFullscreen();
+          }
+      }
+      function exitFullScreen() {
+        var docV = document;
+        var requestMethod = docV.exitFullscreen ||
+                            docV.mozCancelFullScreen ||
+                            docV.webkitExitFullscreen ||
+                            docV.msExitFullscreen;
+         if (requestMethod) {
+               requestMethod.call(docV);
+         } else {
+               console.log("Oops. Request method false.");
+          }
+     }
+     function handleSidebarMenu() {
+       if ($BODY.hasClass('nav-md')) {
+         $SIDEBAR_MENU.find('li.active ul').hide();
+         $SIDEBAR_MENU.find('li.active').addClass('active-sm').removeClass('active');
+       } else {
+         $SIDEBAR_MENU.find('li.active-sm ul').show();
+         $SIDEBAR_MENU.find('li.active-sm').addClass('active').removeClass('active-sm');
+       }
+       $BODY.toggleClass('nav-md nav-sm');
+       $(window).resize();
+     }
+
+     document.addEventListener("fullscreenchange", function() {
+       if (isExpand) {
+         isExpand = false;
+         document.getElementById("expand").classList.remove('fa-compress');
+         document.getElementById("expand").classList.add('fa-expand');
+         handleSidebarMenu();
+       } else {
+         isExpand = true;
+         document.getElementById("expand").classList.remove('fa-expand');
+         document.getElementById("expand").classList.add('fa-compress');
+         handleSidebarMenu();
+       }
+     });
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+
+      <!-- start row -->
+      <div class="row">
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">
+            <div class="x_title">
+              <div class="x_title_left_div">
+                <h3>Work Schedule - Detail</h3>
+              </div>
+              <div class="x_title_right_div">
+                <h3>
+                  <i id="expand" class="fa fa-expand" onclick="onExpand();"></i>
+                </h3>
+              </div>
+            </div>
+            <div class="x_content">
+              <div id="workSchedule">
+              </div>
+              <script src="/static/dashboard/workschedule_d/build.js"></script>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- End row -->
+    </div>
+  </div>
+
+{% endblock content %}
