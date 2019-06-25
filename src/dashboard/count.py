@@ -28,15 +28,19 @@ REDIS_PORT = 6379
 BEACONS_REDIS_DB = 1
 WORKER_REDIS_DB = 2
 EXPIRE_REDIS_DB = 3
+DATA_INFO_EXPIRE_REDIS_DB = 4
 
 # AT1 : 1 , AT2: 2
 BEACONS_COUNT = RedisStore(REDIS_HOST, REDIS_PORT, BEACONS_REDIS_DB)
 # AT1 + AT2 : org_id, AT1 : 1, AT2: 2, AT1_OP : 3, AT2_OP : 4
 WORKER_COUNT = RedisStore(REDIS_HOST, REDIS_PORT, WORKER_REDIS_DB)
 EXPIRE_CACHE = RedisStore(REDIS_HOST, REDIS_PORT, EXPIRE_REDIS_DB)
+DATA_INFO_EXPIRE_CACHE = RedisStore(REDIS_HOST, REDIS_PORT,
+                                    DATA_INFO_EXPIRE_REDIS_DB)
 
-EXPIRE_TIME = 15
-EQUIP_EXPIRE_TIME = 300
+EXPIRE_TIME = 15  # 15s
+EQUIP_EXPIRE_TIME = 120  # 2m
+DATA_INFO_EXPIRE_TIME = 600  # 10m
 EQUIP_OPERATOR_COUNT_KEY = '''equip-operator'''
 DEVICE_DATA_KEY = '''device-data'''
 
@@ -284,6 +288,7 @@ def clear_keys_of_sc(key):
   _org_id = current_user.organization_id
   BEACONS_COUNT.hdel(key, *keys)
   BEACONS_COUNT.hdel(_org_id, *keys)
+  # TODO: hdel, hkeys not
 
 
 def clear_all_of_sc():
@@ -484,7 +489,10 @@ def get_equip_operator_count_settings():
 
 def set_device_data_info(key, value):
   # key -> gid, hid,, value -> dict of data
+  if DATA_INFO_EXPIRE_CACHE.exists(key):
+    return False
   BEACONS_COUNT.set_data(DEVICE_DATA_KEY, key, value)
+  return True
 
 
 def get_device_data_info(key):

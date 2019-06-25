@@ -338,3 +338,9 @@ class RedisStore(object):
 
   def set(self, name, value, expire_time):
     self.store.set(name, value, expire_time)
+
+  def hkeys(self, name):
+    return self.store.hkeys(name)
+
+  def hdel(self, name, *keys):
+    self.store.hdel(name, *keys)

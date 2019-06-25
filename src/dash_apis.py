@@ -129,7 +129,7 @@ def get_scanner_list(kind, org_id=None):
     resp = requests.get(url, headers=headers, params=params)
     if resp.ok:
       scanners = resp.json()
-      logging.info("Get scanner list resp : %s", scanners)
+      logging.info("Get scanner list len resp : %s", len(scanners))
       set_device_data(scanners, _org_id)
       return scanners
     else:
@@ -339,6 +339,7 @@ def get_detected_beacons(hub_id, query_id=None, org_id=None):
 
 def set_device_data(data, org_id):
   for device in data:
-    in_config_apis.create_or_update_device_data(org_id, device)
-    dashboard.count.set_device_data_info(device['id'], device)
+    ret = dashboard.count.set_device_data_info(device['id'], device)
+    if ret:
+      in_config_apis.create_or_update_device_data(org_id, device)
   return True
