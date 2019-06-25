@@ -27,6 +27,10 @@ IDENTIFY_SUCCESS_FACE = "4867"
 IDENTIFY_FAIL_FINGERPRINT = "5124"
 IDENTIFY_FAIL_FACE = "5125"
 
+VERIFY_SUCCESS_ID_PIN = "4097"
+VERIFY_SUCCESS_CARD = "4102"
+VERIFY_SUCCESS_CARD_PIN = "4103"
+
 
 def get_event_list():
   event_list = [
@@ -144,6 +148,15 @@ def set_event(org_id):
                                                user_info['user_id'],
                                                user_info['name'],
                                                data)
+            elif data['event_type_id']['code'] == VERIFY_SUCCESS_ID_PIN:
+              # BUS STATION
+              logging.info("#### pin id success. data : %s", data)
+            elif data['event_type_id']['code'] == VERIFY_SUCCESS_CARD:
+              # BUS STATION
+              logging.info("#### card success. data : %s", data)
+            elif data['event_type_id']['code'] == VERIFY_SUCCESS_CARD_PIN:
+              # BUS STATION
+              logging.info("#### card pin success. data : %s", data)
             last_id = data['id']
           if last_id:
             set_last_id_cache(org_id, int(last_id))
