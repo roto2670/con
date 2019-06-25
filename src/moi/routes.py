@@ -19,10 +19,10 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 import base
 import util
 import in_apis
-from maintenance import blueprint
+from moi import blueprint
 
 
 @blueprint.route('/')
 @util.require_login
 def route_default():
-  pass
+  return render_template("moi_home.html")

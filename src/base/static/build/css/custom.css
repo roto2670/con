@@ -1827,6 +1827,79 @@ span.right {
 .tile_count .tile_stats_count .count_bottom i {
     width: 12px
 }
+
+
+
+.tile_count {
+    /*margin-bottom: 20px;
+    margin-top: 20px*/
+    margin-bottom: 10px;
+    margin-top: 10px
+}
+.tile_count .tile_stats_count_2 {
+    border-bottom: 1px solid #D9DEE4;
+    padding: 0 10px 0 20px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative
+}
+@media (min-width: 992px) {
+    footer {
+        /*margin-left: 230px*/
+        margin-left: 300px
+    }
+}
+@media (min-width: 992px) {
+    .tile_count .tile_stats_count_2 {
+        margin-bottom: 10px;
+        border-bottom: 0;
+        padding-bottom: 10px
+    }
+}
+.tile_count .tile_stats_count_2:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    height: 95px;
+    border-left: 2px solid #ADB2B5;
+    margin-top: 10px
+}
+@media (min-width: 992px) {
+    .tile_count .tile_stats_count_2:first-child:before {
+        border-left: 0
+    }
+}
+.tile_count .tile_stats_count_2 .count {
+    font-size: 30px;
+    line-height: 47px;
+    font-weight: 600
+}
+@media (min-width: 768px) {
+    .tile_count .tile_stats_count_2 .count {
+        font-size: 40px
+    }
+}
+@media (min-width: 992px) and (max-width: 1100px) {
+    .tile_count .tile_stats_count_2 .count {
+        font-size: 38px
+    }
+}
+.tile_count .tile_stats_count_2 span {
+    font-size: 14px;
+    color: #8e8e8e;
+}
+@media (min-width: 768px) {
+    .tile_count .tile_stats_count_2 span {
+        font-size: 15px
+    }
+}
+.tile_count .tile_stats_count_2 .count_bottom i {
+    width: 12px
+}
+
+
+
 .dashboard_graph {
     background: #fff;
     padding: 7px 10px

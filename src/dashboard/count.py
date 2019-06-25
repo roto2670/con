@@ -137,6 +137,20 @@ def default_count():
                          equip_interval=equip_interval, device_list=device_list)
 
 
+def detail_count():
+  _org_id = current_user.organization_id
+  worker_interval = 10
+  equip_interval = 10
+  suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
+  location_config = in_config_apis.get_location_config_by_org(_org_id)
+  if suprema_config:
+    worker_interval = suprema_config.client_interval
+  if location_config:
+    equip_interval = location_config.client_interval
+  return render_template("dashboard_count_detail.html", worker_interval=worker_interval,
+                         equip_interval=equip_interval, device_list=device_list)
+
+
 def _get_device_list(config, org_id):
   resp = suprema_apis.get_device_list(config)
   device_list = resp['DeviceCollection']['rows']

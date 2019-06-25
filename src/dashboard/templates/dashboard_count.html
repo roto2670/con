@@ -1,6 +1,6 @@
 {% extends "base_site.html" %}
 
-{% block title %} Count{% endblock title %}
+{% block title %} Tunnel Entrance Control System{% endblock title %}
 {% block sidebar %}
   <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
     {% include "site_template/sidebar_dashboard.html" %}
@@ -13,42 +13,60 @@
 {% endblock stylesheets %}
 
 {% block content %}
-  <div id="scroll-style-hidden" class="right_col" role="main">
-    <!-- top tiles -->
-    <div class="row tile_count">
-      <div class="col-md-12 col-sm-4 col-xs-6 tile_stats_count">
-        <span><div id="divDate" class="count_top right-align"></div></span>
-        <div id="divTime" class="count right-align"></div>
+    <div id="scroll-style-hidden" class="right_col" role="main">
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile" style="border:0;">
+            <div class="x_title">
+              <div class="x_title_left_div">
+                <div class="row">
+                  <div class="col-md-5 tile_stats_count count">
+                    <h3><a href="/dashboard/count">Summary View</a></h3>
+                  </div>
+                  <div class="col-md-4 tile_stats_count count">
+                    <h3><a href="/dashboard/count/detail">Detail View</a></h3>
+                  </div>
+                  <div class="col-md-3 tile_stats_count count">
+                    <h3><a href="/dashboard/worker_logs">Logs</a></h3>
+                  </div>
+                </div>
+              </div>
+              <div class="x_title_right_div">
+                <h3>
+                  <i id="expand" class="fa fa-expand" onclick="onExpand();"></i>
+                </h3>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <!-- top tiles -->
+                <div class="row tile_count">
+                  <div class="col-md-12 col-sm-4 col-xs-6 tile_stats_count">
+                    <span><div id="divDate" class="count_top right-align" style="font-size: 20px;"></div></span>
+                    <div id="divTime" class="count right-align" style="font-size: 60px;"></div>
+                  </div>
+                </div>
+                <div class="row tile_count">
+                  <div class="col-md-12 col-sm-4 col-xs-6 tile_stats_count" style="margin-bottom: 30px;">
+                    <span class="count_top" style="font-size: 40px;"><i class="fa fa-user"></i> Total Count </span>
+                    <div id="divCount" class="count" style="font-size: 80px; padding-top: 20px;">0</div>
+                  </div>
+                </div>
+                <div class="row tile_count">
+                  <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count_2">
+                    <span class="count_top" style="font-size: 30px;"><i class="fa fa-user"></i> Total Man Power </span>
+                    <div id="divWorker" class="count" style="font-size: 60px; padding-top: 20px;">0</div>
+                  </div>
+                  <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count_2">
+                    <span class="count_top" style="font-size: 30px;"><i class="fa fa-user"></i> Total Equipment </span>
+                    <div id="divEquip" class="count" style="font-size: 60px; padding-top: 20px;">0</div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="row tile_count">
-      <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> AT1 Man Power </span>
-        <div id="divWorkerAt1" class="count">0</div>
-      </div>
-      <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> AT2 Man Power </span>
-        <div id="divWorkerAt2" class="count">0</div>
-      </div>
-    </div>
-    <div class="row tile_count">
-      <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> AT1 Equipment </span>
-        <div id="divEquipAt1" class="count">0</div>
-      </div>
-      <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> AT2 Equipment </span>
-        <div id="divEquipAt2" class="count">0</div>
-      </div>
-    </div>
-    <div class="row tile_count">
-      <div class="col-md-6 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Count </span>
-        <div id="divCount" class="count">0</div>
-      </div>
-    </div>
-
-  </div>
 {% endblock content %}
 
 {% block javascripts %}
@@ -75,59 +93,92 @@
     }
     showClock();
 
-    function getAT1Equip() {
-      jQuery.get("/dashboard/count/equip/counting/1").done(function(data){
+    function getEquip() {
+      jQuery.get("/dashboard/count/equip/counting/total").done(function(data){
         var jsonData = JSON.parse(data),
-            divEquip = document.getElementById("divEquipAt1");
+            divEquip = document.getElementById("divEquip");
         divEquip.innerText = jsonData;
         setTotalCount();
-        setTimeout(getAT1Equip, 1000 * {{ equip_interval }});
+        setTimeout(getEquip, 1000 * {{ equip_interval }});
       });
     }
-    function getAT2Equip() {
-      jQuery.get("/dashboard/count/equip/counting/2").done(function(data){
-        var jsonData = JSON.parse(data),
-            divEquip = document.getElementById("divEquipAt2");
-        divEquip.innerText = jsonData;
-        setTotalCount();
-        setTimeout(getAT2Equip, 1000 * {{ equip_interval }});
-      });
-    }
-    getAT1Equip();
-    getAT2Equip();
+    getEquip();
 
-    function getAT1Worker() {
-      // AT 1 key -> 1
-      jQuery.get("/dashboard/count/worker/counting/1").done(function(data){
+    function getWorker() {
+      jQuery.get("/dashboard/count/worker/counting/total").done(function(data){
         var jsonData = JSON.parse(data),
-            divWorker = document.getElementById("divWorkerAt1");
+            divWorker = document.getElementById("divWorker");
         divWorker.innerText = jsonData;
         setTotalCount();
-        setTimeout(getAT1Worker, 1000 * {{ worker_interval }});
+        setTimeout(getWorker, 1000 * {{ worker_interval }});
       });
     }
-    function getAT2Worker() {
-      // AT 2 key -> 2
-      jQuery.get("/dashboard/count/worker/counting/2").done(function(data){
-        var jsonData = JSON.parse(data),
-            divWorker = document.getElementById("divWorkerAt2");
-        divWorker.innerText = jsonData;
-        setTotalCount();
-        setTimeout(getAT2Worker, 1000 * {{ worker_interval }});
-      });
-    }
-    getAT1Worker();
-    getAT2Worker();
+    getWorker();
 
     function setTotalCount() {
       var divCount = document.getElementById("divCount"),
-          divWorkerAt1 = document.getElementById("divWorkerAt1");
-          divWorkerAt2 = document.getElementById("divWorkerAt2");
-          divEquipAt1 = document.getElementById("divEquipAt1");
-          divEquipAt2 = document.getElementById("divEquipAt2");
-      divCount.innerText = parseInt(divWorkerAt1.innerText) + parseInt(divWorkerAt2.innerText) + parseInt(divEquipAt1.innerText) + parseInt(divEquipAt2.innerText);
+          divEquip = document.getElementById("divEquip"),
+          divWorker = document.getElementById("divWorker");
+      divCount.innerText = parseInt(divEquip.innerText) + parseInt(divWorker.innerText);
     }
 
+      var isExpand = false;
+      function onExpand() {
+        if (isExpand) {
+          exitFullScreen();
+        } else {
+          enterFullScreen();
+        }
+      }
+      function enterFullScreen() {
+          var docV = document.documentElement;
+          if (docV.requestFullscreen) {
+              docV.requestFullscreen();
+          } else if (docV.webkitRequestFullscreen) { // Chrome, Safari (webkit)
+              docV.webkitRequestFullscreen();
+          } else if (docV.mozRequestFullScreen) { // Firefox
+              docV.mozRequestFullScreen();
+          } else if (docV.msRequestFullscreen) { // IE or Edge
+              docV.msRequestFullscreen();
+          }
+      }
+      function exitFullScreen() {
+        var docV = document;
+        var requestMethod = docV.exitFullscreen ||
+                            docV.mozCancelFullScreen ||
+                            docV.webkitExitFullscreen ||
+                            docV.msExitFullscreen;
+         if (requestMethod) {
+               requestMethod.call(docV);
+         } else {
+               console.log("Oops. Request method false.");
+          }
+     }
+     function handleSidebarMenu() {
+       if ($BODY.hasClass('nav-md')) {
+         $SIDEBAR_MENU.find('li.active ul').hide();
+         $SIDEBAR_MENU.find('li.active').addClass('active-sm').removeClass('active');
+       } else {
+         $SIDEBAR_MENU.find('li.active-sm ul').show();
+         $SIDEBAR_MENU.find('li.active-sm').addClass('active').removeClass('active-sm');
+       }
+       $BODY.toggleClass('nav-md nav-sm');
+       $(window).resize();
+     }
+
+     document.addEventListener("fullscreenchange", function() {
+       if (isExpand) {
+         isExpand = false;
+         document.getElementById("expand").classList.remove('fa-compress');
+         document.getElementById("expand").classList.add('fa-expand');
+         handleSidebarMenu();
+       } else {
+         isExpand = true;
+         document.getElementById("expand").classList.remove('fa-expand');
+         document.getElementById("expand").classList.add('fa-compress');
+         handleSidebarMenu();
+       }
+     });
   </script>
 {% endblock javascripts %}
 

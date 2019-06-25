@@ -54,6 +54,12 @@ def default_count():
   return count.default_count()
 
 
+@blueprint.route('/count/detail', methods=['GET'])
+@util.require_login
+def detail_count():
+  return count.detail_count()
+
+
 @blueprint.route('/workschedule', methods=['GET'])
 @util.require_login
 def default_workschedule():

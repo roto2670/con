@@ -23,5 +23,6 @@ from registration import blueprint
 
 
 @blueprint.route('/')
+@util.require_login
 def route_default():
   return render_template("registration_home.html")
