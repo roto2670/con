@@ -101,7 +101,10 @@ GADGET_INFO = {
     "13": "MAI PUMP",
     "14": "MOBILE PRODUCTION UNIT",
     "15": "CHARGING PUMP UNIT",
-    "16": "BUS"
+    "16": "BUS",
+    "17": "Core Drilling Machine",
+    "18": "Explosive Van",
+    "19": "Concrete Mixer Truck"
 }
 
 
