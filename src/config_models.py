@@ -80,6 +80,8 @@ class _EnterenceWorkerLog(db.Model):
   __tablename__ = '_enterence_worker_log'
 
   id = Column(Integer, primary_key=True)
+  inout = Column(Integer)
+  access_point = Column(Integer)
   event_type = Column(String(25))
   event_time = Column(DateTime)
   created_time = Column(DateTime)

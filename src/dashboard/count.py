@@ -331,15 +331,17 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
         ret = WORKER_COUNT.delete_data(key, user_id)
         ret = WORKER_COUNT.delete_data(org_id, user_id)
         text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
-        in_config_apis.create_enterence_worker_log(event_data, text, org_id)
+        in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
+                                                   event_data, text, org_id)
         _set_expire_cache(user_id, user_name)
       elif WORKER_COUNT.has_data(REVERSE_ACCESS_POINT[key], user_id):
         reverse_key = REVERSE_ACCESS_POINT[key]
         ret = WORKER_COUNT.delete_data(reverse_key, user_id)
         ret = WORKER_COUNT.delete_data(org_id, user_id)
         text = WORKER_EXIT_TEXT_2.format(user_name, ACCESS_POINT[key],
-                                        ACCESS_POINT[reverse_key])
-        in_config_apis.create_enterence_worker_log(event_data, text, org_id)
+                                         ACCESS_POINT[reverse_key])
+        in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
+                                                   event_data, text, org_id)
         _set_expire_cache(user_id, user_name)
     else:
       logging.debug("%s device_id is IN type device. user name : %s",
@@ -350,7 +352,8 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
       ret = WORKER_COUNT.set_data(key, user_id, user_name)
       ret = WORKER_COUNT.set_data(org_id, user_id, user_name)
       text = WORKER_ENTER_TEXT.format(user_name, ACCESS_POINT[key])
-      in_config_apis.create_enterence_worker_log(event_data, text, org_id)
+      in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
+                                                 text, org_id)
       _set_expire_cache(user_id, user_name)
     else:
       logging.debug("%s device_id is OUT type device. user name : %s",
