@@ -216,6 +216,90 @@
           </div><!-- End x_panel-->
 
       </div>  <!-- End row-->
+
+
+      <div class="row">  <!-- Start row --> <!-- Bus Setting -->
+          <div class="x_panel tile">
+            <div class="x_title">
+              <h3>Bus Setting</h3>
+              <div class="clearfix"></div>
+            </div>
+
+            <div class="x_content">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <!-- Setting -->
+                <table class="table table-striped projects">
+                  <thead>
+                    <tr>
+                      <th>F/S User ID</th>
+                      <th>F/S User Name</th>
+                      <th>Beacon Name</th>
+                      <th>Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Bus Setting list-->
+                    {% for bus_setting in bus_setting_list %}
+                      <tr>
+                          <td>{{ bus_setting.bus_user_id }}</td>
+                          <td>{{ bus_setting.bus_user_name }}</td>
+                          <td>{{ bus_setting.bus_beacon_name }}</td>
+                          <td>
+                            <a href="/dashboard/bus/delete/{{ bus_setting.id }}/beacon/{{ bus_setting.bus_beacon_id }}"
+                                class="btn btn-danger btn-xs">
+                              <i class="fa fa-remove"></i> Delete
+                            </a>
+                          </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+
+                <!-- Bus Setting input -->
+                <table class="table table-striped projects">
+                  <thead>
+                    <tr>
+                      <th>F/S User ID</th>
+                      <th>F/S User Name</th>
+                      <th>Beacon</th>
+                      <th>Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Kind Setting(equip worker_count) -->
+                      <tr>
+                        <form class="right-align" id="equip-worker" action="/dashboard/bus/settings" method="POST">
+                          <td>
+                            <input type="text" id="bus_user_id" name="bus_user_id"
+                                class="col-md-3 col-sm-3 col-xs-3">
+                          </td>
+                          <td>
+                            <input type="text" id="bus_user_name" name="bus_user_name"
+                                class="col-md-3 col-sm-3 col-xs-3">
+                          </td>
+                          <td>
+                            <select id="bus_beacon_id" name="bus_beacon_id">
+                              {% for beacon in bus_list %}
+                                <option id="bus_beacon_id" value="{{ beacon.id }}">{{ beacon.name }}</option>
+                              {% endfor %}
+                              <option id="none" value="none">None</option>
+                            </select>
+                          </td>
+                          <td>
+                            <button type="submit" class="btn btn-info btn-xs">Save</button>
+                          </td>
+                        </form>
+                      </tr>
+                    <!-- Kind Setting -->
+                  </tbody>
+                </table>
+
+              </div>
+            </div><!-- End x_content -->
+          </div><!-- End x_panel-->
+
+      </div>  <!-- End row-->
+
   </div>
 
 {% endblock content %}

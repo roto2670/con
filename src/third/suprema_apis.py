@@ -128,6 +128,15 @@ def set_last_id_cache(org_id, last_id):
   LAST_ID_CACHE[org_id] = last_id
 
 
+def _set_worker_count(org_id, data):
+  user_info = data['user_id']
+  if 'user_id' in user_info and 'name' in user_info:
+    dashboard.count.set_worker_count(org_id,
+                                     user_info['user_id'],
+                                     user_info['name'],
+                                     data)
+
+
 def set_event(org_id):
   if org_id in LAST_ID_CACHE:
     last_data_id = LAST_ID_CACHE[org_id]
@@ -142,21 +151,20 @@ def set_event(org_id):
           rows = _extract_rows(config_data, limit)
           last_id = None
           for data in rows:
-            if data['event_type_id']['code'] == config_data.event_id:
-              user_info = data['user_id']
-              dashboard.count.set_worker_count(org_id,
-                                               user_info['user_id'],
-                                               user_info['name'],
-                                               data)
+            if data['event_type_id']['code'] == IDENTIFY_SUCCESS_FACE:
+              _set_worker_count(org_id, data)
             elif data['event_type_id']['code'] == VERIFY_SUCCESS_ID_PIN:
               # BUS STATION
               logging.info("#### pin id success. data : %s", data)
+              _set_worker_count(org_id, data)
             elif data['event_type_id']['code'] == VERIFY_SUCCESS_CARD:
               # BUS STATION
               logging.info("#### card success. data : %s", data)
+              _set_worker_count(org_id, data)
             elif data['event_type_id']['code'] == VERIFY_SUCCESS_CARD_PIN:
               # BUS STATION
               logging.info("#### card pin success. data : %s", data)
+              _set_worker_count(org_id, data)
             last_id = data['id']
           if last_id:
             set_last_id_cache(org_id, int(last_id))

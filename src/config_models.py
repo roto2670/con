@@ -76,6 +76,19 @@ class _DeviceData(db.Model):
   organization_id = Column(String(75))
 
 
+class _BusSettingData(db.Model):
+  __tablename__ = '_bus_setting_data'
+
+  id = Column(Integer, primary_key=True)
+  bus_user_id = Column(String(75))
+  bus_user_name = Column(String(75))
+  bus_beacon_id = Column(String(75))
+  bus_beacon_name = Column(String(75))
+  last_updated_user = Column(String(75))
+  last_updated_time = Column(DateTime)
+  organization_id = Column(String(75))
+
+
 class _EnterenceWorkerLog(db.Model):
   __tablename__ = '_enterence_worker_log'
 

@@ -55,6 +55,11 @@ IN_OUT_SETTING_ID = {
 
 ACCESS_1_ID = 1
 ACCESS_2_ID = 2
+BUS_WORKSHOP_ID = 3
+BUS_ACCESS_1_ID = 4
+BUS_ACCESS_2_ID = 5
+
+BUS_USER_GROUP_ID = '''1013'''
 
 # Using operator count
 ACCESS_1_OPERATOR_ID = 3
@@ -63,6 +68,9 @@ ACCESS_2_OPERATOR_ID = 4
 ACCESS_POINT = {
   ACCESS_1_ID: "AT 1",
   ACCESS_2_ID: "AT 2",
+  BUS_WORKSHOP_ID: "BUS WORKSHOP",
+  BUS_ACCESS_1_ID: "BUS AT 1",
+  BUS_ACCESS_2_ID: "BUS AT 2",
   0: "None"
 }
 REVERSE_ACCESS_POINT = {
@@ -83,10 +91,29 @@ CHECKING_DEVICE_LIST = set([])  # [device_id, ..]
 AT_1_DEVICE_LIST = set([])
 AT_2_DEVICE_LIST = set([])
 
+# user_id == bus_id
+BUS_CHECKING_LIST = {}  # {device_id: user_id, ..}  # in checking start, not in checking end
+BUS_WORKSHOP_DEVICE_LIST = set([])  # [device_id, ..]
+BUS_AT_1_DEVICE_LIST = set([])
+BUS_AT_2_DEVICE_LIST = set([])
+
+# Bus setting
+BUS_SETTING_DATA = {}  # {beacon_id: user_id(facestation, bus), ..}
+
 # FaceSTation
 DEVICE_LIST = {}   # {org_id : [list]}  # FaceStation Device List
 DEVICE_LIST_TIME = {}  # {org_id : time}  # FaceStation Device refresh time
 INTERVAL_TIME = 600  # 10m
+
+
+def test():
+  a = {}
+  a['BUS_CHECKING_LIST'] = BUS_CHECKING_LIST
+  a['BUS_WORKSHOP_DEVICE_LIST'] = list(BUS_WORKSHOP_DEVICE_LIST)
+  a['BUS_AT_1_DEVICE_LIST'] = list(BUS_AT_1_DEVICE_LIST)
+  a['BUS_AT_2_DEVICE_LIST'] = list(BUS_AT_2_DEVICE_LIST)
+  a['BUS_SETTING_DATA'] = BUS_SETTING_DATA
+  return a
 
 
 GADGET_INFO = {
@@ -106,7 +133,7 @@ GADGET_INFO = {
     "14": "MOBILE PRODUCTION UNIT",
     "15": "CHARGING PUMP UNIT",
     "16": "BUS",
-    "17": "Core Drilling Machine",
+    "17": "WCBH Drilling Machine",
     "18": "Explosive Van",
     "19": "Concrete Mixer Truck"
 }
@@ -159,6 +186,31 @@ def _get_device_list(config, org_id):
   return device_list
 
 
+def __add_bus_setting(bus_beacon_id, bus_user_id):
+  BUS_SETTING_DATA[bus_beacon_id] = bus_user_id
+
+
+def __delete_bus_setting(bus_beacon_id):
+  if bus_beacon_id in BUS_SETTING_DATA:
+    del BUS_SETTING_DATA[bus_beacon_id]
+
+
+def set_bus_setting(bus_user_id, bus_user_name, bus_beacon_id):
+  org_id = current_user.organization_id
+  beacon_data = in_config_apis.get_device_data(bus_beacon_id, org_id)
+  in_config_apis.create_or_update_bus_setting_data(bus_user_id, bus_user_name,
+                                                   bus_beacon_id, beacon_data.name,
+                                                   org_id)
+  __add_bus_setting(bus_beacon_id, bus_user_id)
+  return redirect("/dashboard/count/settings")
+
+
+def delete_bus_setting(_id, bus_beacon_id):
+  in_config_apis.delete_bus_setting_data(_id, current_user.organization_id)
+  __delete_bus_setting(bus_beacon_id)
+  return redirect("/dashboard/count/settings")
+
+
 def device_list():
   _org_id = current_user.organization_id
   device_list = []  # facestation
@@ -182,6 +234,8 @@ def device_list():
   for scanner in scanners:
     setting_id_list.append(scanner.device_id)
     settings_dict[scanner.device_id] = scanner
+  bus_list = in_config_apis.get_device_data_by_tag("16", _org_id)
+  bus_setting_list = in_config_apis.get_bus_setting_data_list()
   return render_template("count_settings.html", device_list=device_list,
                          in_out_setting=IN_OUT_SETTING_ID,
                          access_point=ACCESS_POINT,
@@ -189,7 +243,9 @@ def device_list():
                          settings_dict=settings_dict,
                          scanner_list=scanners,
                          equip_kind_list=GADGET_INFO,
-                         equip_kind_settings=equip_kind_settings)
+                         equip_kind_settings=equip_kind_settings,
+                         bus_list=bus_list,
+                         bus_setting_list=bus_setting_list)
 
 
 def __fs_set_inout(inout, device_id):
@@ -200,7 +256,7 @@ def __fs_set_inout(inout, device_id):
   else:
     if device_id in IN_LIST:
       IN_LIST.remove(device_id)
-    else:
+    elif device_id in OUT_LIST:
       OUT_LIST.remove(device_id)
 
 
@@ -211,15 +267,33 @@ def __fs_set_access_point(ap, device_id):
   elif ap == ACCESS_2_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     AT_2_DEVICE_LIST.add(device_id)
+  elif ap == BUS_WORKSHOP_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    BUS_WORKSHOP_DEVICE_LIST.add(device_id)
+  elif ap == BUS_ACCESS_1_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    BUS_AT_1_DEVICE_LIST.add(device_id)
+  elif ap == BUS_ACCESS_2_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    BUS_AT_2_DEVICE_LIST.add(device_id)
   else:
     if device_id in AT_1_DEVICE_LIST:
       AT_1_DEVICE_LIST.remove(device_id)
       if not AT_1_DEVICE_LIST:
         clear_keys(ACCESS_1_ID)
-    else:
+    elif device_id in AT_2_DEVICE_LIST:
       AT_2_DEVICE_LIST.remove(device_id)
       if not AT_2_DEVICE_LIST:
         clear_keys(ACCESS_2_ID)
+    elif device_id in BUS_WORKSHOP_DEVICE_LIST:
+      # TODO: clear keys?
+      BUS_WORKSHOP_DEVICE_LIST.remove(device_id)
+    elif device_id in BUS_AT_1_DEVICE_LIST:
+      # TODO: clear keys?
+      BUS_AT_1_DEVICE_LIST.remove(device_id)
+    elif device_id in BUS_AT_2_DEVICE_LIST:
+      # TODO: clear keys?
+      BUS_AT_2_DEVICE_LIST.remove(device_id)
 
 
 def __sc_set_access_point(ap, device_id):
@@ -260,6 +334,12 @@ def _delete_device_of_facestation(device_id):
     AT_1_DEVICE_LIST.remove(device_id)
   if device_id in AT_2_DEVICE_LIST:
     AT_2_DEVICE_LIST.remove(device_id)
+  if device_id in BUS_WORKSHOP_DEVICE_LIST:
+    BUS_WORKSHOP_DEVICE_LIST.remove(device_id)
+  if device_id in BUS_AT_1_DEVICE_LIST:
+    BUS_AT_1_DEVICE_LIST.remove(device_id)
+  if device_id in BUS_AT_2_DEVICE_LIST:
+    BUS_AT_2_DEVICE_LIST.remove(device_id)
   if device_id in IN_LIST:
     IN_LIST.remove(device_id)
   if device_id in OUT_LIST:
@@ -343,6 +423,16 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
         in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
                                                    event_data, text, org_id)
         _set_expire_cache(user_id, user_name)
+    elif device_id in BUS_AT_1_DEVICE_LIST and device_id in BUS_CHECKING_LIST:
+      bus_id = BUS_CHECKING_LIST[device_id]
+      WORKER_COUNT.set_data(bus_id, user_id, event_data)
+      _set_expire_cache(user_id, user_name)
+      # BUS_CACHE input, and later, beacon detected then count down
+    elif device_id in BUS_AT_2_DEVICE_LIST and device_id in BUS_CHECKING_LIST:
+      bus_id = BUS_CHECKING_LIST[device_id]
+      WORKER_COUNT.set_data(bus_id, user_id, event_data)
+      _set_expire_cache(user_id, user_name)
+      # BUS_CACHE input, and later, beacon detected then count down
     else:
       logging.debug("%s device_id is IN type device. user name : %s",
                     device_id, user_name)
@@ -355,6 +445,11 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
       in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
                                                  text, org_id)
       _set_expire_cache(user_id, user_name)
+    elif device_id in BUS_WORKSHOP_DEVICE_LIST and device_id in BUS_CHECKING_LIST:
+      # BUS_CACHE input, and later, beacon detected then count up
+      bus_id = BUS_CHECKING_LIST[device_id]
+      WORKER_COUNT.set_data(bus_id, user_id, event_data)
+      _set_expire_cache(user_id, user_name)
     else:
       logging.debug("%s device_id is OUT type device. user name : %s",
                     device_id, user_name)
@@ -362,6 +457,8 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
 
 def set_worker_count(org_id, user_id, name, event_data):
   device_id = event_data['device_id']['id']
+  device_name = event_data['device_id']['name']
+  user_group_id = event_data['user_group_id']['id']
   if device_id in CHECKING_DEVICE_LIST and not EXPIRE_CACHE.exists(user_id):
     if device_id in AT_1_DEVICE_LIST:
       _set_worker_count(device_id, ACCESS_1_ID, user_id, name, event_data,
@@ -369,11 +466,38 @@ def set_worker_count(org_id, user_id, name, event_data):
     elif device_id in AT_2_DEVICE_LIST:
       _set_worker_count(device_id, ACCESS_2_ID, user_id, name, event_data,
                         org_id)
+    elif device_id in BUS_WORKSHOP_DEVICE_LIST:
+      if user_group_id == BUS_USER_GROUP_ID:
+        _check_start_end_count(user_id, device_id, device_name)
+      else:
+        _set_worker_count(device_id, BUS_WORKSHOP_ID, user_id, name,
+                          event_data, org_id)
+    elif device_id in BUS_AT_1_DEVICE_LIST:
+      if user_group_id == BUS_USER_GROUP_ID:
+        _check_start_end_count(user_id, device_id, device_name)
+      else:
+        _set_worker_count(device_id, BUS_ACCESS_1_ID, user_id, name,
+                          event_data, org_id)
+    elif device_id in BUS_AT_2_DEVICE_LIST:
+      if user_group_id == BUS_USER_GROUP_ID:
+        _check_start_end_count(user_id, device_id, device_name)
+      else:
+        _set_worker_count(device_id, BUS_ACCESS_2_ID, user_id, name,
+                          event_data, org_id)
   else:
     has_checking = device_id in CHECKING_DEVICE_LIST
     has_expire = EXPIRE_CACHE.exists(user_id)
     logging.debug("Checking Device : %s, Expire Cache : %s, Device : %s, name : %s",
                   has_checking, has_expire, device_id, name)
+
+
+def _check_start_end_count(user_id, device_id, device_name):
+  if device_id in BUS_CHECKING_LIST:
+    del BUS_CHECKING_LIST[device_id]
+    logging.debug("%s(%s) is count end.", device_id, device_name)
+  else:
+    BUS_CHECKING_LIST[device_id] = user_id
+    logging.debug("%s(%s) is count start.", device_id, device_name)
 
 
 def get_total_worker():
@@ -439,6 +563,21 @@ def _set_equip_count(key, org_id, gid, hid):
                                                hid, scanner_name, gid,
                                                device_name, text, org_id)
       _set_expire_equip_cache(gid, device_name)
+
+      if gid in BUS_SETTING_DATA and device_tag == "16": # 16 is bus
+        bus_id = BUS_SETTING_DATA[gid]
+        bus_user_list = WORKER_COUNT.get_all(bus_id)  # {user_id: event_data, ..}
+        for user_id, event_data in bus_user_list.items():
+          user_name = event_data['user_id']['name']
+          if WORKER_COUNT.has_data(key, user_id):
+            WORKER_COUNT.delete_data(key, user_id)
+            WORKER_COUNT.delete_data(org_id, user_id)
+            # TODO: Change text? exit with bus?
+            u_text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
+            in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
+                                                       event_data, u_text, org_id)
+            _set_expire_cache(user_id, user_name)
+            WORKER_COUNT.hdel(bus_id, user_id)
     elif BEACONS_COUNT.has_data(REVERSE_ACCESS_POINT[key], gid):
       reverse_key = REVERSE_ACCESS_POINT[key]
       ret = BEACONS_COUNT.delete_data(reverse_key, gid)
@@ -453,6 +592,21 @@ def _set_equip_count(key, org_id, gid, hid):
                                                hid, scanner_name, gid,
                                                device_name, text, org_id)
       _set_expire_equip_cache(gid, device_name)
+
+      if gid in BUS_SETTING_DATA and device_tag == "16": # 16 is bus
+        bus_id = BUS_SETTING_DATA[gid]
+        bus_user_list = WORKER_COUNT.get_all(bus_id)  # {user_id: event_data, ..}
+        for user_id, event_data in bus_user_list.items():
+          user_name = event_data['user_id']['name']
+          if WORKER_COUNT.has_data(key, user_id):
+            WORKER_COUNT.delete_data(key, user_id)
+            WORKER_COUNT.delete_data(org_id, user_id)
+            # TODO: Change text? exit with bus?
+            u_text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
+            in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
+                                                       event_data, u_text, org_id)
+            _set_expire_cache(user_id, user_name)
+            WORKER_COUNT.hdel(bus_id, user_id)
   else:
     # equip enter
     ret = BEACONS_COUNT.set_data(key, gid, device_name)
@@ -466,6 +620,19 @@ def _set_equip_count(key, org_id, gid, hid):
                                              hid, scanner_name, gid, device_name,
                                              text, org_id)
     _set_expire_equip_cache(gid, device_name)
+
+    if gid in BUS_SETTING_DATA and device_tag == "16": # 16 is bus
+      bus_id = BUS_SETTING_DATA[gid]
+      bus_user_list = WORKER_COUNT.get_all(bus_id)  # {user_id: event_data, ..}
+      for user_id, event_data in bus_user_list.items():
+        user_name = event_data['user_id']['name']
+        WORKER_COUNT.set_data(key, user_id, user_name)
+        WORKER_COUNT.set_data(org_id, user_id, user_name)
+        # TODO: Change text? enter with bus?
+        u_text = WORKER_ENTER_TEXT.format(user_name, ACCESS_POINT[key])
+        in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
+                                                   u_text, org_id)
+        WORKER_COUNT.hdel(bus_id, user_id)
 
 
 def set_equip_count(org_id, hid, dist_data_list):
@@ -523,6 +690,15 @@ def _set_access_point(access_point, device_id):
   elif access_point == ACCESS_2_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     AT_2_DEVICE_LIST.add(device_id)
+  elif access_point == BUS_WORKSHOP_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    BUS_WORKSHOP_DEVICE_LIST.add(device_id)
+  elif access_point == BUS_ACCESS_1_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    BUS_AT_1_DEVICE_LIST.add(device_id)
+  elif access_point == BUS_ACCESS_2_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    BUS_AT_2_DEVICE_LIST.add(device_id)
 
 
 def _set_in_out_setting(inout, device_id):
@@ -541,6 +717,10 @@ def _set_access_point_of_sc(access_point, device_id):
     S_AT_2_DEVICE_LIST.add(device_id)
 
 
+def _set_bus_setting(bus_beacon_id, bus_user_id):
+  BUS_SETTING_DATA[bus_beacon_id] = bus_user_id
+
+
 def init():
   org_id = '''ac983bfaa401d89475a45952e0a642cf'''
   settings = in_config_apis.get_count_device_setting(FACE_STATION_TYPE, org_id)
@@ -556,3 +736,9 @@ def init():
     device_id = setting.device_id
     access_point = setting.access_point
     _set_access_point_of_sc(access_point, device_id)
+
+  bus_settings = in_config_apis.get_bus_setting_data_list(org_id)
+  for setting in bus_settings:
+    bus_beacon_id = setting.bus_beacon_id
+    bus_user_id = setting.bus_user_id
+    _set_bus_setting(bus_beacon_id, bus_user_id)

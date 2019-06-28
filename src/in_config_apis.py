@@ -25,6 +25,7 @@ from config_models import _EnterenceWorkerLog as EnterenceWorkerLog
 from config_models import _CountDeviceSetting as CountDeviceSetting
 from config_models import _EntranceEquipLog as EntranceEquipLog
 from config_models import _DeviceData as DeviceData
+from config_models import _BusSettingData as BusSettingData
 
 
 def get_datetime():
@@ -293,6 +294,13 @@ def get_device_data(id, org_id):
   return device
 
 
+def get_device_data_by_tag(tag, org_id):
+  tags = json.dumps([str(tag)])
+  device_list = DeviceData.query.filter_by(tags=tags,
+                                           organization_id=org_id).all()
+  return device_list
+
+
 def update_device_data(id, name, kind, custom, tags, org_id):
   device = get_device_data(id, org_id)
   device.name = name
@@ -321,3 +329,52 @@ def create_or_update_device_data(org_id, device_data):
                         organization_id=org_id)
     db.session.add(device)
   db.session.commit()
+
+
+def create_or_update_bus_setting_data(bus_user_id, bus_user_name, bus_beacon_id,
+                                      bus_beacon_name, org_id):
+  cur_time = get_datetime()
+  ret = get_bus_setting_data(bus_user_id, bus_beacon_id, org_id)
+  if ret:
+    ret.bus_user_id = bus_user_id
+    ret.bus_user_name = bus_user_name
+    ret.bus_beacon_id = bus_beacon_id
+    ret.bus_beacon_name = bus_beacon_name
+    ret.last_updated_user = current_user.email
+    ret.last_update_time = cur_time
+  else:
+    bus = BusSettingData(bus_user_id=bus_user_id,
+                         bus_user_name=bus_user_name,
+                         bus_beacon_id=bus_beacon_id,
+                         bus_beacon_name=bus_beacon_name,
+                         last_updated_user=current_user.email,
+                         last_updated_time=cur_time,
+                         organization_id=org_id)
+    db.session.add(bus)
+  db.session.commit()
+
+
+def get_bus_setting_data(bus_user_id, bus_beacon_id, org_id):
+  bus_data = BusSettingData.query.filter_by(bus_user_id=bus_user_id,
+                                            bus_beacon_id=bus_beacon_id,
+                                            organization_id=org_id).one_or_none()
+  return bus_data
+
+
+def get_bus_setting_data_by_id(_id, org_id):
+  bus_data = BusSettingData.query.filter_by(id=_id,
+                                            organization_id=org_id).one_or_none()
+  return bus_data
+
+
+def get_bus_setting_data_list(org_id=None):
+  _org_id = org_id if org_id else current_user.organization_id
+  bus_list = BusSettingData.query.filter_by(organization_id=_org_id).all()
+  return bus_list
+
+
+def delete_bus_setting_data(_id, org_id):
+  ret = get_bus_setting_data_by_id(_id, org_id)
+  if ret:
+    db.session.delete(ret)
+    db.session.commit()
