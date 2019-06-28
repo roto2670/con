@@ -435,7 +435,7 @@ def _set_equip_count(key, org_id, gid, hid):
         operator_key = OPERATOR_COUNT_KEY[key]
         _handle_operator_count(operator_key, gid, device_name)
       text = EQUIP_EXIT_TEXT.format(device_name, ACCESS_POINT[key])
-      in_config_apis.create_entrance_equip_log(IN_SETTING_ID, key, device_tag,
+      in_config_apis.create_entrance_equip_log(OUT_SETTING_ID, key, device_tag,
                                                hid, scanner_name, gid,
                                                device_name, text, org_id)
       _set_expire_equip_cache(gid, device_name)
@@ -449,7 +449,7 @@ def _set_equip_count(key, org_id, gid, hid):
         _handle_operator_count(operator_key, gid, device_name)
       text = EQUIP_EXIT_TEXT_2.format(device_name, ACCESS_POINT[key],
                                       ACCESS_POINT[reverse_key])
-      in_config_apis.create_entrance_equip_log(IN_SETTING_ID, key, device_tag,
+      in_config_apis.create_entrance_equip_log(OUT_SETTING_ID, key, device_tag,
                                                hid, scanner_name, gid,
                                                device_name, text, org_id)
       _set_expire_equip_cache(gid, device_name)
