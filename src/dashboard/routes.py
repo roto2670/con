@@ -32,6 +32,12 @@ LOCATION_MAP_COMMON_FILE_NAME = '''location.png'''
 LOCATION_MAP_URI = "/dashboard/static/location/{org_id}/{file_name}"
 
 
+@blueprint.route('/test', methods=['GET'])
+@util.require_login
+def default_test():
+  return json.dumps(count.test())
+
+
 @blueprint.route('/', methods=['GET'])
 @util.require_login
 def default_route():
@@ -82,6 +88,22 @@ def default_count_setting_page():
 @util.require_login
 def default_count_setting(device_id):
   return count.set_device(device_id)
+
+
+@blueprint.route('/bus/settings', methods=['POST'])
+@util.require_login
+def set_bus_settting():
+  # bus_user_id from facestation, bus_beacon_id from mib
+  bus_user_id = request.form.get('bus_user_id')
+  bus_user_name = request.form.get('bus_user_name')
+  bus_beacon_id = request.form.get('bus_beacon_id')
+  return count.set_bus_setting(bus_user_id, bus_user_name, bus_beacon_id)
+
+
+@blueprint.route('/bus/delete/<_id>/beacon/<bus_beacon_id>', methods=['GET'])
+@util.require_login
+def delete_bus_settting(_id, bus_beacon_id):
+  return count.delete_bus_setting(_id, bus_beacon_id)
 
 
 @blueprint.route('/count/settings/delete/<device_id>/typ/<typ>', methods=['GET'])
