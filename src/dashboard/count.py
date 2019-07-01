@@ -360,7 +360,7 @@ def delete_device(device_id, typ):
     in_config_apis.delete_count_device_setting(device_id)
     _delete_device_of_facestation(device_id)
   elif typ == SCANNER_TYPE:
-    in_config_apis.reset_count_device_setting(device_id)
+    in_config_apis.delete_count_device_setting(device_id)
     _delete_device_of_scanner(device_id)
   return redirect("/dashboard/count/settings")
 

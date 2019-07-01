@@ -161,7 +161,7 @@ def get_beacon_list(product_id):
       resp = requests.get(url, headers=headers)
       if resp.ok:
         gadgets = resp.json()
-        logging.info("Get beacon list resp : %s", gadgets)
+        logging.info("Get beacon list resp size : %s", len(gadgets))
         set_device_data(gadgets, current_user.organization_id)
         return gadgets
       else:
