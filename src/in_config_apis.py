@@ -197,6 +197,22 @@ def get_enterence_worker_log_list(organization_id, page_num=1, limit=None):
   return log_list
 
 
+def get_enterence_in_worker_log_list(organization_id, page_num=1, limit=None):
+  _limit = limit if limit else 30
+  log_list = EnterenceWorkerLog.query.filter_by(organization_id=organization_id,
+                                                inout=1).\
+      order_by(desc(EnterenceWorkerLog.id)).paginate(page_num, _limit, False)
+  return log_list
+
+
+def get_enterence_out_worker_log_list(organization_id, page_num=1, limit=None):
+  _limit = limit if limit else 30
+  log_list = EnterenceWorkerLog.query.filter_by(organization_id=organization_id,
+                                                inout=2).\
+      order_by(desc(EnterenceWorkerLog.id)).paginate(page_num, _limit, False)
+  return log_list
+
+
 def create_or_update_count_device_setting(device_id, typ, inout, access_point,
                                           name=""):
   cur_time = get_datetime()

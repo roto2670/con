@@ -188,6 +188,46 @@ def get_entrance_worker_log():
   return json.dumps(new_list)
 
 
+@blueprint.route('/worker_log/in', methods=["GET"])
+@util.require_login
+def get_entrance_in_worker_log():
+  org_id = current_user.organization_id
+  _page_num = request.args.get('page_num')
+  _limit = request.args.get('limit', 30)
+  log_list = in_config_apis.get_enterence_in_worker_log_list(org_id,
+                                                             page_num=int(_page_num),
+                                                             limit=int(_limit))
+  new_list = []
+  for log in log_list.items:
+    trans_dict = log.__dict__
+    if '_sa_instance_state' in trans_dict:
+      del trans_dict['_sa_instance_state']
+    trans_dict['event_time'] = str(trans_dict['event_time'])
+    trans_dict['created_time'] = str(trans_dict['created_time'])
+    new_list.append(trans_dict)
+  return json.dumps(new_list)
+
+
+@blueprint.route('/worker_log/out', methods=["GET"])
+@util.require_login
+def get_entrance_out_worker_log():
+  org_id = current_user.organization_id
+  _page_num = request.args.get('page_num')
+  _limit = request.args.get('limit', 30)
+  log_list = in_config_apis.get_enterence_out_worker_log_list(org_id,
+                                                              page_num=int(_page_num),
+                                                              limit=int(_limit))
+  new_list = []
+  for log in log_list.items:
+    trans_dict = log.__dict__
+    if '_sa_instance_state' in trans_dict:
+      del trans_dict['_sa_instance_state']
+    trans_dict['event_time'] = str(trans_dict['event_time'])
+    trans_dict['created_time'] = str(trans_dict['created_time'])
+    new_list.append(trans_dict)
+  return json.dumps(new_list)
+
+
 @blueprint.route('/equip_log', methods=["GET"])
 @util.require_login
 def get_entrance_equip_log():
