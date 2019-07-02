@@ -116,6 +116,15 @@ def test():
   return a
 
 
+def test_count():
+  a = {}
+  a['IN_LiST'] = list(IN_LIST)
+  a['OUT_LiST'] = list(OUT_LIST)
+  a['CHECKING_DEVICE_LIST'] = list(CHECKING_DEVICE_LIST)
+  a['AT_1_DEVICE_LIST'] = list(AT_1_DEVICE_LIST)
+  a['AT_2_DEVICE_LIST'] = list(AT_2_DEVICE_LIST)
+
+
 GADGET_INFO = {
     "1": "JUMBO DRILL(2B)",
     "2": "JUMBO DRILL(3B)",

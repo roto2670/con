@@ -32,10 +32,16 @@ LOCATION_MAP_COMMON_FILE_NAME = '''location.png'''
 LOCATION_MAP_URI = "/dashboard/static/location/{org_id}/{file_name}"
 
 
+@blueprint.route('/test/bus', methods=['GET'])
+@util.require_login
+def default_test_bus():
+  return json.dumps(count.test())
+
+
 @blueprint.route('/test', methods=['GET'])
 @util.require_login
 def default_test():
-  return json.dumps(count.test())
+  return json.dumps(count.test_count())
 
 
 @blueprint.route('/', methods=['GET'])
