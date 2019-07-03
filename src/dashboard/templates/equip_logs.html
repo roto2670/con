@@ -129,7 +129,7 @@
                     return nextPageNum;
                   }
                   function getLogs(){
-                    url = "/dash/worker_log/in/1";
+                    url = "/dash/equip_log/in/1";
                     jQuery.get(url, { 'page_num': getNextPageNumber()})
                       .done(function (data) {
                         var logList = JSON.parse(data);
@@ -175,7 +175,7 @@
                     return nextPageNum;
                   }
                   function getLogs(){
-                    url = "/dash/worker_log/out/1";
+                    url = "/dash/equip_log/out/1";
                     jQuery.get(url, { 'page_num': getNextPageNumber()})
                       .done(function (data) {
                         var logList = JSON.parse(data);
@@ -225,7 +225,7 @@
                     return nextPageNum;
                   }
                   function getLogs(){
-                    url = "/dash/worker_log/in/2";
+                    url = "/dash/equip_log/in/2";
                     jQuery.get(url, { 'page_num': getNextPageNumber()})
                       .done(function (data) {
                         var logList = JSON.parse(data);
@@ -271,7 +271,7 @@
                     return nextPageNum;
                   }
                   function getLogs(){
-                    url = "/dash/worker_log/out/2";
+                    url = "/dash/equip_log/out/2";
                     jQuery.get(url, { 'page_num': getNextPageNumber()})
                       .done(function (data) {
                         var logList = JSON.parse(data);

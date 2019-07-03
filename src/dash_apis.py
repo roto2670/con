@@ -321,7 +321,7 @@ def get_detected_beacons(hub_id, query_id=None, org_id=None):
       if query_resp.ok:
         query_val = query_resp.json()
         query_data = query_val['v']
-        logging.info("Get detected beacons resp : %s", query_data)
+        logging.info("Get detected beacons resp size : %s", len(query_data))
         if query_data:
           return query_data
         else:

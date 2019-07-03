@@ -114,6 +114,10 @@
 {% block javascripts %}
   {{ super()}}
   <script>
+    var isEmergency = "{{emergency|safe}}",
+        freezeTimeMsg = "{{time_msg|safe}}",
+        freezeDateMsg = "{{date_msg|safe}}";
+
     var weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
         month = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
     function showClock(){
@@ -133,7 +137,12 @@
         divDate.innerText = dateMsg;
         setTimeout(showClock, 1000);
     }
-    showClock();
+    if (isEmergency == "False") {
+      showClock();
+    } else {
+      divTime.innerText = freezeTimeMsg;
+      divDate.innerText = freezeDateMsg;
+    }
 
     function getEquip() {
       jQuery.get("/dashboard/count/equip/counting/total").done(function(data){

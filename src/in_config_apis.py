@@ -197,17 +197,21 @@ def get_enterence_worker_log_list(organization_id, page_num=1, limit=None):
   return log_list
 
 
-def get_enterence_in_worker_log_list(organization_id, page_num=1, limit=None):
+def get_enterence_in_worker_log_list(organization_id, access_point, page_num=1,
+                                     limit=None):
   _limit = limit if limit else 30
   log_list = EnterenceWorkerLog.query.filter_by(organization_id=organization_id,
+                                                access_point=access_point,
                                                 inout=1).\
       order_by(desc(EnterenceWorkerLog.id)).paginate(page_num, _limit, False)
   return log_list
 
 
-def get_enterence_out_worker_log_list(organization_id, page_num=1, limit=None):
+def get_enterence_out_worker_log_list(organization_id, access_point, page_num=1,
+                                      limit=None):
   _limit = limit if limit else 30
   log_list = EnterenceWorkerLog.query.filter_by(organization_id=organization_id,
+                                                access_point=access_point,
                                                 inout=2).\
       order_by(desc(EnterenceWorkerLog.id)).paginate(page_num, _limit, False)
   return log_list
@@ -288,8 +292,28 @@ def create_entrance_equip_log(inout, access_point, kind, hub_id,
 
 def get_entrance_equip_log_list(organization_id, page_num=1, limit=None):
   _limit = limit if limit else 30
-  log_list = EnterenceWorkerLog.query.filter_by(organization_id=organization_id).\
-    order_by(desc(EnterenceWorkerLog.created_time)).paginate(page_num, _limit, False)
+  log_list = EntranceEquipLog.query.filter_by(organization_id=organization_id).\
+    order_by(desc(EntranceEquipLog.created_time)).paginate(page_num, _limit, False)
+  return log_list
+
+
+def get_entrance_in_equip_log_list(organization_id, access_point, page_num=1,
+                                   limit=None):
+  _limit = limit if limit else 30
+  log_list = EntranceEquipLog.query.filter_by(organization_id=organization_id,
+                                              access_point=access_point,
+                                              inout=1).\
+    order_by(desc(EntranceEquipLog.created_time)).paginate(page_num, _limit, False)
+  return log_list
+
+
+def get_entrance_out_equip_log_list(organization_id, access_point, page_num=1,
+                                    limit=None):
+  _limit = limit if limit else 30
+  log_list = EntranceEquipLog.query.filter_by(organization_id=organization_id,
+                                              access_point=access_point,
+                                              inout=2).\
+    order_by(desc(EntranceEquipLog.created_time)).paginate(page_num, _limit, False)
   return log_list
 
 

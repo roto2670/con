@@ -32,13 +32,13 @@ LOCATION_MAP_COMMON_FILE_NAME = '''location.png'''
 LOCATION_MAP_URI = "/dashboard/static/location/{org_id}/{file_name}"
 
 
-@blueprint.route('/test/bus', methods=['GET'])
+@blueprint.route('/testcheck/bus', methods=['GET'])
 @util.require_login
 def default_test_bus():
   return json.dumps(count.test())
 
 
-@blueprint.route('/test', methods=['GET'])
+@blueprint.route('/testcheck', methods=['GET'])
 @util.require_login
 def default_test():
   return json.dumps(count.test_count())
@@ -56,8 +56,21 @@ def default_route():
     worker_interval = suprema_config.client_interval
   if location_config:
     equip_interval = location_config.client_interval
+  emergency_cache = count.get_emergency_info()
   return render_template("dashboard_home.html", worker_interval=worker_interval,
-                         equip_interval=equip_interval)
+                         equip_interval=equip_interval,
+                         emergency=emergency_cache[count.IS_EMERGENCY_KEY],
+                         time_msg=emergency_cache[count.TIME_MSG_KEY],
+                         date_msg=emergency_Cache[count.DATE_MSG_KEY])
+
+
+@blueprint.route('/emergency', methods=['POST'])
+@util.require_login
+def default_emergency():
+  cur_time = request.form.get('cur_time')
+  cur_date = request.form.get('cur_date')
+  is_emergency = json.loads(request.form.get('emergency'))
+  return count.set_emergency(is_emergency, cur_time, cur_date)
 
 
 @blueprint.route('/count', methods=['GET'])
@@ -70,6 +83,12 @@ def default_count():
 @util.require_login
 def detail_count():
   return count.detail_count()
+
+
+@blueprint.route('/count/reset', methods=['GET'])
+@util.require_login
+def reset_count():
+  return count.clear_all()
 
 
 @blueprint.route('/workschedule', methods=['GET'])
@@ -349,3 +368,8 @@ def set_suprema_settings():
 def get_enterence_worker_log():
   return render_template("worker_logs.html")
 
+
+@blueprint.route('/equip_logs', methods=["GET"])
+@util.require_login
+def get_enterence_equip_log():
+  return render_template("equip_logs.html")

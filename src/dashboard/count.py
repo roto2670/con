@@ -123,6 +123,7 @@ def test_count():
   a['CHECKING_DEVICE_LIST'] = list(CHECKING_DEVICE_LIST)
   a['AT_1_DEVICE_LIST'] = list(AT_1_DEVICE_LIST)
   a['AT_2_DEVICE_LIST'] = list(AT_2_DEVICE_LIST)
+  return a
 
 
 GADGET_INFO = {
@@ -159,6 +160,41 @@ S_AT_2_DEVICE_LIST = set([])
 # }}}
 
 
+# {{{ emergency
+
+IS_EMERGENCY_KEY = '''is_emergency'''
+TIME_MSG_KEY = '''time_msg'''
+DATE_MSG_KEY = '''date_msg'''
+USER_KEY = '''user'''
+
+EMERGENCY = {
+   IS_EMERGENCY_KEY: False,
+   TIME_MSG_KEY: "",
+   DATE_MSG_KEY: "",
+   USER_KEY: ""
+}
+
+# }}}
+
+
+def set_emergency(is_emergency, time_msg, date_msg):
+  if is_emergency:
+    EMERGENCY[IS_EMERGENCY_KEY] = is_emergency
+    EMERGENCY[TIME_MSG_KEY] = time_msg
+    EMERGENCY[DATE_MSG_KEY] = date_msg
+    EMERGENCY[USER_KEY] = current_user.email
+  else:
+    EMERGENCY[IS_EMERGENCY_KEY] = is_emergency
+    EMERGENCY[TIME_MSG_KEY] = ""
+    EMERGENCY[DATE_MSG_KEY] = ""
+    EMERGENCY[USER_KEY] = current_user.email
+  return redirect("/dashboard/count")
+
+
+def get_emergency_info():
+  return EMERGENCY
+
+
 def default_count():
   _org_id = current_user.organization_id
   worker_interval = 10
@@ -170,7 +206,10 @@ def default_count():
   if location_config:
     equip_interval = location_config.client_interval
   return render_template("dashboard_count.html", worker_interval=worker_interval,
-                         equip_interval=equip_interval, device_list=device_list)
+                         equip_interval=equip_interval, device_list=device_list,
+                         emergency=EMERGENCY[IS_EMERGENCY_KEY],
+                         time_msg=EMERGENCY[TIME_MSG_KEY],
+                         date_msg=EMERGENCY[DATE_MSG_KEY])
 
 
 def detail_count():
@@ -184,7 +223,10 @@ def detail_count():
   if location_config:
     equip_interval = location_config.client_interval
   return render_template("dashboard_count_detail.html", worker_interval=worker_interval,
-                         equip_interval=equip_interval, device_list=device_list)
+                         equip_interval=equip_interval, device_list=device_list,
+                         emergency=EMERGENCY[IS_EMERGENCY_KEY],
+                         time_msg=EMERGENCY[TIME_MSG_KEY],
+                         date_msg=EMERGENCY[DATE_MSG_KEY])
 
 
 def _get_device_list(config, org_id):
@@ -383,7 +425,9 @@ def clear_keys(key):
 
 def clear_all():
   WORKER_COUNT.flushdb()
-  return redirect("/dashboard/count/settings")
+  BEACONS_COUNT.flushdb()
+  EXPIRE_CACHE.flushdb()
+  return redirect("/dashboard/count")
 
 
 def clear_keys_of_sc(key):
@@ -465,39 +509,40 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
 
 
 def set_worker_count(org_id, user_id, name, event_data):
-  device_id = event_data['device_id']['id']
-  device_name = event_data['device_id']['name']
-  user_group_id = event_data['user_group_id']['id']
-  if device_id in CHECKING_DEVICE_LIST and not EXPIRE_CACHE.exists(user_id):
-    if device_id in AT_1_DEVICE_LIST:
-      _set_worker_count(device_id, ACCESS_1_ID, user_id, name, event_data,
-                        org_id)
-    elif device_id in AT_2_DEVICE_LIST:
-      _set_worker_count(device_id, ACCESS_2_ID, user_id, name, event_data,
-                        org_id)
-    elif device_id in BUS_WORKSHOP_DEVICE_LIST:
-      if user_group_id == BUS_USER_GROUP_ID:
-        _check_start_end_count(user_id, device_id, device_name)
-      else:
-        _set_worker_count(device_id, BUS_WORKSHOP_ID, user_id, name,
-                          event_data, org_id)
-    elif device_id in BUS_AT_1_DEVICE_LIST:
-      if user_group_id == BUS_USER_GROUP_ID:
-        _check_start_end_count(user_id, device_id, device_name)
-      else:
-        _set_worker_count(device_id, BUS_ACCESS_1_ID, user_id, name,
-                          event_data, org_id)
-    elif device_id in BUS_AT_2_DEVICE_LIST:
-      if user_group_id == BUS_USER_GROUP_ID:
-        _check_start_end_count(user_id, device_id, device_name)
-      else:
-        _set_worker_count(device_id, BUS_ACCESS_2_ID, user_id, name,
-                          event_data, org_id)
-  else:
-    has_checking = device_id in CHECKING_DEVICE_LIST
-    has_expire = EXPIRE_CACHE.exists(user_id)
-    logging.debug("Checking Device : %s, Expire Cache : %s, Device : %s, name : %s",
-                  has_checking, has_expire, device_id, name)
+  if not EMERGENCY[IS_EMERGENCY_KEY]:
+    device_id = event_data['device_id']['id']
+    device_name = event_data['device_id']['name']
+    user_group_id = event_data['user_group_id']['id']
+    if device_id in CHECKING_DEVICE_LIST and not EXPIRE_CACHE.exists(user_id):
+      if device_id in AT_1_DEVICE_LIST:
+        _set_worker_count(device_id, ACCESS_1_ID, user_id, name, event_data,
+                          org_id)
+      elif device_id in AT_2_DEVICE_LIST:
+        _set_worker_count(device_id, ACCESS_2_ID, user_id, name, event_data,
+                          org_id)
+      elif device_id in BUS_WORKSHOP_DEVICE_LIST:
+        if user_group_id == BUS_USER_GROUP_ID:
+          _check_start_end_count(user_id, device_id, device_name)
+        else:
+          _set_worker_count(device_id, BUS_WORKSHOP_ID, user_id, name,
+                            event_data, org_id)
+      elif device_id in BUS_AT_1_DEVICE_LIST:
+        if user_group_id == BUS_USER_GROUP_ID:
+          _check_start_end_count(user_id, device_id, device_name)
+        else:
+          _set_worker_count(device_id, BUS_ACCESS_1_ID, user_id, name,
+                            event_data, org_id)
+      elif device_id in BUS_AT_2_DEVICE_LIST:
+        if user_group_id == BUS_USER_GROUP_ID:
+          _check_start_end_count(user_id, device_id, device_name)
+        else:
+          _set_worker_count(device_id, BUS_ACCESS_2_ID, user_id, name,
+                            event_data, org_id)
+    else:
+      has_checking = device_id in CHECKING_DEVICE_LIST
+      has_expire = EXPIRE_CACHE.exists(user_id)
+      logging.debug("Checking Device : %s, Expire Cache : %s, Device : %s, name : %s",
+                    has_checking, has_expire, device_id, name)
 
 
 def _check_start_end_count(user_id, device_id, device_name):
@@ -645,13 +690,14 @@ def _set_equip_count(key, org_id, gid, hid):
 
 
 def set_equip_count(org_id, hid, dist_data_list):
-  if hid in S_CHECKING_DEVICE_LIST:
-    gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
-    for gid in gid_set:
-      if not EXPIRE_CACHE.exists(gid) and hid in S_AT_1_DEVICE_LIST:
-        _set_equip_count(ACCESS_1_ID, org_id, gid, hid)
-      elif not EXPIRE_CACHE.exists(gid) and hid in S_AT_2_DEVICE_LIST:
-        _set_equip_count(ACCESS_2_ID, org_id, gid, hid)
+  if not EMERGENCY[IS_EMERGENCY_KEY]:
+    if hid in S_CHECKING_DEVICE_LIST:
+      gid_set = set([dist_data['gid'] for dist_data in dist_data_list])
+      for gid in gid_set:
+        if not EXPIRE_CACHE.exists(gid) and hid in S_AT_1_DEVICE_LIST:
+          _set_equip_count(ACCESS_1_ID, org_id, gid, hid)
+        elif not EXPIRE_CACHE.exists(gid) and hid in S_AT_2_DEVICE_LIST:
+          _set_equip_count(ACCESS_2_ID, org_id, gid, hid)
 
 
 def get_total_equip():

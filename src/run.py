@@ -13,10 +13,12 @@ import sys
 import os
 import logging
 import logging.handlers
+from datetime import timedelta
 from importlib import import_module
 
 
 from flask import Flask  # noqa : pylint: disable=import-error
+from flask import session
 from flask_cors import CORS
 #import flask_monitoringdashboard as dashboard
 
@@ -76,6 +78,13 @@ def configure_database(app):
   db.create_all()
 
 
+def configure_login(app):
+  @app.before_request
+  def before_request():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=60)
+
+
 def configure_logs(app):
   level = logging.DEBUG
   log_path = app.config.get('LOG_PATH')
@@ -105,6 +114,7 @@ def create_app():
   register_blueprints(app)
   configure_database(app)
   dashboard.count.init()
+  configure_login(app)
   back_scheduler.init()
   common.start()
   return app

@@ -145,6 +145,7 @@ def set_event(org_id):
     logging.info("### evt log chk : %s", evt_log_chk)
     if evt_log_chk and evt_log_chk['EventCollection']['rows']:
       chk_data = evt_log_chk['EventCollection']['rows'][0]
+      logging.info("### last data id : %s", last_data_id)
       if last_data_id:
         if int(chk_data['id']) > last_data_id:
           limit = int(chk_data['id']) - last_data_id
