@@ -424,9 +424,9 @@ def clear_keys(key):
 
 
 def clear_all():
-  WORKER_COUNT.flushdb()
-  BEACONS_COUNT.flushdb()
-  EXPIRE_CACHE.flushdb()
+  WORKER_COUNT.clear_all_data()
+  BEACONS_COUNT.clear_all_data()
+  EXPIRE_CACHE.clear_all_data()
   return redirect("/dashboard/count")
 
 

@@ -61,7 +61,7 @@ def default_route():
                          equip_interval=equip_interval,
                          emergency=emergency_cache[count.IS_EMERGENCY_KEY],
                          time_msg=emergency_cache[count.TIME_MSG_KEY],
-                         date_msg=emergency_Cache[count.DATE_MSG_KEY])
+                         date_msg=emergency_cache[count.DATE_MSG_KEY])
 
 
 @blueprint.route('/emergency', methods=['POST'])
