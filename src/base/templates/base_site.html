@@ -166,6 +166,9 @@
             document.execCommand("copy");
             alert("Copied to clipboard");
           }
+          $(function () {
+            $('[data-toggle-tip="tooltip"]').tooltip();
+          });
         </script>
       {% endblock %}
       <!-- Custom Theme Scripts -->

@@ -20,35 +20,38 @@
     {% endblock %}
     {% if firebase_auth.api_key %}
       <script>
-        firebase.initializeApp({
+        var app = firebase.initializeApp({
           apiKey: "{{ firebase_auth.api_key }}",
           authDomain: "{{ firebase_auth.auth_domain }}",
           databaseURL: "https://{{ firebase_auth.project_id }}.firebaseio.com",
           storageBucket: "{{ firebase_auth.project_id }}.appspot.com",
           projectId: "{{ firebase_auth.project_id }}"
         });
-        var ui = new firebaseui.auth.AuthUI(firebase.auth());
-        ui.start("#firebaseui-auth-container", {
-          queryParameterForSignInSuccessUrl: "next",
-          signInOptions: [ {{ firebase_auth.provider_ids }} ],
-          credentialHelper: firebaseui.auth.CredentialHelper.NONE,
-          callbacks: {
-            signInSuccess: function(user, credential, redirectUrl) {
-              user.getIdToken().then(function(token) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "{{ firebase_auth.url_for('sign_in') }}", true);
-                xhr.setRequestHeader("Content-Type", "application/jwt");
-                xhr.onreadystatechange = function() {
-                  if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    window.location.replace(redirectUrl || "{{ referrer }}" || "{{ request.url_root }}");
+        app.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+          .then(function() {
+              var ui = new firebaseui.auth.AuthUI(app.auth());
+              ui.start("#firebaseui-auth-container", {
+                queryParameterForSignInSuccessUrl: "next",
+                signInOptions: [ {{ firebase_auth.provider_ids }} ],
+                credentialHelper: firebaseui.auth.CredentialHelper.NONE,
+                callbacks: {
+                  signInSuccess: function(user, credential, redirectUrl) {
+                    user.getIdToken().then(function(token) {
+                      var xhr = new XMLHttpRequest();
+                      xhr.open("POST", "{{ firebase_auth.url_for('sign_in') }}", true);
+                      xhr.setRequestHeader("Content-Type", "application/jwt");
+                      xhr.onreadystatechange = function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                          window.location.replace(redirectUrl || "{{ referrer }}" || "{{ request.url_root }}");
+                        }
+                      };
+                      xhr.send(token);
+                    });
+                    return false;
                   }
-                };
-                xhr.send(token);
+                }
               });
-              return false;
-            }
-          }
-        });
+          })
       </script>
     {% endif %}
   </head>

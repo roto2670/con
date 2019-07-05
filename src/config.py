@@ -32,7 +32,7 @@ class Config(object):
     LOG_PATH = '/tmp/console.log'
   else:
     LOG_PATH = os.path.join(os.path.expanduser('~'), 'log', 'console.log')
-  LOG_BACKUP_COUNT = 10
+  LOG_BACKUP_COUNT = 20
   LOG_MAX_BYTES = 10485760
   CELERY_BACKEND = 'rpc://'
   CELERY_BROKER = 'pyamqp://naran:skfkszhsthf1@localhost:5672/'

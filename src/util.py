@@ -337,7 +337,7 @@ class RedisStore(object):
     return self.store.exists(name)
 
   def set(self, name, value, expire_time):
-    self.store.set(name, value, expire_time)
+    self.store.set(name, json.dumps(value), expire_time)
 
   def hkeys(self, name):
     return self.store.hkeys(name)

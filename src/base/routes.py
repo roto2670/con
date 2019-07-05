@@ -38,13 +38,13 @@ from models import _Permission as Permission
 
 @blueprint.route('/')
 def route_default():
-  user = "Guest" if current_user.is_anonymous else current_user.email
-  ip_addr = util.get_ip_addr()
-  referrer = request.referrer if request.referrer else "Direct"
-  user_agent = str(request.user_agent)
-  accept_language = str(request.accept_languages)
-  in_apis.create_referrer_info(user, ip_addr, referrer, user_agent,
-                               accept_language)
+  # user = "Guest" if current_user.is_anonymous else current_user.email
+  # ip_addr = util.get_ip_addr()
+  # referrer = request.referrer if request.referrer else "Direct"
+  # user_agent = str(request.user_agent)
+  # accept_language = str(request.accept_languages)
+  # in_apis.create_referrer_info(user, ip_addr, referrer, user_agent,
+  #                              accept_language)
   return redirect(url_for('login_blueprint.login'))
 
 

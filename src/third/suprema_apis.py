@@ -50,9 +50,8 @@ def login_sup_server(_id, password, base_url, org_id):
       url = "{base}login".format(base=base_url)
       data = {
         "User": {
-          "login_id": "admin",
+          "login_id": "smartsystem",
           "password": "mproject1"
-          #"password": "adminadmin1"
         }
       }
     else:

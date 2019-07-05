@@ -726,11 +726,12 @@ def get_equip_operator_count_settings():
   return equip_kind
 
 
-def set_device_data_info(key, value):
+def set_device_data_info(key, value, is_force=False):
   # key -> gid, hid,, value -> dict of data
-  if DATA_INFO_EXPIRE_CACHE.exists(key):
+  if DATA_INFO_EXPIRE_CACHE.exists(key) and not is_force:
     return False
   BEACONS_COUNT.set_data(DEVICE_DATA_KEY, key, value)
+  DATA_INFO_EXPIRE_CACHE.set(key, value, DATA_INFO_EXPIRE_TIME)
   return True
 
 
