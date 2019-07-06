@@ -20,6 +20,7 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 import util
 import common
 import in_apis
+import dash_apis
 import in_config_apis
 from dashboard import count
 from dashboard import blueprint
@@ -113,6 +114,15 @@ def default_count_setting_page():
 @util.require_login
 def default_count_setting(device_id):
   return count.set_device(device_id)
+
+
+@blueprint.route('/device/refresh', methods=['GET'])
+@util.require_login
+def default_refresh_device():
+  org_id = current_user.organization_id
+  config_data = in_config_apis.get_location_config_by_org(org_id)
+  dash_apis.get_refresh_beacon_list(config_data.product_id)
+  return redirect("/dashboard/count/settings")
 
 
 @blueprint.route('/bus/settings', methods=['POST'])

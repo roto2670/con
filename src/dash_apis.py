@@ -337,9 +337,42 @@ def get_detected_beacons(hub_id, query_id=None, org_id=None):
     return None
 
 
-def set_device_data(data, org_id):
+def get_refresh_beacon_list(product_id):
+  """
+  :param : product_id
+  :return type : list of dict
+  :ret_content : product_id가 일치하는 gadget들의 정보를 받아온다. dict 형식의
+                      gadget data들이 list로 만들어져 온다.
+  """
+  try:
+    if apis.IS_DEV:
+      ret = dash_api_mock.beacon_list()
+      set_device_data(ret, current_user.organization_id, is_force=True)
+      return ret
+    else:
+      url = "{base}products/{pid}/gadgets".format(base=THIRD_BASE_URL,
+                                                  pid=product_id)
+      headers = _get_user_header()
+      logging.info("Get refresh beacon list request. url : %s", url)
+      resp = requests.get(url, headers=headers)
+      if resp.ok:
+        gadgets = resp.json()
+        logging.info("Get refresh beacon list resp size : %s", len(gadgets))
+        set_device_data(gadgets, current_user.organization_id, is_force=True)
+        return gadgets
+      else:
+        logging.warning("Failed to get refresh beacon list. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return []
+  except:
+    logging.exception("Raise error while get refresh beacon list. url : %s", url)
+    return None
+
+
+def set_device_data(data, org_id, is_force=False):
   for device in data:
-    ret = dashboard.count.set_device_data_info(device['id'], device)
+    ret = dashboard.count.set_device_data_info(device['id'], device,
+                                               is_force=is_force)
     if ret:
       in_config_apis.create_or_update_device_data(org_id, device)
   return True
