@@ -32,10 +32,30 @@
                   <tr>
                     <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
                     <td>{{ user.email }}</td>
-                    {% if user.level == 0 %}
-                      <td>Owner</td>
+                    {% if current_user.level == 0 %}
+                      {% if current_user.id == user.id %}
+                        <td>Admin</td>
+                      {% else %}
+                        <td>
+                          <form id="level-{{ user.id }}" action="/management/organization/member/{{ user.id }}/level" method="POST">
+                            <select id="level" name="level" onchange="this.form.submit()">
+                              {% for k, v in user_level.items() %}
+                                {% if user.level == k %}
+                                  <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
+                                {% else %}
+                                  <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
+                                {% endif %}
+                              {% endfor %}
+                            </select>
+                          </form>
+                        </td>
+                      {% endif %}
                     {% else %}
-                      <td>Member</td>
+                      {% if user.level == 0 %}
+                        <td>Admin</td>
+                      {% else %}
+                        <td>{{ user_level[user.level] }}</td>
+                      {% endif %}
                     {% endif %}
                     <td>{{ user.last_access_time | datetimeFilter }}</td>
                     {% if user.level == 0 %}

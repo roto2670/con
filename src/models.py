@@ -58,6 +58,15 @@ OWNER = 0
 MEMBER = 1
 TESTER = 2
 
+# level
+SK_ADMIN = 0
+SK_NORMAL = 1
+SK_HQ = 3
+ADNOC_SITE = 4
+ADNOC_HQ = 5
+MOI = 6
+
+
 class _User(UserMixin, db.Model):
   # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#
   __tablename__ = '_user'

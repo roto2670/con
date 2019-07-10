@@ -426,6 +426,12 @@ def update_user_by_accept(user_id):
   db.session.commit()
 
 
+def update_user_by_level(user_id, level):
+  user = User.query.filter_by(id=user_id).one_or_none()
+  user.level = int(level)
+  db.session.commit()
+
+
 def delete_user_by_id(user_id):
   user = User.query.filter_by(id=user_id).one_or_none()
   if user:

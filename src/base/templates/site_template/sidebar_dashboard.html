@@ -36,23 +36,36 @@
             <i class="fa fa-calendar"></i>Schedule - Detail
           </a>
         </li>
-        <li>
-          <a href="#">
-            <i class="fa fa-volume-up"></i>PA System
-          </a>
-        </li>
-        <li>
-          <a href="http://172.16.0.12:4488/station/" target="_blank">
-            <i class="fa fa-bullhorn"></i>Smart PTT
-          </a>
-        </li>
-        <!--
-        <li>
-          <a href="/dashboard/worker_logs">
-            <i class="fa fa-file-text-o"></i>Logs
-          </a>
-        </li>
-        -->
+        {% if current_user.level == 0 %}
+          <li>
+            <a href="#">
+              <i class="fa fa-volume-up"></i>PA System
+            </a>
+          </li>
+          <li>
+            <a href="http://172.16.0.12:4488/station/" target="_blank">
+              <i class="fa fa-bullhorn"></i>Smart PTT
+            </a>
+          </li>
+        {% else %}
+          <li>
+            <a>
+              <i class="fa fa-volume-up"></i>PA System
+            </a>
+          </li>
+          <li>
+            <a>
+              <i class="fa fa-bullhorn"></i>Smart PTT
+            </a>
+          </li>
+        {% endif %}
+        {% if current_user.level in [3, 4, 5] %}
+          <li>
+            <a> <!-- TODO: cctv monitoring -->
+              <i class="fa fa-eye"></i>CCTV Monitoring
+            </a>
+          </li>
+        {% endif %}
       </ul>
     </div>
   </div>

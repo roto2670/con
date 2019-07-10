@@ -61,6 +61,13 @@ def default_organization_member():
   return organization.member()
 
 
+@blueprint.route('/organization/member/<user_id>/level', methods=['POST'])
+@util.require_login
+def member_level(user_id):
+  level = request.form['level']
+  return organization.member_level(user_id, level)
+
+
 @blueprint.route('/organization/member/<user_id>/accept', methods=['POST'])
 @util.require_login
 def member_accept(user_id):

@@ -35,6 +35,16 @@ LOGO_URL_FORMAT = '''/static/images/{}/{}'''
 FOOTER_URL_FORMAT = '''/static/footer/{}/'''
 
 
+USER_LEVEL = {
+    models.SK_ADMIN: "Admin",
+    models.SK_NORMAL: "SKEC",
+    models.SK_HQ: "SK HQ",
+    models.ADNOC_SITE: "ADNOC SITE",
+    models.ADNOC_HQ: "ADNOC HQ",
+    models.MOI: "MOI"
+}
+
+
 def general():
   if current_user.organization_id:
     org = in_apis.get_organization(current_user.organization_id)
@@ -96,9 +106,14 @@ def member():
     invite_list = in_apis.get_invite_list(current_user.organization_id)
     return render_template("member_organization.html",
                            user_list=user_list,
-                           invite_list=invite_list)
+                           invite_list=invite_list, user_level=USER_LEVEL)
   else:
     return redirect("/management/organization/create")
+
+
+def member_level(user_id, level):
+  in_apis.update_user_by_level(user_id, level)
+  return redirect("/management/organization/member")
 
 
 def member_accept(user_id):

@@ -6,38 +6,87 @@
 
 
 <div class="nav-sm top_sidebar_menu">
-  <div class="logo_img_div">
-    <a href="/">
-      <img class="logo_img_middle" src="/static/images/logo-main_page.png">
-    </a>
-  </div>
-  <ul class="nav side-menu">
-    <li>
-      <a href="/dashboard" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Tunnel Operationn">
-        <i class="fa fa-area-chart"></i>
+  {% if current_user.level == 6 %}  <!-- MOI -->
+    <div class="logo_img_div">
+      <a href="/">
+        <img class="logo_img_middle" src="/static/images/logo-main_page.png">
       </a>
-    </li>
-    <li>
-      <a href="/moi" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="MOI Operation">
-        <i class="fa fa-th-large"></i>
+    </div>
+    <ul class="nav side-menu">
+      <li>  <!-- TODO: MOI Dashboard -->
+        <a href="/dashboard" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Tunnel Operationn">
+          <i class="fa fa-area-chart"></i>
+        </a>
+      </li>
+      <li>
+        <a href="/moi" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="MOI Operation">
+          <i class="fa fa-th-large"></i>
+        </a>
+      </li>
+      <li>  <!-- TODO: MOI user control-->
+        <a data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Settings">
+          <i class="fa fa-cogs"></i>
+        </a>
+      </li>
+  {% else %}  <!-- OTHER -->
+    <div class="logo_img_div">
+      <a href="/">
+        <img class="logo_img_middle" src="/static/images/logo-main_page.png">
       </a>
-    </li>
-    <li>
-      <a href="/registration" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Registration">
-        <i class="fa fa-pencil-square-o"></i>
-      </a>
-    </li>
-    <li>
-      <a href="/dashboard/settings" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Maintenance">
-        <i class="fa fa-laptop"></i>
-      </a>
-    </li>
-    <li>
-      <a href="/management/organization/member" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Settings">
-        <i class="fa fa-cogs"></i>
-      </a>
-    </li>
-  </ul>
+    </div>
+    <ul class="nav side-menu">
+      <li>
+        <a href="/dashboard" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Tunnel Operationn">
+          <i class="fa fa-area-chart"></i>
+        </a>
+      </li>
+
+      {% if current_user.level == 0 %}
+        <li>
+          <a href="/moi" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="MOI Operation">
+            <i class="fa fa-th-large"></i>
+          </a>
+        </li>
+        <li>
+          <a href="/registration" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Registration">
+            <i class="fa fa-pencil-square-o"></i>
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/settings" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Maintenance">
+            <i class="fa fa-laptop"></i>
+          </a>
+        </li>
+        <li>
+          <a href="/management/organization/member" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Settings">
+            <i class="fa fa-cogs"></i>
+          </a>
+        </li>
+      {% else %}
+        <li>
+          <a data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="MOI Operation">
+            <i class="fa fa-th-large"></i>
+          </a>
+        </li>
+        <li>
+          <a data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Registration">
+            <i class="fa fa-pencil-square-o"></i>
+          </a>
+        </li>
+        <li>
+          <a data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Maintenance">
+            <i class="fa fa-laptop"></i>
+          </a>
+        </li>
+        <li>
+          <a data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Settings">
+            <i class="fa fa-cogs"></i>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  {% endif %}
+
   <ul class="nav navbar-nav organization_align_bottom">
     <li>
       <a href="#" data-target=".logout-modal" class="user-profile" data-toggle="modal" data-toggle-tip="tooltip" data-placement="right" data-original-title="Logout">
