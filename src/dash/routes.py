@@ -34,7 +34,8 @@ def get_location_inforamtion():
   if apis.IS_DEV:
     data = {
         "product_id": "mibsskec",
-        "interval": 10
+        "interval": 10,
+        "stage": current_user.level
     }
     return json.dumps(data)
   else:
@@ -43,13 +44,15 @@ def get_location_inforamtion():
     if not config_data:
       data = {
           "product_id": "",
-          "interval": 0
+          "interval": 0,
+          "stage": current_user.level
       }
       return json.dumps(data)
     else:
       data = {
           "product_id": config_data.product_id,
-          "interval": config_data.client_interval
+          "interval": config_data.client_interval,
+          "stage": current_user.level
       }
       return json.dumps(data)
 
