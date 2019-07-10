@@ -1913,7 +1913,6 @@ a.user-profile {
     width: 29px;
     height: 29px;
     border-radius: 50%;
-    margin-right: 10px
 }
 ul.top_profiles {
     height: 330px;
@@ -4518,8 +4517,7 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 }
 
 .logo_img_div {
-    height: 110px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .logo_img_middle {
@@ -4527,6 +4525,12 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     width: 60%;
     height: auto;
     margin: 20%
+}
+.logo_img_middle_moi {
+    position: relative;
+    width: 60%;
+    height: auto;
+    margin: 20% 20% 0% 20%;
 }
 
 .custom_padding_top_10 {
@@ -4538,51 +4542,51 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 }
 
 .tooltip.left .tooltip-inner {
-    background-color: #1b8dd7;
-    border-color: #1b8dd7;
+    background-color: #008d44;
+    border-color: #008d44;
     padding: 10px;
     font-size: 14px;
     font-weight: bold;
 }
 
 .tooltip.left .tooltip-arrow {
-    border-left-color: #1b8dd7;
+    border-left-color: #008d44;
 }
 
 .tooltip.right .tooltip-inner {
-    background-color: #1b8dd7;
-    border-color: #1b8dd7;
+    background-color: #008d44;
+    border-color: #008d44;
     padding: 10px;
     font-size: 14px;
     font-weight: bold;
 }
 
 .tooltip.right .tooltip-arrow {
-    border-right-color: #1b8dd7;
+    border-right-color: #008d44;
 }
 
 .tooltip.top .tooltip-inner {
-    background-color: #1b8dd7;
-    border-color: #1b8dd7;
+    background-color: #008d44;
+    border-color: #008d44;
     padding: 10px;
     font-size: 14px;
     font-weight: bold;
 }
 
 .tooltip.top .tooltip-arrow {
-    border-top-color: #1b8dd7;
+    border-top-color: #008d44;
 }
 
 .tooltip.bottom .tooltip-inner {
-    background-color: #1b8dd7;
-    border-color: #1b8dd7;
+    background-color: #008d44;
+    border-color: #008d44;
     padding: 10px;
     font-size: 14px;
     font-weight: bold;
 }
 
 .tooltip.bottom .tooltip-arrow {
-    border-bottom-color: #1b8dd7;
+    border-bottom-color: #008d44;
 }
 
 .info_page {

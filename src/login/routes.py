@@ -14,6 +14,7 @@ from flask import current_app, redirect, render_template, request, url_for  # no
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import util
+import models
 import in_apis
 from base import db
 from login import blueprint
@@ -37,7 +38,10 @@ def login():
       if not current_user.organization_id:
         return redirect(url_for('management_blueprint.create'))
       else:
-        return redirect(url_for('dashboard_blueprint.default_route'))
+        if current_user.level == models.MOI:
+          return redirect(url_for('moi_blueprint.route_default'))
+        else:
+          return redirect(url_for('dashboard_blueprint.default_route'))
     else:
       return redirect(url_for('base_blueprint.route_verified'))
 
