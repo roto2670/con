@@ -144,8 +144,7 @@ html , body{
     padding: 0 0 4px 0
 }
 .left_col {
-    /*background: #2A3F54*/
-    background: #1fa6fc
+    background: #00a64f
 }
 .nav-sm .container.body .col-md-3.left_col {
     min-height: 100%;
@@ -531,11 +530,9 @@ body .container.body .right_col {
     cursor: pointer;
 }
 body {
-    /*color: #73879C;*/
-    color: #1b94e2;
-    /* color: #0f6aa3; */
+    color: #00a64f;
     /*background: #2A3F54;*/
-    background: #1fa6fc;
+    background: #00a64f;
     font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
     font-size: 13px;
     font-weight: 400;
@@ -1138,7 +1135,7 @@ h2 {
     border-bottom: 1px solid #e9f1f7;
     padding: 1px 22px 0px;
     margin-bottom: 10px;
-    background: #eff8ff;
+    background: #d6feea;
 }
 .x_title .filter {
     width: 40%;
@@ -4515,7 +4512,7 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
 
 .top_sidebar_menu {
     position: absolute;
-    background: #1b8dd7;
+    background: #008d44;
     width: 70px;
     height: 100%;
 }
@@ -4679,7 +4676,7 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     padding-right:30px;
 }
 .top_navigation_color {
-    color: #1b8dd7;
+    color: #00a64f;
     font-weight: bold;
 }
 

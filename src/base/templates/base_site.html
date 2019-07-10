@@ -32,7 +32,11 @@
         <link href="{{ url_for('static', filename='vendors/pnotify/dist/pnotify.nonblock.css') }}" rel="stylesheet">
       {% endblock stylesheets %}
       <!-- Custom Theme Style -->
-      <link href="{{ url_for('static', filename='build/css/custom.css') }}" rel="stylesheet">
+      {% if current_user.level == 6 %}
+        <link href="{{ url_for('static', filename='build/css/custom_moi.css') }}" rel="stylesheet">
+      {% else %}
+        <link href="{{ url_for('static', filename='build/css/custom.css') }}" rel="stylesheet">
+      {% endif %}
     {% endblock head %}
   </head>
 
