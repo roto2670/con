@@ -1,0 +1,64 @@
+{% extends "base_site.html" %}
+
+{% block title %} Dashboard {% endblock title %}
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_moi.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js') }}"></script>
+{% endblock stylesheets %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <!-- start row -->
+    <div class="row">
+
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <div class="x_panel tile" style="height: 840px">
+            <div class="x_title">
+              <h3>Location Tracking</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="mapView">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <div class="x_panel tile" style="height: 410px;">
+            <div class="x_title">
+              <h3>CCTV Monitoring</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <img src="" id="cctv" class="col-md-12 col-sm-12">
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <div class="x_panel tile" style="height: 410px;">
+            <div class="x_title">
+              <h3>Explosive Inventory System</h3>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <img src="" id="inventory" class="col-md-12 col-sm-12">
+            </div>
+          </div>
+        </div>
+
+    </div><!-- End row -->
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ super()}}
+{% endblock javascripts %}
+

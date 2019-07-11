@@ -1,0 +1,46 @@
+{% extends "base_site.html" %}
+
+{% block title %} User Control {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% if current_user.level == 6 %}
+      {% include "site_template/sidebar_moi_user.html" %}
+    {% else %}
+      {% include "site_template/sidebar_moi.html" %}
+    {% endif %}
+  </div>
+{% endblock sidebar %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col" role="main">
+  <div class="row">  <!-- start row -->
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_content">  <!-- x_content 1 -->
+
+          <div class="x_content">  <!-- x_content 2 -->
+            <table class="table table-striped projects">
+              <thead>
+                <tr>
+                  <th style="width:10%"></th>
+                  <th>Email</th>
+                  <th>Level</th>
+                  <th>last_access</th>
+                  <th>Edit</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>  <!-- end x_content 2 -->
+
+        </div>  <!-- end x_content 1 -->
+      </div>  <!-- end x_panel -->
+    </div>
+
+  </div>  <!-- End row -->
+</div>
+
+{% endblock content %}

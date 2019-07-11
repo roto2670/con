@@ -3,22 +3,39 @@
   <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
 
     <div class="nav_title nav_sm_hidden sub_side_top_tile">
-      <div style="display: inline-block">
-        <i class="fa fa-th-large"></i>
-      </div>
-      <div style="display: inline-block">
-        MOI Operation
-      </div>
+      {% if current_user.level == 6 %}
+        <div style="display: inline-block">
+          <i class="fa fa-th-large"></i>
+        </div>
+        <div style="display: inline-block; font-size: 20px;">
+          Blasting Operation
+        </div>
+      {% else %}
+        <div style="display: inline-block">
+          <i class="fa fa-th-large"></i>
+        </div>
+        <div style="display: inline-block">
+          MOI Operation
+        </div>
+      {% endif %}
     </div>
     <br><br><br>
 
     <div class="menu_section">
       <ul class="nav side-menu nav_sm_hidden">
-        <li>
-          <a href="/moi">
-            <i class="fa fa-users"></i> User Control
-          </a>
-        </li>
+        {% if current_user.level == 6 %}
+          <li>
+            <a href="/moi/location">
+              <i class="fa fa-map-marker"></i> Location Tracking
+            </a>
+          </li>
+        {% else %}
+          <li>
+            <a href="/moi/user">
+              <i class="fa fa-users"></i> User Control
+            </a>
+          </li>
+        {% endif %}
         <li>
           <a href="#">
             <i class="fa fa-eye"></i> CCTV Monitoring

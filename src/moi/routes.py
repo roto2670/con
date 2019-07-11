@@ -18,6 +18,7 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import base
 import util
+import models
 import in_apis
 from moi import blueprint
 
@@ -25,4 +26,19 @@ from moi import blueprint
 @blueprint.route('/')
 @util.require_login
 def route_default():
-  return render_template("moi_home.html")
+  if current_user.level == models.MOI:
+    return render_template("moi_dashboard.html")
+  else:
+    return render_template("moi_user.html")
+
+
+@blueprint.route('/location')
+@util.require_login
+def route_dashboard_location():
+  return render_template("moi_location.html")
+
+
+@blueprint.route('/user')
+@util.require_login
+def route_user_control():
+  return render_template("moi_user.html")
