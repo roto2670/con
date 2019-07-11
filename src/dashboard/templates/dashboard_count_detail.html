@@ -20,17 +20,17 @@
             <div class="x_title">
               <div class="x_title_left_entrance_div">
                 <div class="row">
-                  <div class="col-md-3 tile_stats_count count">
-                    <h3><a href="/dashboard/count">Summary View</a></h3>
+                  <div class="col-md-3 tile_stats_count count entrance_menu_tile_div">
+                    <h3 class="entrance_menu_tile_h"><a href="/dashboard/count">Summary View</a></h3>
                   </div>
-                  <div class="col-md-3 tile_stats_count count">
-                    <h3><a href="/dashboard/count/detail">Detail View</a></h3>
+                  <div class="col-md-3 tile_stats_count count entrance_menu_tile_div">
+                    <h3 class="entrance_menu_tile_select"><a href="/dashboard/count/detail">Detail View</a></h3>
                   </div>
-                  <div class="col-md-3 tile_stats_count count">
-                    <h3><a href="/dashboard/worker_logs">Logs by Man</a></h3>
+                  <div class="col-md-3 tile_stats_count count entrance_menu_tile_div">
+                    <h3 class="entrance_menu_tile_h"><a href="/dashboard/worker_logs">Logs by Man</a></h3>
                   </div>
-                  <div class="col-md-3 tile_stats_count count">
-                    <h3><a href="/dashboard/equip_logs">Logs by Equip</a></h3>
+                  <div class="col-md-3 tile_stats_count count entrance_menu_tile_div">
+                    <h3 class="entrance_menu_tile_h"><a href="/dashboard/equip_logs">Logs by Equip</a></h3>
                   </div>
                 </div>
               </div>
@@ -51,8 +51,22 @@
                 </div>
                 <div class="row tile_count">
                   <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
-                    <span class="count_top"><i class="fa fa-user"></i> Total AT1 </span>
-                    <div id="divCountAt1" class="count">0</div>
+                    <span class="count_top" style="font-size: 30px;"><i class="fa fa-user"></i> Total Count </span>
+                    <div id="divCount" class="count" style="font-size: 80px;">0</div>
+                  </div>
+                  <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
+                    <span class="count_top" style="font-size: 25px;"><i class="fa fa-user"></i> Total Man Power </span>
+                    <div id="divTotalManCount" class="count" style="font-size: 60px;">0</div>
+                  </div>
+                  <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
+                    <span class="count_top" style="font-size: 25px;"><i class="fa fa-user"></i> Total Equipment </span>
+                    <div id="divTotalEquipCount" class="count" style="font-size: 60px;">0</div>
+                  </div>
+                </div>
+                <div class="row tile_count">
+                  <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
+                    <span class="count_top" style="font-size: 20px;"><i class="fa fa-user"></i> Total AT1 </span>
+                    <div id="divCountAt1" class="count" style="font-size: 50px;">0</div>
                   </div>
                   <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
                     <span class="count_top"><i class="fa fa-user"></i> AT1 Man Power </span>
@@ -65,8 +79,8 @@
                 </div>
                 <div class="row tile_count">
                   <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
-                    <span class="count_top"><i class="fa fa-user"></i> Total AT2 </span>
-                    <div id="divCountAt2" class="count">0</div>
+                    <span class="count_top" style="font-size: 20px;"><i class="fa fa-user"></i> Total AT2 </span>
+                    <div id="divCountAt2" class="count" style="font-size: 50px;">0</div>
                   </div>
                   <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
                     <span class="count_top"><i class="fa fa-user"></i> AT2 Man Power </span>
@@ -75,20 +89,6 @@
                   <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
                     <span class="count_top"><i class="fa fa-user"></i> AT2 Equipment </span>
                     <div id="divEquipAt2" class="count">0</div>
-                  </div>
-                </div>
-                <div class="row tile_count">
-                  <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
-                    <span class="count_top"><i class="fa fa-user"></i> Total Count </span>
-                    <div id="divCount" class="count">0</div>
-                  </div>
-                  <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
-                    <span class="count_top"><i class="fa fa-user"></i> Total Man Power </span>
-                    <div id="divTotalManCount" class="count">0</div>
-                  </div>
-                  <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
-                    <span class="count_top"><i class="fa fa-user"></i> Total Equipment </span>
-                    <div id="divTotalEquipCount" class="count">0</div>
                   </div>
                 </div>
               </div>

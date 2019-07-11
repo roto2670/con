@@ -4683,6 +4683,24 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     font-weight: bold;
 }
 
+.entrance_menu_tile_div {
+    text-align: center;
+}
+
+.entrance_menu_tile_select {
+    background-color: rgba(27,148,226,0.5);
+    border-radius: 10px;
+    padding: 5px;
+    margin: 0;
+    margin-top: 6px;
+}
+
+.entrance_menu_tile_h {
+    padding: 5px;
+    margin: 0;
+    margin-top: 6px;
+}
+
 /* keyser custom */
 .site_title img {
     margin: 0 5px;
