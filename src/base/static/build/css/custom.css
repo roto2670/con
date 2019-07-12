@@ -4701,6 +4701,11 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     margin-top: 6px;
 }
 
+.entrance_button_img {
+    width: 60px;
+    padding: 5px;
+}
+
 /* keyser custom */
 .site_title img {
     margin: 0 5px;
