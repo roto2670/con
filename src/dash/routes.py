@@ -150,6 +150,15 @@ def update_scanner():
   return json.dumps(ret)
 
 
+@blueprint.route('/beacons/update', methods=["POST"])
+@util.require_login
+def update_beacon():
+  json_data = request.get_json()
+  beacon_data = json_data['beacon']
+  ret = dash_apis.update_beacon(beacon_data)
+  return json.dumps(ret)
+
+
 @blueprint.route('/cam/location', methods=["POST"])
 @util.require_login
 def update_cam_location():
