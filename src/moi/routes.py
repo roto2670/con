@@ -41,4 +41,5 @@ def route_dashboard_location():
 @blueprint.route('/user')
 @util.require_login
 def route_user_control():
-  return render_template("moi_user.html")
+  user_list = in_apis.get_user_list_by_moi(current_user.organization_id)
+  return render_template("moi_user.html", user_list=user_list)

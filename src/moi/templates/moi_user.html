@@ -26,12 +26,16 @@
                 <tr>
                   <th style="width:10%"></th>
                   <th>Email</th>
-                  <th>Level</th>
                   <th>last_access</th>
-                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>
+                {% for user in user_list %}
+                  <tr>
+                    <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.last_access_time | datetimeFilter }}</td>
+                {% endfor %}
               </tbody>
             </table>
           </div>  <!-- end x_content 2 -->

@@ -105,6 +105,32 @@ def update_cam_location(cam_data):
     return None
 
 
+def update_beacon(beacon_data):
+  try:
+    if apis.IS_DEV:
+      ret = dash_api_mock.update_beacon(beacon_data)
+      return ret
+    url = "{base}gadgets/{beacon_id}".format(base=THIRD_BASE_URL,
+                                            beacon_id=beacon_data['id'])
+    headers = _get_user_header(is_json=True)
+    data = json.dumps({"custom": beacon_data['custom']})
+    logging.info("Update beacon location request. url : %s, data : %s",
+                 url, data)
+    resp = requests.post(url, headers=headers, data=data)
+    if resp.ok:
+      logging.info("update beacon location successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed update beacon location. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while update beacon location.",
+                      beacon_data)
+    return None
+
+
 def get_scanner_list(kind, org_id=None):
   """
   :param : kind

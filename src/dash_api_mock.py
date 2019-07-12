@@ -460,6 +460,14 @@ def update_hub_location_mock(hub_obj):
   return False
 
 
+def update_beacon(beacon_obj):
+  beacon_id = beacon_obj['id']
+  if beacon_id in MOCK_BEACON_CACHE:
+    MOCK_BEACON_CACHE[beacon_id]['custom'] = beacon_obj['custom']
+    return True
+  return False
+
+
 def beacon_info(beacon_id):
   if beacon_id in MOCK_BEACON_CACHE:
     return MOCK_BEACON_CACHE[beacon_id]
