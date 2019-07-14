@@ -227,7 +227,8 @@ def create_or_update_count_device_setting(device_id, typ, inout, access_point,
     setting.inout = inout
     setting.access_point = access_point
     last_updated_time = cur_time
-    last_updated_user = current_user.email
+    #last_updated_user = current_user.email
+    last_updated_user = ""
   else:
     device_setting = CountDeviceSetting(device_id=device_id,
                                         name=name,
@@ -235,8 +236,8 @@ def create_or_update_count_device_setting(device_id, typ, inout, access_point,
                                         inout=inout,
                                         access_point=access_point,
                                         last_updated_time=cur_time,
-                                        last_updated_user=current_user.email,
-                                        organization_id=current_user.organization_id)
+                                        last_updated_user="",
+                                        organization_id="ac983bfaa401d89475a45952e0a642cf")
     db.session.add(device_setting)
   db.session.commit()
 

@@ -9,7 +9,7 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-
+import time
 import os, stat
 import logging
 import json
@@ -323,13 +323,15 @@ def set_location_settings():
                                           _server_interval, _org_id)
     logging.info("Update location Config. User : %s, Pid : %s",
                  current_user.email, _product_id)
-    back_scheduler.scheduler_main_equip(_org_id, _kind, _server_interval, True)
+    # TODO:
+    # back_scheduler.scheduler_main_equip(_org_id, _kind, _server_interval, True)
   else:
     in_config_apis.create_location_config(_product_id, _kind, _client_interval,
                                           _server_interval, _org_id)
     logging.info("Create Suprema Config. User : %s, Pid : %s",
                  current_user.email, _product_id)
-    back_scheduler.scheduler_main_equip(_org_id, _kind, _server_interval)
+    # TODO:
+    # back_scheduler.scheduler_main_equip(_org_id, _kind, _server_interval)
   return redirect("/dashboard/settings")
 
 
@@ -383,3 +385,17 @@ def get_enterence_worker_log():
 @util.require_login
 def get_enterence_equip_log():
   return render_template("equip_logs.html")
+
+
+@blueprint.route('/set/equip_count', methods=["POST"])
+def set_equip_count():
+  # print('start')
+  # st = time.time()
+  raw_data = request.get_data()
+  data = json.loads(raw_data.decode('utf-8'))
+  hid = data['hub_id']
+  dist_data_list = data['value']
+  count.set_equip_count('ac983bfaa401d89475a45952e0a642cf', hid, dist_data_list)
+  # et = time.time() - st
+  # print(et)
+  return json.dumps(True)

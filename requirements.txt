@@ -16,7 +16,6 @@ gevent==1.3.6
 celery==4.2.1
 mysqlclient==1.3.13
 country-list==0.1.1
-flask_monitoringdashboard
 pytest
 flask_cors==3.0.7
 apscheduler==3.6.0

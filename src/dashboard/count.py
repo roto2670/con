@@ -281,7 +281,7 @@ def device_list():
     else:
       device_list = _get_device_list(suprema_config, _org_id)
   equip_kind_settings = get_equip_operator_count_settings()
-  scanners = in_config_apis.get_count_device_setting(SCANNER_TYPE)
+  scanners = in_config_apis.get_count_device_setting(SCANNER_TYPE, "ac983bfaa401d89475a45952e0a642cf")
   for scanner in scanners:
     setting_id_list.append(scanner.device_id)
     settings_dict[scanner.device_id] = scanner
