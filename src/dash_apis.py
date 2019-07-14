@@ -28,10 +28,6 @@ BASE_URL = '''http://api.mib.io/i/v1/'''
 OFFSET_SEC = 60
 
 
-def init(app):
-  pass
-
-
 def _get_user_header(is_json=False, org_id=None):
   if org_id:
     _org = in_apis.get_organization(org_id)

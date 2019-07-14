@@ -23,9 +23,9 @@ SCHED = BackgroundScheduler()
 
 def init():
   worker_config_list = get_all_woreker_config()
-  equip_config_list = get_all_equip_config()
+  # equip_config_list = get_all_equip_config()
   worker_count_init(worker_config_list)
-  equip_count_init(equip_config_list)
+  # equip_count_init(equip_config_list)
   SCHED.start()
 
 
