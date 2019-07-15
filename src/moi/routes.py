@@ -29,7 +29,7 @@ def route_default():
   if current_user.level == models.MOI:
     return render_template("moi_dashboard.html")
   else:
-    return render_template("moi_user.html")
+    return redirect('/moi/user')
 
 
 @blueprint.route('/location')

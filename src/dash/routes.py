@@ -150,32 +150,6 @@ def update_scanner():
   return json.dumps(ret)
 
 
-@blueprint.route('/hubs/update/ws', methods=["POST"])
-def update_scanner_ws():
-  """
-  :param : None
-  :return : bool
-  :content : body에 custom정보가 담긴 hub data 를 post 한다
-  """
-  raw_data = request.get_data()
-  hub_data = json.loads(raw_data.decode('utf-8'))
-  # hub_data = json_data['hub']
-  # ret = dash_apis.update_scanner(hub_data)
-  custom = hub_data['custom']
-  if 'is_counted_hub' in custom and custom['is_counted_hub']:
-    # 0, 0 is none -> default
-    device_setting = in_config_apis.get_count_device(hub_data['id'])
-    access_point = device_setting.access_point if device_setting else 0
-    in_config_apis.create_or_update_count_device_setting(hub_data['id'],
-                                                         SCANNER_TYPE,
-                                                         0, access_point,
-                                                         name=hub_data['name'])
-  elif 'is_counted_hub' in custom and not custom['is_counted_hub']:
-    # TODO: delete count setting and delete redis ...
-    dashboard.count.delete_device(hub_data['id'], SCANNER_TYPE)
-  return json.dumps(True)
-
-
 @blueprint.route('/beacons/update', methods=["POST"])
 @util.require_login
 def update_beacon():

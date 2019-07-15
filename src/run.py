@@ -61,6 +61,7 @@ def register_blueprints(app):
       'maintenance',
       'registration',
       'moi',
+      'internal',
       'login'
   ]
   for blueprint in blueprints:

@@ -28,6 +28,9 @@ from config_models import _DeviceData as DeviceData
 from config_models import _BusSettingData as BusSettingData
 
 
+ORG_ID = '''ac983bfaa401d89475a45952e0a642cf'''
+
+
 def get_datetime():
   return datetime.datetime.now(pytz.timezone('UTC'))
 
@@ -237,7 +240,7 @@ def create_or_update_count_device_setting(device_id, typ, inout, access_point,
                                         access_point=access_point,
                                         last_updated_time=cur_time,
                                         last_updated_user="",
-                                        organization_id="ac983bfaa401d89475a45952e0a642cf")
+                                        organization_id=ORG_ID)
     db.session.add(device_setting)
   db.session.commit()
 
