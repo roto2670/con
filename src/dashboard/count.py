@@ -299,6 +299,26 @@ def device_list():
                          bus_setting_list=bus_setting_list)
 
 
+def scanner_list():
+  raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
+  data_list = []
+  for raw_data in raw_datas.values():
+    # TODO:
+    if 'issuer' in raw_data and raw_data['issuer'] == 'com.thenaran.skec':
+      data_list.append(raw_data)
+  return data_list
+
+
+def beacon_list():
+  raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
+  data_list = []
+  for raw_data in raw_datas.values():
+    # TODO:
+    if raw_data['kind'] == 'mibsskec':
+      data_list.append(raw_data)
+  return data_list
+
+
 def __fs_set_inout(inout, device_id):
   if inout == IN_SETTING_ID:
     IN_LIST.add(device_id)
