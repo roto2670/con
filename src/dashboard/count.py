@@ -319,6 +319,11 @@ def beacon_list():
   return data_list
 
 
+def get_beacon(gid):
+  data = BEACONS_COUNT.get_data(DEVICE_DATA_KEY, gid)
+  return data
+
+
 def __fs_set_inout(inout, device_id):
   if inout == IN_SETTING_ID:
     IN_LIST.add(device_id)

@@ -21,10 +21,9 @@ import in_apis
 import in_config_apis
 import dashboard.count
 import dash_api_mock
+from constants import BASE_URL, THIRD_BASE_URL
 
 
-THIRD_BASE_URL = '''http://api.mib.io/v1/'''
-BASE_URL = '''http://api.mib.io/i/v1/'''
 OFFSET_SEC = 60
 
 
