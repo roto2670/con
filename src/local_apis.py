@@ -15,7 +15,7 @@ import logging
 
 import requests
 
-from constatns import THIRD_BASE_URL, BASE_URL
+from constants import THIRD_BASE_URL, BASE_URL
 
 
 def update_beacon_information(gid, hid, name, kind, moi):
