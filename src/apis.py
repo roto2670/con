@@ -16,10 +16,10 @@ import logging
 import requests  # noqa : pylint: disable=import-error
 from flask_login import current_user
 
+from constants import BASE_URL, THIRD_BASE_URL
+
 
 IS_DEV = True
-BASE_URL = '''http://api.mib.io/i/v1/'''
-THIRD_BASE_URL = '''http://api.mib.io/v1/'''
 HEADERS = {}
 JSON_HEADERS = {}
 

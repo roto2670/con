@@ -126,7 +126,11 @@
               <tbody>
                 {% for beacon in beacon_list %}
                   <tr>
-                    <td>{{ beacon.name }}</td>
+                    <td>
+                      <a href="/registration/beacon/{{beacon.id}}/update">
+                        {{ beacon.name }}
+                      </a>
+                    </td>
                     <td>{{ beacon.mac }}</td>
                     <td>{{ category[beacon.tags[0]] }}</td>
                     {% if 'is_visible_moi' in beacon.custom %}

@@ -19,6 +19,7 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 import base
 import util
 import in_apis
+import local_apis
 from dashboard import count
 from registration import blueprint
 
@@ -49,6 +50,23 @@ def beacon_list_route():
     return render_template("beacon_list.html", beacon_list=new_list,
                            category=count.GADGET_INFO,
                            selected_category=selected_category)
+
+
+@blueprint.route('/beacon/<gid>/update', methods=['GET', 'POST'])
+@util.require_login
+def beacon_update_route(gid):
+  if request.method == "GET":
+    beacon = count.get_beacon(gid)
+    return render_template("update_beacon.html", beacon=beacon,
+                           category=count.GADGET_INFO)
+  else:
+    name = request.form.get('name')
+    kind = request.form.get('kind')
+    moi = request.form.get('moi')
+    hid = request.form.get('hid')
+    local_apis.update_beacon_information(gid, hid, name, kind, moi)
+    return redirect("/registration/beacon")
+
 
 
 @blueprint.route('/scanner', methods=['GET', 'POST'])
