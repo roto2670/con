@@ -96,8 +96,8 @@
                     {% endif %}
                     <!-- location -->
                     <td>
-                      {% if 'location' in scanner.custom %}
-                        {{ location[scanner.custom.location] }}
+                      {% if scanner.tags|length != 0 %}
+                        {{ location[scanner.tags[0]] }}
                       {% else %}
                       {% endif %}
                     </td>

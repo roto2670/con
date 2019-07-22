@@ -57,8 +57,8 @@ def update_scanner_information(hid, name, location, count):
   }
   body = {
     "name": name,
+    "tags": [location],
     "custom": {
-        "location": location
     }
   }
   if int(count) == 1:

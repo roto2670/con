@@ -45,7 +45,7 @@
                     <div class="col-md-8">
                       <select id="location" name="location" class="form-control" disabled>
                         {% for k, v in location.items() %}
-                          {% if k == scanner.custom.location %}
+                          {% if k == scanner.tags[0] %}
                             <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
                           {% else %}
                             <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
