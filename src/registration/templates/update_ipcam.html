@@ -1,0 +1,80 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_registration.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block title %} Update IPcam {% endblock title %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+
+      <div class="row">  <!-- Start row -->
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">  <!-- start x_panel -->
+
+            <div class="x_title">
+              <div class="x_title_left_div">
+                <h3>IPcam</h3>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+
+
+            <div class="x_content">  <!-- start x_content -->
+
+              <form id="hook" action="/registration/ipcam/{{ ipcam.id }}/update"
+                class="form-horizontal form-label-left" method="post">
+                <div class="col-md-9">
+                  <br>
+                  <div class="item form-group">
+                    <label class="control-label col-md-4" for="name">Name
+                    </label>
+                    <div class="col-md-8">
+                      <input type="text" id="name" name="name" value="{{ ipcam.name }}"
+                          class="form-control col-md-6 col-xs-6" maxlength="16"
+                          onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g,'');" >
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-4" for="hookClientKey">MOI
+                    </label>
+                    <div class="col-md-8">
+                      <select id="moi" name="moi" class="form-control">
+                        {% if 'is_visible_moi' in ipcam.custom %}
+                          {% if ipcam.custom.is_visible_moi %}
+                            <option id="1" value="1" selected>ON</option>
+                            <option id="0" value="0">OFF</option>
+                          {% else %}
+                            <option id="1" value="1">ON</option>
+                            <option id="0" value="0" selected>OFF</option>
+                          {% endif %}
+                        {% else %}
+                          <option id="1" value="1">ON</option>
+                          <option id="0" value="0" selected>OFF</option>
+                        {% endif %}
+                      </select>
+                    </div>
+                  </div>
+                  <br>
+                  <input type="hidden" id="hid" name="hid" value="{{ ipcam.hub_id }}"
+                      class="form-control col-md-6 col-xs-6">
+                  <div style="text-align: right">
+                    <button type="submit" class="btn btn-default">Update</button>
+                  </div>
+                </div>
+              </form>
+
+            </div>  <!-- End x_content -->
+
+          </div>  <!-- End x_panel -->
+        </div>
+      </div>  <!-- End row-->
+
+    </div>
+  </div>
+
+{% endblock content %}

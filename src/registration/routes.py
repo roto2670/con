@@ -11,6 +11,7 @@
 
 
 import json
+import hashlib
 import logging
 
 from flask import render_template, redirect, request  # noqa : pylint: disable=import-error
@@ -107,3 +108,95 @@ def scanner_update_route(hid):
     is_count = request.form.get('count')
     local_apis.update_scanner_information(hid, name, location, is_count)
     return redirect("/registration/scanner")
+
+
+@blueprint.route('/ipcam', methods=['GET', 'POST'])
+@util.require_login
+def ipcam_list_route():
+  ipcam_list = count.ipcam_list()
+  if request.method == "GET":
+    return render_template("ipcam_list.html", ipcam_list=ipcam_list)
+  else:
+    selected_category = request.form['category']
+    new_list = []
+    if selected_category != "100":
+      for beacon in beacon_list:
+        if beacon['tags'] and beacon['tags'][0] == selected_category:
+          new_list.append(beacon)
+    else:
+      new_list = beacon_list
+    return render_template("beacon_list.html", beacon_list=new_list,
+                           category=count.GADGET_INFO,
+                           selected_category=selected_category)
+
+
+
+@blueprint.route('/ipcam/create', methods=['GET', 'POST'])
+@util.require_login
+def reg_ipcam():
+  if request.method == "GET":
+    return render_template("register_ipcam.html")
+  else:
+    ip = request.form.get('ip')
+    _id = request.form.get('id')
+    password = request.form.get('password')
+    name = request.form.get('name')
+    mac_hash = hashlib.md5()
+    mac_hash.update(ip.encode('utf-8'))
+    mac_addr = mac_hash.hexdigest()[:12]
+
+    new_id_hash = hashlib.md5()
+    new_id_hash.update(mac_addr.encode('utf-8'))
+    new_id = new_id_hash.hexdigest()
+
+    topic = "gadget.added"
+    value = {
+      "id": new_id,
+      "mac": mac_addr,
+      "name": name,
+      "kind": "ipcam",
+      "protocol": 0,
+      "firmware_version": "0.0.0",
+      "model_number": 0,
+      "model_name": "ipcam",
+      "sdk_version": "0.3",
+      "beacon": "",
+      "security": "",
+      "hub_id": "",
+      "account_id": "",
+      "status": "",
+      "locale": "US",
+      "rssi": 0,
+      "battery": 0,
+      "progress": 0,
+      "latest_version": "0.0.0",
+      "is_depr": 0,
+      "custom": {
+          "ip": ip,
+          "password": password,
+          "id": _id,
+          "is_visible_moi": 0,
+      },
+      "tags": [],
+      "beacon_spec": {
+          "uuid": "9cba31e2-0237-eb44-45f2-7b288dbe1c44",
+          "major": 36805,
+          "minor": 36533,
+          "interval": 700,
+          "during_second": 0
+      },
+      "img_url": ""
+    }
+
+
+@blueprint.route('/ipcam/<ipcam_id>/update', methods=['GET', 'POST'])
+@util.require_login
+def ipcam_update_route(ipcam_id):
+  if request.method == "GET":
+    ipcam = count.get_ipcam(ipcam_id)
+    return render_template("update_ipcam.html", ipcam=ipcam)
+  else:
+    name = request.form.get('name')
+    moi = request.form.get('moi')
+    local_apis.update_ipcam_information(ipcam_id, name, moi)
+    return redirect("/registration/ipcam")
