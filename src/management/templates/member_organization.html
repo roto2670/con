@@ -31,7 +31,11 @@
                 {% for user in user_list %}
                   <tr>
                     <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
-                    <td>{{ user.email }}</td>
+                    <td>
+                      <a href="/management/organization/member/{{ user.id }}/password">
+                        {{ user.email }}
+                      </a>
+                    </td>
                     {% if current_user.level == 0 %}
                       {% if current_user.id == user.id %}
                         <td>Admin</td>

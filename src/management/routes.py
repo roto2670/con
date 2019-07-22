@@ -80,6 +80,18 @@ def member_delete(user_id):
   return organization.member_delete(user_id)
 
 
+@blueprint.route('/organization/member/create', methods=['GET', 'POST'])
+@util.require_login
+def member_create():
+  return organization.member_create()
+
+
+@blueprint.route('/organization/member/<user_id>/password', methods=['GET', 'POST'])
+@util.require_login
+def member_password(user_id):
+  return organization.member_password(user_id)
+
+
 @blueprint.route('/organization/product', methods=['GET'])
 @util.require_login
 def default_organization_product():
