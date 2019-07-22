@@ -75,7 +75,8 @@ def scanner_list_route():
   scanner_list = count.scanner_list()
   if request.method == "GET":
     return render_template("scanner_list.html", scanner_list=scanner_list,
-                           selected_onoff=100, selected_location=100)
+                           selected_onoff=100, selected_location=100,
+                           location=count.SCANNER_LOCATION)
   else:
     selected_onoff = int(request.form['onoff'])
     selected_location = int(request.form['location'])
@@ -91,3 +92,18 @@ def scanner_list_route():
       return render_template("scanner_list.html", scanner_list=scanner_list,
                             selected_onoff=selected_onoff,
                             selected_location=selected_location)
+
+
+@blueprint.route('/scanner/<hid>/update', methods=['GET', 'POST'])
+@util.require_login
+def scanner_update_route(hid):
+  if request.method == "GET":
+    scanner = count.get_scanner(hid)
+    return render_template("update_scanner.html", scanner=scanner,
+                           location=count.SCANNER_LOCATION)
+  else:
+    name = request.form.get('name')
+    location = request.form.get('location')
+    is_count = request.form.get('count')
+    local_apis.update_scanner_information(hid, name, location, is_count)
+    return redirect("/registration/scanner")

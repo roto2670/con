@@ -65,6 +65,7 @@
                       CSV Download
                     </button>
                   </th>
+                  <th></th>
                 </tr>
                 <tr>
                   <th>Name</th>
@@ -72,12 +73,17 @@
                   <th>Location</th>
                   <th>Status</th>
                   <th>IP Address</th>
+                  <th>Count</th>
                 </tr>
               </thead>
               <tbody>
                 {% for scanner in scanner_list %}
                   <tr>
-                    <td>{{ scanner.name }}</td>
+                    <td>
+                      <a href="/registration/scanner/{{ scanner.id }}/update">
+                        {{ scanner.name }}
+                      </a>
+                    </td>
                     <!-- wifi mac -->
                     {% if "network" in scanner %}
                       {% if "wifi_mac" in scanner.network %}
@@ -89,7 +95,12 @@
                       <td></td>
                     {% endif %}
                     <!-- location -->
-                    <td></td>
+                    <td>
+                      {% if 'location' in scanner.custom %}
+                        {{ location[scanner.custom.location] }}
+                      {% else %}
+                      {% endif %}
+                    </td>
                     <!-- status -->
                     {% if scanner.status == 0 %}
                       <td style="padding-left: 20px;"><img src="/static/images/off.png"
@@ -102,6 +113,15 @@
                     {% if "network" in scanner %}
                       {% if "ip" in scanner.network %}
                         <td>{{ scanner.network.ip }}</td>
+                      {% else %}
+                        <td></td>
+                      {% endif %}
+                    {% else %}
+                      <td></td>
+                    {% endif %}
+                    {% if 'is_counted_hub' in scanner.custom %}
+                      {% if scanner.custom.is_counted_hub %}
+                        <td>On</td>
                       {% else %}
                         <td></td>
                       {% endif %}

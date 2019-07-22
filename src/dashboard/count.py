@@ -148,6 +148,12 @@ GADGET_INFO = {
     "19": "Concrete Mixer Truck"
 }
 
+SCANNER_LOCATION = {
+    "0": "None",
+    "1": "AT1",
+    "2": "AT2"
+}
+
 
 # }}}
 
@@ -321,6 +327,11 @@ def beacon_list():
 
 def get_beacon(gid):
   data = BEACONS_COUNT.get_data(DEVICE_DATA_KEY, gid)
+  return data
+
+
+def get_scanner(hid):
+  data = BEACONS_COUNT.get_data(DEVICE_DATA_KEY, hid)
   return data
 
 

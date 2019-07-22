@@ -6,7 +6,7 @@
   </div>
 {% endblock sidebar %}
 
-{% block title %} Update Beacon {% endblock title %}
+{% block title %} Update Scanner {% endblock title %}
 
 {% block content %}
   <div id="scroll-style-hidden" class="right_col" role="main">
@@ -18,7 +18,7 @@
 
             <div class="x_title">
               <div class="x_title_left_div">
-                <h3>Beacon</h3>
+                <h3>Scanner</h3>
               </div>
               <div class="clearfix"></div>
             </div>
@@ -26,7 +26,7 @@
 
             <div class="x_content">  <!-- start x_content -->
 
-              <form id="hook" action="/registration/beacon/{{ beacon.id}}/update"
+              <form id="hook" action="/registration/scanner/{{ scanner.id }}/update"
                 class="form-horizontal form-label-left" method="post">
                 <div class="col-md-9">
                   <br>
@@ -34,18 +34,18 @@
                     <label class="control-label col-md-4" for="name">Name
                     </label>
                     <div class="col-md-8">
-                      <input type="text" id="name" name="name" value="{{ beacon.name }}"
+                      <input type="text" id="name" name="name" value="{{ scanner.name }}"
                           class="form-control col-md-6 col-xs-6" maxlength="16"
                           onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g,'');" >
                     </div>
                   </div>
                   <div class="item form-group">
-                    <label class="control-label col-md-4" for="hookClientKey">Kind
+                    <label class="control-label col-md-4" for="location">Location
                     </label>
                     <div class="col-md-8">
-                      <select id="kind" name="kind" class="form-control">
-                        {% for k, v in category.items() %}
-                          {% if k == beacon.tags[0] %}
+                      <select id="location" name="location" class="form-control" disabled>
+                        {% for k, v in location.items() %}
+                          {% if k == scanner.custom.location %}
                             <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
                           {% else %}
                             <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
@@ -54,13 +54,14 @@
                       </select>
                     </div>
                   </div>
+
                   <div class="item form-group">
-                    <label class="control-label col-md-4" for="hookClientKey">MOI
+                    <label class="control-label col-md-4" for="count">Count
                     </label>
                     <div class="col-md-8">
-                      <select id="moi" name="moi" class="form-control">
-                        {% if 'is_visible_moi' in beacon.custom %}
-                          {% if beacon.custom.is_visible_moi %}
+                      <select id="count" name="count" class="form-control">
+                        {% if 'is_counted_hub' in scanner.custom %}
+                          {% if scanner.custom.is_counted_hub %}
                             <option id="1" value="1" selected>ON</option>
                             <option id="0" value="0">OFF</option>
                           {% else %}
@@ -75,8 +76,6 @@
                     </div>
                   </div>
                   <br>
-                  <input type="hidden" id="hid" name="hid" value="{{ beacon.hub_id }}"
-                      class="form-control col-md-6 col-xs-6">
                   <div style="text-align: right">
                     <button type="submit" class="btn btn-default">Update</button>
                   </div>
