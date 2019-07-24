@@ -346,7 +346,7 @@ def set_suprema_settings():
   _event_id = request.form['supremaEvent']
   _org_id = current_user.organization_id
 
-  login_result = suprema_apis.login_sup_server(_id, _pw, _url, _org_id)
+  login_result = suprema_apis.check_login(_id, _pw)
   if login_result:
     config_data = in_config_apis.get_suprema_config_by_org(_org_id)
     if config_data:
@@ -364,6 +364,7 @@ def set_suprema_settings():
       logging.info("Create Suprema Config. User : %s, base url : %s",
                    current_user.email, _url)
       back_scheduler.scheduler_main_worker(_org_id, _server_interval)
+    suprema_apis.set_id_pw(_org_id, _id, _pw)
     return redirect("/dashboard/settings")
   else:
     logging.warning(
