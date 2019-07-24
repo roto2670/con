@@ -14,7 +14,9 @@
 from flask_login import UserMixin  # noqa : pylint: disable=import-error
 from sqlalchemy import ForeignKey  # noqa : pylint: disable=import-error
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text  # noqa : pylint: disable=import-error
+from sqlalchemy import Binary  # noqa : pylint: disable=import-error
 from sqlalchemy.orm import relationship  # noqa : pylint: disable=import-error
+from bcrypt import gensalt, hashpw
 
 # self
 from base import db, login_manager
@@ -82,6 +84,7 @@ class _User(UserMixin, db.Model):
   last_access_time = Column(DateTime)
   ip_address = Column(String(75))
   level = Column(Integer)
+  password = Column(Binary)
 
   organization_id = Column(String(75), ForeignKey('_organization.id'))
 
@@ -91,6 +94,8 @@ class _User(UserMixin, db.Model):
     for property, value in kwargs.items():
       if hasattr(value, '__iter__') and not isinstance(value, str):
         value = value[0]
+      if property == 'password':
+        value = hashpw(value.encode('utf-8'), gensalt())
       setattr(self, property, value)
 
   def __repr__(self):

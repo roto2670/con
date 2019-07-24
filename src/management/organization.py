@@ -15,6 +15,7 @@ import uuid
 import logging
 import tempfile
 
+from bcrypt import checkpw
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
@@ -124,6 +125,39 @@ def member_accept(user_id):
 def member_delete(user_id):
   in_apis.delete_user_by_id(user_id)
   return redirect("/management/organization/member")
+
+
+def member_create():
+  if request.method == "GET":
+    return render_template('member_create.html', user_level=USER_LEVEL)
+  else:
+    email = request.form['email']
+    username = request.form['username']
+    password = request.form['password']
+    level = request.form['level']
+    in_apis.create_user(email, username, password, level)
+    return redirect("/management/organization/member")
+
+
+def member_password(user_id):
+  if request.method == "GET":
+    return render_template('password.html', user_id=user_id)
+  else:
+    cur_password = request.form['cur_password']
+    new_password = request.form['new_password']
+    confirm_password = request.form['confirm_password']
+    _user = in_apis.get_user(user_id)
+    if _user and cur_password and _user.password and \
+        checkpw(cur_password.encode('utf8'), _user.password):
+      if new_password and confirm_password and new_password == confirm_password:
+        in_apis.update_user_password(user_id, new_password)
+        return redirect('/management/organization/member')
+    #TODO: update then remove below
+    elif _user and not _user.password and new_password and \
+        confirm_password and new_password == confirm_password:
+      in_apis.update_user_password(user_id, new_password)
+      return redirect('/management/organization/member')
+    return render_template('password.html')
 
 
 def product():

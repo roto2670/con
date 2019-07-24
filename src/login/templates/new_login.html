@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    {% block scripts %}
+    {% endblock %}
+    <title>Smart Control System</title>
+    <link type="text/css" rel="stylesheet" href="/static/build/css/custom-auth-1.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+    {% block styles %}
+    {% endblock %}
+  </head>
+
+  <body>
+    {% block header %}
+    {% endblock %}
+    {% if is_error %}
+      <script>
+        window.alert("Invalid email or password.");
+      </script>
+      <div>
+      </div>
+    {% endif %}
+    <form action="/auth/login/signin" method="POST">
+      <div id="firebaseui-auth-container" class="auth-content">
+        <div class="top-container">
+          <div class="logo-container">
+              <img class="logo" src="{{ logo_uri }}" />
+          </div>
+        </div>
+        <div class="header-container">
+          <div class="messege-container">
+            <div class="input_container">
+              <input id="email" name="email" class="input_value" type="text" placeholder="Email">
+            </div>
+            <div class="input_container">
+              <input id="password" name="password" class="input_value" type="password" placeholder="Password">
+            </div>
+            <div class="new_button_container">
+            <button class="new_button" type="submit">Login</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    {% block footer %}
+    {% endblock %}
+  </body>
+</html>

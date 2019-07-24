@@ -15,6 +15,7 @@ import logging
 import datetime
 
 import pytz
+from bcrypt import gensalt, hashpw
 from flask_login import current_user  # noqa : pylint: disable=import-error
 from flask import abort, render_template  # noqa : pylint: disable=import-error
 from sqlalchemy.orm.session import make_transient  # noqa : pylint: disable=import-error
@@ -22,6 +23,7 @@ from sqlalchemy import desc
 
 import apis
 import mail
+import util
 import models
 from base import db
 from models import _Product as Product
@@ -42,6 +44,7 @@ from models import _ReferrerInfo as ReferrerInfo
 from models import _SubDomain as SubDomain
 from models import _Domain as Domain
 from models import _ForkProduct as ForkProduct
+from models import _Permission as Permission
 
 
 def get_datetime():
@@ -386,6 +389,32 @@ def update_organization_by_logo(organization_id, logo_path):
 # {{{ User
 
 
+def create_user(email, username, password, level):
+  cur_time = get_datetime()
+  org_id = "ac983bfaa401d89475a45952e0a642cf"  # default skec
+  user_id = uuid.uuid4().hex
+  user = User(id=user_id,
+              email=email,
+              name=username,
+              firebase_user_id=user_id,
+              email_verified=True,
+              sign_in_provider="",
+              photo_url='/static/images/user.png',
+              created_time=cur_time,
+              last_access_time=cur_time,
+              ip_address=util.get_ip_addr(),
+              level=int(level),
+              password=password,
+              organization_id=org_id)
+  db.session.add(user)
+  db.session.commit()
+  permission = Permission(id=uuid.uuid4().hex,
+                          permission='777',
+                          user_id=user.id)
+  db.session.add(permission)
+  db.session.commit()
+
+
 def get_user(user_id):
   user = User.query.filter_by(id=user_id).one_or_none()
   return user
@@ -445,6 +474,14 @@ def delete_user_by_id(user_id):
     db.session.commit()
     return True
   return False
+
+
+def update_user_password(user_id, password):
+  user = User.query.filter_by(id=user_id).one_or_none()
+  if user:
+    _password = hashpw(password.encode('utf-8'), gensalt())
+    user.password = _password
+    db.session.commit()
 
 
 # }}}
