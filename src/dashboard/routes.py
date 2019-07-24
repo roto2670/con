@@ -21,6 +21,7 @@ import util
 import common
 import in_apis
 import dash_apis
+import constants
 import in_config_apis
 from dashboard import count
 from dashboard import blueprint
@@ -396,7 +397,7 @@ def set_equip_count():
   data = json.loads(raw_data.decode('utf-8'))
   hid = data['hub_id']
   dist_data_list = data['value']
-  count.set_equip_count('ac983bfaa401d89475a45952e0a642cf', hid, dist_data_list)
+  count.set_equip_count(constants.ORG_ID, hid, dist_data_list)
   # et = time.time() - st
   # print(et)
   return json.dumps(True)

@@ -29,6 +29,7 @@ import common
 import models
 import worker
 import in_apis
+import constants
 import in_config_apis
 from base import blueprint
 from base import db, login_manager, auth
@@ -175,19 +176,7 @@ def production_sign_in(token):
   user.last_access_time = in_apis.get_datetime()
   user.ip_address = util.get_ip_addr()
   invite = in_apis.get_invite_by_email(token['email'])
-  # TODO: Auto set org_id
-  if not user.organization_id:
-    if apis.IS_DEV:
-      org_id = "993a39cdeed84d72851efe581b9a74ed"
-    else:
-      org_id = "ac983bfaa401d89475a45952e0a642cf"  # default skec
-  else:
-    org_id = user.organization_id
-  user.organization_id = org_id
-  org = in_apis.get_organization(org_id)
-  users = json.loads(org.users)
-  users.append(token['email'])
-  org.users = json.dumps(users)
+  user.organization_id = constants.ORG_ID
   db.session.commit()
   if not user.permission:
     permission = Permission(id=uuid.uuid4().hex,

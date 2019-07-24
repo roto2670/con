@@ -18,6 +18,7 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 from sqlalchemy import desc
 
 from base import db
+from constants import ORG_ID
 from config_models import _Footer as Footer
 from config_models import _SupremaConfig as SupremaConfig
 from config_models import _LocationConfig as LocationConfig
@@ -26,9 +27,6 @@ from config_models import _CountDeviceSetting as CountDeviceSetting
 from config_models import _EntranceEquipLog as EntranceEquipLog
 from config_models import _DeviceData as DeviceData
 from config_models import _BusSettingData as BusSettingData
-
-
-ORG_ID = '''ac983bfaa401d89475a45952e0a642cf'''
 
 
 def get_datetime():

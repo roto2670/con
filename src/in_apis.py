@@ -25,6 +25,7 @@ import apis
 import mail
 import util
 import models
+import constants
 from base import db
 from models import _Product as Product
 from models import _ProductStage as ProductStage
@@ -391,7 +392,7 @@ def update_organization_by_logo(organization_id, logo_path):
 
 def create_user(email, username, password, level):
   cur_time = get_datetime()
-  org_id = "ac983bfaa401d89475a45952e0a642cf"  # default skec
+  org_id = constants.ORG_ID
   user_id = uuid.uuid4().hex
   user = User(id=user_id,
               email=email,

@@ -21,6 +21,7 @@ import dashboard
 import dashboard.count
 from dash import blueprint
 import in_config_apis
+import constants
 from config_models import SCANNER_TYPE
 
 
@@ -243,8 +244,7 @@ def get_entrance_out_worker_log(ap):
 @blueprint.route('/equip_log', methods=["GET"])
 @util.require_login
 def get_entrance_equip_log():
-  org_id = current_user.organization_id
-  org_id = 'ac983bfaa401d89475a45952e0a642cf'
+  org_id = constants.ORG_ID
   _page_num = request.args.get('page_num')
   _limit = request.args.get('limit', 30)
   log_list = in_config_apis.get_entrance_equip_log_list(org_id,
@@ -264,8 +264,7 @@ def get_entrance_equip_log():
 @blueprint.route('/equip_log/in/<ap>', methods=["GET"])
 @util.require_login
 def get_entrance_in_equip_log(ap):
-  org_id = current_user.organization_id
-  org_id = 'ac983bfaa401d89475a45952e0a642cf'
+  org_id = constants.ORG_ID
   _page_num = request.args.get('page_num')
   _limit = request.args.get('limit', 30)
   log_list = in_config_apis.get_entrance_in_equip_log_list(org_id, int(ap),
@@ -285,8 +284,7 @@ def get_entrance_in_equip_log(ap):
 @blueprint.route('/equip_log/out/<ap>', methods=["GET"])
 @util.require_login
 def get_entrance_out_equip_log(ap):
-  org_id = current_user.organization_id
-  org_id = 'ac983bfaa401d89475a45952e0a642cf'
+  org_id = constants.ORG_ID
   _page_num = request.args.get('page_num')
   _limit = request.args.get('limit', 30)
   log_list = in_config_apis.get_entrance_out_equip_log_list(org_id, int(ap),

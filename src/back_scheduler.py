@@ -29,14 +29,15 @@ def init():
 
 def worker_count_init(worker_config_list):
   for config_data in worker_config_list:
-    ret = suprema_apis.login_sup_server(config_data.suprema_id,
-                                        config_data.suprema_pw)
+    ret = suprema_apis.check_login(config_data.suprema_id,
+                                   config_data.suprema_pw)
     if ret:
       logging.info("Start Scheduler of url : %s, org : %s",
                    config_data.base_url, config_data.organization_id)
       suprema_apis.set_last_id_cache(config_data.organization_id,
                                      config_data.last_data_id)
-      suprema_apis.set_id_pw(config_data.suprema_id,
+      suprema_apis.set_id_pw(config_data.organization_id,
+                             config_data.suprema_id,
                              config_data.suprema_pw)
       scheduler_main_worker(config_data.organization_id,
                             config_data.server_interval)

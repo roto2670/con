@@ -45,8 +45,8 @@ LOCAL_CLI_HEADER = {
 
 
 def _send_local_biostar(method, subpath, data_headers=None, data_body=None):
-  url = "{base}gadgets/{gid}/sync-endpoints/*".format(base=LOCAL_HUB_CLID_ADDR,
-                                                      gid=LOCAL_HUB_CLID_GID)
+  url = "{base}gadgets/{gid}/sync-endpoints/*".format(base=LOCAL_HUB_CLI_ADDR,
+                                                      gid=LOCAL_HUB_CLI_GID)
   body = {
       "key": "smartsystem",
       "otp": 0,
@@ -208,10 +208,7 @@ def set_id_pw(org_id, _id, pw):
 
 def _set_worker_count(org_id, data):
   user_info = data['user_id']
-  print(org_id)
-  print("data : ", data)
   if 'user_id' in user_info and 'name' in user_info:
-    print("set worker ", user_info)
     dashboard.count.set_worker_count(org_id,
                                      user_info['user_id'],
                                      user_info['name'],
@@ -240,6 +237,7 @@ def set_event(org_id):
           rows = _extract_rows(config_data, limit)
           last_id = None
           for data in rows:
+            #TODO:
             #if data['event_type_id']['code'] == IDENTIFY_SUCCESS_FACE:
             if data['event_type_id']['code'] == IDENTIFY_SUCCESS_FINGERPRINT:
               _set_worker_count(org_id, data)

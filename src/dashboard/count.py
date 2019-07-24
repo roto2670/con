@@ -16,6 +16,7 @@ import logging
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
+import constants
 import in_config_apis
 from util import RedisStore
 from third import suprema_apis
@@ -287,7 +288,7 @@ def device_list():
     else:
       device_list = _get_device_list(suprema_config, _org_id)
   equip_kind_settings = get_equip_operator_count_settings()
-  scanners = in_config_apis.get_count_device_setting(SCANNER_TYPE, "ac983bfaa401d89475a45952e0a642cf")
+  scanners = in_config_apis.get_count_device_setting(SCANNER_TYPE, constants.ORG_ID)
   for scanner in scanners:
     setting_id_list.append(scanner.device_id)
     settings_dict[scanner.device_id] = scanner
@@ -829,7 +830,7 @@ def _set_bus_setting(bus_beacon_id, bus_user_id):
 
 
 def init():
-  org_id = '''ac983bfaa401d89475a45952e0a642cf'''
+  org_id = constants.ORG_ID
   settings = in_config_apis.get_count_device_setting(FACE_STATION_TYPE, org_id)
   for setting in settings:
     device_id = setting.device_id

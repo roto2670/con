@@ -17,6 +17,7 @@ from flask_login import current_user, login_user, logout_user  # noqa : pylint: 
 import util
 import models
 import in_apis
+import constants
 from base import db
 from login import blueprint
 
@@ -52,7 +53,7 @@ def login():
 def sign_in_progress():
   email = request.form.get('email')
   password = request.form.get('password')
-  user = in_apis.get_user_by_email(email, 'ac983bfaa401d89475a45952e0a642cf')
+  user = in_apis.get_user_by_email(email, constants.ORG_ID)
   if user and user.password and checkpw(password.encode('utf-8'), user.password):
     user.last_access_time = in_apis.get_datetime()
     user.ip_address = util.get_ip_addr()
@@ -66,30 +67,6 @@ def sign_in_progress():
     return redirect("/auth/login?error=true")
 
 
-# TODO: Using firebase
-# @blueprint.route('/login', methods={'GET', 'POST'})
-# def login():
-#   if not current_user.is_authenticated:
-#     referrer = request.args['ref'] if 'ref' in request.args else None
-#     return current_app.extensions['firebase_auth'].login(referrer=referrer,
-#                                                          logo_uri=SK_LOGO_URI)
-#   else:
-#     user = in_apis.get_user(current_user.id)
-#     user.last_access_time = in_apis.get_datetime()
-#     user.ip_address = util.get_ip_addr()
-#     db.session.commit()
-#     if current_user.email_verified:
-#       if not current_user.organization_id:
-#         return redirect(url_for('management_blueprint.create'))
-#       else:
-#         if current_user.level == models.MOI:
-#           return redirect(url_for('moi_blueprint.route_default'))
-#         else:
-#           return redirect(url_for('dashboard_blueprint.default_route'))
-#     else:
-#       return redirect(url_for('base_blueprint.route_verified'))
-
-
 @blueprint.route('/sign-in', methods={'POST'})
 def sign_in():
   return current_app.extensions['firebase_auth'].sign_in()
@@ -99,8 +76,6 @@ def sign_in():
 def sign_out():
   logout_user()
   return redirect(url_for('login_blueprint.login'))
-  # TODO: using firebase
-  # return current_app.extensions['firebase_auth'].sign_out()
 
 
 @blueprint.route('/<template>')

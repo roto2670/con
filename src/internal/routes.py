@@ -15,6 +15,7 @@ import logging
 
 from flask import render_template, redirect, request  # noqa : pylint: disable=import-error
 
+import constants
 import in_config_apis
 import dashboard.count
 from internal import blueprint
@@ -51,7 +52,7 @@ def set_equip_count():
     data = json.loads(raw_data.decode('utf-8'))
     hid = data['hub_id']
     dist_data_list = data['value']
-    dashboard.count.set_equip_count('ac983bfaa401d89475a45952e0a642cf', hid,
+    dashboard.count.set_equip_count(constants.ORG_ID, hid,
                                     dist_data_list)
     return json.dumps(True)
   except:
