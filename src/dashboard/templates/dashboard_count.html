@@ -130,6 +130,7 @@
 
 {% block javascripts %}
   {{ super()}}
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.min.js"></script>
   <script>
     var isEmergency = "{{emergency|safe}}",
         freezeTimeMsg = "{{time_msg|safe}}",
@@ -186,10 +187,16 @@
             divEquip = document.getElementById("divEquip");
         divEquip.innerText = jsonData;
         setTotalCount();
-        setTimeout(getEquip, 1000 * {{ equip_interval }});
+        //setTimeout(getEquip, 1000 * {{ equip_interval }});
       });
     }
     getEquip();
+
+    function getEquip11(count) {
+      var divEquip = document.getElementById("divEquip");
+      divEquip.innerText = count;
+      setTotalCount();
+    }
 
     function getWorker() {
       jQuery.get("/dashboard/count/worker/counting/total").done(function(data){
@@ -197,10 +204,16 @@
             divWorker = document.getElementById("divWorker");
         divWorker.innerText = jsonData;
         setTotalCount();
-        setTimeout(getWorker, 1000 * {{ worker_interval }});
+        //setTimeout(getWorker, 1000 * {{ worker_interval }});
       });
     }
     getWorker();
+
+    function getWorker11(count) {
+      var divWorker = document.getElementById("divWorker");
+      divWorker.innerText = count;
+      setTotalCount();
+    }
 
     function setTotalCount() {
       var divCount = document.getElementById("divCount"),
@@ -270,6 +283,35 @@
     function resetAll() {
       window.location.href = "/dashboard/count/reset";
     }
+
+    $(document).ready(function(){
+      var sock = io.connect('http://127.0.0.1:5000/ws/count');
+      sock.on('connect', function(){
+        sock.send("connect");
+      });
+
+      sock.on('disconnect', function(msg){
+        sock.send("disconnect");
+      });
+
+      sock.on('msg', function(msg){
+        console.log('Received Message : ',msg);
+      });
+
+      sock.on('worker', function(msg){
+        console.log('Received RRRR Message :',msg);
+        getWorker11(msg);
+        console.log(new Date());
+      });
+
+      sock.on('equip', function(msg){
+        console.log('Received RRRR Message :',msg);
+        getEquip11(msg);
+        console.log(new Date());
+      });
+
+    });
+
   </script>
 {% endblock javascripts %}
 

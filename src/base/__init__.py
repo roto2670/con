@@ -12,6 +12,7 @@
 from flask import Blueprint  # noqa : pylint: disable=import-error
 from flask_login import LoginManager  # noqa : pylint: disable=import-error
 from flask_sqlalchemy import SQLAlchemy  # noqa : pylint: disable=import-error
+from flask_socketio import SocketIO
 
 from login import FirebaseAuth
 
@@ -26,3 +27,4 @@ blueprint = Blueprint(
 db = SQLAlchemy()
 auth = FirebaseAuth()
 login_manager = LoginManager()
+socket_io = SocketIO()

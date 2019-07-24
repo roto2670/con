@@ -26,8 +26,9 @@ import common
 import base.routes
 import dashboard.count
 import back_scheduler
-from base import db, auth, login_manager
+from base import db, auth, login_manager, socket_io
 from config import DebugConfig, ProductionConfig
+
 
 sys.dont_write_bytecode = True
 
@@ -115,7 +116,12 @@ def create_app():
   configure_login(app)
   back_scheduler.init()
   common.start()
+  conf_socket(app)
   return app
+
+
+def conf_socket(app):
+  socket_io.init_app(app)
 
 
 if not apis.IS_DEV:
@@ -129,7 +135,8 @@ if  __name__ == '__main__':
   if apis.IS_DEV:
     _app.debug = True
     CORS(_app)
-    _app.run(host='127.0.0.1', port=5000, use_reloader=False)
+    #_app.run(host='127.0.0.1', port=5000, use_reloader=False)
+    socket_io.run(_app, port=5000)
   else:
     cur_path = os.path.dirname(os.path.abspath(__file__))
     ssl_path = os.path.join(cur_path, 'ssl')

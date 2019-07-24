@@ -17,6 +17,7 @@ from flask import abort, render_template, request, redirect, url_for  # noqa : p
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import constants
+import local_apis
 import in_config_apis
 from util import RedisStore
 from third import suprema_apis
@@ -236,8 +237,8 @@ def detail_count():
                          date_msg=EMERGENCY[DATE_MSG_KEY])
 
 
-def _get_device_list(config, org_id):
-  resp = suprema_apis.get_device_list(config)
+def _get_device_list(org_id):
+  resp = local_apis.get_suprema_device_list()
   device_list = resp['DeviceCollection']['rows']
   DEVICE_LIST[org_id] = device_list
   DEVICE_LIST_TIME[org_id] = time.time()
@@ -282,11 +283,11 @@ def device_list():
   if suprema_config:
     if _org_id in DEVICE_LIST_TIME:
       if (time.time() - DEVICE_LIST_TIME[_org_id]) >= INTERVAL_TIME:
-        device_list = _get_device_list(suprema_config, _org_id)
+        device_list = _get_device_list(_org_id)
       else:
         device_list = DEVICE_LIST[_org_id]
     else:
-      device_list = _get_device_list(suprema_config, _org_id)
+      device_list = _get_device_list(_org_id)
   equip_kind_settings = get_equip_operator_count_settings()
   scanners = in_config_apis.get_count_device_setting(SCANNER_TYPE, constants.ORG_ID)
   for scanner in scanners:

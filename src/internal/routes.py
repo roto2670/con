@@ -54,7 +54,57 @@ def set_equip_count():
     dist_data_list = data['value']
     dashboard.count.set_equip_count(constants.ORG_ID, hid,
                                     dist_data_list)
+    at1_count = dashboard.count.get_equip_count(1)
+    at2_count = dashboard.count.get_equip_count(2)
+    total_count = at1_count + at2_count
+    emit('equip', total_count, namespace="/ws/count", broadcast=True)
+    emit('equip_at1', at1_count, namespace="/ws/count", broadcast=True)
+    emit('equip_at2', at2_count, namespace="/ws/count", broadcast=True)
     return json.dumps(True)
   except:
     logging.exception("Raise error while set equip count.")
     return json.dumps(False)
+
+
+from flask_socketio import emit
+from base import socket_io
+
+
+@blueprint.route('/set/worker_count', methods=["POST"])
+def set_worker_count():
+  try:
+    raw_data = request.get_data()
+    data = json.loads(raw_data.decode('utf-8'))
+    org_id = data['org_id']
+    _data = data['value']
+    dashboard.count.set_worker_count(constants.ORG_ID, _data['user_id']['user_id'],
+                                     _data['user_id']['name'], _data)
+    at1_count = dashboard.count.get_worker_count(1)
+    at2_count = dashboard.count.get_worker_count(2)
+    total_count = at1_count + at2_count
+    emit('worker', total_count, namespace="/ws/count", broadcast=True)
+    emit('worker_at1', total_count, namespace="/ws/count", broadcast=True)
+    emit('worker_at2', total_count, namespace="/ws/count", broadcast=True)
+    return json.dumps(True)
+  except:
+    logging.exception("Raise error while set worker count.")
+    return json.dumps(False)
+
+
+@socket_io.on('connect', namespace="/name")
+def connect():
+  print("connect")
+  logging.info("#### connect")
+
+
+
+@socket_io.on('disconnect', namespace="/name")
+def disconnect():
+  print("disconnect")
+  logging.info("#### disconnect")
+
+
+@socket_io.on('msg', namespace="/name")
+def msg(data):
+  print(data)
+  logging.info("#### msg : %s ", data)

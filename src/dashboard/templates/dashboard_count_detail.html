@@ -155,6 +155,7 @@
 
 {% block javascripts %}
   {{ super()}}
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.min.js"></script>
   <script>
     var isEmergency = "{{emergency|safe}}",
         freezeTimeMsg = "{{time_msg|safe}}",
@@ -226,8 +227,22 @@
         setTimeout(getAT2Equip, 1000 * {{ equip_interval }});
       });
     }
-    getAT1Equip();
-    getAT2Equip();
+    //getAT1Equip();
+    //getAT2Equip();
+    function getAT1Equip11(count) {
+      var divEquip = document.getElementById("divEquipAt1");
+      divEquip.innerText = count;
+      setTotalAT1();
+      setTotalEquip();
+      setTotalCount();
+    }
+    function getAT2Equip11(count) {
+      var divEquip = document.getElementById("divEquipAt2");
+      divEquip.innerText = count;
+      setTotalAT2();
+      setTotalEquip();
+      setTotalCount();
+    }
 
     function getAT1Worker() {
       // AT 1 key -> 1
@@ -253,8 +268,24 @@
         setTimeout(getAT2Worker, 1000 * {{ worker_interval }});
       });
     }
-    getAT1Worker();
-    getAT2Worker();
+    //getAT1Worker();
+    //getAT2Worker();
+    function getAT1Worker11(count) {
+      // AT 1 key -> 1
+      var divWorker = document.getElementById("divWorkerAt1");
+      divWorker.innerText = count;
+      setTotalAT1();
+      setTotalManPower();
+      setTotalCount();
+    }
+    function getAT2Worker11(count) {
+      // AT 2 key -> 2
+      var divWorker = document.getElementById("divWorkerAt2");
+      divWorker.innerText = count;
+      setTotalAT2();
+      setTotalManPower();
+      setTotalCount();
+    }
 
     function setTotalAT1() {
       var divCountAt1 = document.getElementById("divCountAt1"),
@@ -350,6 +381,46 @@
     function resetAll() {
       window.location.href = "/dashboard/count/reset";
     }
+
+    $(document).ready(function(){
+      var sock = io.connect('http://127.0.0.1:5000/ws/count');
+      sock.on('connect', function(){
+        sock.send("connect");
+      });
+
+      sock.on('disconnect', function(msg){
+        sock.send("disconnect");
+      });
+
+      sock.on('msg', function(msg){
+        console.log('Received Message : ',msg);
+      });
+
+      sock.on('worker_at1', function(msg){
+        console.log('Received RRRR Message :',msg);
+        getAT1Worker11(count);
+        console.log(new Date());
+      });
+      sock.on('worker_at2', function(msg){
+        console.log('Received RRRR Message :',msg);
+        getAT1Worker22(count);
+        console.log(new Date());
+      });
+
+      sock.on('equip_at1', function(msg){
+        console.log('Received RRRR Message :',msg);
+        getAT1Equip11(msg);
+        console.log(new Date());
+      });
+
+      sock.on('equip_at2', function(msg){
+        console.log('Received RRRR Message :',msg);
+        getAT2Equip11(msg);
+        console.log(new Date());
+      });
+
+    });
+
   </script>
 {% endblock javascripts %}
 
