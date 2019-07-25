@@ -22,9 +22,10 @@ SCHED = BackgroundScheduler()
 
 
 def init():
-  worker_config_list = get_all_woreker_config()
-  worker_count_init(worker_config_list)
+  # worker_config_list = get_all_woreker_config()
+  # worker_count_init(worker_config_list)
   # SCHED.start()
+  pass
 
 
 def worker_count_init(worker_config_list):
