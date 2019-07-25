@@ -145,3 +145,13 @@ def update_ipcam_information(ipcam_id, name, moi):
     logging.exception("Raise error while update ipcam information. Body : %s",
                       body)
     return None
+
+
+def get_suprema_device_list():
+  try:
+    url = "{}/device_list".format(constants.SUPREMA_ADDR)
+    resp = requests.get(url)
+    return resp.json()
+  except:
+    logging.exception("Failed to get device list.")
+    return {}
