@@ -25,7 +25,6 @@ import worker
 import in_apis
 import in_config_apis
 import models
-import mail
 import util
 import base.routes
 from base import db
@@ -343,76 +342,6 @@ def delete_noti_key(noti_key_id):
   else:
     logging.warning("Failed to delete noti key.")
     return redirect('/management/organization/notification')
-
-
-def send_invite():
-  email_addr = request.form['email']
-  _user = in_apis.get_user_by_email(email_addr, current_user.organization_id)
-  if not _user:
-    with open(util.get_mail_form_path('invite.html'), 'r') as _f:
-      content = _f.read()
-    key = uuid.uuid4().hex
-    auth_url = request.host_url + 'management/organization/confirm?key=' + key + \
-        '&o=' + current_user.organization_id
-    org = in_apis.get_organization(current_user.organization_id)
-    title = common.get_msg("organization.member.mail_title")
-    title = title.format(org.original_name)
-    msg = common.get_msg("organization.member.mail_message")
-    msg = msg.format(org.original_name, org.original_name)
-    content = content.format(auth_url=auth_url, title=title, msg=msg)
-    try:
-      mail.send(email_addr, title, content)
-      _invite = in_apis.get_invite_by_member(email_addr,
-                                             current_user.organization_id)
-      if _invite:
-        _t = in_apis.get_datetime() - _invite.invited_time
-        if _t.seconds >= 86400:
-          in_apis.update_invite_by_key(key, _invite)
-      else:
-        in_apis.create_invite(email_addr, key, current_user.email,
-                              current_user.organization_id)
-    except:
-      logging.exception("Raise error. to : %s, sender : %s, org : %s",
-                        email_addr, current_user.email, org.original_name)
-      abort(500)
-  return redirect('/management/organization/member')
-
-
-def confirm_mail():
-  key = request.args['key']
-  organization_id = request.args['o']
-  invite = in_apis.get_invite(key, organization_id)
-  if invite:
-    in_apis.update_invite(key, organization_id)
-    if current_user.is_anonymous:
-      return redirect(url_for('login_blueprint.login'))
-    else:
-      if invite.email == current_user.email:
-        user = in_apis.get_user(current_user.id)
-        user.organization_id = organization_id
-        org = in_apis.get_organization(organization_id)
-        users = json.loads(org.users)
-        users.append(user.email)
-        org.users = json.dumps(users)
-        db.session.commit()
-        return redirect(url_for('home_blueprint.index'))
-      else:
-        base.routes.logout()
-        return redirect(url_for('login_blueprint.login'))
-  else:
-    logging.warning("Fail to confirm to mail. key : %s, org : %s",
-                    key, organization_id)
-    abort(400)
-
-
-def delete_invite(invite_id):
-  try:
-    in_apis.delete_invite(invite_id)
-    return redirect('/management/organization/member')
-  except:
-    logging.exception("Raise error while delete invite. Id : %s, user : %s",
-                      invite_id, current_user.email)
-    abort(500)
 
 
 def delete_organization():

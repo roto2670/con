@@ -22,7 +22,6 @@ from sqlalchemy.orm.session import make_transient  # noqa : pylint: disable=impo
 from sqlalchemy import desc
 
 import apis
-import mail
 import util
 import models
 import constants
@@ -960,9 +959,6 @@ def pre_release(product_id, model_id_list):
       _info.product_stage_id = new_pre_release_id
     db.session.commit()
     remove_product_stage(_pre_release.id)
-    for model_name, firmware_version in send_mail_info_dict.items():
-      mail.send_about_test_user(product_id, model_name, firmware_version,
-                                models.TESTER_PRE_RELEASE)
     return True
   else:
     return False

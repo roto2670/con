@@ -23,7 +23,6 @@ from flask import render_template, redirect, request, url_for  # noqa : pylint: 
 from flask_login import current_user, login_user, logout_user  # noqa : pylint: disable=import-error
 
 import apis
-import mail
 import util
 import common
 import models
@@ -39,13 +38,6 @@ from models import _Permission as Permission
 
 @blueprint.route('/')
 def route_default():
-  # user = "Guest" if current_user.is_anonymous else current_user.email
-  # ip_addr = util.get_ip_addr()
-  # referrer = request.referrer if request.referrer else "Direct"
-  # user_agent = str(request.user_agent)
-  # accept_language = str(request.accept_languages)
-  # in_apis.create_referrer_info(user, ip_addr, referrer, user_agent,
-  #                              accept_language)
   return redirect(url_for('login_blueprint.login'))
 
 
@@ -55,11 +47,6 @@ def route_robots():
   return send_from_directory(path, 'robots.txt')
 
 
-@blueprint.route('/doc')
-def route_doc():
-  return render_template('doc.html')
-
-
 @blueprint.route('/verified')
 def route_verified():
   if current_user.is_anonymous:
@@ -67,20 +54,7 @@ def route_verified():
   elif current_user.email_verified:
     return redirect(url_for('login_blueprint.login'))
   else:
-    #send_verified_email()
     return render_template('confirm_wait.html', user_email=current_user.email)
-
-
-@blueprint.route('/verified/send')
-def send_verified_email():
-  has_email = in_apis.has_email(current_user.email)
-  if has_email:
-    in_apis.remove_email_auth(has_email.id)
-  key = uuid.uuid4().hex
-  auth_url = request.host_url + 'verified/confirm?key=' + key
-  mail.send_about_verified(current_user.email, auth_url)
-  in_apis.create_email_auth(current_user.email, key, current_user.id)
-  logging.info("Send verified email. Email : %s", current_user.email)
 
 
 def _is_confirm(email_auth):

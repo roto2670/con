@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2020 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -16,16 +16,13 @@ import logging.handlers
 from datetime import timedelta
 from importlib import import_module
 
-
 from flask import Flask  # noqa : pylint: disable=import-error
 from flask import session
-# from flask_cors import CORS
 
 import apis
 import common
 import base.routes
 import dashboard.count
-import back_scheduler
 from base import db, auth, login_manager, socket_io
 from config import DebugConfig, ProductionConfig
 
@@ -114,7 +111,6 @@ def create_app():
   configure_database(app)
   dashboard.count.init()
   configure_login(app)
-  back_scheduler.init()
   common.start()
   conf_socket(app)
   return app

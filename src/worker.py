@@ -101,28 +101,6 @@ def get_hex_to_json(file_path):
     logging.exception("Raise error while convert firmware.")
 
 
-SG_API_KEY = 'SG.Iit8M_G8R9GBiRBknKi7fw.'\
-          '-qGUCtHKXjZplV89FHYScAVG9u5crHlsCIopTQxg5aM'
-
-
-@worker.task()
-def _send_mail(request_body):
-  sendgrid_client = sendgrid.SendGridAPIClient(apikey=SG_API_KEY)
-  _resp = sendgrid_client.client.mail.send.post(request_body=request_body)
-  logging.debug("code : %s, header : %s, body : %s", _resp.status_code,
-                _resp.headers, _resp.body)
-  logging.debug("resp : %s", _resp)
-  logging.debug("resp : %s", dir(_resp))
-  resp = {}
-  return json.dumps(resp)
-
-
-def send_mail(request_body):
-  ret = _send_mail.delay(request_body)
-  resp = ret.get()
-  return json.loads(resp)
-
-
 # TIMEZONE
 IPINFO_URL = '''https://ipinfo.io/{ip}?token=e7239ad4a056a0'''
 

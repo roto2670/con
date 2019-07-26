@@ -122,23 +122,6 @@ def delete_noti_key(noti_key_id):
   return organization.delete_noti_key(noti_key_id)
 
 
-@blueprint.route('/organization/invite', methods=['POST'])
-@util.require_login
-def send_invite():
-  return organization.send_invite()
-
-
-@blueprint.route('/organization/confirm', methods=['GET'])
-def confirm_mail():
-  return organization.confirm_mail()
-
-
-@blueprint.route('/organization/invite/delete/<invite_id>')
-@util.require_login
-def delete_invite(invite_id):
-  return organization.delete_invite(invite_id)
-
-
 @blueprint.route('/organization/delete', methods=['POST'])
 @util.require_login
 def delete_organization():

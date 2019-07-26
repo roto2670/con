@@ -23,7 +23,6 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import apis
 import util
-import mail
 import common
 import models
 import worker
@@ -245,39 +244,7 @@ def tester(product_id):
                            invite_list=invite_list)
   else:
     # TODO: Send email
-    tester_email = request.form['newTesterEmail']
-    _tester = in_apis.get_tester_by_email(tester_email, product_id)
-    if not _tester:
-      _send_invite(tester_email, product_id)
     return redirect('/products/' + product_id + '/tester')
-
-
-def _send_invite(email_addr, product_id):
-  with open(util.get_mail_form_path('tester_invite.html'), 'r') as _f:
-    content = _f.read()
-  key = uuid.uuid4().hex
-  auth_url = request.host_url + 'products/confirm?key=' + key + '&o=' +\
-      current_user.organization_id
-  _product = in_apis.get_product(product_id)
-  title = common.get_msg("products.tester.mail_title")
-  title = title.format(_product.name)
-  msg = common.get_msg("products.tester.mail_message")
-  msg = msg.format(_product.name)
-  content = content.format(auth_url=auth_url, title=title, msg=msg)
-  try:
-    mail.send(email_addr, title, content)
-    _invite = in_apis.get_invite_by_product_id(product_id, email_addr,
-                                               current_user.organization_id)
-    if _invite:
-      _t = in_apis.get_datetime() - _invite.invited_time
-      if _t.seconds >= 86400:
-        in_apis.update_invite_by_key(key, _invite)
-    else:
-      in_apis.create_invite(email_addr, key, current_user.email,
-                            current_user.organization_id, level=models.TESTER,
-                            product_id=product_id)
-  except:
-    logging.exception("Raise error")
 
 
 @blueprint.route('/<product_id>/product_import', methods=['GET', 'POST'])
@@ -330,7 +297,6 @@ def product_send_invite(email, product_id, model_id):
   content = content.format(auth_url=auth_url, title=title, msg=msg)
   target_organization_id = in_apis.get_user_by_email_only(email).organization_id
   try:
-    mail.send(email, title, content)
     in_apis.create_fork_product(_product, email, model_id,
                                 current_user.email, key, target_organization_id)
   except:
@@ -614,8 +580,6 @@ def upload_firmware(product_id, model_id):
         if _ret:
           in_apis.update_stage_info_by_dev_about_firmware(product_id, model_id,
                                                           _firmware.id)
-          mail.send_about_test_user(product_id, _model.name, firmware_version,
-                                    models.TESTER_DEV)
           return redirect('/products/' + product_id + '/model/' + model_id)
         else:
           logging.warning("Failed to update stage while upload firmware.")
