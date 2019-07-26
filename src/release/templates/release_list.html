@@ -176,7 +176,7 @@
                                   <td>{{ release_stage.hook_url }}</td>
                                   <td>{{ release_stage.hook_client_key }}</td>
                                   <td>{{ release_stage.last_updated_user }}</td>
-                                  <td>{{ release_stage.last_updated_time | datetimeFilter }}</td>
+                                  <td>{{ release_stage.last_updated_time }}</td>
                                 </tr>
                               {% endfor %}
                             {% endif %}
@@ -229,7 +229,7 @@
                                   <td>{{ pre_stage.hook_url }}</td>
                                   <td>{{ pre_stage.hook_client_key }}</td>
                                   <td>{{ pre_stage.last_updated_user }}</td>
-                                  <td>{{ pre_stage.last_updated_time | datetimeFilter }}</td>
+                                  <td>{{ pre_stage.last_updated_time }}</td>
                                 </tr>
                               {% endfor %}
                             {% endif %}
@@ -317,7 +317,7 @@
                                   <td>{{ dev_stage.hook_url }}</td>
                                   <td>{{ dev_stage.hook_client_key }}</td>
                                   <td>{{ dev_stage.last_updated_user }}</td>
-                                  <td>{{ dev_stage.last_updated_time | datetimeFilter }}</td>
+                                  <td>{{ dev_stage.last_updated_time }}</td>
                                 </tr>
                               {% endfor %}
                             {% endif %}
@@ -392,7 +392,7 @@
                                   <td>{{ history.hook_url }}</td>
                                   <td>{{ history.hook_client_key }}</td>
                                   <td>{{ history.last_updated_user }}</td>
-                                  <td>{{ history.last_updated_time | datetimeFilter }}</td>
+                                  <td>{{ history.last_updated_time }}</td>
                                 </tr>
                               {% endfor %}
                             </tbody>

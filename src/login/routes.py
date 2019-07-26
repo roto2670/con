@@ -57,7 +57,9 @@ def sign_in_progress():
   if user and user.password and checkpw(password.encode('utf-8'), user.password):
     user.last_access_time = in_apis.get_datetime()
     user.ip_address = util.get_ip_addr()
+    print("hi")
     login_user(user)
+    print("hi1")
     if user.level == models.MOI:
       return redirect(url_for('moi_blueprint.route_default'))
     else:

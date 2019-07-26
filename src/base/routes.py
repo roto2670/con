@@ -251,50 +251,6 @@ def about_product():
 ## Jinja template
 
 
-CUR_TIMEZONE = {}  # {user_id : {'code': code, 'tz': timezone, 'last_access': timestamp}}
-
-
-def set_timezone(ip_addr):
-  if ip_addr != "127.0.0.1":
-    ipinfo = worker.get_timezone(ip_addr)
-    if 'country' in ipinfo:
-      country_code = ipinfo['country']
-      _tz = pytz.country_timezones[country_code]
-      if _tz:
-        CUR_TIMEZONE[current_user.id] = {'tz': _tz[0], 'code': country_code,
-                                         'last_access' : time.time()}
-        logging.info("%s user set timezone : %s", current_user.email, _tz)
-
-
-def get_timezone():
-  if current_user.id not in CUR_TIMEZONE:
-    set_timezone(util.get_ip_addr())
-  elif (time.time() - CUR_TIMEZONE[current_user.id]['last_access']) > 7200:
-    set_timezone(util.get_ip_addr())
-  if current_user.id in CUR_TIMEZONE and 'tz' in CUR_TIMEZONE[current_user.id]:
-    return CUR_TIMEZONE[current_user.id]['tz']
-  else:
-    return 'UTC'
-
-
-def datetime_filter(value):
-  tz_info = get_timezone()
-  _value = pytz.timezone(tz_info).localize(value)
-  _timestamp = time.mktime(_value.timetuple())
-  _timestamp += _value.utcoffset().seconds
-  _new_time = datetime.datetime.fromtimestamp(_timestamp)
-  return _new_time
-
-
-def timestamp_filter(value):
-  tz_info = get_timezone()
-  _value = pytz.timezone(tz_info).localize(datetime.datetime.utcfromtimestamp(value))
-  _timestamp = int(value)
-  _timestamp += _value.utcoffset().seconds
-  _new_time = datetime.datetime.fromtimestamp(_timestamp)
-  return _new_time
-
-
 COUNTRY_CODES = {}  # {"code": "name", ..}
 
 def get_country_name(code):

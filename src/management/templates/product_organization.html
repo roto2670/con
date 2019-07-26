@@ -31,13 +31,13 @@
                     <td>
                       <a>{{ product.name }}</a>
                       <br />
-                      <small>Created {{ product.created_time | datetimeFilter }}</small>
+                      <small>Created {{ product.created_time }}</small>
                     </td>
                     <td>
                       <a>{{ product.id }}</a>
                     </td>
                     <td>
-                      <a>{{ product.last_updated_time | datetimeFilter }}</a>
+                      <a>{{ product.last_updated_time }}</a>
                     </td>
                     <td>
                       <a href="/home/{{ product.id }}" class="btn btn-primary btn-xs"><i class="fa fa-folder"></i> View </a>

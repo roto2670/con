@@ -52,7 +52,7 @@
                       {{ permit.model.product.code }} {{ permit.model.name }}<br>
                     {% endfor%}
                   </td>
-                  <td>{{ noti_key.last_updated_time|datetimeFilter }}</td>
+                  <td>{{ noti_key.last_updated_time }}</td>
                   <td>{{ noti_key.last_updated_user }}</td>
                   <td>
                     <a href="/management/organization/notikey/update/{{ noti_key.id }}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Edit </a>

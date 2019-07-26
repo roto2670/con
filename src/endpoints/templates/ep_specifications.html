@@ -55,7 +55,7 @@
                           {{ specification.version }}
                         </td>
                         <td>{{ specification.last_updated_user }}</td>
-                        <td>{{ specification.last_updated_time | datetimeFilter }}</td>
+                        <td>{{ specification.last_updated_time }}</td>
                         <td>
                           <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target=".sp-modal-{{ specification.id }}"><i class="fa fa-file-text-o"></i> View </button>
                           <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target=".header-modal-{{ specification.id }}"><i class="fa fa-cloud-download"></i> Header </button>

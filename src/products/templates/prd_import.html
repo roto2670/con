@@ -103,10 +103,10 @@
                     <tr>
                       <td>{{ fork_info.target_email }}</td>
                       <td>{{ org_dict[fork_info.target_organization] }}</td>
-                      <td>{{ fork_info.created_time | datetimeFilter }}</td>
+                      <td>{{ fork_info.created_time }}</td>
                       {% if fork_info.accepted_time %}
                         <td>{{ fork_info.accepted_user }}</td>
-                        <td>{{ fork_info.accepted_time | datetimeFilter}}</td>
+                        <td>{{ fork_info.accepted_time }}</td>
                       {% else %}
                         <td></td>
                         <td></td>
