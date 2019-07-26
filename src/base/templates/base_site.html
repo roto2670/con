@@ -70,20 +70,6 @@
           }
         </script>
       {% endif %}
-      {% if onboarding_msg %}
-        <script>
-          onload = function() {
-            new PNotify({
-              title: '{{ onboarding_msg.title }}',
-              text: '{{ onboarding_msg.msg }}',
-              type: 'info',
-              hide: true,
-              icon: false,
-              styling: 'bootstrap3'
-          });
-          }
-        </script>
-      {% endif %}
     {% endif %}
 
     {% block body %}

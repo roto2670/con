@@ -158,7 +158,7 @@
   <!--
   <script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.min.js"></script>
   -->
-  <script src="{{ url_for('static', filename='vendors/socketio/socket.io.m.njs') }}"></script>
+  <script src="{{ url_for('static', filename='vendors/socketio/socket.io.min.js') }}"></script>
   <script>
     var isEmergency = "{{emergency|safe}}",
         freezeTimeMsg = "{{time_msg|safe}}",
@@ -216,7 +216,7 @@
         setTotalAT1();
         setTotalEquip();
         setTotalCount();
-        setTimeout(getAT1Equip, 1000 * {{ equip_interval }});
+        //setTimeout(getAT1Equip, 1000 * {{ equip_interval }});
       });
     }
     function getAT2Equip() {
@@ -227,11 +227,11 @@
         setTotalAT2();
         setTotalEquip();
         setTotalCount();
-        setTimeout(getAT2Equip, 1000 * {{ equip_interval }});
+        //setTimeout(getAT2Equip, 1000 * {{ equip_interval }});
       });
     }
-    //getAT1Equip();
-    //getAT2Equip();
+    getAT1Equip();
+    getAT2Equip();
     function getAT1Equip11(count) {
       var divEquip = document.getElementById("divEquipAt1");
       divEquip.innerText = count;
@@ -256,7 +256,7 @@
         setTotalAT1();
         setTotalManPower();
         setTotalCount();
-        setTimeout(getAT1Worker, 1000 * {{ worker_interval }});
+        //setTimeout(getAT1Worker, 1000 * {{ worker_interval }});
       });
     }
     function getAT2Worker() {
@@ -268,11 +268,11 @@
         setTotalAT2();
         setTotalManPower();
         setTotalCount();
-        setTimeout(getAT2Worker, 1000 * {{ worker_interval }});
+        //setTimeout(getAT2Worker, 1000 * {{ worker_interval }});
       });
     }
-    //getAT1Worker();
-    //getAT2Worker();
+    getAT1Worker();
+    getAT2Worker();
     function getAT1Worker11(count) {
       // AT 1 key -> 1
       var divWorker = document.getElementById("divWorkerAt1");

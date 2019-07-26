@@ -27,7 +27,6 @@ import in_config_apis
 import models
 import mail
 import util
-import onboarding
 import base.routes
 from base import db
 
@@ -180,7 +179,6 @@ def create():
           "message": common.get_msg("organization.create.organization.modal_message"),
           "ok": common.get_msg("organization.create.organization.modal_ok")
       }
-      onboarding.clear_session()
       return render_template("create_organization.html", modal=modal)
   else:
     name = request.form['name']

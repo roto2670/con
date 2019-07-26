@@ -1,4 +1,4 @@
-# MicroBot Console
+# SmartSystem
 
 ## Requirment
     upper Python3.7
@@ -38,6 +38,7 @@
 
 # Using gunicorn
     gunicorn -w 3 --certfile ssl/mib_io.crt --keyfile ssl/mib_io.key -b 127.0.0.1:5000 run:__app
+    gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 run:__app
 
 
 # Using MySQL for Google Cloud SQL
@@ -54,32 +55,4 @@
     nohup celery -A worker.worker worker --loglevel=debug
 
 
-# Structure![](res/cs_struct_180906.png)
-
-
 # DataBase![](res/cs_db190605.png)
-
-
-# Reference
-
-#### https://github.com/afourmy/flask-gentelella
-#### https://github.com/klokantech/flask-firebase
-#### https://cloud.google.com/sql/docs/mysql/connect-external-app#python
-#### https://github.com/GoogleCloudPlatform/getting-started-python/blob/504b3d550b551502cfe96f32542c31b232135eff/2-structured-data/config.py
-#### https://flask-monitoringdashboard.readthedocs.io/en/master/index.html
-
-
-# WordCloud
-
-#### https://github.com/d3/d3
-#### https://github.com/jasondavies/d3-cloud
-#### https://github.com/wvengen/d3-wordcloud
-
-
-# Console Document
-
-#### Storyboard [Link](https://ovenapp.io/view/p6S16zsgDcDSXPj6ZdUVxql7ElvMV2Bn/bhthA)
-
-#### Message [Link](https://docs.google.com/spreadsheets/d/1mGpmTbqgb7dihBFkI8bSTq0tT2QMWC1soVBa4q-7Bbg/edit#gid=1738330008)
-
-#### Message Slide [Link](https://docs.google.com/presentation/d/175Wa5WUp-VasoTu4giINSe1Enr81K-WYP81R6c4OWc4/edit#slide=id.p)

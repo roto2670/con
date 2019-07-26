@@ -23,7 +23,6 @@ import builder
 import in_apis
 import models
 import validate
-import onboarding
 import base.routes
 from endpoints import blueprint
 
@@ -186,7 +185,6 @@ def download_header_file(product_id, specification_id, model_id):
     # TODO: Handle build number when upper 255
     h_builder = builder.MibEndpoints.build(json.loads(content.specifications))
     _header = h_builder.to_lib_body(model.code, build_number)
-    onboarding.set_header_file()
     return Response(_header, mimetype='text/x-c',
                     headers={'Content-Disposition':'attachment;filename=gadget.h'})
   except:
@@ -199,7 +197,6 @@ def download_header_file(product_id, specification_id, model_id):
 @util.require_login
 def test_call(product_id, gadget, endpoint_name, version):
   logging.info("Test call. %s", endpoint_name)
-  onboarding.set_test()
   _product = in_apis.get_product(product_id)
   _specifications = in_apis.get_specifications_by_version(product_id, version)
   specification = json.loads(_specifications.specifications)

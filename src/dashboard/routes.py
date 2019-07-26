@@ -356,7 +356,8 @@ def set_suprema_settings():
                                            _org_id)
       logging.info("Update Suprema Config. User : %s, base url : %s",
                    current_user.email, _url)
-      back_scheduler.scheduler_main_worker(_org_id, _server_interval, True)
+      # TODO:
+      #back_scheduler.scheduler_main_worker(_org_id, _server_interval, True)
     else:
       in_config_apis.create_suprema_config(_url, _id, _pw, _event_id,
                                            _client_interval, _server_interval,
@@ -364,7 +365,8 @@ def set_suprema_settings():
       suprema_apis.set_last_id_cache(_org_id, 0)
       logging.info("Create Suprema Config. User : %s, base url : %s",
                    current_user.email, _url)
-      back_scheduler.scheduler_main_worker(_org_id, _server_interval)
+      # TODO:
+      #back_scheduler.scheduler_main_worker(_org_id, _server_interval)
     suprema_apis.set_id_pw(_org_id, _id, _pw)
     return redirect("/dashboard/settings")
   else:

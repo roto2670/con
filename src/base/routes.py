@@ -233,7 +233,7 @@ def internal_error(error):
 
 ## context processor
 
-import onboarding
+
 CUR_PRODUCT = {}  # {user_id : CUR_PRODUCT}
 
 

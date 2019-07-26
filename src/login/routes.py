@@ -58,7 +58,10 @@ def sign_in_progress():
     user.last_access_time = in_apis.get_datetime()
     user.ip_address = util.get_ip_addr()
     login_user(user)
-    return redirect(url_for('base_blueprint.route_default'))
+    if user.level == models.MOI:
+      return redirect(url_for('moi_blueprint.route_default'))
+    else:
+      return redirect(url_for('dashboard_blueprint.default_route'))
   # TODO:
   # elif user:
   #   login_user(user)

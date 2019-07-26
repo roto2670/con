@@ -88,11 +88,13 @@ def scanner_list_route():
           new_list.append(scanner)
       return render_template("scanner_list.html", scanner_list=new_list,
                             selected_onoff=selected_onoff,
-                            selected_location=selected_location)
+                            selected_location=selected_location,
+                            location=count.SCANNER_LOCATION)
     else:
       return render_template("scanner_list.html", scanner_list=scanner_list,
                             selected_onoff=selected_onoff,
-                            selected_location=selected_location)
+                            selected_location=selected_location,
+                            location=count.SCANNER_LOCATION)
 
 
 @blueprint.route('/scanner/<hid>/update', methods=['GET', 'POST'])
