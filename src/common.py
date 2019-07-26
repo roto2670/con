@@ -29,13 +29,6 @@ def _get_info_message():
   return info_message
 
 
-def _get_onboarding_message():
-  onboarding_message = session.get('onboarding_message', {})
-  if onboarding_message:
-    del session['onboarding_message']
-  return onboarding_message
-
-
 def set_error_message(title, message):
   session['error_message'] = {"title": title, "msg": message}
 
@@ -44,13 +37,8 @@ def set_info_message(title, message):
   session['info_message'] = {"title": title, "msg": message}
 
 
-def set_onboarding_message(title, message):
-  session['onboarding_message'] = {"title": title, "msg": message}
-
-
 def get_message():
-  return dict(error_msg=_get_error_message(), info_msg=_get_info_message(),
-              onboarding_msg=_get_onboarding_message())
+  return dict(error_msg=_get_error_message(), info_msg=_get_info_message())
 
 
 FILE_NAME = "message.{}"

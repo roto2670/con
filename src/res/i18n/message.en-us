@@ -98,39 +98,5 @@
           "notNotiKey_title": "Need to register notification key",
           "notNotiKey_message": "Please register the Notification key and try again."
       }
-  },
-  "onboarding": {
-      "model": {
-          "title": "Model",
-          "msg": "You need to create model. Product > Model > Create"
-      },
-      "download_file": {
-          "title": "Download",
-          "msg": "Please download example file. Product > Model > Example"
-      },
-      "ep": {
-          "title": "Specfication",
-          "msg": "Please upload specification of json. Endpoints > Specifications > Upload"
-      },
-      "header": {
-          "title": "Header File",
-          "msg": "Please Download header file. Endpoints > Specifications > Header"
-      },
-      "firmware": {
-          "title": "Firmware",
-          "msg": "Please Upload Binary file of Firmware. Product > Model > Firmware > Register"
-      },
-      "tester": {
-          "title": "Tester",
-          "msg": "Please invite Tester. Product > Tester > Send Invite"
-      },
-      "test": {
-          "title": "Test",
-          "msg": "Please Test. Endpoints > Tests"
-      },
-      "release": {
-          "title": "Release",
-          "msg": "Please Release your product. Release > Release"
-      }
   }
 }

@@ -19,7 +19,7 @@ from importlib import import_module
 
 from flask import Flask  # noqa : pylint: disable=import-error
 from flask import session
-from flask_cors import CORS
+# from flask_cors import CORS
 
 import apis
 import common
@@ -128,13 +128,18 @@ if not apis.IS_DEV:
   # gunicorn
   __app = create_app()
   __app.debug = False
+  socket_io.run(__app, port=5000)
+else:
+  __app = create_app()
+  __app.debug = False
+  socket_io.run(__app, port=5000)
 
 
 if  __name__ == '__main__':
   _app = create_app()
   if apis.IS_DEV:
     _app.debug = True
-    CORS(_app)
+    # CORS(_app)
     #_app.run(host='127.0.0.1', port=5000, use_reloader=False)
     socket_io.run(_app, port=5000)
   else:
