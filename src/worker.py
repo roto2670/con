@@ -25,7 +25,7 @@ from celery import Celery  # noqa : pylint: disable=import-error
 
 def init():
   _worker = Celery('worker', backend='amqp',
-                   broker='pyamqp://naran:skfkszhsthf1@localhost:5672/')
+                   broker='pyamqp://mporject:mproject@localhost:5672/')
   return _worker
 
 
