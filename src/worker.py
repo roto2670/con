@@ -99,28 +99,3 @@ def get_hex_to_json(file_path):
       return ret_json
   except Exception:
     logging.exception("Raise error while convert firmware.")
-
-
-# TIMEZONE
-IPINFO_URL = '''https://ipinfo.io/{ip}?token=e7239ad4a056a0'''
-
-
-@worker.task()
-def _get_timezone(ip_addr):
-  """
-'{\n  "ip": "157.49.215.57",\n  "city": "Bengaluru",\n
- "region": "Karnataka",\n  "country": "IN",\n  "loc": "12.9833,77.5833",\n
-  "postal": "560001",\n  "org": "AS55836 Reliance Jio Infocomm Limited"\n}'
-  """
-  url = IPINFO_URL.format(ip=ip_addr)
-  resp = requests.get(url)
-  if resp.ok:
-    return resp.text
-  else:
-    return json.dumps({})
-
-
-def get_timezone(ip_addr):
-  ret = _get_timezone.delay(ip_addr)
-  resp = ret.get()
-  return json.loads(resp)

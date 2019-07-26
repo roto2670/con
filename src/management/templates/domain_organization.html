@@ -38,10 +38,10 @@
                 <tr>
                   <td>{{ domain.domain }}</td>
                   <td>{{ domain.request_user }}</td>
-                  <td>{{ domain.created_time | datetimeFilter }}</td>
+                  <td>{{ domain.created_time }}</td>
                   <td>{{ domain.accepted }}</td>
                   {% if domain.accepted %}
-                    <td>{{ domain.accepted_time | datetimeFilter }}</td>
+                    <td>{{ domain.accepted_time }}</td>
                   {% else %}
                     <td></td>
                   {% endif %}

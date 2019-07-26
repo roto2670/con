@@ -70,7 +70,7 @@
                         <td>{{ user_level[user.level] }}</td>
                       {% endif %}
                     {% endif %}
-                    <td>{{ user.last_access_time | datetimeFilter }}</td>
+                    <td>{{ user.last_access_time }}</td>
                     {% if user.level == 0 %}
                       <td></td>
                     {% else %}

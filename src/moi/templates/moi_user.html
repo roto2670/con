@@ -34,7 +34,7 @@
                   <tr>
                     <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.last_access_time | datetimeFilter }}</td>
+                    <td>{{ user.last_access_time }}</td>
                 {% endfor %}
               </tbody>
             </table>

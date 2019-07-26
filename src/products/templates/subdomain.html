@@ -37,9 +37,9 @@
                     <tr>
                       <td>{{ sub_domain.subname }}</td>
                       <td>{{ sub_domain.domain_name }}</td>
-                      <td>{{ sub_domain.created_time | datetimeFilter }}</td>
+                      <td>{{ sub_domain.created_time }}</td>
                       {% if sub_domain.accepted_time %}
-                        <td>{{ sub_domain.accepted_time | datetimeFilter}}</td>
+                        <td>{{ sub_domain.accepted_time }}</td>
                         <td>{{ sub_domain.accepted_user }}</td>
                       {% else %}
                         <td></td>
