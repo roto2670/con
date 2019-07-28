@@ -38,6 +38,12 @@ def route_dashboard_location():
   return render_template("moi_location.html")
 
 
+@blueprint.route('/cctv')
+@util.require_login
+def route_dashboard_location():
+  return render_template("moi_cctv.html")
+
+
 @blueprint.route('/user')
 @util.require_login
 def route_user_control():
