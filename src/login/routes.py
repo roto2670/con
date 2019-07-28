@@ -59,8 +59,10 @@ def sign_in_progress():
     user.ip_address = util.get_ip_addr()
     login_user(user)
     if user.level == models.MOI:
+      logging.info("MOI User login. User : %s", user)
       return redirect('/moi')
     else:
+      logging.info("SmartSystem User login. User : %s", user)
       return redirect('/dashboard')
   # TODO:
   # elif user:

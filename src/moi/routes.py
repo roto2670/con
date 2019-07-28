@@ -40,7 +40,7 @@ def route_dashboard_location():
 
 @blueprint.route('/cctv')
 @util.require_login
-def route_dashboard_location():
+def route_dashboard_cctv():
   return render_template("moi_cctv.html")
 
 
