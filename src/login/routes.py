@@ -9,6 +9,7 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import logging
 
 from bcrypt import checkpw
 from flask import current_app, redirect, render_template, request, url_for  # noqa : pylint: disable=import-error
