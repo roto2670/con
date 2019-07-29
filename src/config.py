@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2020 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -34,8 +34,6 @@ class Config(object):
     LOG_PATH = os.path.join(os.path.expanduser('~'), 'log', 'console.log')
   LOG_BACKUP_COUNT = 20
   LOG_MAX_BYTES = 10485760
-  CELERY_BACKEND = 'rpc://'
-  CELERY_BROKER = 'pyamqp://naran:skfkszhsthf1@localhost:5672/'
   TOKEN = 'console-admin'
 
 

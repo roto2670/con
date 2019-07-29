@@ -20,7 +20,6 @@ import constants
 import local_apis
 import in_config_apis
 from util import RedisStore
-from third import suprema_apis
 from config_models import FACE_STATION_TYPE
 from config_models import SCANNER_TYPE
 
@@ -31,6 +30,7 @@ BEACONS_REDIS_DB = 1
 WORKER_REDIS_DB = 2
 EXPIRE_REDIS_DB = 3
 DATA_INFO_EXPIRE_REDIS_DB = 4
+STREAMING_REDIS_DB = 5  # Using API Server
 
 # AT1 : 1 , AT2: 2
 BEACONS_COUNT = RedisStore(REDIS_HOST, REDIS_PORT, BEACONS_REDIS_DB)

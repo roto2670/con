@@ -20,16 +20,6 @@ import requests
 import sendgrid  # noqa : pylint: disable=import-error
 from OpenSSL import crypto  # noqa : pylint: disable=import-error
 from intelhex import IntelHex  # noqa : pylint: disable=import-error
-from celery import Celery  # noqa : pylint: disable=import-error
-
-
-def init():
-  _worker = Celery('worker', backend='amqp',
-                   broker='pyamqp://mporject:mproject@localhost:5672/')
-  return _worker
-
-
-worker = init()
 
 
 def _generate_private_key(p12, key_path):
@@ -67,19 +57,17 @@ def _generate_noti_key(file_path, password):
   return cert.decode(), secret_key.decode()
 
 
-@worker.task()
 def _get_about_noti_key(password, file_path):
   cert, secret_key = _generate_noti_key(file_path, password)
   return (cert, secret_key)
 
 
 def get_about_noti_key(password, file_path):
-  ret = _get_about_noti_key.delay(password, file_path)
+  ret = _get_about_noti_key(password, file_path)
   cert, secret_key = ret.get()
   return (cert, secret_key)
 
 
-@worker.task()
 def _get_hex_to_json(file_path):
   _ih = IntelHex(file_path)
   bin_array = _ih.tobinarray()
@@ -90,12 +78,7 @@ def _get_hex_to_json(file_path):
 
 def get_hex_to_json(file_path):
   try:
-    if apis.IS_DEV:
-      ret = _get_hex_to_json(file_path)
-      return ret
-    else:
-      ret = _get_hex_to_json.delay(file_path)
-      ret_json = ret.get()
-      return ret_json
+    ret = _get_hex_to_json(file_path)
+    return ret
   except Exception:
     logging.exception("Raise error while convert firmware.")

@@ -20,13 +20,10 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 import util
 import common
 import in_apis
-import dash_apis
 import constants
 import in_config_apis
 from dashboard import count
 from dashboard import blueprint
-import back_scheduler
-from third import suprema_apis
 
 
 SCHEDULE_COMMON_FILE_NAME = '''schedule'''
@@ -121,8 +118,7 @@ def default_count_setting(device_id):
 @util.require_login
 def default_refresh_device():
   org_id = current_user.organization_id
-  config_data = in_config_apis.get_location_config_by_org(org_id)
-  dash_apis.get_refresh_beacon_list(config_data.product_id)
+  # TODO: Refresh beacon list to apiserver?
   return redirect("/dashboard/count/settings")
 
 
@@ -293,92 +289,6 @@ def upload_location_map():
   return uri
 
 
-@blueprint.route('/settings', methods=['GET'])
-@util.require_login
-def dashboard_settings():
-  _org_id = current_user.organization_id
-  prd_list = in_apis.get_product_list(_org_id)
-  noti_key_list = in_apis.get_noti_key_list(_org_id)
-  biostar_event_list = suprema_apis.get_event_list()
-  suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
-  location_config = in_config_apis.get_location_config_by_org(_org_id)
-  return render_template("dashboard_settings.html", prd_list=prd_list,
-                         noti_key_list=noti_key_list,
-                         biostar_event_list=biostar_event_list,
-                         suprema_config=suprema_config,
-                         location_config=location_config)
-
-
-@blueprint.route('/settings/location', methods=['POST'])
-@util.require_login
-def set_location_settings():
-  _product_id = request.form['locationPrdId']
-  _client_interval = int(request.form['locationClientInterval'])
-  _server_interval = int(request.form['locationServerInterval'])
-  _kind = request.form['locationkindName']
-  _org_id = current_user.organization_id
-
-  config_data = in_config_apis.get_location_config_by_org(_org_id)
-  if config_data:
-    in_config_apis.update_location_config(_product_id, _kind, _client_interval,
-                                          _server_interval, _org_id)
-    logging.info("Update location Config. User : %s, Pid : %s",
-                 current_user.email, _product_id)
-    # TODO:
-    # back_scheduler.scheduler_main_equip(_org_id, _kind, _server_interval, True)
-  else:
-    in_config_apis.create_location_config(_product_id, _kind, _client_interval,
-                                          _server_interval, _org_id)
-    logging.info("Create Suprema Config. User : %s, Pid : %s",
-                 current_user.email, _product_id)
-    # TODO:
-    # back_scheduler.scheduler_main_equip(_org_id, _kind, _server_interval)
-  return redirect("/dashboard/settings")
-
-
-@blueprint.route('/settings/suprema', methods=['POST'])
-@util.require_login
-def set_suprema_settings():
-  _id = request.form['supremaId']
-  _pw = request.form['supremaPassword']
-  _url = request.form['supremaBaseUrl']
-  _client_interval = int(request.form['supremaClientInterval'])
-  _server_interval = int(request.form['supremaServerInterval'])
-  _event_id = request.form['supremaEvent']
-  _org_id = current_user.organization_id
-
-  login_result = suprema_apis.check_login(_id, _pw)
-  if login_result:
-    config_data = in_config_apis.get_suprema_config_by_org(_org_id)
-    if config_data:
-      in_config_apis.update_suprema_config(_url, _id, _pw, _event_id,
-                                           _client_interval, _server_interval,
-                                           _org_id)
-      logging.info("Update Suprema Config. User : %s, base url : %s",
-                   current_user.email, _url)
-      # TODO:
-      #back_scheduler.scheduler_main_worker(_org_id, _server_interval, True)
-    else:
-      in_config_apis.create_suprema_config(_url, _id, _pw, _event_id,
-                                           _client_interval, _server_interval,
-                                           _org_id)
-      suprema_apis.set_last_id_cache(_org_id, 0)
-      logging.info("Create Suprema Config. User : %s, base url : %s",
-                   current_user.email, _url)
-      # TODO:
-      #back_scheduler.scheduler_main_worker(_org_id, _server_interval)
-    suprema_apis.set_id_pw(_org_id, _id, _pw)
-    return redirect("/dashboard/settings")
-  else:
-    logging.warning(
-        "Fail to login. Check your ID, Password.  ID : %s, Password : %s",
-        _id, _pw)
-    title = common.get_msg("dashboard.biostar.failed_setting_title")
-    msg = common.get_msg("dashboard.biostar.failed_setting_message")
-    common.set_error_message(title, msg)
-    return redirect("/dashboard/settings")
-
-
 @blueprint.route('/worker_logs', methods=["GET"])
 @util.require_login
 def get_enterence_worker_log():
@@ -389,17 +299,3 @@ def get_enterence_worker_log():
 @util.require_login
 def get_enterence_equip_log():
   return render_template("equip_logs.html")
-
-
-@blueprint.route('/set/equip_count', methods=["POST"])
-def set_equip_count():
-  # print('start')
-  # st = time.time()
-  raw_data = request.get_data()
-  data = json.loads(raw_data.decode('utf-8'))
-  hid = data['hub_id']
-  dist_data_list = data['value']
-  count.set_equip_count(constants.ORG_ID, hid, dist_data_list)
-  # et = time.time() - st
-  # print(et)
-  return json.dumps(True)
