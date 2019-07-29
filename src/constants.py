@@ -16,14 +16,12 @@ if IS_DEV:
   THIRD_BASE_URL = '''http://192.168.0.14/v1/'''
   BASE_URL = '''http://192.168.0.14/i/v1/'''
   LOCAL_HUB_CLI_ADDR = '''https://192.168.1.224:443'''
-  LOCAL_HUB_CLI_GID = '''74e6788846294397c9616c502daad659'''
   SUPREMA_ADDR = '''http://127.0.0.1:5556'''
 else:
-  THIRD_BASE_URL = '''http://api.mib.io/v1/'''
-  BASE_URL = '''http://api.mib.io/i/v1/'''
-  #TODO:
-  LOCAL_HUB_CLI_ADDR = '''http://123.123.123.123/v1/'''
-  LOCAL_HUB_CLI_GID = ''''''
-  SUPREMA_ADDR = ''''''
+  THIRD_BASE_URL = '''http://172.16.5.4/v1/'''
+  BASE_URL = '''http://172.16.5.4/i/v1/'''
+  LOCAL_HUB_CLI_ADDR = '''https://172.16.5.10:443'''
+  SUPREMA_ADDR = '''http://127.0.0.1:5556'''
 
 ORG_ID = '''ac983bfaa401d89475a45952e0a642cf'''
+
