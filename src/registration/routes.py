@@ -155,7 +155,6 @@ def reg_ipcam():
 
     security = uuid.uuid4().hex[:24]
 
-    topic = "gadget.added"
     value = {
       "id": new_id,
       "mac": mac_addr,
@@ -193,6 +192,10 @@ def reg_ipcam():
       },
       "img_url": ""
     }
+    ret = local_apis.register_ipcam(value)
+    logging.info("Register ipcam resp : %s", ret)
+    return redirect("/registration/ipcam")
+
 
 
 @blueprint.route('/ipcam/<ipcam_id>/update', methods=['GET', 'POST'])
