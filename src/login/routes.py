@@ -50,21 +50,24 @@ def login():
       return redirect(url_for('base_blueprint.route_verified'))
 
 
-@blueprint.route('/login/signin', methods={'POST'})
+@blueprint.route('/login/signin', methods=['POST'])
 def sign_in_progress():
   email = request.form.get('email')
   password = request.form.get('password')
   user = in_apis.get_user_by_email(email, constants.ORG_ID)
   if user and user.password and checkpw(password.encode('utf-8'), user.password):
-    user.last_access_time = in_apis.get_datetime()
-    user.ip_address = util.get_ip_addr()
-    login_user(user)
+    in_apis.update_user_by_ip(user.id, util.get_ip_addr())
+    login_user(user, remember=False)
     if user.level == models.MOI:
       logging.info("MOI User login. User : %s", user)
-      return redirect('/moi')
+      # TODO:
+      #return redirect(url_for('moi_blueprint.route_default'))
+      return "<script>window.location.href = '/moi/'; </script>"
     else:
       logging.info("SmartSystem User login. User : %s", user)
-      return redirect('/dashboard')
+      # TODO:
+      #return redirect(url_for('dashboard_blueprint.default_route'))
+      return "<script>window.location.href = '/dashboard/'; </script>"
   # TODO:
   # elif user:
   #   login_user(user)
