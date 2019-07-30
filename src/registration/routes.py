@@ -11,6 +11,7 @@
 
 
 import json
+import uuid
 import hashlib
 import logging
 
@@ -23,6 +24,7 @@ import in_apis
 import local_apis
 from dashboard import count
 from registration import blueprint
+from constants import REG_HUB_ID, REG_ACCOUNT_ID, BEACON_SPEC
 
 
 @blueprint.route('/')
@@ -151,6 +153,8 @@ def reg_ipcam():
     new_id_hash.update(mac_addr.encode('utf-8'))
     new_id = new_id_hash.hexdigest()
 
+    security = uuid.uuid4().hex[:24]
+
     topic = "gadget.added"
     value = {
       "id": new_id,
@@ -162,11 +166,11 @@ def reg_ipcam():
       "model_number": 0,
       "model_name": "ipcam",
       "sdk_version": "0.3",
-      "beacon": "",
-      "security": "",
-      "hub_id": "",
-      "account_id": "",
-      "status": "",
+      "beacon": REG_ACCOUNT_ID,
+      "security": security,
+      "hub_id": REG_HUB_ID,
+      "account_id": REG_ACCOUNT_ID,
+      "status": 0,
       "locale": "US",
       "rssi": 0,
       "battery": 0,
@@ -181,7 +185,7 @@ def reg_ipcam():
       },
       "tags": [],
       "beacon_spec": {
-          "uuid": "9cba31e2-0237-eb44-45f2-7b288dbe1c44",
+          "uuid": BEACON_SPEC,
           "major": 36805,
           "minor": 36533,
           "interval": 700,

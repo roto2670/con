@@ -9,19 +9,14 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-import time
 import os, stat
-import logging
 import json
+import logging
 
-from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
+from flask import render_template, request, redirect  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import util
-import common
-import in_apis
-import constants
-import in_config_apis
 from dashboard import count
 from dashboard import blueprint
 
@@ -46,18 +41,8 @@ def default_test():
 @blueprint.route('/', methods=['GET'])
 @util.require_login
 def default_route():
-  _org_id = current_user.organization_id
-  worker_interval = 10
-  equip_interval = 10
-  suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
-  location_config = in_config_apis.get_location_config_by_org(_org_id)
-  if suprema_config:
-    worker_interval = suprema_config.client_interval
-  if location_config:
-    equip_interval = location_config.client_interval
   emergency_cache = count.get_emergency_info()
-  return render_template("dashboard_home.html", worker_interval=worker_interval,
-                         equip_interval=equip_interval,
+  return render_template("dashboard_home.html",
                          emergency=emergency_cache[count.IS_EMERGENCY_KEY],
                          time_msg=emergency_cache[count.TIME_MSG_KEY],
                          date_msg=emergency_cache[count.DATE_MSG_KEY])

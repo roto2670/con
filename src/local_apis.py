@@ -16,7 +16,7 @@ import logging
 import requests
 
 import constants
-from constants import THIRD_BASE_URL, BASE_URL
+from constants import THIRD_BASE_URL, BASE_URL, REG_HUB_ID
 
 
 def update_beacon_information(gid, hid, name, kind, moi):
@@ -83,10 +83,7 @@ def update_scanner_information(hid, name, location, count):
 
 
 def register_ipcam(gadget_info):
-  if constants.IS_DEV:
-    hid = '''8cfbf561ef3d4a63f11e3cac862b20fd''' # V20(LG).NaranTest
-  else:
-    hid = '''bc298b66bd67a950a49bdd64b09d37a0'''  # Galaxy A30
+  hid = REG_HUB_ID
   url = "{base}hubs/{hid}/event".format(base=BASE_URL, hid=hid)
   headers = {
     "Content-Type": "application/json",
@@ -113,10 +110,7 @@ def register_ipcam(gadget_info):
 
 
 def update_ipcam_information(ipcam_id, name, moi):
-  if constants.IS_DEV:
-    hid = '''8cfbf561ef3d4a63f11e3cac862b20fd''' # V20(LG).NaranTest
-  else:
-    hid = '''bc298b66bd67a950a49bdd64b09d37a0'''  # Galaxy A30
+  hid = REG_HUB_ID
   url = "{base}gadgets/{ipcam_id}".format(base=BASE_URL, ipcam_id=ipcam_id)
   headers = {
     "Content-Type": "application/json",

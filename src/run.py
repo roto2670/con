@@ -122,10 +122,6 @@ if not apis.IS_DEV:
   __app = create_app()
   __app.debug = False
   socket_io.run(__app, port=5000)
-else:
-  __app = create_app()
-  __app.debug = False
-  socket_io.run(__app, port=5000)
 
 
 if  __name__ == '__main__':
