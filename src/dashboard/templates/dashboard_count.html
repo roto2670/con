@@ -55,17 +55,21 @@
                     <button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target=".header-modal"
                         style="background-color: #fafafa; color: #8e8e8e; border-color: #efefef; font-weight: bold; position: absolute; left: 10px; font-size: 25px;">
                       <img src="/static/images/icon--reset.svg" class="entrance_button_img">
-                      Reset Count
+                      Reset Count&nbsp;
                     </button>
-                    <button class="btn btn-danger btn-xs" data-dismiss="modal" onclick="emergency()"
-                        style="background-color: #fafafa; color: #8e8e8e; border-color: #efefef; font-weight: bold; position: absolute; left: 250px; font-size: 25px;">
-                      <img src="/static/images/icon--emergency-color.svg" class="entrance_button_img">
-                      {% if emergency %}
-                        Emergency STOP
-                      {% else %}
-                        Emergency
-                      {% endif %}
-                    </button>
+                    {% if emergency %}
+                      <button class="btn btn-danger btn-xs" data-dismiss="modal" onclick="emergency()"
+                          style="background-color: #ff4848; color: #ffffff; border-color: #efefef; font-weight: bold; position: absolute; left: 250px; font-size: 25px;">
+                        <img src="/static/images/icon--emergency-white.svg" class="entrance_button_img">
+                        &nbsp;&nbsp;Cancel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      </button>
+                    {% else %}
+                      <button class="btn btn-danger btn-xs" data-dismiss="modal" onclick="emergency()"
+                          style="background-color: #fafafa; color: #8e8e8e; border-color: #efefef; font-weight: bold; position: absolute; left: 250px; font-size: 25px;">
+                        <img src="/static/images/icon--emergency-color.svg" class="entrance_button_img">
+                        Emergency&nbsp;
+                      </button>
+                    {% endif %}
 
                   </div>
                   <!-- modal-->
