@@ -121,7 +121,7 @@ if not apis.IS_DEV:
   # gunicorn
   __app = create_app()
   __app.debug = False
-  socket_io.run(__app, port=5000)
+  socket_io.run(__app, host='0.0.0.0', port=5000)
 
 
 if  __name__ == '__main__':
@@ -130,7 +130,7 @@ if  __name__ == '__main__':
     _app.debug = True
     # CORS(_app)
     #_app.run(host='127.0.0.1', port=5000, use_reloader=False)
-    socket_io.run(_app, port=5000)
+    socket_io.run(_app, host='0.0.0.0', port=5000)
   else:
     cur_path = os.path.dirname(os.path.abspath(__file__))
     ssl_path = os.path.join(cur_path, 'ssl')

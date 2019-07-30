@@ -203,7 +203,8 @@
     getWorkScheduleDetail();
 
     $(document).ready(function(){
-      var sock = io.connect('http://127.0.0.1:5000/ws/count');
+      var host = window.location.hostname;
+      var sock = io.connect('http://' + host + ':5000/ws/count');
       sock.on('connect', function(){
         sock.send("connect");
       });
