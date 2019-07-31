@@ -19,7 +19,7 @@ from home import blueprint
 @blueprint.route('/<product_id>')
 @util.require_login
 def product_index(product_id):
-  return render_template('index.html')
+  return render_template('index.html', prd_id=product_id)
 
 
 @blueprint.route('/<template>')

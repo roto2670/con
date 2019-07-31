@@ -28,30 +28,12 @@ def get_location_inforamtion():
   :param : None
   :return : infomation of dict
   """
-  if apis.IS_DEV:
-    data = {
-        "product_id": "mibsskec",
-        "interval": 10,
-        "stage": current_user.level
-    }
-    return json.dumps(data)
-  else:
-    _org_id = current_user.organization_id
-    config_data = in_config_apis.get_location_config_by_org(_org_id)
-    if not config_data:
-      data = {
-          "product_id": "",
-          "interval": 0,
-          "stage": current_user.level
-      }
-      return json.dumps(data)
-    else:
-      data = {
-          "product_id": config_data.product_id,
-          "interval": config_data.client_interval,
-          "stage": current_user.level
-      }
-      return json.dumps(data)
+  data = {
+      "product_id": "mibsskec",
+      "interval": 10,
+      "stage": current_user.level
+  }
+  return json.dumps(data)
 
 
 @blueprint.route('/worker_log', methods=["GET"])

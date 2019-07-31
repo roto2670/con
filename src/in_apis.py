@@ -39,8 +39,6 @@ from models import _Invite as Invite
 from models import _Tester as Tester
 from models import _Firmware as Firmware
 from models import _History as History
-from models import _EmailAuth as EmailAuth
-from models import _ReferrerInfo as ReferrerInfo
 from models import _SubDomain as SubDomain
 from models import _Domain as Domain
 from models import _ForkProduct as ForkProduct
@@ -1031,65 +1029,6 @@ def release(product_id, model_id_list):
   else:
     return False
 
-
-# }}}
-
-
-# {{{ EmailAuth
-
-
-def create_email_auth(email, key, user_id):
-  email_auth = EmailAuth(id=uuid.uuid4().hex,
-                         email=email,
-                         key=key,
-                         user_id=user_id,
-                         is_confirm=False,
-                         sent_time=get_datetime())
-  db.session.add(email_auth)
-  db.session.commit()
-
-
-def get_auth_by_key(key):
-  email_auth = EmailAuth.query.filter_by(key=key,
-                                         is_confirm=False).one_or_none()
-  return email_auth
-
-
-def has_email(email):
-  email_auth = EmailAuth.query.filter_by(email=email, is_confirm=False).one_or_none()
-  return email_auth
-
-
-def update_email_auth(_id):
-  email_auth = EmailAuth.query.filter_by(id=_id).one_or_none()
-  email_auth.is_confirm = True
-  email_auth.accepted_time = get_datetime()
-  db.session.commit()
-
-
-def remove_email_auth(_id):
-  email_auth = EmailAuth.query.filter_by(id=_id).one_or_none()
-  if email_auth:
-    db.session.delete(email_auth)
-    db.session.commit()
-
-
-# }}}
-
-
-# {{{ ReferrerInfo
-
-
-def create_referrer_info(user, ip_addr, referrer, user_agent, accept_language):
-  referrer_info = ReferrerInfo(id=uuid.uuid4().hex,
-                               user=user,
-                               ip_address=ip_addr,
-                               referrer=referrer,
-                               user_agent=user_agent,
-                               accept_language=accept_language,
-                               accepted_time=get_datetime())
-  db.session.add(referrer_info)
-  db.session.commit()
 
 # }}}
 

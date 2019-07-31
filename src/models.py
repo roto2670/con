@@ -1,7 +1,7 @@
 
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2020 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -9,6 +9,7 @@
 # |  _    |       |    __  |       |  _    |
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
+
 
 # 3rd party
 from flask_login import UserMixin  # noqa : pylint: disable=import-error
@@ -419,42 +420,6 @@ class _Invite(db.Model):
   invited_time = Column(DateTime)
   invited_user = Column(String(75))
   accepted = Column(Integer)
-  accepted_time = Column(DateTime)
-
-  def __init__(self, **kwargs):
-    for property, value in kwargs.items():
-      if hasattr(value, '__iter__') and not isinstance(value, str):
-        value = value[0]
-      setattr(self, property, value)
-
-
-class _EmailAuth(db.Model):
-  __tablename__ = '_email_auth'
-
-  id = Column(String(75), primary_key=True)
-  email = Column(String(75))
-  key = Column(String(75))
-  user_id = Column(String(75))
-  is_confirm = Column(Boolean, default=False, nullable=False)
-  sent_time = Column(DateTime)
-  accepted_time = Column(DateTime)
-
-  def __init__(self, **kwargs):
-    for property, value in kwargs.items():
-      if hasattr(value, '__iter__') and not isinstance(value, str):
-        value = value[0]
-      setattr(self, property, value)
-
-
-class _ReferrerInfo(db.Model):
-  __tablename__ = '_referrer_info'
-
-  id = Column(String(75), primary_key=True)
-  user = Column(String(75))
-  ip_address = Column(String(75))
-  referrer = Column(String(225))
-  user_agent = Column(String(225))
-  accept_language = Column(String(225))
   accepted_time = Column(DateTime)
 
   def __init__(self, **kwargs):

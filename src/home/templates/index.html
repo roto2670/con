@@ -1,5 +1,11 @@
 {% extends "base_site.html" %}
 
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar.html" %}
+  </div>
+{% endblock sidebar %}
+
 {% block title %} {{ current_product.name }} {% endblock title %}
 
 {% block stylesheets %}
