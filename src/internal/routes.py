@@ -91,20 +91,21 @@ def set_worker_count():
     return json.dumps(False)
 
 
-@socket_io.on('connect', namespace="/name")
+@socket_io.on('connect', namespace="/ws/count")
 def connect():
-  print("connect")
-  logging.info("#### connect")
+  logging.info("Connect count")
 
 
-
-@socket_io.on('disconnect', namespace="/name")
+@socket_io.on('disconnect', namespace="/ws/count")
 def disconnect():
-  print("disconnect")
-  logging.info("#### disconnect")
+  logging.info("Disconnect count")
 
 
-@socket_io.on('msg', namespace="/name")
-def msg(data):
-  print(data)
-  logging.info("#### msg : %s ", data)
+@socket_io.on('connect', namespace="/ws/log/worker")
+def connect():
+  logging.info("Connect worker logs")
+
+
+@socket_io.on('disconnect', namespace="/ws/log/worker")
+def disconnect():
+  logging.info("Disconnect worker logs")

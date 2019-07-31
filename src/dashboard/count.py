@@ -11,10 +11,12 @@
 
 
 import time
+import json
 import logging
 
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
+from flask_socketio import emit
 
 import constants
 import local_apis
@@ -487,6 +489,10 @@ def _set_expire_equip_cache(gid, value):
   EXPIRE_CACHE.set(gid, value, EQUIP_EXPIRE_TIME)
 
 
+def _send_worker_log(log):
+  emit('worker', json.dumps(log), namespace="/ws/log/worker", broadcast=True)
+
+
 def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
   if WORKER_COUNT.has_data(org_id, user_id):
     # User exit
@@ -495,18 +501,20 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
         ret = WORKER_COUNT.delete_data(key, user_id)
         ret = WORKER_COUNT.delete_data(org_id, user_id)
         text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
-        in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
-                                                   event_data, text, org_id)
+        log = in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
+                                                         event_data, text, org_id)
         _set_expire_cache(user_id, user_name)
+        _send_worker_log(log)
       elif WORKER_COUNT.has_data(REVERSE_ACCESS_POINT[key], user_id):
         reverse_key = REVERSE_ACCESS_POINT[key]
         ret = WORKER_COUNT.delete_data(reverse_key, user_id)
         ret = WORKER_COUNT.delete_data(org_id, user_id)
         text = WORKER_EXIT_TEXT_2.format(user_name, ACCESS_POINT[key],
                                          ACCESS_POINT[reverse_key])
-        in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
-                                                   event_data, text, org_id)
+        log = in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
+                                                         event_data, text, org_id)
         _set_expire_cache(user_id, user_name)
+        _send_worker_log(log)
     elif device_id in BUS_AT_1_DEVICE_LIST and device_id in BUS_CHECKING_LIST:
       bus_id = BUS_CHECKING_LIST[device_id]
       WORKER_COUNT.set_data(bus_id, user_id, event_data)
@@ -526,9 +534,10 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
       ret = WORKER_COUNT.set_data(key, user_id, user_name)
       ret = WORKER_COUNT.set_data(org_id, user_id, user_name)
       text = WORKER_ENTER_TEXT.format(user_name, ACCESS_POINT[key])
-      in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
-                                                 text, org_id)
+      log = in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
+                                                       text, org_id)
       _set_expire_cache(user_id, user_name)
+      _send_worker_log(log)
     elif device_id in BUS_WORKSHOP_DEVICE_LIST and device_id in BUS_CHECKING_LIST:
       # BUS_CACHE input, and later, beacon detected then count up
       bus_id = BUS_CHECKING_LIST[device_id]
@@ -620,6 +629,10 @@ def _handle_operator_count(operator_key, gid, name):
     WORKER_COUNT.set_data(operator_key, gid, name)
 
 
+def _send_equip_log(log):
+  emit('equip', json.dumps(log), namespace="/ws/log/equip", broadcast=True)
+
+
 EQUIP_ENTER_TEXT = "{} entered {}"
 EQUIP_EXIT_TEXT = "{} came out {}"
 EQUIP_EXIT_TEXT_2 = "{} came out {}. But it entered {}"
@@ -644,10 +657,11 @@ def _set_equip_count(key, org_id, gid, hid):
         operator_key = OPERATOR_COUNT_KEY[key]
         _handle_operator_count(operator_key, gid, device_name)
       text = EQUIP_EXIT_TEXT.format(device_name, ACCESS_POINT[key])
-      in_config_apis.create_entrance_equip_log(OUT_SETTING_ID, key, device_tag,
-                                               hid, scanner_name, gid,
-                                               device_name, text, org_id)
+      log = in_config_apis.create_entrance_equip_log(OUT_SETTING_ID, key, device_tag,
+                                                     hid, scanner_name, gid,
+                                                     device_name, text, org_id)
       _set_expire_equip_cache(gid, device_name)
+      _send_equip_log(log)
 
       if gid in BUS_SETTING_DATA and device_tag == "16": # 16 is bus
         bus_id = BUS_SETTING_DATA[gid]
@@ -659,9 +673,10 @@ def _set_equip_count(key, org_id, gid, hid):
             WORKER_COUNT.delete_data(org_id, user_id)
             # TODO: Change text? exit with bus?
             u_text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
-            in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
-                                                       event_data, u_text, org_id)
+            log = in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
+                                                             event_data, u_text, org_id)
             _set_expire_cache(user_id, user_name)
+            _send_worker_log(log)
             WORKER_COUNT.hdel(bus_id, user_id)
     elif BEACONS_COUNT.has_data(REVERSE_ACCESS_POINT[key], gid):
       reverse_key = REVERSE_ACCESS_POINT[key]
@@ -673,10 +688,11 @@ def _set_equip_count(key, org_id, gid, hid):
         _handle_operator_count(operator_key, gid, device_name)
       text = EQUIP_EXIT_TEXT_2.format(device_name, ACCESS_POINT[key],
                                       ACCESS_POINT[reverse_key])
-      in_config_apis.create_entrance_equip_log(OUT_SETTING_ID, key, device_tag,
-                                               hid, scanner_name, gid,
-                                               device_name, text, org_id)
+      log = in_config_apis.create_entrance_equip_log(OUT_SETTING_ID, key, device_tag,
+                                                     hid, scanner_name, gid,
+                                                     device_name, text, org_id)
       _set_expire_equip_cache(gid, device_name)
+      _send_equip_log(log)
 
       if gid in BUS_SETTING_DATA and device_tag == "16": # 16 is bus
         bus_id = BUS_SETTING_DATA[gid]
@@ -688,9 +704,10 @@ def _set_equip_count(key, org_id, gid, hid):
             WORKER_COUNT.delete_data(org_id, user_id)
             # TODO: Change text? exit with bus?
             u_text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
-            in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
-                                                       event_data, u_text, org_id)
+            log = in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
+                                                             event_data, u_text, org_id)
             _set_expire_cache(user_id, user_name)
+            _send_worker_log(log)
             WORKER_COUNT.hdel(bus_id, user_id)
   else:
     # equip enter
@@ -701,10 +718,11 @@ def _set_equip_count(key, org_id, gid, hid):
       operator_key = OPERATOR_COUNT_KEY[key]
       _handle_operator_count(operator_key, gid, device_name)
     text = EQUIP_ENTER_TEXT.format(device_name, ACCESS_POINT[key])
-    in_config_apis.create_entrance_equip_log(IN_SETTING_ID, key, device_tag,
-                                             hid, scanner_name, gid, device_name,
-                                             text, org_id)
+    log = in_config_apis.create_entrance_equip_log(IN_SETTING_ID, key, device_tag,
+                                                   hid, scanner_name, gid, device_name,
+                                                   text, org_id)
     _set_expire_equip_cache(gid, device_name)
+    _send_equip_log(log)
 
     if gid in BUS_SETTING_DATA and device_tag == "16": # 16 is bus
       bus_id = BUS_SETTING_DATA[gid]
@@ -715,9 +733,10 @@ def _set_equip_count(key, org_id, gid, hid):
         WORKER_COUNT.set_data(org_id, user_id, user_name)
         # TODO: Change text? enter with bus?
         u_text = WORKER_ENTER_TEXT.format(user_name, ACCESS_POINT[key])
-        in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
-                                                   u_text, org_id)
+        log = in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
+                                                         u_text, org_id)
         WORKER_COUNT.hdel(bus_id, user_id)
+        _send_worker_log(log)
 
 
 def set_equip_count(org_id, hid, dist_data_list):

@@ -47,6 +47,20 @@ def create_enterence_worker_log(inout, access_point, data, text,
                            organization_id=organization_id)
   db.session.add(log)
   db.session.commit()
+  return {
+    "id": log.id,
+    "event_type": log.event_type,
+    "event_time": str(log.event_time),
+    "inout": log.inout,
+    "access_point": log.access_point,
+    "created_time": str(log.created_time),
+    "worker_id": log.worker_id,
+    "worker_name": log.worker_name,
+    "device_id": log.device_id,
+    "device_name": log.device_name,
+    "text": log.text,
+    "organization_id": log.organization_id
+  }
 
 
 def get_enterence_worker_log_list(organization_id, page_num=1, limit=None):
@@ -148,6 +162,20 @@ def create_entrance_equip_log(inout, access_point, kind, hub_id,
                          organization_id=organization_id)
   db.session.add(log)
   db.session.commit()
+  return {
+    "id": log.id,
+    "inout": log.inout,
+    "access_point": log.access_point,
+    "kind": log.kind,
+    "event_time": str(log.event_time),
+    "created_time": str(log.created_time),
+    "hub_id": log.hub_id,
+    "hub_name": log.hub_name,
+    "gadget_id": log.gadget_id,
+    "gadget_name": log.gadget_name,
+    "text": log.text,
+    "organization_id": log.organization_id
+  }
 
 
 def get_entrance_equip_log_list(organization_id, page_num=1, limit=None):
