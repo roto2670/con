@@ -204,34 +204,14 @@ def get_emergency_info():
 
 
 def default_count():
-  _org_id = current_user.organization_id
-  worker_interval = 10
-  equip_interval = 10
-  suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
-  location_config = in_config_apis.get_location_config_by_org(_org_id)
-  if suprema_config:
-    worker_interval = suprema_config.client_interval
-  if location_config:
-    equip_interval = location_config.client_interval
-  return render_template("dashboard_count.html", worker_interval=worker_interval,
-                         equip_interval=equip_interval, device_list=device_list,
+  return render_template("dashboard_count.html",
                          emergency=EMERGENCY[IS_EMERGENCY_KEY],
                          time_msg=EMERGENCY[TIME_MSG_KEY],
                          date_msg=EMERGENCY[DATE_MSG_KEY])
 
 
 def detail_count():
-  _org_id = current_user.organization_id
-  worker_interval = 10
-  equip_interval = 10
-  suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
-  location_config = in_config_apis.get_location_config_by_org(_org_id)
-  if suprema_config:
-    worker_interval = suprema_config.client_interval
-  if location_config:
-    equip_interval = location_config.client_interval
-  return render_template("dashboard_count_detail.html", worker_interval=worker_interval,
-                         equip_interval=equip_interval, device_list=device_list,
+  return render_template("dashboard_count_detail.html",
                          emergency=EMERGENCY[IS_EMERGENCY_KEY],
                          time_msg=EMERGENCY[TIME_MSG_KEY],
                          date_msg=EMERGENCY[DATE_MSG_KEY])
@@ -256,7 +236,7 @@ def __delete_bus_setting(bus_beacon_id):
 
 def set_bus_setting(bus_user_id, bus_user_name, bus_beacon_id):
   org_id = current_user.organization_id
-  beacon_data = in_config_apis.get_device_data(bus_beacon_id, org_id)
+  beacon_data = get_device_data_info(bus_beacon_id)
   in_config_apis.create_or_update_bus_setting_data(bus_user_id, bus_user_name,
                                                    bus_beacon_id, beacon_data.name,
                                                    org_id)
@@ -279,21 +259,19 @@ def device_list():
   for setting in settings:
     setting_id_list.append(setting.device_id)
     settings_dict[setting.device_id] = setting
-  suprema_config = in_config_apis.get_suprema_config_by_org(_org_id)
-  if suprema_config:
-    if _org_id in DEVICE_LIST_TIME:
-      if (time.time() - DEVICE_LIST_TIME[_org_id]) >= INTERVAL_TIME:
-        device_list = _get_device_list(_org_id)
-      else:
-        device_list = DEVICE_LIST[_org_id]
-    else:
+  if _org_id in DEVICE_LIST_TIME:
+    if (time.time() - DEVICE_LIST_TIME[_org_id]) >= INTERVAL_TIME:
       device_list = _get_device_list(_org_id)
+    else:
+      device_list = DEVICE_LIST[_org_id]
+  else:
+    device_list = _get_device_list(_org_id)
   equip_kind_settings = get_equip_operator_count_settings()
   scanners = in_config_apis.get_count_device_setting(SCANNER_TYPE, constants.ORG_ID)
   for scanner in scanners:
     setting_id_list.append(scanner.device_id)
     settings_dict[scanner.device_id] = scanner
-  bus_list = in_config_apis.get_device_data_by_tag("16", _org_id)
+  bus_list = get_device_data_info_list_by_tag("16")  # 16 is BUS
   bus_setting_list = in_config_apis.get_bus_setting_data_list()
   return render_template("count_settings.html", device_list=device_list,
                          in_out_setting=IN_OUT_SETTING_ID,
@@ -790,6 +768,15 @@ def set_device_data_info(key, value, is_force=False):
 
 def get_device_data_info(key):
   return BEACONS_COUNT.get_data(DEVICE_DATA_KEY, key)
+
+
+def get_device_data_info_list_by_tag(tag):
+  ret_list = []
+  value_list = BEACONS_COUNT.get_data_of_values(DEVICE_DATA_KEY)
+  for value in value_list:
+    if value['tags'] and value['tags'][0] == tag:
+      ret_list.append(value)
+  return ret_list
 
 
 def _set_access_point(access_point, device_id):

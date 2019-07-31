@@ -3,68 +3,31 @@
   <div class="nav_title nav_sm_hidden sub_side_top_tile">
     Dev
   </div>
-  <br><br><br>
-
-  <div class="product_menu nav_sm_hidden">
-    <div class="btn-group">
-      {% if current_user.organization_id %}
-        {% if current_product %}
-          <button type="button" class="btn btn-primary product-title text-left">{{ current_product.id }}</button>
-        {% else %}
-          <button type="button" class="btn btn-primary product-title text-left">Products</button>
-        {% endif %}
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-          <span class="caret"></span>
-          <span class="sr-only">Toggle Dropdown</span>
-        </button>
-        <ul class="dropdown-menu" role="menu" style="width: 100%">
-          {% for product in product_list %}
-            <li><a href="/home/{{ product.id }}">{{ product.id }}</a></li>
-          {% endfor %}
-          {% if product_list %}
-            <li class="divider"></li>
-          {% endif %}
-          <li><a href="/products/create">Create New Product</a>
-        </ul>
-      {% endif %}
-    </div>
-  </div>
 
   <!-- sidebar menu -->
   <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
     <br><br><br>
     <div class="menu_section">
       <ul class="nav side-menu nav_sm_hidden">
-        {% if current_product %}
-          <li><a href="/"><i class="fa fa-area-chart"></i>Dashboard <span class="label label-success pull-right">Beta</span></a></li>
           <!-- Product -->
           <li><a><i class="fa fa-list"></i> Product <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-                <li><a href="/products/{{ current_product.id }}/general">General</a></li>
-                <li><a href="/products/{{ current_product.id }}/model">Model</a></li>
-                <li><a href="/products/{{ current_product.id }}/authentication">Authentication</a></li>
-                {% if current_product.typ == 1 %}
-                  <li><a href="/products/{{ current_product.id }}/subdomain">Subdomain</a></li>
-                {% endif %}
-                <li><a href="/products/{{ current_product.id }}/tester">Tester</a></li>
-                <li><a href="/products/{{ current_product.id }}/product_import">Import</a></li>
+                <li><a href="/products/{{ prd_id }}/model">Model</a></li>
+                <li><a href="/products/{{ prd_id }}/authentication">Authentication</a></li>
+                <li><a href="/products/{{ prd_id }}/tester">Tester</a></li>
             </ul>
           </li>
           <!-- Endpoints -->
           <li><a><i class="fa fa-tasks"></i> Endpoints <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-                <li><a href="/endpoints/{{ current_product.id }}/specifications">Specifications</a></li>
-                <li><a href="/endpoints/{{ current_product.id }}/tests">Tests</a></li>
-                <li><a href="/endpoints/{{ current_product.id }}/logs">Logs</a></li>
+                <li><a href="/endpoints/{{ prd_id }}/specifications">Specifications</a></li>
             </ul>
           </li>
           <li><a><i class="fa fa-sliders"></i> Release <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-                <li><a href="/release/{{ current_product.id }}/list">Release</a></li>
+                <li><a href="/release/{{ prd_id }}/list">Release</a></li>
             </ul>
           </li>
-        {% endif %}
-        <li><a href="/doc"><i class="fa fa-file-text-o"></i> Document </a>
       </ul>
     </div>
   </div>

@@ -308,8 +308,8 @@ class RedisStore(object):
     if values:
       value_list = []
       for value in values:
-        value_list += json.loads(value)
-      return list(set(value_list))
+        value_list.append(json.loads(value))
+      return value_list
     else:
       return []
 

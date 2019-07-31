@@ -393,32 +393,3 @@ def accepted_domain():
   # TODO: Send cert files and register domain to reverse proxy server
   # TODO: in_apis.update_domain(domain_id)
   pass
-
-
-def register_footer_image():
-  try:
-    upload_files = request.files.getlist("file[]")
-    file_names = []
-    base_path = util.get_static_path()
-    org_path = os.path.join(base_path, 'footer', current_user.organization_id)
-    for upload_file in upload_files:
-      content = upload_file.read()
-      if not os.path.exists(org_path):
-        os.makedirs(org_path)
-      file_path = os.path.join(org_path, upload_file.filename)
-      if os.path.exists(file_path):
-        os.remove(file_path)
-      with open(file_path, 'wb') as _f:
-        _f.write(content)
-      os.chmod(file_path, stat.S_IREAD)
-      image_uri = FOOTER_URL_FORMAT.format(current_user.organization_id)
-      file_names.append(upload_file.filename)
-    footer = in_config_apis.get_footer_by_organization(current_user.organization_id)
-    if footer:
-      in_config_apis.update_footer("", org_path, file_names, image_uri)
-    else:
-      in_config_apis.create_footer("", org_path, file_names, image_uri)
-    return redirect("/management/organization/general")
-  except:
-    logging.exception("Raise error while register logo image")
-    abort(500)
