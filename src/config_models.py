@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 #
 # Copyright 2017-2020 Naran Inc. All rights reserved.
@@ -46,15 +45,10 @@ class _EnterenceWorkerLog(db.Model):
   text = Column(Text)
   organization_id = Column(String(75))
 
-  def __init__(self, **kwargs):
-    for property, value in kwargs.items():
-      if hasattr(value, '__iter__') and not isinstance(value, str):
-        value = value[0]
-      setattr(self, property, value)
-
 
 FACE_STATION_TYPE = 1
 SCANNER_TYPE = 2
+
 
 class _CountDeviceSetting(db.Model):
   __tablename__ = '_count_device_setting'
@@ -85,9 +79,3 @@ class _EntranceEquipLog(db.Model):
   gadget_name = Column(String(75))
   text = Column(Text)
   organization_id = Column(String(75))
-
-  def __init__(self, **kwargs):
-    for property, value in kwargs.items():
-      if hasattr(value, '__iter__') and not isinstance(value, str):
-        value = value[0]
-      setattr(self, property, value)

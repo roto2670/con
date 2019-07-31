@@ -9,7 +9,46 @@
 {% block title %} Tunnel Entrance Control System {% endblock title %}
 {% block javascripts %}
   {{ super() }}
+  <script src="{{ url_for('static', filename='vendors/socketio/socket.io.min.js') }}"></script>
   <script>
+      $(document).ready(function(){
+        var host = window.location.hostname;
+        var sock = io.connect('http://' + host + ':5000/ws/log/equip');
+        sock.on('connect', function(){
+          sock.send("equip log connect");
+        });
+
+        sock.on('disconnect', function(msg){
+          sock.send("equip log disconnect");
+        });
+
+        sock.on('equip', function(msg){
+          console.log('Received Equip Log Message :',msg);
+          var logData = JSON.parse(msg);
+              timestamp = logData.event_time,
+              payLoad = logData.text;
+          var addObj= "<div class=''>" +
+                "<h3 class='panel-title'>" + timestamp +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                payLoad + "</h3>" +
+            "</div>"
+
+          if (logData.inout == 1) {
+            if (logData.access_point == 1) {
+              $(".accordionInAT1").prepend(addObj);
+            } else {
+              $(".accordionInAT2").prepend(addObj);
+            }
+          } else {
+            if (logData.access_point == 1) {
+              $(".accordionOutAT1").prepend(addObj);
+            } else {
+              $(".accordionOutAT2").prepend(addObj);
+            }
+          }
+        });
+      });
+
       var isExpand = false;
       function onExpand() {
         if (isExpand) {
@@ -119,19 +158,13 @@
               <h3>AT-1 Check-In</h3>
             </div>
             <div class="x_content">
-              <div class="accordionInAT1" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
+              <div class="accordionInAT1" id="scroll-style-hidden" role="tablist" aria-multiselectable="true"
+                  style="overflow:scroll;max-height: 500px;">
               </div>
                 <script>
-                  var nextPageNum = 1;
-                  function setNextPageNumber() {
-                    nextPageNum += 1;
-                  }
-                  function getNextPageNumber() {
-                    return nextPageNum;
-                  }
                   function getLogs(){
                     url = "/dash/equip_log/in/1";
-                    jQuery.get(url, { 'page_num': getNextPageNumber()})
+                    jQuery.get(url, { 'page_num': 1})
                       .done(function (data) {
                         var logList = JSON.parse(data);
                         if (logList) {
@@ -147,10 +180,7 @@
 
                             $(".accordionInAT1").append(addObj);
                           });
-                        } else {
-                          $(".pageMore").remove();
                         }
-                        setNextPageNumber();
                       });
                   }
                   getLogs();
@@ -165,19 +195,13 @@
               <h3>AT-1 Check-Out</h3>
             </div>
             <div class="x_content">
-              <div class="accordionOutAT1" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
+              <div class="accordionOutAT1" id="scroll-style-hidden" role="tablist" aria-multiselectable="true"
+                  style="overflow:scroll;max-height: 500px;">
               </div>
                 <script>
-                  var nextPageNum = 1;
-                  function setNextPageNumber() {
-                    nextPageNum += 1;
-                  }
-                  function getNextPageNumber() {
-                    return nextPageNum;
-                  }
                   function getLogs(){
                     url = "/dash/equip_log/out/1";
-                    jQuery.get(url, { 'page_num': getNextPageNumber()})
+                    jQuery.get(url, { 'page_num': 1})
                       .done(function (data) {
                         var logList = JSON.parse(data);
                         if (logList) {
@@ -193,10 +217,7 @@
 
                             $(".accordionOutAT1").append(addObj);
                           });
-                        } else {
-                          $(".pageMore").remove();
                         }
-                        setNextPageNumber();
                       });
                   }
                   getLogs();
@@ -215,19 +236,13 @@
               <h3>AT-2 Check-In</h3>
             </div>
             <div class="x_content">
-              <div class="accordionInAT2" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
+              <div class="accordionInAT2" id="scroll-style-hidden" role="tablist" aria-multiselectable="true"
+                  style="overflow:scroll;max-height: 500px;">
               </div>
                 <script>
-                  var nextPageNum = 1;
-                  function setNextPageNumber() {
-                    nextPageNum += 1;
-                  }
-                  function getNextPageNumber() {
-                    return nextPageNum;
-                  }
                   function getLogs(){
                     url = "/dash/equip_log/in/2";
-                    jQuery.get(url, { 'page_num': getNextPageNumber()})
+                    jQuery.get(url, { 'page_num': 1})
                       .done(function (data) {
                         var logList = JSON.parse(data);
                         if (logList) {
@@ -243,10 +258,7 @@
 
                             $(".accordionInAT2").append(addObj);
                           });
-                        } else {
-                          $(".pageMore").remove();
                         }
-                        setNextPageNumber();
                       });
                   }
                   getLogs();
@@ -261,19 +273,13 @@
               <h3>AT-2 Check-Out</h3>
             </div>
             <div class="x_content">
-              <div class="accordionOutAT2" id="scroll-style-hidden" role="tablist" aria-multiselectable="true" style="overflow:scroll;">
+              <div class="accordionOutAT2" id="scroll-style-hidden" role="tablist" aria-multiselectable="true"
+                  style="overflow:scroll;max-height: 500px;">
               </div>
                 <script>
-                  var nextPageNum = 1;
-                  function setNextPageNumber() {
-                    nextPageNum += 1;
-                  }
-                  function getNextPageNumber() {
-                    return nextPageNum;
-                  }
                   function getLogs(){
                     url = "/dash/equip_log/out/2";
-                    jQuery.get(url, { 'page_num': getNextPageNumber()})
+                    jQuery.get(url, { 'page_num': 1})
                       .done(function (data) {
                         var logList = JSON.parse(data);
                         if (logList) {
@@ -289,10 +295,7 @@
 
                             $(".accordionOutAT2").append(addObj);
                           });
-                        } else {
-                          $(".pageMore").remove();
                         }
-                        setNextPageNumber();
                       });
                   }
                   getLogs();
