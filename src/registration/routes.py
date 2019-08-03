@@ -209,3 +209,76 @@ def ipcam_update_route(ipcam_id):
     moi = request.form.get('moi')
     local_apis.update_ipcam_information(ipcam_id, name, moi)
     return redirect("/registration/ipcam")
+
+
+@blueprint.route('/ipcam/<ipcam_id>/delete', methods=['GET'])
+@util.require_login
+def ipcam_delete_route(ipcam_id):
+  local_apis.remove_ipcam(ipcam_id)
+  return redirect("/registration/ipcam")
+
+
+@blueprint.route('/pa', methods=['GET'])
+@util.require_login
+def pa_list_route():
+  return render_template("pa_list.html")
+
+
+@blueprint.route('/pa/create', methods=['GET', 'POST'])
+@util.require_login
+def reg_pa():
+  if request.method == "GET":
+    return render_template("register_pa.html")
+  else:
+    ip = request.form.get('ip')
+    _id = request.form.get('id')
+    password = request.form.get('password')
+    name = request.form.get('name')
+    mac_hash = hashlib.md5()
+    mac_hash.update(ip.encode('utf-8'))
+    mac_addr = mac_hash.hexdigest()[:12]
+
+    new_id_hash = hashlib.md5()
+    new_id_hash.update(mac_addr.encode('utf-8'))
+    new_id = new_id_hash.hexdigest()
+
+    security = uuid.uuid4().hex[:24]
+
+    value = {
+      "id": new_id,
+      "mac": mac_addr,
+      "name": name,
+      "kind": "paspeaker",
+      "protocol": 0,
+      "firmware_version": "0.0.0",
+      "model_number": 0,
+      "model_name": "paspeaker",
+      "sdk_version": "0.3",
+      "beacon": REG_ACCOUNT_ID,
+      "security": security,
+      "hub_id": REG_HUB_ID,
+      "account_id": REG_ACCOUNT_ID,
+      "status": 0,
+      "locale": "US",
+      "rssi": 0,
+      "battery": 0,
+      "progress": 0,
+      "latest_version": "0.0.0",
+      "is_depr": 0,
+      "custom": {
+          "ip": ip
+      },
+      "tags": [],
+      "beacon_spec": {
+          "uuid": BEACON_SPEC,
+          "major": 36805,
+          "minor": 36533,
+          "interval": 700,
+          "during_second": 0
+      },
+      "img_url": ""
+    }
+    #TODO: register pa speaker
+    # ret = local_apis.register_ipcam(value)
+    # logging.info("Register paspeaker resp : %s", ret)
+    return redirect("/registration/pa")
