@@ -20,7 +20,7 @@
 
       var table = document.getElementById(tableId);
       var csvString = BOM;
-      for (var rowCnt = 0; rowCnt < table.rows.length; rowCnt++) {
+      for (var rowCnt = 1; rowCnt < table.rows.length; rowCnt++) {
           var rowData = table.rows[rowCnt].cells;
           for (var colCnt = 0; colCnt < rowData.length; colCnt++) {
               var columnData = rowData[colCnt].innerHTML;
@@ -29,7 +29,17 @@
               }
               else {
                   columnData = columnData.toString().replace(/"/g, '""'); // escape double quotes
+                  if (columnData.indexOf('vstatus=""on""') >= 0) {
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                      columnData += "ON";
+                  } else if (columnData.indexOf('vstatus=""off""') >= 0){
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                      columnData += "OFF";
+                  } else {
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                  }
               }
+              columnData = columnData.replace(/(^\s*)|(\s*$)/gi, "");
               csvString = csvString + '"' + columnData + '",';
           }
           csvString = csvString.substring(0, csvString.length - 1);
@@ -156,9 +166,7 @@
                 {% for scanner in scanner_list %}
                   <tr>
                     <td>
-                      <a href="/registration/scanner/{{ scanner.id }}/update">
-                        {{ scanner.name }}
-                      </a>
+                      <a href="/registration/scanner/{{ scanner.id }}/update">{{ scanner.name }}</a>
                     </td>
                     <!-- wifi mac -->
                     {% if "network" in scanner %}
@@ -180,10 +188,10 @@
                     <!-- status -->
                     {% if scanner.status == 0 %}
                       <td style="padding-left: 20px;"><img src="/static/images/off.png"
-                          style="width:16px; border: 2px solid #000000; border-radius: 100%"></td>
+                          style="width:16px; border: 2px solid #000000; border-radius: 100%" vstatus="off"></td>
                     {% else %}
                       <td style="padding-left: 20px;"><img src="/static/images/on.png"
-                          style="width:16px; border: 2px solid #000000; border-radius: 100%"></td>
+                          style="width:16px; border: 2px solid #000000; border-radius: 100%" vstatus="on"></td>
                     {% endif %}
                     <!-- ip address -->
                     {% if "network" in scanner %}

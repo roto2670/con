@@ -20,7 +20,7 @@
 
       var table = document.getElementById(tableId);
       var csvString = BOM;
-      for (var rowCnt = 0; rowCnt < table.rows.length; rowCnt++) {
+      for (var rowCnt = 1; rowCnt < table.rows.length; rowCnt++) {
           var rowData = table.rows[rowCnt].cells;
           for (var colCnt = 0; colCnt < rowData.length; colCnt++) {
               var columnData = rowData[colCnt].innerHTML;
@@ -29,7 +29,9 @@
               }
               else {
                   columnData = columnData.toString().replace(/"/g, '""'); // escape double quotes
+                  columnData = columnData.replace(/(<([^>]+)>)/ig,"");
               }
+              columnData = columnData.replace(/(^\s*)|(\s*$)/gi, "");
               csvString = csvString + '"' + columnData + '",';
           }
           csvString = csvString.substring(0, csvString.length - 1);
@@ -147,7 +149,6 @@
                 <tr>
                   <td> Total </td>
                   <td> {{ beacon_list|length }}</td>
-                  <td></td>
                   <td></td>
                   <td></td>
                 </tr>
