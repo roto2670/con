@@ -78,13 +78,31 @@ def reset_count():
 @blueprint.route('/workschedule', methods=['GET'])
 @util.require_login
 def default_workschedule():
-  return render_template("workschedule.html")
+  base_path = util.get_static_path()
+  org_path = os.path.join(base_path, 'dashboard', 'workschedule',
+                          current_user.organization_id)
+  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
+  if os.path.exists(file_path):
+    path = '/static/dashboard/workschedule/' + current_user.organization_id + \
+         "/" + SCHEDULE_COMMON_FILE_NAME
+  else:
+    path = ""
+  return render_template("workschedule.html", img_src=path)
 
 
 @blueprint.route('/workschedule/detail', methods=['GET'])
 @util.require_login
 def default_workschedule_detail():
-  return render_template("workschedule_detail.html")
+  base_path = util.get_static_path()
+  org_path = os.path.join(base_path, 'dashboard', 'workschedule_d',
+                          current_user.organization_id)
+  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
+  if os.path.exists(file_path):
+    path = '/static/dashboard/workschedule_d/' + current_user.organization_id + \
+         "/" + SCHEDULE_COMMON_FILE_NAME
+  else:
+    path = ""
+  return render_template("workschedule_detail.html", img_src=path)
 
 
 @blueprint.route('/count/settings', methods=['GET'])
@@ -164,20 +182,6 @@ def get_total_equip_count():
   return json.dumps(total_equip_count)
 
 
-@blueprint.route('/workschedule/view', methods=['GET'])
-@util.require_login
-def get_workschedule():
-  base_path = util.get_static_path()
-  org_path = os.path.join(base_path, 'dashboard', 'workschedule',
-                          current_user.organization_id)
-  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
-  if os.path.exists(file_path):
-    return '/static/dashboard/workschedule/' + current_user.organization_id + \
-         "/" + SCHEDULE_COMMON_FILE_NAME
-  else:
-    return ""
-
-
 @blueprint.route('/workschedule/upload', methods=['POST'])
 @util.require_login
 def upload_workschedule():
@@ -194,22 +198,7 @@ def upload_workschedule():
   with open(file_path, 'wb') as f:
     f.write(content)
   os.chmod(file_path, stat.S_IREAD)
-  return '/static/dashboard/workschedule/' + current_user.organization_id + \
-      "/" + SCHEDULE_COMMON_FILE_NAME
-
-
-@blueprint.route('/workschedule/detail/view', methods=['GET'])
-@util.require_login
-def get_workschedule_detail():
-  base_path = util.get_static_path()
-  org_path = os.path.join(base_path, 'dashboard', 'workschedule_d',
-                          current_user.organization_id)
-  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
-  if os.path.exists(file_path):
-    return '/static/dashboard/workschedule_d/' + current_user.organization_id + \
-         "/" + SCHEDULE_COMMON_FILE_NAME
-  else:
-    return ""
+  return redirect("/dashboard/workschedule")
 
 
 @blueprint.route('/workschedule/detail/upload', methods=['POST'])
@@ -228,8 +217,7 @@ def upload_workschedule_detail():
   with open(file_path, 'wb') as f:
     f.write(content)
   os.chmod(file_path, stat.S_IREAD)
-  return '/static/dashboard/workschedule_d/' + current_user.organization_id + \
-      "/" + SCHEDULE_COMMON_FILE_NAME
+  return redirect("/dashboard/workschedule/detail")
 
 
 @blueprint.route('/location', methods=['GET'])

@@ -93,18 +93,26 @@
                     <form id="location" action="/registration/scanner" method="POST">
                   <th>
                       <select id="location" name="location" onchange="this.form.submit()">
-                        {% if selected_location == 0 %}
+                        {% if selected_location == "0" %}
                           <option id="100" value="100">All</option>
+                          <option id="0" value="0" selected>Portal</option>
                           <option id="1" value="1">AT1</option>
-                          <option id="0" value="0" selected>AT2</option>
-                        {% elif selected_location == 100 %}
-                          <option id="100" value="100" selected>All</option>
-                          <option id="1" value="1">AT1</option>
-                          <option id="0" value="0">AT2</option>
-                        {% else %}
+                          <option id="2" value="2">AT2</option>
+                        {% elif selected_location == "1" %}
                           <option id="100" value="100">All</option>
+                          <option id="0" value="0">Portal</option>
                           <option id="1" value="1" selected>AT1</option>
-                          <option id="0" value="0">AT2</option>
+                          <option id="2" value="2">AT2</option>
+                        {% elif selected_location == "2" %}
+                          <option id="100" value="100">All</option>
+                          <option id="0" value="0">Portal</option>
+                          <option id="1" value="1">AT1</option>
+                          <option id="2" value="2" selected>AT2</option>
+                        {% else  %}
+                          <option id="100" value="100" selected>All</option>
+                          <option id="0" value="0">Portal</option>
+                          <option id="1" value="1">AT1</option>
+                          <option id="2" value="2">AT2</option>
                         {% endif %}
                       </select>
                   </th>

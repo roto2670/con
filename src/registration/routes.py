@@ -82,12 +82,28 @@ def scanner_list_route():
                            location=count.SCANNER_LOCATION)
   else:
     selected_onoff = int(request.form['onoff'])
-    selected_location = int(request.form['location'])
+    selected_location = request.form['location']
     new_list = []
     if selected_onoff != 100:
       for scanner in scanner_list:
         if scanner['status'] == selected_onoff:
-          new_list.append(scanner)
+          if selected_location != "100":
+            if scanner['tags'] and scanner['tags'][0] == selected_location:
+              new_list.append(scanner)
+          else:
+            new_list.append(scanner)
+      return render_template("scanner_list.html", scanner_list=new_list,
+                            selected_onoff=selected_onoff,
+                            selected_location=selected_location,
+                            location=count.SCANNER_LOCATION)
+    elif selected_location != "100":
+      for scanner in scanner_list:
+        if scanner['tags'] and scanner['tags'][0] == selected_location:
+          if selected_onoff != 100:
+            if scanner['status'] == selected_onoff:
+              new_list.append(scanner)
+          else:
+            new_list.append(scanner)
       return render_template("scanner_list.html", scanner_list=new_list,
                             selected_onoff=selected_onoff,
                             selected_location=selected_location,

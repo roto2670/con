@@ -44,8 +44,8 @@
                         <form class="right-align" id="upload-{{ device['id'] }}" action="/dashboard/count/settings/{{ device['id'] }}" method="POST">
                           <td>{{ device['name'] }}</td>
                           <td>
-                            <select id="inout" name="inout">
-                              {% if device['id'] in setting_id_list %}
+                            {% if device['id'] in setting_id_list %}
+                              <select id="inout" name="inout" disabled>
                                 {% for k, v in in_out_setting.items() %}
                                   {% if k == settings_dict[device['id']].inout %}
                                     <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
@@ -53,12 +53,14 @@
                                     <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
                                   {% endif %}
                                 {% endfor %}
-                              {% else %}
+                              </select>
+                            {% else %}
+                              <select id="inout" name="inout">
                                 {% for k, v in in_out_setting.items() %}
                                   <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
                                 {% endfor %}
-                              {% endif %}
-                            </select>
+                              </select>
+                            {% endif %}
                           </td>
                           <td>
                             {% if device['id'] in setting_id_list %}
@@ -80,13 +82,14 @@
                             {% endif %}
                           </td>
                           <td>
-                            <button type="submit" class="btn btn-info btn-xs">Save</button>
                             {% if device['id'] in setting_id_list %}
                               <!-- 1 is FaceStation Type -->
                               <a href="/dashboard/count/settings/delete/{{ device['id'] }}/typ/1"
                                   class="btn btn-danger btn-xs">
                                 <i class="fa fa-remove"></i> Reset
                               </a>
+                            {% else %}
+                              <button type="submit" class="btn btn-info btn-xs">Save</button>
                             {% endif %}
                           </td>
                           <!-- 1 is FaceStation Type -->
