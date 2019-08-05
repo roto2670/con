@@ -16,6 +16,7 @@ import logging
 import requests
 
 import constants
+import dashboard.count
 from constants import THIRD_BASE_URL, BASE_URL, REG_HUB_ID
 
 
@@ -30,10 +31,13 @@ def update_beacon_information(gid, hid, name, kind, moi):
     "tags": [kind],
     "custom": {}
   }
+  _beacon = dashboard.count.get_beacon(gid)
+  _custom = _beacon['custom']
   if int(moi) == 1:
-    body['custom']['is_visible_moi'] = True
+    _custom['is_visible_moi'] = True
   else:
-    body['custom']['is_visible_moi'] = False
+    _custom['is_visible_moi'] = False
+  body['custom'] = _custom
 
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(body))
@@ -62,10 +66,14 @@ def update_scanner_information(hid, name, location, count):
     "custom": {
     }
   }
+  _scanner = dashboard.count.get_scanner(hid)
+  _custom = _scanner['custom']
   if int(count) == 1:
-    body['custom']['is_counted_hub'] = True
+    _custom['is_counted_hub'] = True
   else:
-    body['custom']['is_counted_hub'] = False
+    _custom['is_counted_hub'] = False
+  body['custom'] = _custom
+
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(body))
     if resp.ok:
@@ -120,10 +128,13 @@ def update_ipcam_information(ipcam_id, name, moi):
     "name": name,
     "custom": {}
   }
+  _ipcam = dashboard.count.get_ipcam(ipcam_id)
+  _custom = _ipcam['custom']
   if int(moi) == 1:
-    body['custom']['is_visible_moi'] = True
+    _custom['is_visible_moi'] = True
   else:
-    body['custom']['is_visible_moi'] = False
+    _custom['is_visible_moi'] = False
+  body['custom'] = _custom
 
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(body))
@@ -137,6 +148,34 @@ def update_ipcam_information(ipcam_id, name, moi):
       return False
   except:
     logging.exception("Raise error while update ipcam information. Body : %s",
+                      body)
+    return None
+
+
+def remove_ipcam(ipcam_id):
+  hid = REG_HUB_ID
+  _ipcam = dashboard.count.get_ipcam(ipcam_id)
+  url = "{base}hubs/{hid}/event".format(base=BASE_URL, hid=hid)
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=hid)
+  }
+  body = {
+    "topic": "gadget.removed",
+    "value": _ipcam
+  }
+  try:
+    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    if resp.ok:
+      logging.info("remove ipcam successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed remove ipcam. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while remove ipcam. Body : %s",
                       body)
     return None
 

@@ -1,6 +1,6 @@
 {% extends "base_site.html" %}
 
-{% block title %} Beacon Tag {% endblock title %}
+{% block title %} PA Speaker {% endblock title %}
 
 {% block sidebar %}
   <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
@@ -11,6 +11,10 @@
 {% block javascripts %}
   {{ super() }}
   <script>
+    function register() {
+      window.location.href = "/registration/pa/create";
+    }
+
     function exportTableToCsv(tableId, filename) {
       if (filename == null || typeof filename == undefined)
           filename = tableId;
@@ -85,32 +89,21 @@
         <div class="x_content">  <!-- x_content 1 -->
 
           <div class="x_content">  <!-- x_content 2 -->
-            <table id="beacon-table" class="table table-striped projects">
+            <table id="pa-table" class="table table-striped projects">
               <thead>
                 <tr>
-                  <th></th>
-                  <th></th>
                   <th>
-                    <form id="category" action="/registration/beacon" method="POST">
-                      <select id="category" name="category" onchange="this.form.submit()">
-                        {% if selected_category == "100" %}
-                          <option id="100" value="100" selected>All</option>
-                        {% else %}
-                          <option id="100" value="100">All</option>
-                        {% endif %}
-                        {% for k, v in category.items() %}
-                          {% if selected_category == k %}
-                            <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
-                          {% else %}
-                            <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
-                          {% endif %}
-                        {% endfor %}
-                      </select>
-                    </form>
+                    <button type="button" class="btn btn-default btn-xs"
+                        onclick="register()"
+                        style="margin-bottom: 0;">
+                      Register
+                    </button>
+                  </th>
+                  <th>
                   </th>
                   <th>
                     <button type="button" class="btn btn-default btn-xs"
-                        onclick="exportTableToCsv('beacon-table', 'Beacon Tag')"
+                        onclick="exportTableToCsv('pa-table', 'Beacon Tag')"
                         style="margin-bottom: 0;">
                       CSV Download
                     </button>
@@ -118,36 +111,18 @@
                 </tr>
                 <tr>
                   <th>Name</th>
-                  <th>Mac Address</th>
-                  <th>Category</th>
-                  <th>MOI</th>
+                  <th>IP Address</th>
+                  <th>Group</th>
                 </tr>
               </thead>
               <tbody>
-                {% for beacon in beacon_list %}
-                  <tr>
-                    <td>
-                      <a href="/registration/beacon/{{beacon.id}}/update">
-                        {{ beacon.name }}
-                      </a>
-                    </td>
-                    <td>{{ beacon.mac }}</td>
-                    <td>{{ category[beacon.tags[0]] }}</td>
-                    {% if 'is_visible_moi' in beacon.custom %}
-                      {% if beacon.custom.is_visible_moi %}
-                        <td>ON</td>
-                      {% else %}
-                        <td>OFF</td>
-                      {% endif %}
-                    {% else %}
-                      <td>OFF</td>
-                    {% endif %}
-                  </tr>
-                {% endfor %}
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
                 <tr>
                   <td> Total </td>
-                  <td> {{ beacon_list|length }}</td>
-                  <td></td>
                   <td></td>
                   <td></td>
                 </tr>
