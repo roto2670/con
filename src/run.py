@@ -12,6 +12,7 @@
 
 import sys
 import os
+import socket
 import logging
 import logging.handlers
 from datetime import timedelta
@@ -23,12 +24,15 @@ from flask import session
 import apis
 import common
 import base.routes
+import dash.routes
 import dashboard.count
 from base import db, auth, login_manager, socket_io
 from config import DebugConfig, ProductionConfig
 
 
 sys.dont_write_bytecode = True
+ADDR_CHK_IP = '''8.8.8.8'''
+ADDR_CHK_PORT = 80
 
 
 def register_extensions(app):
@@ -96,6 +100,17 @@ def configure_logs(app):
   logging.getLogger().addHandler(handler)
 
 
+def set_local_address():
+  try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect((ADDR_CHK_IP, ADDR_CHK_PORT))
+    local_addr = s.getsockname()[0]
+    dash.routes.set_server_addr(local_addr)
+    s.close()
+  except:
+    logging.exception("Fail to get internal IP address. Check your network status")
+
+
 def create_app():
   app = Flask(__name__, static_folder='base/static')
   if apis.IS_DEV:
@@ -110,6 +125,7 @@ def create_app():
   dashboard.count.init()
   configure_login(app)
   common.start()
+  set_local_address()
   conf_socket(app)
   return app
 
