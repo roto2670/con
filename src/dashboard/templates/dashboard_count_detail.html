@@ -56,48 +56,101 @@
                       <img src="/static/images/icon--reset.svg" class="entrance_button_img">
                       Reset Count
                     </button>
+                    <!-- Reset modal-->
+                    <div class="modal fade header-modal" tabindex="-1" role="dialog" aria-hidden="true">
+                      <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                            </button>
+                            <h4 class="modal-title" id="headerFile" style="color: #ff0000"><i class="fa fa-exclamation-triangle"></i> WARING</h4>
+                          </div>
+                          <div>
+                            <div class="modal-body" style="color: #ff0000">
+                              <h4>Reset All Count</h4>
+                              <div>
+                                Do you want to reset all counts?
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                              <button class="btn btn-danger" data-dismiss="modal" onclick="resetAll()">OK</button>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>  <!-- End modal -->
+
                     {% if emergency %}
-                      <button class="btn btn-danger btn-xs" data-dismiss="modal" onclick="emergency()"
+                      <button class="btn btn-danger btn-xs" data-toggle="modal" data-target=".cancel-modal"
                           style="background-color: #ff4848; color: #ffffff; border-color: #efefef; font-weight: bold; position: absolute; left: 250px; font-size: 25px;">
                         <img src="/static/images/icon--emergency-white.svg" class="entrance_button_img">
                         &nbsp;&nbsp;Cancel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                       </button>
+
+                      <!-- Emergency cancel modal-->
+                      <div class="modal fade cancel-modal" tabindex="-3" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                          <div class="modal-content">
+
+                            <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                              </button>
+                              <h4 class="modal-title" id="headerFile" style="color: #ff0000"><i class="fa fa-exclamation-triangle"></i> WARING</h4>
+                            </div>
+                            <div>
+                              <div class="modal-body" style="color: #ff0000">
+                                <h4>Emergency Cancel</h4>
+                                <div>
+                                  Do you want to turn off the emergency status setting?
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-danger" data-dismiss="modal" onclick="emergency()">OK</button>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </div>  <!-- End modal -->
                     {% else %}
-                      <button class="btn btn-danger btn-xs" data-dismiss="modal" onclick="emergency()"
+                      <button class="btn btn-danger btn-xs" data-toggle="modal" data-target=".emergency-modal"
                           style="background-color: #fafafa; color: #8e8e8e; border-color: #efefef; font-weight: bold; position: absolute; left: 250px; font-size: 25px;">
                         <img src="/static/images/icon--emergency-color.svg" class="entrance_button_img">
                         Emergency&nbsp;
                       </button>
-                    {% endif %}
 
-                  </div>
-                  <!-- modal-->
-                  <div class="modal fade header-modal" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog modal-sm">
-                      <div class="modal-content">
+                      <!-- Emergency modal-->
+                      <div class="modal fade emergency-modal" tabindex="-2" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                          <div class="modal-content">
 
-                        <div class="modal-header">
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
-                          </button>
-                          <h4 class="modal-title" id="headerFile">Reset Count</h4>
-                        </div>
-                        <div>
-                          <div class="modal-body">
-                            <h4>Reset All Count</h4>
-                            <div>
-                              Do you want to reset all counts?
+                            <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                              </button>
+                              <h4 class="modal-title" id="headerFile" style="color: #ff0000"><i class="fa fa-exclamation-triangle"></i> WARING</h4>
                             </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                            <button class="btn btn-primary" data-dismiss="modal" onclick="resetAll()">OK</button>
+                            <div>
+                              <div class="modal-body" style="color: #ff0000">
+                                <h4>Emergency</h4>
+                                <div>
+                                  Do you want to set the status to Emergency?
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button class="btn btn-danger" data-dismiss="modal" onclick="emergency()">OK</button>
+                              </div>
+                            </div>
+
                           </div>
                         </div>
-
-                      </div>
-                    </div>
-                  </div>  <!-- End modal -->
-
+                      </div>  <!-- End modal -->
+                    {% endif %}
+                  </div>
                 {% else %}
                   <div class="row tile_count">
                     <div class="col-md-12 col-sm-4 col-xs-6 tile_stats_count">
