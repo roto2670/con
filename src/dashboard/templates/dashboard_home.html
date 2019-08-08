@@ -45,26 +45,6 @@
         </div>
       </div>
     </div>
-    <!--
-    <div class="row tile_count">
-      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Man Power </span>
-        <div id="divWorker" class="count">0</div>
-      </div>
-      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Equipment </span>
-        <div id="divEquip" class="count">0</div>
-      </div>
-      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Count </span>
-        <div id="divCount" class="count">0</div>
-      </div>
-      <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
-        <span><div id="divDate" class="count_top right-align"></div></span>
-        <div id="divTime" class="count right-align"></div>
-      </div>
-    </div>
-    -->
 
     <!-- start row -->
     <div class="row">
@@ -151,7 +131,6 @@
             divEquip = document.getElementById("divEquip");
         divEquip.innerText = jsonData;
         setTotalCount();
-        //setTimeout(getEquip, 1000 * {{ equip_interval }});
       });
     }
     getEquip();
@@ -168,7 +147,6 @@
             divWorker = document.getElementById("divWorker");
         divWorker.innerText = jsonData;
         setTotalCount();
-        //setTimeout(getWorker, 1000 * {{ worker_interval }});
       });
     }
     getWorker();
@@ -218,15 +196,11 @@
       });
 
       sock.on('worker', function(msg){
-        console.log('Received RRRR Message :',msg);
         getWorker11(msg);
-        console.log(new Date());
       });
 
       sock.on('equip', function(msg){
-        console.log('Received RRRR Message :',msg);
         getEquip11(msg);
-        console.log(new Date());
       });
 
     });

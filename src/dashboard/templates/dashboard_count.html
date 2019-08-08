@@ -194,7 +194,6 @@
             divEquip = document.getElementById("divEquip");
         divEquip.innerText = jsonData;
         setTotalCount();
-        //setTimeout(getEquip, 1000 * {{ equip_interval }});
       });
     }
     getEquip();
@@ -211,7 +210,6 @@
             divWorker = document.getElementById("divWorker");
         divWorker.innerText = jsonData;
         setTotalCount();
-        //setTimeout(getWorker, 1000 * {{ worker_interval }});
       });
     }
     getWorker();
@@ -307,15 +305,11 @@
       });
 
       sock.on('worker', function(msg){
-        console.log('Received RRRR Message :',msg);
         getWorker11(msg);
-        console.log(new Date());
       });
 
       sock.on('equip', function(msg){
-        console.log('Received RRRR Message :',msg);
         getEquip11(msg);
-        console.log(new Date());
       });
 
     });
