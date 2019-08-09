@@ -83,8 +83,8 @@ def set_worker_count():
     at2_count = dashboard.count.get_worker_count(2)
     total_count = at1_count + at2_count
     emit('worker', total_count, namespace="/ws/count", broadcast=True)
-    emit('worker_at1', total_count, namespace="/ws/count", broadcast=True)
-    emit('worker_at2', total_count, namespace="/ws/count", broadcast=True)
+    emit('worker_at1', at1_count, namespace="/ws/count", broadcast=True)
+    emit('worker_at2', at2_count, namespace="/ws/count", broadcast=True)
     return json.dumps(True)
   except:
     logging.exception("Raise error while set worker count.")
