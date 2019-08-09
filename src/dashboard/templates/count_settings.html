@@ -1,6 +1,6 @@
 {% extends "base_site.html" %}
 
-{% block title %} Entrance Control Settings {% endblock title %}
+{% block title %} Beacon Scanner Settings {% endblock title %}
 
 {% block sidebar %}
   <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
@@ -18,95 +18,6 @@
 
 {% block content %}
   <div id="scroll-style-hidden" class="right_col" role="main">
-      <div class="row">  <!-- Start row --> <!-- FaceStation -->
-          <div class="x_panel tile">
-            <div class="x_title">
-              <h3>FaceStation</h3>
-              <div class="clearfix"></div>
-            </div>
-
-            <div class="x_content">
-              <div class="col-md-12 col-sm-12 col-xs-12">
-
-                <table class="table table-striped projects">
-                  <thead>
-                    <tr>
-                      <th>Device Name</th>
-                      <th>In/Out</th>
-                      <th>Location</th>
-                      <th>Edit</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <!-- Face Station -->
-                    {% for device in device_list %}
-                      <tr>
-                        <form class="right-align" id="upload-{{ device['id'] }}" action="/dashboard/count/settings/{{ device['id'] }}" method="POST">
-                          <td>{{ device['name'] }}</td>
-                          <td>
-                            {% if device['id'] in setting_id_list %}
-                              <select id="inout" name="inout" disabled>
-                                {% for k, v in in_out_setting.items() %}
-                                  {% if k == settings_dict[device['id']].inout %}
-                                    <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
-                                  {% else %}
-                                    <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
-                                  {% endif %}
-                                {% endfor %}
-                              </select>
-                            {% else %}
-                              <select id="inout" name="inout">
-                                {% for k, v in in_out_setting.items() %}
-                                  <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
-                                {% endfor %}
-                              </select>
-                            {% endif %}
-                          </td>
-                          <td>
-                            {% if device['id'] in setting_id_list %}
-                              <select id="ap" name="ap" disabled>
-                                {% for k, v in access_point.items() %}
-                                  {% if k == settings_dict[device['id']].access_point %}
-                                    <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
-                                  {% else %}
-                                    <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
-                                  {% endif %}
-                                {% endfor %}
-                              </select>
-                            {% else %}
-                              <select id="ap" name="ap">
-                                {% for k, v in access_point.items() %}
-                                  <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
-                                {% endfor %}
-                              </select>
-                            {% endif %}
-                          </td>
-                          <td>
-                            {% if device['id'] in setting_id_list %}
-                              <!-- 1 is FaceStation Type -->
-                              <a href="/dashboard/count/settings/delete/{{ device['id'] }}/typ/1"
-                                  class="btn btn-danger btn-xs">
-                                <i class="fa fa-remove"></i> Reset
-                              </a>
-                            {% else %}
-                              <button type="submit" class="btn btn-info btn-xs">Save</button>
-                            {% endif %}
-                          </td>
-                          <!-- 1 is FaceStation Type -->
-                          <input type="hidden" name="typ" value="1">
-                        </form>
-                      </tr>
-                    {% endfor %}
-                    <!-- Face Station -->
-                  </tbody>
-                </table>
-
-              </div>
-            </div><!-- End x_content -->
-          </div><!-- End x_panel-->
-      </div>  <!-- End row-->
-
-
       <div class="row">  <!-- Start row --> <!-- Beacon Scanner -->
           <div class="x_panel tile">
             <div class="x_title">

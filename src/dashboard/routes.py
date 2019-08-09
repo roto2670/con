@@ -105,7 +105,13 @@ def default_workschedule_detail():
   return render_template("workschedule_detail.html", img_src=path)
 
 
-@blueprint.route('/count/settings', methods=['GET'])
+@blueprint.route('/count/settings/facescanner', methods=['GET'])
+@util.require_login
+def default_facescanner_setting_page():
+  return count.facescanner_list()
+
+
+@blueprint.route('/count/settings/beaconscanner', methods=['GET'])
 @util.require_login
 def default_count_setting_page():
   return count.device_list()
