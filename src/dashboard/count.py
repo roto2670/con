@@ -252,7 +252,7 @@ def delete_bus_setting(_id, bus_beacon_id):
   return redirect("/dashboard/count/settings")
 
 
-def device_list():
+def facescanner_list():
   _org_id = current_user.organization_id
   device_list = []  # facestation
   setting_id_list = []
@@ -268,6 +268,17 @@ def device_list():
       device_list = DEVICE_LIST[_org_id]
   else:
     device_list = _get_device_list(_org_id)
+  return render_template("face_settings.html", device_list=device_list,
+                         in_out_setting=IN_OUT_SETTING_ID,
+                         access_point=ACCESS_POINT,
+                         setting_id_list=setting_id_list,
+                         settings_dict=settings_dict)
+
+
+def device_list():
+  _org_id = current_user.organization_id
+  setting_id_list = []
+  settings_dict = {}
   equip_kind_settings = get_equip_operator_count_settings()
   scanners = in_config_apis.get_count_device_setting(SCANNER_TYPE, constants.ORG_ID)
   for scanner in scanners:
@@ -275,7 +286,7 @@ def device_list():
     settings_dict[scanner.device_id] = scanner
   bus_list = get_device_data_info_list_by_tag("16")  # 16 is BUS
   bus_setting_list = in_config_apis.get_bus_setting_data_list()
-  return render_template("count_settings.html", device_list=device_list,
+  return render_template("count_settings.html",
                          in_out_setting=IN_OUT_SETTING_ID,
                          access_point=ACCESS_POINT,
                          setting_id_list=setting_id_list,
