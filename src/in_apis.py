@@ -671,22 +671,7 @@ def get_specifications_by_version(product_id, version):
 # }}}
 
 
-# {{{ invite
-
-
-def create_invite(email_addr, key, user_email, organization_id, level=None,
-                  product_id=None):
-  invite = Invite(id=uuid.uuid4().hex,
-                  email=email_addr,
-                  organization_id=organization_id,
-                  product_id=product_id if product_id else "",
-                  key=key,
-                  level=level if level else models.MEMBER,
-                  invited_time=get_datetime(),
-                  invited_user=user_email,
-                  accepted=0)
-  db.session.add(invite)
-  db.session.commit()
+# {{{ invite  # TODO: remove this
 
 
 def get_invite(key, organization_id):
@@ -745,11 +730,6 @@ def delete_invite(invite_id):
   if invite:
     db.session.delete(invite)
     db.session.commit()
-
-
-def delete_invite_by_product(product_id):
-  Invite.query.filter_by(product_id=product_id).delete()
-  db.session.commit()
 
 
 def delete_invite_by_organization(organization_id):
