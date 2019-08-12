@@ -75,7 +75,6 @@ def set_worker_count():
   try:
     raw_data = request.get_data()
     data = json.loads(raw_data.decode('utf-8'))
-    org_id = data['org_id']
     _data = data['value']
     dashboard.count.set_worker_count(constants.ORG_ID, _data['user_id']['user_id'],
                                      _data['user_id']['name'], _data)

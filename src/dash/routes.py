@@ -41,7 +41,7 @@ def get_location_inforamtion():
 def get_entrance_worker_log():
   org_id = current_user.organization_id
   _page_num = request.args.get('page_num')
-  _limit = request.args.get('limit', 30)
+  _limit = request.args.get('limit', 100)
   log_list = in_config_apis.get_enterence_worker_log_list(org_id,
                                                           page_num=int(_page_num),
                                                           limit=int(_limit))
@@ -61,7 +61,7 @@ def get_entrance_worker_log():
 def get_entrance_in_worker_log(ap):
   org_id = current_user.organization_id
   _page_num = request.args.get('page_num')
-  _limit = request.args.get('limit', 30)
+  _limit = request.args.get('limit', 100)
   log_list = in_config_apis.get_enterence_in_worker_log_list(org_id, int(ap),
                                                              page_num=int(_page_num),
                                                              limit=int(_limit))
@@ -81,7 +81,7 @@ def get_entrance_in_worker_log(ap):
 def get_entrance_out_worker_log(ap):
   org_id = current_user.organization_id
   _page_num = request.args.get('page_num')
-  _limit = request.args.get('limit', 30)
+  _limit = request.args.get('limit', 100)
   log_list = in_config_apis.get_enterence_out_worker_log_list(org_id, int(ap),
                                                               page_num=int(_page_num),
                                                               limit=int(_limit))
@@ -101,7 +101,7 @@ def get_entrance_out_worker_log(ap):
 def get_entrance_equip_log():
   org_id = constants.ORG_ID
   _page_num = request.args.get('page_num')
-  _limit = request.args.get('limit', 30)
+  _limit = request.args.get('limit', 100)
   log_list = in_config_apis.get_entrance_equip_log_list(org_id,
                                                         page_num=int(_page_num),
                                                         limit=int(_limit))
@@ -121,7 +121,7 @@ def get_entrance_equip_log():
 def get_entrance_in_equip_log(ap):
   org_id = constants.ORG_ID
   _page_num = request.args.get('page_num')
-  _limit = request.args.get('limit', 30)
+  _limit = request.args.get('limit', 100)
   log_list = in_config_apis.get_entrance_in_equip_log_list(org_id, int(ap),
                                                            page_num=int(_page_num),
                                                            limit=int(_limit))
@@ -141,7 +141,7 @@ def get_entrance_in_equip_log(ap):
 def get_entrance_out_equip_log(ap):
   org_id = constants.ORG_ID
   _page_num = request.args.get('page_num')
-  _limit = request.args.get('limit', 30)
+  _limit = request.args.get('limit', 100)
   log_list = in_config_apis.get_entrance_out_equip_log_list(org_id, int(ap),
                                                             page_num=int(_page_num),
                                                             limit=int(_limit))
