@@ -14,11 +14,16 @@ import json
 from flask import request
 from flask_login import current_user
 
-import apis
 import util
 import constants
 import in_config_apis
 from dash import blueprint
+
+SERVER_ADDR = {}
+
+
+def set_server_addr(local_addr):
+  SERVER_ADDR['internal'] = local_addr.strip()
 
 
 @blueprint.route('/location/info', methods=["GET"])
@@ -33,6 +38,13 @@ def get_location_inforamtion():
       "interval": 10,
       "stage": current_user.level
   }
+  req_host = request.headers['Host']
+  req_host = req_host.strip()
+  host = "{}:5000".format(SERVER_ADDR['internal'])
+  if req_host == SERVER_ADDR['internal'] or req_host == host:
+    data['internal'] = True
+  else:
+    data['internal'] = False
   return json.dumps(data)
 
 
