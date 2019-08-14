@@ -96,7 +96,7 @@
             <div class="x_content">
               <div id="workSchedule">
                 {% if current_user.level in [0, 1] %} <!-- 0, 1 is admin, skec -->
-                  <form class="right-align" id="upload" action="/dashboard/workschedule/upload" method="POST" enctype="multipart/form-data">
+                  <form class="right-align" id="upload" action="/dashboard/workschedule/detail/upload" method="POST" enctype="multipart/form-data">
                     <label style="cursor: pointer;"><h4><i class="fa fa-upload"> Upload</i></h4>
                       <input type="file" name="file" form="upload" accept="image/jpeg, image/png" style="display: none;" onChange="this.form.submit();"/>
                     </label>
