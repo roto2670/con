@@ -105,6 +105,34 @@ def default_workschedule_detail():
   return render_template("workschedule_detail.html", img_src=path)
 
 
+@blueprint.route('/workschedule/view', methods=['GET'])
+@util.require_login
+def get_workschedule():
+  base_path = util.get_static_path()
+  org_path = os.path.join(base_path, 'dashboard', 'workschedule',
+                          current_user.organization_id)
+  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
+  if os.path.exists(file_path):
+    return '/static/dashboard/workschedule/' + current_user.organization_id + \
+         "/" + SCHEDULE_COMMON_FILE_NAME
+  else:
+    return ""
+
+
+@blueprint.route('/workschedule/detail/view', methods=['GET'])
+@util.require_login
+def get_workschedule_detail():
+  base_path = util.get_static_path()
+  org_path = os.path.join(base_path, 'dashboard', 'workschedule_d',
+                          current_user.organization_id)
+  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
+  if os.path.exists(file_path):
+    return '/static/dashboard/workschedule_d/' + current_user.organization_id + \
+         "/" + SCHEDULE_COMMON_FILE_NAME
+  else:
+    return ""
+
+
 @blueprint.route('/count/settings/facescanner', methods=['GET'])
 @util.require_login
 def default_facescanner_setting_page():
