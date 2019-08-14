@@ -38,7 +38,7 @@
 
 # Using gunicorn
     gunicorn -w 3 --certfile ssl/mib_io.crt --keyfile ssl/mib_io.key -b 127.0.0.1:5000 run:__app
-    gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 run:__app
+    gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 -b 0.0.0.0:5000 run:__app
 
 
 # Using MySQL for Google Cloud SQL
