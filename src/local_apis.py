@@ -117,7 +117,7 @@ def register_ipcam(gadget_info):
     return None
 
 
-def update_ipcam_information(ipcam_id, name, moi):
+def update_ipcam_information(ipcam_id, name, moi, data=None):
   hid = REG_HUB_ID
   url = "{base}gadgets/{ipcam_id}".format(base=BASE_URL, ipcam_id=ipcam_id)
   headers = {
@@ -128,13 +128,16 @@ def update_ipcam_information(ipcam_id, name, moi):
     "name": name,
     "custom": {}
   }
-  _ipcam = dashboard.count.get_ipcam(ipcam_id)
-  _custom = _ipcam['custom']
-  if int(moi) == 1:
-    _custom['is_visible_moi'] = True
+  if data:
+    body['custom'] = data['custom']
   else:
-    _custom['is_visible_moi'] = False
-  body['custom'] = _custom
+    _ipcam = dashboard.count.get_ipcam(ipcam_id)
+    _custom = _ipcam['custom']
+    if int(moi) == 1:
+      _custom['is_visible_moi'] = True
+    else:
+      _custom['is_visible_moi'] = False
+    body['custom'] = _custom
 
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(body))

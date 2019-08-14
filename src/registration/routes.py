@@ -210,6 +210,7 @@ def reg_ipcam():
     }
     ret = local_apis.register_ipcam(value)
     logging.info("Register ipcam resp : %s", ret)
+    local_apis.update_ipcam_information(new_id, name, 0, value)
     return redirect("/registration/ipcam")
 
 
