@@ -29,6 +29,10 @@ def get_datetime():
   return datetime.datetime.now(pytz.timezone('UTC'))
 
 
+def get_servertime():
+  return datetime.datetime.now().replace(microsecond=0)
+
+
 def create_enterence_worker_log(inout, access_point, data, text,
                                 organization_id):
   cur_time = get_datetime()
@@ -149,10 +153,11 @@ def create_entrance_equip_log(inout, access_point, kind, hub_id,
                               hub_name, gadget_id, gadget_name, text,
                               organization_id):
   cur_time = get_datetime()
+  event_time = get_servertime()
   log = EntranceEquipLog(inout=inout,
                          access_point=access_point,
                          kind=kind,
-                         event_time=cur_time,
+                         event_time=event_time,
                          created_time=cur_time,
                          hub_id=hub_id,
                          hub_name=hub_name,
