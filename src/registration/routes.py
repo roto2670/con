@@ -60,14 +60,16 @@ def beacon_list_route():
 def beacon_update_route(gid):
   if request.method == "GET":
     beacon = count.get_beacon(gid)
+    ipcam_list = count.ipcam_list()
     return render_template("update_beacon.html", beacon=beacon,
-                           category=count.GADGET_INFO)
+                           category=count.GADGET_INFO, ipcam_list=ipcam_list)
   else:
     name = request.form.get('name')
     kind = request.form.get('kind')
     moi = request.form.get('moi')
+    ipcam_id = request.form.get('ipcam')
     hid = request.form.get('hid')
-    local_apis.update_beacon_information(gid, hid, name, kind, moi)
+    local_apis.update_beacon_information(gid, hid, name, kind, moi, ipcam_id)
     return redirect("/registration/beacon")
 
 
