@@ -20,7 +20,7 @@ import dashboard.count
 from constants import THIRD_BASE_URL, BASE_URL, REG_HUB_ID
 
 
-def update_beacon_information(gid, hid, name, kind, moi):
+def update_beacon_information(gid, hid, name, kind, moi, ipcam_id):
   url = "{base}gadgets/{gid}".format(base=BASE_URL, gid=gid)
   headers = {
     "Content-Type": "application/json",
@@ -37,6 +37,11 @@ def update_beacon_information(gid, hid, name, kind, moi):
     _custom['is_visible_moi'] = True
   else:
     _custom['is_visible_moi'] = False
+  if ipcam_id:
+    _custom['ipcamId'] = ipcam_id
+  else:
+    if 'ipcamId' in _custom:
+      del _custom['ipcamId']
   body['custom'] = _custom
 
   try:

@@ -54,6 +54,26 @@
                     </div>
                   </div>
                   <div class="item form-group">
+                    <label class="control-label col-md-4">IPCAM
+                    </label>
+                    <div class="col-md-8">
+                      <select id="ipcam" name="ipcam" class="form-control">
+                        <option id="" value="">None</option>
+                        {% for ipcam in ipcam_list %}
+                          {% if 'ipcamId' in beacon.custom %}
+                            {% if beacon.custom.ipcamId == ipcam.id %}
+                              <option id="{{ ipcam.id }}" value="{{ ipcam.id }}" selected>{{ ipcam.name }}</option>
+                            {% else %}
+                              <option id="{{ ipcam.id }}" value="{{ ipcam.id }}">{{ ipcam.name }}</option>
+                            {% endif %}
+                          {% else %}
+                            <option id="{{ ipcam.id }}" value="{{ ipcam.id }}">{{ ipcam.name }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="item form-group">
                     <label class="control-label col-md-4">MOI
                     </label>
                     <div class="col-md-8">
