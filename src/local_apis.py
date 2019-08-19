@@ -122,7 +122,7 @@ def register_ipcam(gadget_info):
     return None
 
 
-def update_ipcam_information(ipcam_id, name, moi, data=None):
+def update_ipcam_information(ipcam_id, name, moi, kind, data=None):
   hid = REG_HUB_ID
   url = "{base}gadgets/{ipcam_id}".format(base=BASE_URL, ipcam_id=ipcam_id)
   headers = {
@@ -131,6 +131,7 @@ def update_ipcam_information(ipcam_id, name, moi, data=None):
   }
   body = {
     "name": name,
+    "kind": [kind],
     "custom": {}
   }
   if data:

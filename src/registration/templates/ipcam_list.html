@@ -33,7 +33,15 @@
               }
               else {
                   columnData = columnData.toString().replace(/"/g, '""'); // escape double quotes
-                  columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                  if (columnData.indexOf('vstatus=""on""') >= 0) {
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                      columnData += "ON";
+                  } else if (columnData.indexOf('vstatus=""off""') >= 0){
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                      columnData += "OFF";
+                  } else {
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                  }
               }
               columnData = columnData.replace(/(^\s*)|(\s*$)/gi, "");
               csvString = csvString + '"' + columnData + '",';
@@ -101,11 +109,29 @@
                       Register
                     </button>
                   </th>
+                  <th></th>
+                  <th></th>
                   <th>
+                    <form id="category" action="/registration/ipcam" method="POST">
+                      <select id="category" name="category" onchange="this.form.submit()">
+                        {% if selected_category == "100" %}
+                          <option id="100" value="100" selected>All</option>
+                        {% else %}
+                          <option id="100" value="100">All</option>
+                        {% endif %}
+                        {% for k, v in category.items() %}
+                          {% if selected_category == k %}
+                            <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
+                          {% else %}
+                            <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    </form>
                   </th>
                   <th>
                     <button type="button" class="btn btn-default btn-xs"
-                        onclick="exportTableToCsv('ipcam-table', 'Beacon Tag')"
+                        onclick="exportTableToCsv('ipcam-table', 'IPcam')"
                         style="margin-bottom: 0;">
                       CSV Download
                     </button>
@@ -114,6 +140,8 @@
                 <tr>
                   <th>Name</th>
                   <th>IP Address</th>
+                  <th>Status</th>
+                  <th>Category</th>
                   <th>MOI</th>
                 </tr>
               </thead>
@@ -127,6 +155,17 @@
                     </td>
                     <td>
                       {{ ipcam.custom.ip }}
+                    </td>
+                    <!-- status -->
+                    {% if ipcam.status == 0 %}
+                      <td style="padding-left: 20px;"><img src="/static/images/off.png"
+                          style="width:16px; border: 2px solid #000000; border-radius: 100%" vstatus="off"></td>
+                    {% else %}
+                      <td style="padding-left: 20px;"><img src="/static/images/on.png"
+                          style="width:16px; border: 2px solid #000000; border-radius: 100%" vstatus="on"></td>
+                    {% endif %}
+                    <td>
+                      {{ category[ipcam.tags[0]] }}
                     </td>
                     {% if 'is_visible_moi' in ipcam.custom %}
                       {% if ipcam.custom.is_visible_moi %}
@@ -142,6 +181,7 @@
                 <tr>
                   <td> Total </td>
                   <td> {{ ipcam_list|length }}</td>
+                  <td></td>
                   <td></td>
                 </tr>
               </tbody>
