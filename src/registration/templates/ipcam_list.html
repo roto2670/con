@@ -110,9 +110,25 @@
                     </button>
                   </th>
                   <th></th>
-                  <th></th>
-                  <th>
-                    <form id="category" action="/registration/ipcam" method="POST">
+                  <form id="category" action="/registration/ipcam" method="POST">
+                    <th>
+                      <select id="onoff" name="onoff" onchange="this.form.submit()">
+                        {% if selected_onoff == 0 %}
+                          <option id="100" value="100">All</option>
+                          <option id="1" value="1">ON</option>
+                          <option id="0" value="0" selected>OFF</option>
+                        {% elif selected_onoff == 100 %}
+                          <option id="100" value="100" selected>All</option>
+                          <option id="1" value="1">ON</option>
+                          <option id="0" value="0">OFF</option>
+                        {% else %}
+                          <option id="100" value="100">All</option>
+                          <option id="1" value="1" selected>ON</option>
+                          <option id="0" value="0">OFF</option>
+                        {% endif %}
+                      </select>
+                    </th>
+                    <th>
                       <select id="category" name="category" onchange="this.form.submit()">
                         {% if selected_category == "100" %}
                           <option id="100" value="100" selected>All</option>
@@ -127,8 +143,8 @@
                           {% endif %}
                         {% endfor %}
                       </select>
-                    </form>
-                  </th>
+                    </th>
+                  </form>
                   <th>
                     <button type="button" class="btn btn-default btn-xs"
                         onclick="exportTableToCsv('ipcam-table', 'IPcam')"

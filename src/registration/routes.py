@@ -145,19 +145,34 @@ def ipcam_list_route():
   ipcam_list = count.ipcam_list()
   if request.method == "GET":
     return render_template("ipcam_list.html", ipcam_list=ipcam_list,
-                           category=IPCAM_KIND, selected_category="100")
+                           category=IPCAM_KIND, selected_category="100",
+                           selected_onoff=100)
   else:
+    selected_onoff = int(request.form['onoff'])
     selected_category = request.form['category']
     new_list = []
-    if selected_category != "100":
+    if selected_onoff != 100:
+      for ipcam in ipcam_list:
+        if ipcam['status'] == selected_onoff:
+          if selected_category != "100":
+            if ipcam['tags'] and ipcam['tags'][0] == selected_category:
+              new_list.append(ipcam)
+          else:
+            new_list.append(ipcam)
+    elif selected_category != "100":
       for ipcam in ipcam_list:
         if ipcam['tags'] and ipcam['tags'][0] == selected_category:
-          new_list.append(ipcam)
+          if selected_onoff != 100:
+            if ipcam['status'] == selected_onoff:
+              new_list.append(ipcam)
+          else:
+            new_list.append(ipcam)
     else:
       new_list = ipcam_list
     return render_template("ipcam_list.html", ipcam_list=new_list,
                            category=IPCAM_KIND,
-                           selected_category=selected_category)
+                           selected_category=selected_category,
+                           selected_onoff=selected_onoff)
 
 
 
