@@ -60,14 +60,16 @@
                       <select id="ipcam" name="ipcam" class="form-control">
                         <option id="" value="">None</option>
                         {% for ipcam in ipcam_list %}
-                          {% if 'ipcamId' in beacon.custom %}
-                            {% if beacon.custom.ipcamId == ipcam.id %}
-                              <option id="{{ ipcam.id }}" value="{{ ipcam.id }}" selected>{{ ipcam.name }}</option>
+                          {% if ipcam.tags[0] == "2" %} <!-- 2 is Equipment type -->
+                            {% if 'ipcamId' in beacon.custom %}
+                              {% if beacon.custom.ipcamId == ipcam.id %}
+                                <option id="{{ ipcam.id }}" value="{{ ipcam.id }}" selected>{{ ipcam.name }}</option>
+                              {% else %}
+                                <option id="{{ ipcam.id }}" value="{{ ipcam.id }}">{{ ipcam.name }}</option>
+                              {% endif %}
                             {% else %}
                               <option id="{{ ipcam.id }}" value="{{ ipcam.id }}">{{ ipcam.name }}</option>
                             {% endif %}
-                          {% else %}
-                            <option id="{{ ipcam.id }}" value="{{ ipcam.id }}">{{ ipcam.name }}</option>
                           {% endif %}
                         {% endfor %}
                       </select>

@@ -27,6 +27,13 @@ from registration import blueprint
 from constants import REG_HUB_ID, REG_ACCOUNT_ID, BEACON_SPEC
 
 
+IPCAM_KIND = {
+    "0": "Fixed",
+    "1": "Wireless",
+    "2": "Equipment"
+}
+
+
 @blueprint.route('/')
 @util.require_login
 def route_default():
@@ -137,18 +144,19 @@ def scanner_update_route(hid):
 def ipcam_list_route():
   ipcam_list = count.ipcam_list()
   if request.method == "GET":
-    return render_template("ipcam_list.html", ipcam_list=ipcam_list)
+    return render_template("ipcam_list.html", ipcam_list=ipcam_list,
+                           category=IPCAM_KIND, selected_category="100")
   else:
     selected_category = request.form['category']
     new_list = []
     if selected_category != "100":
-      for beacon in beacon_list:
-        if beacon['tags'] and beacon['tags'][0] == selected_category:
-          new_list.append(beacon)
+      for ipcam in ipcam_list:
+        if ipcam['tags'] and ipcam['tags'][0] == selected_category:
+          new_list.append(ipcam)
     else:
-      new_list = beacon_list
-    return render_template("beacon_list.html", beacon_list=new_list,
-                           category=count.GADGET_INFO,
+      new_list = ipcam_list
+    return render_template("ipcam_list.html", ipcam_list=new_list,
+                           category=IPCAM_KIND,
                            selected_category=selected_category)
 
 
@@ -157,11 +165,12 @@ def ipcam_list_route():
 @util.require_login
 def reg_ipcam():
   if request.method == "GET":
-    return render_template("register_ipcam.html")
+    return render_template("register_ipcam.html", category=IPCAM_KIND)
   else:
     ip = request.form.get('ip')
     _id = request.form.get('id')
     password = request.form.get('password')
+    kind = request.form.get('kind')
     name = request.form.get('name')
     mac_hash = hashlib.md5()
     mac_hash.update(ip.encode('utf-8'))
@@ -200,7 +209,7 @@ def reg_ipcam():
           "id": _id,
           "is_visible_moi": 0,
       },
-      "tags": [],
+      "tags": [kind],
       "beacon_spec": {
           "uuid": BEACON_SPEC,
           "major": 36805,
@@ -212,7 +221,7 @@ def reg_ipcam():
     }
     ret = local_apis.register_ipcam(value)
     logging.info("Register ipcam resp : %s", ret)
-    local_apis.update_ipcam_information(new_id, name, 0, value)
+    local_apis.update_ipcam_information(new_id, name, 0, kind, value)
     return redirect("/registration/ipcam")
 
 
@@ -222,11 +231,13 @@ def reg_ipcam():
 def ipcam_update_route(ipcam_id):
   if request.method == "GET":
     ipcam = count.get_ipcam(ipcam_id)
-    return render_template("update_ipcam.html", ipcam=ipcam)
+    return render_template("update_ipcam.html", ipcam=ipcam,
+                           category=IPCAM_KIND)
   else:
     name = request.form.get('name')
+    kind = request.form.get('kind')
     moi = request.form.get('moi')
-    local_apis.update_ipcam_information(ipcam_id, name, moi)
+    local_apis.update_ipcam_information(ipcam_id, name, moi, kind)
     return redirect("/registration/ipcam")
 
 
