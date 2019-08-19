@@ -131,7 +131,7 @@ def update_ipcam_information(ipcam_id, name, moi, kind, data=None):
   }
   body = {
     "name": name,
-    "kind": [kind],
+    "tags": [kind],
     "custom": {}
   }
   if data:
