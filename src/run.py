@@ -61,6 +61,7 @@ def register_blueprints(app):
       'openapi',
       'registration',
       'moi',
+      'pa',
       'internal',
       'login'
   ]
