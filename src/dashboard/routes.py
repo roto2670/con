@@ -17,6 +17,7 @@ from flask import render_template, request, redirect  # noqa : pylint: disable=i
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import util
+import in_config_apis
 from dashboard import count
 from dashboard import blueprint
 
@@ -306,3 +307,19 @@ def get_enterence_worker_log():
 @util.require_login
 def get_enterence_equip_log():
   return render_template("equip_logs.html")
+
+
+@blueprint.route('/search/worker', methods=["GET", "POST"])
+@util.require_login
+def get_worker_search_page():
+  if request.method == "GET":
+    return render_template("search_prepare.html")
+  else:
+    name = request.form.get('username')
+    ap = request.form.get('ap')
+    inout = request.form.get('inout')
+    datetime_list = request.form.get('datetime')
+    datetime_list = json.loads(datetime_list)
+    worker_log_list = in_config_apis.search_worker_log(name, datetime_list,
+                                                       int(ap), int(inout))
+    return render_template("search.html", log_list=worker_log_list)

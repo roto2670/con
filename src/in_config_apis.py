@@ -94,6 +94,25 @@ def get_enterence_out_worker_log_list(organization_id, access_point, page_num=1,
   return log_list
 
 
+def search_worker_log(worker_name, datetime_list, ap, inout):
+  st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
+  end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
+  filter_list = [
+    EnterenceWorkerLog.event_time > st_date,
+    EnterenceWorkerLog.event_time < end_date
+  ]
+  if worker_name:
+    filter_list.append(EnterenceWorkerLog.worker_name.like("%" + worker_name + "%"))
+  if ap != 0:
+    filter_list.append(EnterenceWorkerLog.access_point == ap)
+  if inout != 0:
+    filter_list.append(EnterenceWorkerLog.inout == inout)
+  log_list = EnterenceWorkerLog.query.\
+      filter(*filter_list).\
+      order_by(desc(EnterenceWorkerLog.created_time)).all()
+  return log_list
+
+
 def create_or_update_count_device_setting(device_id, typ, inout, access_point,
                                           name=""):
   cur_time = get_datetime()
