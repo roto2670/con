@@ -55,6 +55,20 @@
             </a>
           </li>
         {% endif %}
+        {% if current_user.level in [0, 1] %}
+          <li>
+            <a href="/moi/cctv">
+              <i class="fa fa-eye"></i>CCTV Monitoring for MOI
+            </a>
+          </li>
+        {% endif %}
+        {% if current_user.level in [0, 1] %}
+          <li>
+            <a href="http://35.225.29.233" target="_blank">
+              <i class="fa fa-server"></i> MOI Inventory
+            </a>
+          </li>
+        {% endif %}
       </ul>
     </div>
   </div>
