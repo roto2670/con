@@ -85,56 +85,6 @@ def route_errors(error):
   return render_template('errors/page_{}.html'.format(error))
 
 
-## Login & Registration
-
-
-DEFAULT_PHOTO_URL = '''/static/images/user.png'''
-
-@auth.production_loader
-def production_sign_in(token):
-  # https://firebase.google.com/docs/auth/admin/verify-id-tokens?hl=ko
-  user = User.query.filter_by(id=token['sub']).one_or_none()
-  if not user:
-    user = User(id=token['sub'],
-                firebase_user_id=token['sub'])
-    user.name = token['name'] if 'name' in token else token['email']
-    user.email = token['email']
-    user.email_verified = user.email_verified if user.email_verified else token['email_verified']
-    user.sign_in_provider = token['firebase']['sign_in_provider']
-    user.photo_url = token.get('picture', DEFAULT_PHOTO_URL)
-    user.created_time = in_apis.get_datetime()
-    user.level = models.MEMBER
-    db.session.add(user)
-  user.last_access_time = in_apis.get_datetime()
-  user.ip_address = util.get_ip_addr()
-  invite = in_apis.get_invite_by_email(token['email'])
-  user.organization_id = constants.ORG_ID
-  db.session.commit()
-  if not user.permission:
-    permission = Permission(id=uuid.uuid4().hex,
-                            permission='777',
-                            user_id=user.id)
-    db.session.add(permission)
-  db.session.commit()
-  login_user(user)
-  return redirect(url_for('base_blueprint.route_default'))
-
-
-@auth.unloader
-def logout():
-  logout_user()
-  return redirect(url_for('login_blueprint.login'))
-
-
-@blueprint.route('/shutdown')
-def shutdown():
-  func = request.environ.get('werkzeug.server.shutdown')
-  if func is None:
-    raise RuntimeError('Not running with the Werkzeug Server')
-  func()
-  return 'Server shutting down...'
-
-
 ## Errors
 
 
