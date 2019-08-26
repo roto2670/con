@@ -132,8 +132,9 @@ def member_create():
     email = request.form['email']
     username = request.form['username']
     password = request.form['password']
+    department = request.form['department']
     level = request.form['level']
-    in_apis.create_user(email, username, password, level)
+    in_apis.create_user(email, username, password, department, level)
     return redirect("/management/organization/member")
 
 
@@ -156,6 +157,17 @@ def member_password(user_id):
       in_apis.update_user_password(user_id, new_password)
       return redirect('/management/organization/member')
     return render_template('password.html')
+
+
+def member_update(user_id):
+  if request.method == "GET":
+    user = in_apis.get_user(user_id)
+    return render_template('member_update.html', user=user)
+  else:
+    username = request.form['username']
+    department = request.form['department']
+    in_apis.update_user_information(user_id, username, department)
+    return redirect('/management/organization/member')
 
 
 def product():

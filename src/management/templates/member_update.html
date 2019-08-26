@@ -1,0 +1,69 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_management.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block title %} Update Information {% endblock title %}
+
+{% block stylesheets %}
+  {{ super() }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">
+            <div class="x_title">
+              <h2>Update Information</h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <br />
+              <form id="update" data-parsley-validate class="form-horizontal form-label-left"
+                  action="/management/organization/member/{{ user.id }}/update" method="POST">
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="username">
+                    Name <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                      <input type="text" id="username" name="username" value="{{ user.name }}"
+                          class="form-control col-md-6 col-xs-6" required="required"
+                          onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g,'');" >
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="department">
+                    Department <span class="required">*</span>
+                  </label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                      <input type="text" id="department" name="department" value="{{ user.sign_in_provider }}"
+                          class="form-control col-md-6 col-xs-6" required="required"
+                          onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s-]/g,'');" >
+                  </div>
+                </div>
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <button type="submit" class="btn btn-default">Update</button>
+                  </div>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div> <!-- End Row-->
+
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ super() }}
+{% endblock javascripts %}

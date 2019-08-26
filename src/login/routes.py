@@ -35,7 +35,7 @@ def login():
                            is_error=is_error)
   else:
     user = in_apis.get_user(current_user.id)
-    user.last_access_time = in_apis.get_datetime()
+    user.last_access_time = in_apis.get_servertime()
     user.ip_address = util.get_ip_addr()
     db.session.commit()
     if current_user.email_verified:

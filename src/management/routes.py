@@ -86,6 +86,12 @@ def member_password(user_id):
   return organization.member_password(user_id)
 
 
+@blueprint.route('/organization/member/<user_id>/update', methods=['GET', 'POST'])
+@util.require_login
+def member_update(user_id):
+  return organization.member_update(user_id)
+
+
 @blueprint.route('/organization/product', methods=['GET'])
 @util.require_login
 def default_organization_product():

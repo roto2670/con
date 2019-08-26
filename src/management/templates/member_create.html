@@ -61,6 +61,16 @@
                     </div>
                   </div>
                   <div class="item form-group">
+                    <label class="control-label col-md-4" for="department">
+                      Department <span class="required">*</span>
+                    </label>
+                    <div class="col-md-8">
+                      <input type="text" id="department" name="department" value=""
+                          class="form-control col-md-6 col-xs-6" required="required"
+                          onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s-]/g,'');" >
+                    </div>
+                  </div>
+                  <div class="item form-group">
                     <label class="control-label col-md-4" for="level">
                       Level <span class="required">*</span>
                     </label>

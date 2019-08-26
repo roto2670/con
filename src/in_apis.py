@@ -49,6 +49,10 @@ def get_datetime():
   return datetime.datetime.now(pytz.timezone('UTC'))
 
 
+def get_servertime():
+  return datetime.datetime.now().replace(microsecond=0)
+
+
 # {{{ Product
 
 
@@ -387,7 +391,7 @@ def update_organization_by_logo(organization_id, logo_path):
 # {{{ User
 
 
-def create_user(email, username, password, level):
+def create_user(email, username, password, department, level):
   cur_time = get_datetime()
   org_id = constants.ORG_ID
   user_id = uuid.uuid4().hex
@@ -396,10 +400,9 @@ def create_user(email, username, password, level):
               name=username,
               firebase_user_id=user_id,
               email_verified=True,
-              sign_in_provider="",
+              sign_in_provider=department,  # Using department
               photo_url='/static/images/user.png',
               created_time=cur_time,
-              last_access_time=cur_time,
               ip_address=util.get_ip_addr(),
               level=int(level),
               password=password,
@@ -442,7 +445,7 @@ def get_user_list_by_moi(organization_id):
 def update_user_by_ip(user_id, ip_addr):
   user = User.query.filter_by(id=user_id).one_or_none()
   user.ip_address = ip_addr
-  user.last_access_time = get_datetime()
+  user.last_access_time = get_servertime()
   db.session.commit()
 
 
@@ -479,6 +482,14 @@ def update_user_password(user_id, password):
   if user:
     _password = hashpw(password.encode('utf-8'), gensalt())
     user.password = _password
+    db.session.commit()
+
+
+def update_user_information(user_id, name, department):
+  user = User.query.filter_by(id=user_id).one_or_none()
+  if user:
+    user.name = name
+    user.sign_in_provider = department
     db.session.commit()
 
 

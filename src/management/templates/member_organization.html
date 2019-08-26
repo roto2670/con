@@ -39,8 +39,10 @@
                 <table class="table table-striped projects">
                   <thead>
                     <tr>
-                      <th style="width:10%"></th>
+                      <th style="width:3%"></th>
                       <th>Email</th>
+                      <th>Name</th>
+                      <th>Department</th>
                       <th>Level</th>
                       <th>last_access</th>
                       <th>Edit</th>
@@ -50,11 +52,15 @@
                     {% for user in user_list %}
                       {% if user.level == 0 %}
                       <tr>
-                        <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
+                        <td></td>
                         <td>
-                          <a href="/management/organization/member/{{ user.id }}/password">
                             {{ user.email }}
-                          </a>
+                        </td>
+                        <td>
+                          {{ user.name }}
+                        </td>
+                        <td>
+                          {{ user.sign_in_provider }}
                         </td>
                         {% if current_user.level == 0 %}
                           {% if current_user.id == user.id %}
@@ -81,9 +87,27 @@
                             <td>{{ user_level[user.level] }}</td>
                           {% endif %}
                         {% endif %}
-                        <td>{{ user.last_access_time }}</td>
+                        <td>
+                          {% if user.last_access_time %}
+                            {{ user.last_access_time }}
+                          {% else %}
+                          {% endif %}
+                        </td>
                         {% if user.level == 0 %}
-                          <td></td>
+                          <td>
+                            {% if user.id == current_user.id %}
+                              <a href="/management/organization/member/{{ user.id }}/update">
+                                <button type="button" class="btn-info btn-xs">
+                                  Edit
+                                </button>
+                              </a>
+                              <a href="/management/organization/member/{{ user.id }}/password">
+                                <button type="button" class="btn-dark btn-xs">
+                                  Password
+                                </button>
+                              </a>
+                            {% endif %}
+                          </td>
                         {% else %}
                           {% if current_user.level == 0 %}
                             <td>
@@ -148,8 +172,10 @@
                 <table class="table table-striped projects">
                   <thead>
                     <tr>
-                      <th style="width:10%"></th>
+                      <th style="width:3%"></th>
                       <th>Email</th>
+                      <th>Name</th>
+                      <th>Department</th>
                       <th>Level</th>
                       <th>last_access</th>
                       <th>Edit</th>
@@ -159,11 +185,15 @@
                     {% for user in user_list %}
                       {% if user.level == 1 %}
                       <tr>
-                        <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
+                        <td></td>
                         <td>
-                          <a href="/management/organization/member/{{ user.id }}/password">
-                            {{ user.email }}
-                          </a>
+                          {{ user.email }}
+                        </td>
+                        <td>
+                          {{ user.name }}
+                        </td>
+                        <td>
+                          {{ user.sign_in_provider }}
                         </td>
                         {% if current_user.level == 0 %}
                           {% if current_user.id == user.id %}
@@ -190,12 +220,26 @@
                             <td>{{ user_level[user.level] }}</td>
                           {% endif %}
                         {% endif %}
-                        <td>{{ user.last_access_time }}</td>
+                        <td>
+                          {% if user.last_access_time %}
+                            {{ user.last_access_time }}
+                          {% endif %}
+                        </td>
                         {% if user.level == 0 %}
                           <td></td>
                         {% else %}
                           {% if current_user.level == 0 %}
                             <td>
+                              <a href="/management/organization/member/{{ user.id }}/update">
+                                <button type="button" class="btn-info btn-xs">
+                                  Edit
+                                </button>
+                              </a>
+                              <a href="/management/organization/member/{{ user.id }}/password">
+                                <button type="button" class="btn-dark btn-xs">
+                                  Password
+                                </button>
+                              </a>
                               <button type="button" class="btn-danger btn-xs" data-toggle="modal"
                                   data-target=".delete-modal-{{ user.id }}">
                                 <i class="fa fa-remove"> Delete</i>
@@ -257,8 +301,10 @@
                 <table class="table table-striped projects">
                   <thead>
                     <tr>
-                      <th style="width:10%"></th>
+                      <th style="width:3%"></th>
                       <th>Email</th>
+                      <th>Name</th>
+                      <th>Department</th>
                       <th>Level</th>
                       <th>last_access</th>
                       <th>Edit</th>
@@ -268,11 +314,15 @@
                     {% for user in user_list %}
                       {% if user.level == 3 %}
                       <tr>
-                        <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
+                        <td></td>
                         <td>
-                          <a href="/management/organization/member/{{ user.id }}/password">
-                            {{ user.email }}
-                          </a>
+                          {{ user.email }}
+                        </td>
+                        <td>
+                          {{ user.name }}
+                        </td>
+                        <td>
+                          {{ user.sign_in_provider }}
                         </td>
                         {% if current_user.level == 0 %}
                           {% if current_user.id == user.id %}
@@ -299,12 +349,26 @@
                             <td>{{ user_level[user.level] }}</td>
                           {% endif %}
                         {% endif %}
-                        <td>{{ user.last_access_time }}</td>
+                        <td>
+                          {% if user.last_access_time %}
+                            {{ user.last_access_time }}
+                          {% endif %}
+                        </td>
                         {% if user.level == 0 %}
                           <td></td>
                         {% else %}
                           {% if current_user.level == 0 %}
                             <td>
+                              <a href="/management/organization/member/{{ user.id }}/update">
+                                <button type="button" class="btn-info btn-xs">
+                                  Edit
+                                </button>
+                              </a>
+                              <a href="/management/organization/member/{{ user.id }}/password">
+                                <button type="button" class="btn-dark btn-xs">
+                                  Password
+                                </button>
+                              </a>
                               <button type="button" class="btn-danger btn-xs" data-toggle="modal"
                                   data-target=".delete-modal-{{ user.id }}">
                                 <i class="fa fa-remove"> Delete</i>
@@ -366,8 +430,10 @@
                 <table class="table table-striped projects">
                   <thead>
                     <tr>
-                      <th style="width:10%"></th>
+                      <th style="width:3%"></th>
                       <th>Email</th>
+                      <th>Name</th>
+                      <th>Department</th>
                       <th>Level</th>
                       <th>last_access</th>
                       <th>Edit</th>
@@ -377,11 +443,15 @@
                     {% for user in user_list %}
                       {% if user.level == 4 %}
                       <tr>
-                        <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
+                        <td></td>
                         <td>
-                          <a href="/management/organization/member/{{ user.id }}/password">
-                            {{ user.email }}
-                          </a>
+                          {{ user.email }}
+                        </td>
+                        <td>
+                          {{ user.name }}
+                        </td>
+                        <td>
+                          {{ user.sign_in_provider }}
                         </td>
                         {% if current_user.level == 0 %}
                           {% if current_user.id == user.id %}
@@ -408,12 +478,26 @@
                             <td>{{ user_level[user.level] }}</td>
                           {% endif %}
                         {% endif %}
-                        <td>{{ user.last_access_time }}</td>
+                        <td>
+                          {% if user.last_access_time %}
+                            {{ user.last_access_time }}
+                          {% endif %}
+                        </td>
                         {% if user.level == 0 %}
                           <td></td>
                         {% else %}
                           {% if current_user.level == 0 %}
                             <td>
+                              <a href="/management/organization/member/{{ user.id }}/update">
+                                <button type="button" class="btn-info btn-xs">
+                                  Edit
+                                </button>
+                              </a>
+                              <a href="/management/organization/member/{{ user.id }}/password">
+                                <button type="button" class="btn-dark btn-xs">
+                                  Password
+                                </button>
+                              </a>
                               <button type="button" class="btn-danger btn-xs" data-toggle="modal"
                                   data-target=".delete-modal-{{ user.id }}">
                                 <i class="fa fa-remove"> Delete</i>
@@ -476,8 +560,10 @@
                 <table class="table table-striped projects">
                   <thead>
                     <tr>
-                      <th style="width:10%"></th>
+                      <th style="width:3%"></th>
                       <th>Email</th>
+                      <th>Name</th>
+                      <th>Department</th>
                       <th>Level</th>
                       <th>last_access</th>
                       <th>Edit</th>
@@ -487,11 +573,15 @@
                     {% for user in user_list %}
                       {% if user.level == 5 %}
                       <tr>
-                        <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
+                        <td></td>
                         <td>
-                          <a href="/management/organization/member/{{ user.id }}/password">
-                            {{ user.email }}
-                          </a>
+                          {{ user.email }}
+                        </td>
+                        <td>
+                          {{ user.name }}
+                        </td>
+                        <td>
+                          {{ user.sign_in_provider }}
                         </td>
                         {% if current_user.level == 0 %}
                           {% if current_user.id == user.id %}
@@ -518,12 +608,26 @@
                             <td>{{ user_level[user.level] }}</td>
                           {% endif %}
                         {% endif %}
-                        <td>{{ user.last_access_time }}</td>
+                        <td>
+                          {% if user.last_access_time %}
+                            {{ user.last_access_time }}
+                          {% endif %}
+                        </td>
                         {% if user.level == 0 %}
                           <td></td>
                         {% else %}
                           {% if current_user.level == 0 %}
                             <td>
+                              <a href="/management/organization/member/{{ user.id }}/update">
+                                <button type="button" class="btn-info btn-xs">
+                                  Edit
+                                </button>
+                              </a>
+                              <a href="/management/organization/member/{{ user.id }}/password">
+                                <button type="button" class="btn-dark btn-xs">
+                                  Password
+                                </button>
+                              </a>
                               <button type="button" class="btn-danger btn-xs" data-toggle="modal"
                                   data-target=".delete-modal-{{ user.id }}">
                                 <i class="fa fa-remove"> Delete</i>
@@ -585,8 +689,10 @@
                 <table class="table table-striped projects">
                   <thead>
                     <tr>
-                      <th style="width:10%"></th>
+                      <th style="width:3%"></th>
                       <th>Email</th>
+                      <th>Name</th>
+                      <th>Department</th>
                       <th>Level</th>
                       <th>last_access</th>
                       <th>Edit</th>
@@ -596,11 +702,15 @@
                     {% for user in user_list %}
                       {% if user.level == 6 %}
                       <tr>
-                        <td style="text-align: center"><ul class="list-inline"><li><img src="{{ user.photo_url }}" class="avatar"></li></ul></td>
+                        <td></td>
                         <td>
-                          <a href="/management/organization/member/{{ user.id }}/password">
-                            {{ user.email }}
-                          </a>
+                          {{ user.email }}
+                        </td>
+                        <td>
+                          {{ user.name }}
+                        </td>
+                        <td>
+                          {{ user.sign_in_provider }}
                         </td>
                         {% if current_user.level == 0 %}
                           {% if current_user.id == user.id %}
@@ -627,12 +737,26 @@
                             <td>{{ user_level[user.level] }}</td>
                           {% endif %}
                         {% endif %}
-                        <td>{{ user.last_access_time }}</td>
+                        <td>
+                          {% if user.last_access_time %}
+                            {{ user.last_access_time }}
+                          {% endif %}
+                        </td>
                         {% if user.level == 0 %}
                           <td></td>
                         {% else %}
                           {% if current_user.level == 0 %}
                             <td>
+                              <a href="/management/organization/member/{{ user.id }}/update">
+                                <button type="button" class="btn-info btn-xs">
+                                  Edit
+                                </button>
+                              </a>
+                              <a href="/management/organization/member/{{ user.id }}/password">
+                                <button type="button" class="btn-dark btn-xs">
+                                  Password
+                                </button>
+                              </a>
                               <button type="button" class="btn-danger btn-xs" data-toggle="modal"
                                   data-target=".delete-modal-{{ user.id }}">
                                 <i class="fa fa-remove"> Delete</i>

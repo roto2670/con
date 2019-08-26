@@ -79,7 +79,7 @@ class _User(UserMixin, db.Model):
   name = Column(String(75))
   firebase_user_id = Column(String(75), unique=True)
   email_verified = Column(Boolean, default=False, nullable=False)
-  sign_in_provider = Column(String(75))
+  sign_in_provider = Column(String(75))  # Using Department
   photo_url = Column(String(225))
   created_time = Column(DateTime)
   last_access_time = Column(DateTime)
