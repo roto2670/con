@@ -20,6 +20,7 @@ class _NoticeBoard(db.Model):
   __tablename__ = '_notice_board'
   id = Column(Integer, primary_key=True)
   title = Column(String(75))
+  category = Column(String(75))
   writer = Column(String(75))
   department = Column(String(75))
   file_path = Column(Text)
@@ -31,6 +32,7 @@ class _ScheduleBoard(db.Model):
   __tablename__ = '_schedule_board'
   id = Column(Integer, primary_key=True)
   title = Column(String(75))
+  category = Column(String(75))
   writer = Column(String(75))
   department = Column(String(75))
   file_path = Column(Text)

@@ -35,10 +35,12 @@ def get_servertime():
   return datetime.datetime.now().replace(microsecond=0)
 
 
-def create_notice_content(title, writer, department, file_path, org_id=None):
+def create_notice_content(title, category, writer, department, file_path,
+                          org_id=None):
   _org_id = org_id if org_id else current_user.organization_id
   cur_time = get_servertime()
   content = NoticeBoard(title=title,
+                        category=category,
                         writer=writer,
                         department=department,
                         file_path=file_path,
@@ -69,10 +71,12 @@ def delete_notice(_id):
     db.session.commit()
 
 
-def create_schedule_content(title, writer, department, file_path, org_id=None):
+def create_schedule_content(title, category, writer, department, file_path,
+                            org_id=None):
   _org_id = org_id if org_id else current_user.organization_id
   cur_time = get_servertime()
   content = ScheduleBoard(title=title,
+                          category=category,
                           writer=writer,
                           department=department,
                           file_path=file_path,

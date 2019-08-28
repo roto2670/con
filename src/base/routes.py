@@ -179,3 +179,7 @@ def datetime_check(value):
   cur_date = datetime.datetime.now()
   new_check_date = value - datetime.timedelta(days=-3)
   return new_check_date > cur_date
+
+
+def change_us_format(value):
+  return value.strftime("%m/%d/%Y  %H:%M:%S")

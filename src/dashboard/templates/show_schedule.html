@@ -6,7 +6,7 @@
   </div>
 {% endblock sidebar %}
 
-{% block title %} Schedule {% endblock title %}
+{% block title %} Schedule Board {% endblock title %}
 
 {% block javascripts %}
   {{ super()}}
@@ -26,7 +26,14 @@
           <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel tile">
                 <div class="x_title">
-                  <h3> Notice </h3>
+                  <div class="x_title_left_div">
+                    <h4> {{ schedule.title }} </h4>
+                  </div>
+                  <div class="x_title_right_div">
+                    <a href="/dashboard/board/schedule">
+                      <button class="btn btn-default btn-sm" style="margin-top:5px;"> List </button>
+                    </a>
+                  </div>
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
@@ -34,39 +41,29 @@
                   <form action="#" method="post" class="form-horizontal form-label-left">
 
                     <div class="form-group">
-                      <label class="control-label col-md-2 col-sm-2 col-xs-2" for="title">Title
+                      <label class="control-label col-md-1 col-sm-1 col-xs-1" for="writer">Writer
                       </label>
-                      <label class="control-label col-md-8 col-sm-8 col-xs-8" style="text-align:left;">
-                        {{ schedule.title }}
-                      </label>
-                    </div>
-
-                    <div class="form-group">
-                      <label class="control-label col-md-2 col-sm-2 col-xs-2" for="writer">Writer
-                      </label>
-                      <label class="control-label col-md-8 col-sm-8 col-xs-8" style="text-align:left;">
+                      <label class="control-label col-md-2 col-sm-2 col-xs-2" style="text-align:left;">
                         {{ schedule.writer }}
                       </label>
-                    </div>
 
-                    <div class="form-group">
-                      <label class="control-label col-md-2 col-sm-2 col-xs-2" for="department">Department
+                      <label class="control-label col-md-1 col-sm-1 col-xs-1" for="department">Department
                       </label>
-                      <label class="control-label col-md-8 col-sm-8 col-xs-8" style="text-align:left;">
+                      <label class="control-label col-md-2 col-sm-2 col-xs-2" style="text-align:left;">
                         {{ schedule.department }}
                       </label>
-                    </div>
-                    <div class="form-group">
-                      <label class="control-label col-md-2 col-sm-2 col-xs-2" for="department">Date
+
+                      <label class="control-label col-md-1 col-sm-1 col-xs-1" for="date">Date
                       </label>
-                      <label class="control-label col-md-8 col-sm-8 col-xs-8" style="text-align:left;">
-                        {{ schedule.created_time }}
+                      <label class="control-label col-md-2 col-sm-2 col-xs-2" style="text-align:left;">
+                        {{ schedule.created_time|usDateFormat }}
                       </label>
                     </div>
+
                     <div class="ln_solid"></div>
 
                     <div class="form-group">
-                      <label class="control-label col-md-2 col-sm-2 col-xs-2" for="department">Content
+                      <label class="control-label col-md-2 col-sm-2 col-xs-2" for="content">
                       </label>
                       <div class="col-md-8 col-sm-8 col-xs-8">
                       <!--
@@ -82,10 +79,10 @@
                   <div class="ln_solid"></div>
                   <div style="text-align:right;">
                     <a href="/dashboard/board/schedule">
-                      <button class="btn btn-default"> List </button>
+                      <button class="btn btn-default btn-sm"> List </button>
                     </a>
                   {% if current_user.level == 0 %}
-                    <button class="btn btn-danger" data-toggle="modal" data-target=".schedule-modal">Delete</button>
+                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target=".schedule-modal">Delete</button>
                   {% endif %}
                   </div>
                   <div class="modal fade schedule-modal" tabindex="-3" role="dialog" aria-hidden="true">

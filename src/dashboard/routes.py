@@ -359,6 +359,7 @@ def register_notice():
     return render_template("register_notice.html")
   else:
     title = request.form.get('title')
+    category = request.form.get('category')
     writer = request.form.get('writer')
     department = request.form.get('department')
     upload_file = request.files['file']
@@ -378,7 +379,8 @@ def register_notice():
     os.chmod(file_path, stat.S_IREAD)
     url = '/static/dashboard/notice/' + current_user.organization_id + \
          "/" + NOTICE_COMMON_FILE_NAME + "_" + name
-    in_config_apis.create_notice_content(title, writer, department, url)
+    in_config_apis.create_notice_content(title, category, writer, department,
+                                         url)
     return redirect("/dashboard/board/notice")
 
 
@@ -417,6 +419,7 @@ def register_schedule():
     return render_template("register_schedule.html")
   else:
     title = request.form.get('title')
+    category = request.form.get('category')
     writer = request.form.get('writer')
     department = request.form.get('department')
     upload_file = request.files['file']
@@ -436,7 +439,8 @@ def register_schedule():
     os.chmod(file_path, stat.S_IREAD)
     url = '/static/dashboard/schedule/' + current_user.organization_id + \
          "/" + SCHEDULE_COMMON_FILE_NAME + "_" + name
-    in_config_apis.create_schedule_content(title, writer, department, url)
+    in_config_apis.create_schedule_content(title, category, writer, department,
+                                           url)
     return redirect("/dashboard/board/schedule")
 
 
