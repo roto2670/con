@@ -70,9 +70,35 @@
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
-              <a href="/dashboard/workschedule">
-                <img src="" id="workSchedule" class="col-md-12 col-sm-12">
-              </a>
+            <table id="notice-table" class="table table-striped projects">
+              <thead>
+                <tr>
+                  <th style="width:2%"></th>
+                  <th>Title</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for notice in notice_list %}
+                  <tr>
+                    <td>
+                      {% if notice.created_time|datetimeCheck %}
+                        <i class="fa fa-exclamation-circle"></i>
+                      {% endif %}
+                    </td>
+                    <td><div>
+                      <a href="/dashboard/board/notice/{{ notice.id }}/show">
+                        {% if notice.title|length >= 30 %}
+                          {{ notice.title[:30] }}...
+                        {% else %}
+                          {{ notice.title }}
+                        {% endif %}
+                      </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
             </div>
           </div>
         </div>

@@ -1,0 +1,62 @@
+{% extends "base_site.html" %}
+
+{% block title %} Notice List {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_dashboard.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col" role="main">
+  <div class="row">  <!-- start row -->
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_content">  <!-- x_content 1 -->
+
+          <div class="x_content">  <!-- x_content 2 -->
+            {% if current_user.level in [0, 1] %}
+              <div style="text-align: right;">
+                <a href="/dashboard/board/notice/register">
+                  <button class="btn btn-default btn-xs">Register</button>
+                </a>
+              </div>
+            {% endif %}
+            <table id="notice-table" class="table table-striped projects">
+              <thead>
+                <tr>
+                  <th style="width:2%"></th>
+                  <th style="width:43%">Title</th>
+                  <th style="width:20%">Writer</th>
+                  <th style="width:20%">Department</th>
+                  <th style="width:15%">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for notice in notice_list %}
+                  <tr>
+                    <td>
+                      {% if notice.created_time|datetimeCheck %}
+                        <i class="fa fa-exclamation-circle"></i>
+                      {% endif %}
+                    </td>
+                    <td><a href="/dashboard/board/notice/{{ notice.id }}/show">{{ notice.title }}</a></td>
+                    <td>{{ notice.writer }}</td>
+                    <td>{{ notice.department }}</td>
+                    <td>{{ notice.created_time }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>  <!-- end x_content 2 -->
+
+        </div>  <!-- end x_content 1 -->
+      </div>  <!-- end x_panel -->
+    </div>
+
+  </div>  <!-- End row -->
+</div>
+
+{% endblock content %}

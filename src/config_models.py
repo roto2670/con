@@ -16,6 +16,29 @@ from sqlalchemy import Column, DateTime, String, Text, Integer  # noqa : pylint:
 from base import db
 
 
+class _NoticeBoard(db.Model):
+  __tablename__ = '_notice_board'
+  id = Column(Integer, primary_key=True)
+  title = Column(String(75))
+  writer = Column(String(75))
+  department = Column(String(75))
+  file_path = Column(Text)
+  created_time = Column(DateTime)
+  organization_id = Column(String(75))
+
+
+class _ScheduleBoard(db.Model):
+  __tablename__ = '_schedule_board'
+  id = Column(Integer, primary_key=True)
+  id = Column(Integer, primary_key=True)
+  title = Column(String(75))
+  writer = Column(String(75))
+  department = Column(String(75))
+  file_path = Column(Text)
+  created_time = Column(DateTime)
+  organization_id = Column(String(75))
+
+
 class _BusSettingData(db.Model):
   __tablename__ = '_bus_setting_data'
 
