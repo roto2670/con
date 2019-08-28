@@ -69,6 +69,40 @@ def delete_notice(_id):
     db.session.commit()
 
 
+def create_schedule_content(title, writer, department, file_path, org_id=None):
+  _org_id = org_id if org_id else current_user.organization_id
+  cur_time = get_servertime()
+  content = ScheduleBoard(title=title,
+                          writer=writer,
+                          department=department,
+                          file_path=file_path,
+                          created_time=cur_time,
+                          organization_id=_org_id)
+  db.session.add(content)
+  db.session.commit()
+
+
+def get_schedule(_id):
+  schedule_content = ScheduleBoard.query.filter_by(id=_id).one_or_none()
+  return schedule_content
+
+
+def get_schedule_list(page_num=1, limit=None):
+  _limit = limit if limit else 30
+  # notice_list = NoticeBoard.query.\
+  #   order_by(desc(NoticeBoard.created_time)).paginate(page_num, _limit, False)
+  schedule_list = ScheduleBoard.query.\
+    order_by(desc(ScheduleBoard.created_time)).all()
+  return schedule_list
+
+
+def delete_schedule(_id):
+  ret = get_schedule(_id)
+  if ret:
+    db.session.delete(ret)
+    db.session.commit()
+
+
 def create_enterence_worker_log(inout, access_point, data, text,
                                 organization_id):
   cur_time = get_datetime()

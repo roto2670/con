@@ -66,39 +66,39 @@
         <div class="col-md-4 col-sm-4 col-xs-12">
           <div class="x_panel tile" style="height: 410px;">
             <div class="x_title">
-              <h3>Work Schedule - Summary</h3>
+              <h3>Notice</h3>
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
-            <table id="notice-table" class="table table-striped projects">
-              <thead>
-                <tr>
-                  <th style="width:2%"></th>
-                  <th>Title</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for notice in notice_list %}
+              <table id="notice-table" class="table table-striped projects">
+                <thead>
                   <tr>
-                    <td>
-                      {% if notice.created_time|datetimeCheck %}
-                        <i class="fa fa-exclamation-circle"></i>
-                      {% endif %}
-                    </td>
-                    <td><div>
-                      <a href="/dashboard/board/notice/{{ notice.id }}/show">
-                        {% if notice.title|length >= 30 %}
-                          {{ notice.title[:30] }}...
-                        {% else %}
-                          {{ notice.title }}
-                        {% endif %}
-                      </a>
-                      </div>
-                    </td>
+                    <th style="width:2%"></th>
+                    <th>Title</th>
                   </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {% for notice in notice_list %}
+                    <tr>
+                      <td>
+                        {% if notice.created_time|datetimeCheck %}
+                          <i class="fa fa-exclamation-circle"></i>
+                        {% endif %}
+                      </td>
+                      <td><div>
+                        <a href="/dashboard/board/notice/{{ notice.id }}/show">
+                          {% if notice.title|length >= 30 %}
+                            {{ notice.title[:30] }}...
+                          {% else %}
+                            {{ notice.title }}
+                          {% endif %}
+                        </a>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -106,13 +106,39 @@
         <div class="col-md-4 col-sm-4 col-xs-12">
           <div class="x_panel tile" style="height: 410px;">
             <div class="x_title">
-              <h3>Work Schedule - Detail</h3>
+              <h3>Schedule</h3>
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
-              <a href="/dashboard/workschedule/detail">
-                <img src="" id="workSchedule-detail" class="col-md-12 col-sm-12">
-              </a>
+              <table id="schedule-table" class="table table-striped projects">
+                <thead>
+                  <tr>
+                    <th style="width:2%"></th>
+                    <th>Title</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for schedule in schedule_list %}
+                    <tr>
+                      <td>
+                        {% if schedule.created_time|datetimeCheck %}
+                          <i class="fa fa-exclamation-circle"></i>
+                        {% endif %}
+                      </td>
+                      <td><div>
+                        <a href="/dashboard/board/schedule/{{ schedule.id }}/show">
+                          {% if schedule.title|length >= 30 %}
+                            {{ schedule.title[:30] }}...
+                          {% else %}
+                            {{ schedule.title }}
+                          {% endif %}
+                        </a>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

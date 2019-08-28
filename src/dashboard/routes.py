@@ -23,8 +23,8 @@ from dashboard import count
 from dashboard import blueprint
 
 
-SCHEDULE_COMMON_FILE_NAME = '''schedule'''
 NOTICE_COMMON_FILE_NAME = '''notice'''
+SCHEDULE_COMMON_FILE_NAME = '''schedule'''
 LOCATION_MAP_COMMON_FILE_NAME = '''location.png'''
 LOCATION_MAP_URI = "/dashboard/static/location/{org_id}/{file_name}"
 
@@ -46,11 +46,13 @@ def default_test():
 def default_route():
   emergency_cache = count.get_emergency_info()
   notice_list = _get_notice_list_summary()
+  schedule_list = _get_schedule_list_summary()
   return render_template("dashboard_home.html",
                          emergency=emergency_cache[count.IS_EMERGENCY_KEY],
                          time_msg=emergency_cache[count.TIME_MSG_KEY],
                          date_msg=emergency_cache[count.DATE_MSG_KEY],
-                         notice_list=notice_list)
+                         notice_list=notice_list,
+                         schedule_list=schedule_list)
 
 
 @blueprint.route('/emergency', methods=['POST'])
@@ -377,7 +379,6 @@ def register_notice():
     url = '/static/dashboard/notice/' + current_user.organization_id + \
          "/" + NOTICE_COMMON_FILE_NAME + "_" + name
     in_config_apis.create_notice_content(title, writer, department, url)
-    logging.info("### url : %s", url)
     return redirect("/dashboard/board/notice")
 
 
@@ -386,3 +387,61 @@ def register_notice():
 def delete_notice(notice_id):
   in_config_apis.delete_notice(notice_id)
   return redirect("/dashboard/board/notice")
+
+
+def _get_schedule_list_summary():
+  schedule_list = in_config_apis.get_schedule_list()
+  if len(schedule_list) > 7:
+    schedule_list = schedule_list[:7]
+  return schedule_list
+
+
+@blueprint.route('/board/schedule/<schedule_id>/show', methods=["GET"])
+@util.require_login
+def get_schedule_content(schedule_id):
+  schedule = in_config_apis.get_schedule(int(schedule_id))
+  return render_template("show_schedule.html", schedule=schedule)
+
+
+@blueprint.route('/board/schedule', methods=["GET"])
+@util.require_login
+def get_schedule_list():
+  schedule_list = in_config_apis.get_schedule_list()
+  return render_template("schedule_list.html", schedule_list=schedule_list)
+
+
+@blueprint.route('/board/schedule/register', methods=["GET", "POST"])
+@util.require_login
+def register_schedule():
+  if request.method == "GET":
+    return render_template("register_schedule.html")
+  else:
+    title = request.form.get('title')
+    writer = request.form.get('writer')
+    department = request.form.get('department')
+    upload_file = request.files['file']
+    content = upload_file.read()
+    name = upload_file.filename
+    base_path = util.get_static_path()
+
+    org_path = os.path.join(base_path, 'dashboard', 'schedule',
+                            current_user.organization_id)
+    if not os.path.exists(org_path):
+      os.makedirs(org_path)
+    file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME + "_" + name)
+    if os.path.exists(file_path):
+      os.remove(file_path)
+    with open(file_path, 'wb') as f:
+      f.write(content)
+    os.chmod(file_path, stat.S_IREAD)
+    url = '/static/dashboard/schedule/' + current_user.organization_id + \
+         "/" + SCHEDULE_COMMON_FILE_NAME + "_" + name
+    in_config_apis.create_schedule_content(title, writer, department, url)
+    return redirect("/dashboard/board/schedule")
+
+
+@blueprint.route('/board/schedule/<schedule_id>/delete', methods=["GET"])
+@util.require_login
+def delete_schedule(schedule_id):
+  in_config_apis.delete_schedule(schedule_id)
+  return redirect("/dashboard/board/schedule")
