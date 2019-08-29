@@ -41,22 +41,20 @@
                   <form action="#" method="post" class="form-horizontal form-label-left">
 
                     <div class="form-group">
-                      <label class="control-label col-md-1 col-sm-1 col-xs-1" for="writer">Writer
-                      </label>
-                      <label class="control-label col-md-2 col-sm-2 col-xs-2" style="text-align:left;">
-                        {{ schedule.writer }}
+                      <label class="control-label col-md-3 col-sm-3 col-xs-3 board_sub_title" style="text-align:left;border-right:1px solid #e5e5e5">
+                        Writer : {{ schedule.writer }}
                       </label>
 
-                      <label class="control-label col-md-1 col-sm-1 col-xs-1" for="department">Department
-                      </label>
-                      <label class="control-label col-md-2 col-sm-2 col-xs-2" style="text-align:left;">
-                        {{ schedule.department }}
+                      <label class="control-label col-md-3 col-sm-3 col-xs-3 board_sub_title" style="text-align:left;border-right:1px solid #e5e5e5">
+                        Category : {{ schedule.category }}
                       </label>
 
-                      <label class="control-label col-md-1 col-sm-1 col-xs-1" for="date">Date
+                      <label class="control-label col-md-3 col-sm-3 col-xs-3 board_sub_title" style="text-align:left;border-right:1px solid #e5e5e5">
+                        Department : {{ schedule.department }}
                       </label>
-                      <label class="control-label col-md-2 col-sm-2 col-xs-2" style="text-align:left;">
-                        {{ schedule.created_time|usDateFormat }}
+
+                      <label class="control-label col-md-3 col-sm-3 col-xs-3 board_sub_title" style="text-align:left;">
+                        Date : {{ schedule.created_time|usDateFormat }}
                       </label>
                     </div>
 

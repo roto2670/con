@@ -4710,6 +4710,10 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     cursor: pointer;
 }
 
+.board_sub_title {
+    color: #9f9f9f;
+}
+
 /* keyser custom */
 .site_title img {
     margin: 0 5px;
