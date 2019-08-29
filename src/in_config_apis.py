@@ -19,6 +19,8 @@ from sqlalchemy import desc
 
 from base import db
 from constants import ORG_ID
+from config_models import _NoticeBoard as NoticeBoard
+from config_models import _ScheduleBoard as ScheduleBoard
 from config_models import _EnterenceWorkerLog as EnterenceWorkerLog
 from config_models import _CountDeviceSetting as CountDeviceSetting
 from config_models import _EntranceEquipLog as EntranceEquipLog
@@ -31,6 +33,78 @@ def get_datetime():
 
 def get_servertime():
   return datetime.datetime.now().replace(microsecond=0)
+
+
+def create_notice_content(title, category, writer, department, file_path,
+                          org_id=None):
+  _org_id = org_id if org_id else current_user.organization_id
+  cur_time = get_servertime()
+  content = NoticeBoard(title=title,
+                        category=category,
+                        writer=writer,
+                        department=department,
+                        file_path=file_path,
+                        created_time=cur_time,
+                        organization_id=_org_id)
+  db.session.add(content)
+  db.session.commit()
+
+
+def get_notice(_id):
+  notice_content = NoticeBoard.query.filter_by(id=_id).one_or_none()
+  return notice_content
+
+
+def get_notice_list(page_num=1, limit=None):
+  _limit = limit if limit else 30
+  # notice_list = NoticeBoard.query.\
+  #   order_by(desc(NoticeBoard.created_time)).paginate(page_num, _limit, False)
+  notice_list = NoticeBoard.query.\
+    order_by(desc(NoticeBoard.created_time)).all()
+  return notice_list
+
+
+def delete_notice(_id):
+  ret = get_notice(_id)
+  if ret:
+    db.session.delete(ret)
+    db.session.commit()
+
+
+def create_schedule_content(title, category, writer, department, file_path,
+                            org_id=None):
+  _org_id = org_id if org_id else current_user.organization_id
+  cur_time = get_servertime()
+  content = ScheduleBoard(title=title,
+                          category=category,
+                          writer=writer,
+                          department=department,
+                          file_path=file_path,
+                          created_time=cur_time,
+                          organization_id=_org_id)
+  db.session.add(content)
+  db.session.commit()
+
+
+def get_schedule(_id):
+  schedule_content = ScheduleBoard.query.filter_by(id=_id).one_or_none()
+  return schedule_content
+
+
+def get_schedule_list(page_num=1, limit=None):
+  _limit = limit if limit else 30
+  # notice_list = NoticeBoard.query.\
+  #   order_by(desc(NoticeBoard.created_time)).paginate(page_num, _limit, False)
+  schedule_list = ScheduleBoard.query.\
+    order_by(desc(ScheduleBoard.created_time)).all()
+  return schedule_list
+
+
+def delete_schedule(_id):
+  ret = get_schedule(_id)
+  if ret:
+    db.session.delete(ret)
+    db.session.commit()
 
 
 def create_enterence_worker_log(inout, access_point, data, text,

@@ -1,0 +1,122 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_dashboard.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block title %} Schedule Board {% endblock title %}
+
+{% block javascripts %}
+  {{ super()}}
+  <script>
+    function delete_schedule(scheduleId) {
+      window.location.href = "/dashboard/board/schedule/" + scheduleId + "/delete";
+    }
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+      <!-- start row -->
+      <div class="row">
+
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel tile">
+                <div class="x_title">
+                  <div class="x_title_left_div">
+                    <h4> {{ schedule.title }} </h4>
+                  </div>
+                  <div class="x_title_right_div">
+                    <a href="/dashboard/board/schedule">
+                      <button class="btn btn-default btn-sm" style="margin-top:5px;"> List </button>
+                    </a>
+                  </div>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <form action="#" method="post" class="form-horizontal form-label-left">
+
+                    <div class="form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-3 board_sub_title" style="text-align:left;border-right:1px solid #e5e5e5">
+                        Writer : {{ schedule.writer }}
+                      </label>
+
+                      <label class="control-label col-md-3 col-sm-3 col-xs-3 board_sub_title" style="text-align:left;border-right:1px solid #e5e5e5">
+                        Category : {{ schedule.category }}
+                      </label>
+
+                      <label class="control-label col-md-3 col-sm-3 col-xs-3 board_sub_title" style="text-align:left;border-right:1px solid #e5e5e5">
+                        Department : {{ schedule.department }}
+                      </label>
+
+                      <label class="control-label col-md-3 col-sm-3 col-xs-3 board_sub_title" style="text-align:left;">
+                        Date : {{ schedule.created_time|usDateFormat }}
+                      </label>
+                    </div>
+
+                    <div class="ln_solid"></div>
+
+                    <div class="form-group">
+                      <label class="control-label col-md-2 col-sm-2 col-xs-2" for="content">
+                      </label>
+                      <div class="col-md-8 col-sm-8 col-xs-8">
+                      <!--
+                        <a href="#" onclick="window.open('{{ schedule.file_path }}', '{{ schedule.title }}','width=#, height=#,location=0, directories=no,resizable=no,status=no,toolbar=no,menubar=no'); return false">
+                      -->
+                        <a href="{{ schedule.file_path }}" target="_blank">
+                          <img src="{{schedule.file_path}}" style="width: 100%">
+                        </a>
+                      </div>
+                    </div>
+                  </form>
+
+                  <div class="ln_solid"></div>
+                  <div style="text-align:right;">
+                    <a href="/dashboard/board/schedule">
+                      <button class="btn btn-default btn-sm"> List </button>
+                    </a>
+                  {% if current_user.level == 0 %}
+                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target=".schedule-modal">Delete</button>
+                  {% endif %}
+                  </div>
+                  <div class="modal fade schedule-modal" tabindex="-3" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-sm">
+                      <div class="modal-content">
+
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                          </button>
+                          <h4 class="modal-title" id="headerFile" style="color: #ff0000"><i class="fa fa-exclamation-triangle"></i> WARING</h4>
+                        </div>
+                        <div>
+                          <div class="modal-body" style="color: #ff0000">
+                            <h4>Delete {{ schedule.title }}</h4>
+                            <div>
+                              Do you want to delete the {{ schedule.title}}?
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button class="btn btn-danger" data-dismiss="modal" onclick="delete_schedule({{ schedule.id }});">OK</button>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>  <!-- End modal -->
+
+
+                </div>
+              </div>
+            </div>
+
+      </div>  <!-- End row -->
+
+    </div>
+  </div>
+
+{% endblock content %}
