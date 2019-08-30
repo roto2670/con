@@ -364,21 +364,24 @@ def register_notice():
     department = request.form.get('department')
     upload_file = request.files['file']
     content = upload_file.read()
-    name = upload_file.filename
-    base_path = util.get_static_path()
 
-    org_path = os.path.join(base_path, 'dashboard', 'notice',
-                            current_user.organization_id)
-    if not os.path.exists(org_path):
-      os.makedirs(org_path)
-    file_path = os.path.join(org_path, NOTICE_COMMON_FILE_NAME + "_" + name)
-    if os.path.exists(file_path):
-      os.remove(file_path)
-    with open(file_path, 'wb') as f:
-      f.write(content)
-    os.chmod(file_path, stat.S_IREAD)
-    url = '/static/dashboard/notice/' + current_user.organization_id + \
-         "/" + NOTICE_COMMON_FILE_NAME + "_" + name
+    if content:
+      name = upload_file.filename
+      base_path = util.get_static_path()
+      org_path = os.path.join(base_path, 'dashboard', 'notice',
+                              current_user.organization_id)
+      if not os.path.exists(org_path):
+        os.makedirs(org_path)
+      file_path = os.path.join(org_path, NOTICE_COMMON_FILE_NAME + "_" + name)
+      if os.path.exists(file_path):
+        os.remove(file_path)
+      with open(file_path, 'wb') as f:
+        f.write(content)
+      os.chmod(file_path, stat.S_IREAD)
+      url = '/static/dashboard/notice/' + current_user.organization_id + \
+          "/" + NOTICE_COMMON_FILE_NAME + "_" + name
+    else:
+      url = ""
     in_config_apis.create_notice_content(title, category, writer, department,
                                          url)
     return redirect("/dashboard/board/notice")
@@ -424,21 +427,24 @@ def register_schedule():
     department = request.form.get('department')
     upload_file = request.files['file']
     content = upload_file.read()
-    name = upload_file.filename
-    base_path = util.get_static_path()
+    if content:
+      name = upload_file.filename
+      base_path = util.get_static_path()
 
-    org_path = os.path.join(base_path, 'dashboard', 'schedule',
-                            current_user.organization_id)
-    if not os.path.exists(org_path):
-      os.makedirs(org_path)
-    file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME + "_" + name)
-    if os.path.exists(file_path):
-      os.remove(file_path)
-    with open(file_path, 'wb') as f:
-      f.write(content)
-    os.chmod(file_path, stat.S_IREAD)
-    url = '/static/dashboard/schedule/' + current_user.organization_id + \
-         "/" + SCHEDULE_COMMON_FILE_NAME + "_" + name
+      org_path = os.path.join(base_path, 'dashboard', 'schedule',
+                              current_user.organization_id)
+      if not os.path.exists(org_path):
+        os.makedirs(org_path)
+      file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME + "_" + name)
+      if os.path.exists(file_path):
+        os.remove(file_path)
+      with open(file_path, 'wb') as f:
+        f.write(content)
+      os.chmod(file_path, stat.S_IREAD)
+      url = '/static/dashboard/schedule/' + current_user.organization_id + \
+          "/" + SCHEDULE_COMMON_FILE_NAME + "_" + name
+    else:
+      url = ""
     in_config_apis.create_schedule_content(title, category, writer, department,
                                            url)
     return redirect("/dashboard/board/schedule")
