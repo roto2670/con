@@ -1,0 +1,213 @@
+
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_dashboard.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+  {{ super() }}
+  <!-- bootstrap-daterangepicker -->
+  <link href="{{ url_for('static', filename='vendors/bootstrap-daterangepicker/daterangepicker.css') }}" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block javascripts %}
+  {{ super() }}
+    <!-- bootstrap-daterangepicker -->
+    <script src="{{ url_for('static', filename='vendors/moment/min/moment.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendors/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+    <script>
+	   function init_daterangepicker_right() {
+
+				if( typeof ($.fn.daterangepicker) === 'undefined'){ return; }
+				console.log('init_daterangepicker_right');
+
+				var cb = function(start, end, label) {
+				  console.log("CB : " , start.toISOString(), end.toISOString(), label);
+				  $('#reportrange_right span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+				};
+
+				var optionSet1 = {
+				  //startDate: moment().subtract(29, 'days'),
+				  startDate: moment(),
+				  endDate: moment(),
+				  minDate: '01/01/2019',
+				  maxDate: '12/31/2025',
+				  dateLimit: {
+            days: 7
+				  },
+				  showDropdowns: true,
+				  showWeekNumbers: true,
+				  timePicker: false,
+				  timePickerIncrement: 1,
+				  timePicker12Hour: true,
+				  ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()]
+            //'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            //'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+				  },
+				  opens: 'right',
+				  buttonClasses: ['btn btn-default'],
+				  applyClass: 'btn-small btn-primary',
+				  cancelClass: 'btn-small',
+				  format: 'MM/DD/YYYY',
+				  separator: ' to ',
+          autoApply: true,
+          showCustomRangeLabel: true,
+				  locale: {
+            applyLabel: 'Submit',
+            cancelLabel: 'Clear',
+            fromLabel: 'From',
+            toLabel: 'To',
+            customRangeLabel: 'Custom',
+            daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+            monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            firstDay: 1
+				  }
+				};
+
+				$('#reportrange_right span').html(moment().format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+        document.getElementById('datetime').value = JSON.stringify([
+          moment().format('YYYY,MM,DD') + ',00,00,00',
+          moment().format('YYYY,MM,DD,HH,mm,ss')
+        ]);
+
+				$('#reportrange_right').daterangepicker(optionSet1, cb);
+
+				$('#reportrange_right').on('show.daterangepicker', function() {
+				  console.log("show event fired");
+				});
+				$('#reportrange_right').on('hide.daterangepicker', function() {
+				  console.log("hide event fired");
+				});
+				$('#reportrange_right').on('apply.daterangepicker', function(ev, picker) {
+				  console.log("apply event fired, start/end dates are " + picker.startDate.format('MMMM D, YYYY') + " to " + picker.endDate.format('MMMM D, YYYY'));
+				  console.log("apply event fired, start/end dates are " + picker.startDate.format('YYYY-MM-DD HH:mm:ss') + " to " + picker.endDate.format('MMMM D, YYYY'));
+          var datetimeList = [
+            picker.startDate.format('YYYY,MM,DD,HH,mm,ss'),
+            picker.endDate.format('YYYY,MM,DD,HH,mm,ss')
+          ];
+          document.getElementById('datetime').value = JSON.stringify(datetimeList);
+          // SET data
+				});
+				$('#reportrange_right').on('cancel.daterangepicker', function(ev, picker) {
+				  console.log("cancel event fired");
+          document.getElementById('datetime').value = JSON.stringify([]);
+          // REMOVE data
+				});
+	   }
+	   init_daterangepicker_right();
+    </script>
+{% endblock javascripts %}
+
+{% block title %} Search {% endblock title %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+
+      <div class="row">  <!-- Start row -->
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">  <!-- start x_panel -->
+
+            <div class="x_title">
+              <div class="x_title_left_div">
+                <div class="col-md-6 tile_stats_count count entrance_menu_tile_div">
+                  <h3 class="entrance_menu_tile_select"><a href="/dashboard/search/worker">Man Log</a></h3>
+                </div>
+                <div class="col-md-6 tile_stats_count count entrance_menu_tile_div">
+                  <h3 class="entrance_menu_tile_h"><a href="/dashboard/search/equip">Equipment Log</a></h3>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+
+
+            <div class="x_content">  <!-- start x_content -->
+
+              <form id="search" action="/dashboard/search/worker"
+                class="form-horizontal form-label-left" method="post">
+                <div class="col-md-9">
+                  <br>
+                  <div class="item form-group">
+                    <label class="control-label col-md-4" for="userid">
+                      ID
+                    </label>
+                    <div class="col-md-8">
+                      <input type="text" id="userid" name="userid" value=""
+                          class="form-control col-md-6 col-xs-6" >
+                    </div>
+                  </div>
+
+                  <div class="item form-group">
+                    <label class="control-label col-md-4" for="username">
+                      Name
+                    </label>
+                    <div class="col-md-8">
+                      <input type="text" id="username" name="username" value=""
+                          class="form-control col-md-6 col-xs-6" >
+                    </div>
+                  </div>
+
+                  <div class="item form-group">
+                    <label class="control-label col-md-4" for="username">
+                      Date
+                    </label>
+                    <div class="col-md-8">
+                      <div id="reportrange_right" class="pull-left" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                        <span>December 30, 2014 - January 28, 2015</span> <b class="caret"></b>
+                      </div>
+                      <input type="hidden" id="datetime" name="datetime" value="[]"
+                          class="form-control col-md-6 col-xs-6" >
+                    </div>
+                  </div>
+
+                  <div class="item form-group">
+                    <label class="control-label col-md-4" for="username">
+                      In/Out
+                    </label>
+                    <div class="col-md-8">
+                      <select id="inout" name="inout" class="form-control">
+                        <option id="0" value="0">ALL</option>
+                        <option id="1" value="1">IN</option>
+                        <option id="2" value="2">OUT</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="item form-group">
+                    <label class="control-label col-md-4" for="username">
+                      Access Tunnel
+                    </label>
+                    <div class="col-md-8">
+                      <select id="ap" name="ap" class="form-control">
+                        <option id="0" value="0">ALL</option>
+                        <option id="1" value="1">AT1</option>
+                        <option id="2" value="2">AT2</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <br>
+                  <div style="text-align: right">
+                    <button type="submit" class="btn btn-default">Search</button>
+                  </div>
+                </div>
+              </form>
+
+            </div>  <!-- End x_content -->
+
+          </div>  <!-- End x_panel -->
+        </div>
+      </div>  <!-- End row-->
+
+    </div>
+  </div>
+
+{% endblock content %}

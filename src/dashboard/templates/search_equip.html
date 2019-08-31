@@ -1,0 +1,174 @@
+{% extends "base_site.html" %}
+
+{% block title %} Search{% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_dashboard.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block javascripts %}
+  {{ super() }}
+  <script>
+    function search() {
+      window.location.href = "/dashboard/search/equip";
+    }
+
+    function exportTableToCsv(tableId, filename) {
+      var curDate = new Date(),
+          dateString = " " + (curDate.getMonth() + 1) + '-' + curDate.getDate() + '-' + curDate.getFullYear();
+      if (filename == null || typeof filename == undefined)
+          filename = tableId;
+      filename += dateString;
+      filename += ".csv";
+
+      var BOM = "\uFEFF";
+
+      var table = document.getElementById(tableId);
+      var csvString = BOM;
+      for (var rowCnt = 1; rowCnt < table.rows.length; rowCnt++) {
+          var rowData = table.rows[rowCnt].cells;
+          for (var colCnt = 0; colCnt < rowData.length; colCnt++) {
+              var columnData = rowData[colCnt].innerHTML;
+              if (columnData == null || columnData.length == 0) {
+                  columnData = "".replace(/"/g, '""');
+              }
+              else {
+                  columnData = columnData.toString().replace(/"/g, '""'); // escape double quotes
+                  columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+              }
+              columnData = columnData.replace(/(^\s*)|(\s*$)/gi, "");
+              csvString = csvString + '"' + columnData + '",';
+          }
+          csvString = csvString.substring(0, csvString.length - 1);
+          csvString = csvString + "\r\n";
+      }
+      csvString = csvString.substring(0, csvString.length - 1);
+
+      // IE 10, 11, Edge Run
+      if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+
+          var blob = new Blob([decodeURIComponent(csvString)], {
+              type: 'text/csv;charset=utf8'
+          });
+
+          window.navigator.msSaveOrOpenBlob(blob, filename);
+
+      } else if (window.Blob && window.URL) {
+          // HTML5 Blob
+          var blob = new Blob([csvString], { type: 'text/csv;charset=utf8' });
+          var csvUrl = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.setAttribute('style', 'display:none');
+          a.setAttribute('href', csvUrl);
+          a.setAttribute('download', filename);
+          document.body.appendChild(a);
+
+          a.click()
+          a.remove();
+      } else {
+          // Data URI
+          var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
+          var blob = new Blob([csvString], { type: 'text/csv;charset=utf8' });
+          var csvUrl = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.setAttribute('style', 'display:none');
+          a.setAttribute('target', '_blank');
+          a.setAttribute('href', csvData);
+          a.setAttribute('download', filename);
+          document.body.appendChild(a);
+          a.click()
+          a.remove();
+      }
+    }
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col" role="main">
+  <div class="row">  <!-- start row -->
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel title">
+        <div class="x_title">
+          <div class="x_title_left_div">
+            <div class="col-md-6 tile_stats_count count entrance_menu_tile_div">
+              <h3 class="entrance_menu_tile_h"><a href="/dashboard/search/worker">Man Log</a></h3>
+            </div>
+            <div class="col-md-6 tile_stats_count count entrance_menu_tile_div">
+              <h3 class="entrance_menu_tile_select"><a href="/dashboard/search/equip">Equipment Log</a></h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+
+        <div class="x_content">  <!-- x_content 1 -->
+
+          <div class="x_content">  <!-- x_content 2 -->
+            <table id="pa-table" class="table table-striped projects">
+              <thead>
+                <tr>
+                  <th>
+                    <button type="button" class="btn btn-default btn-xs"
+                        onclick="search()"
+                        style="margin-bottom: 0;">
+                      Search
+                    </button>
+                  </th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th>
+                    <button type="button" class="btn btn-default btn-xs"
+                        onclick="exportTableToCsv('pa-table', 'Equipment Log')"
+                        style="margin-bottom: 0;">
+                      CSV Download
+                    </button>
+                  </th>
+                </tr>
+                <tr>
+                  <th>Name</th>
+                  <th>Type Name</th>
+                  <th>Type Code</th>
+                  <th>Time</th>
+                  <th>In / Out</th>
+                  <th>Access</th>
+                  <th>Device Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for log in log_list %}
+                  <tr>
+                    <td>{{ log.gadget_name }}</td>
+                    <td>{{ kind_dict[log.kind] }}</td>
+                    <td>{{ log.kind }}</td>
+                    <td>{{ log.event_time }}</td>
+                    <td>{{ log.inout }}</td>
+                    <td>{{ log.access_point }}</td>
+                    <td>{{ log.hub_name }}</td>
+                  </tr>
+                {% endfor %}
+                <tr>
+                  <td> Total </td>
+                  <td>{{ log_list|length }}</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>  <!-- end x_content 2 -->
+
+        </div>  <!-- end x_content 1 -->
+      </div>  <!-- end x_panel -->
+    </div>
+
+  </div>  <!-- End row -->
+</div>
+
+{% endblock content %}
