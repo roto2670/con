@@ -26,6 +26,13 @@
             <i class="fa fa-tasks"></i>Entrance Control
           </a>
         </li>
+        {% if current_user.level in [0, 1] %}
+          <li>
+            <a href="/dashboard/search/worker">
+              <i class="fa fa-search"></i>Search Log
+            </a>
+          </li>
+        {% endif %}
         <li>
           <a href="/dashboard/board/notice">
             <i class="fa fa-calendar"></i>Notice Board

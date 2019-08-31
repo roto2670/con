@@ -319,16 +319,36 @@ def get_enterence_equip_log():
 @util.require_login
 def get_worker_search_page():
   if request.method == "GET":
-    return render_template("search_prepare.html")
+    return render_template("search_worker_prepare.html")
   else:
+    _id = request.form.get('userid')
     name = request.form.get('username')
     ap = request.form.get('ap')
     inout = request.form.get('inout')
     datetime_list = request.form.get('datetime')
     datetime_list = json.loads(datetime_list)
-    worker_log_list = in_config_apis.search_worker_log(name, datetime_list,
+    worker_log_list = in_config_apis.search_worker_log(_id, name, datetime_list,
                                                        int(ap), int(inout))
-    return render_template("search.html", log_list=worker_log_list)
+    return render_template("search_worker.html", log_list=worker_log_list)
+
+
+@blueprint.route('/search/equip', methods=["GET", "POST"])
+@util.require_login
+def get_equip_search_page():
+  if request.method == "GET":
+    return render_template("search_equip_prepare.html",
+                           kind_dict=count.GADGET_INFO)
+  else:
+    kind = request.form.get('kind')
+    name = request.form.get('equipname')
+    ap = request.form.get('ap')
+    inout = request.form.get('inout')
+    datetime_list = request.form.get('datetime')
+    datetime_list = json.loads(datetime_list)
+    equip_log_list = in_config_apis.search_equip_log(name, kind, datetime_list,
+                                                     int(ap), int(inout))
+    return render_template("search_equip.html", log_list=equip_log_list,
+                           kind_dict=count.GADGET_INFO)
 
 
 def _get_notice_list_summary():

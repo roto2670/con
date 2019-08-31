@@ -1,6 +1,6 @@
 {% extends "base_site.html" %}
 
-{% block title %} Search Worker Log Result{% endblock title %}
+{% block title %} Search{% endblock title %}
 
 {% block sidebar %}
   <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
@@ -90,7 +90,19 @@
   <div class="row">  <!-- start row -->
 
     <div class="col-md-12 col-sm-12 col-xs-12">
-      <div class="x_panel">
+      <div class="x_panel tile">
+        <div class="x_title">
+          <div class="x_title_left_div">
+            <div class="col-md-6 tile_stats_count count entrance_menu_tile_div">
+              <h3 class="entrance_menu_tile_select"><a href="/dashboard/search/worker">Man Log</a></h3>
+            </div>
+            <div class="col-md-6 tile_stats_count count entrance_menu_tile_div">
+              <h3 class="entrance_menu_tile_h"><a href="/dashboard/search/equip">Equipment Log</a></h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+
         <div class="x_content">  <!-- x_content 1 -->
 
           <div class="x_content">  <!-- x_content 2 -->
