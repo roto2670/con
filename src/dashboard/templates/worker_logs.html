@@ -27,11 +27,19 @@
           var logData = JSON.parse(msg);
               timestamp = logData.event_time,
               payLoad = logData.text;
-          var addObj= "<div class=''>" +
-                "<h3 class='panel-title'>" + timestamp +
-                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                payLoad + "</h3>" +
-            "</div>"
+              if (log.typ == 1) {
+                var addObj= "<div class='' style='color: #ff0000'>" +
+                                "<h3 class='panel-title'>" + timestamp +
+                                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                "[&nbsp;<i class='fa fa-exclamation'></i>" + "&nbsp;Violation&nbsp;]&nbsp;&nbsp;" + payLoad + "</h3>" +
+                            "</div>"
+              } else {
+                var addObj= "<div class=''>" +
+                                "<h3 class='panel-title'>" + timestamp +
+                                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                payLoad + "</h3>" +
+                            "</div>"
+              }
 
           if (logData.inout == 1) {
             if (logData.access_point == 1) {
@@ -175,7 +183,7 @@
                               var addObj= "<div class='' style='color: #ff0000'>" +
                                               "<h3 class='panel-title'>" + timestamp +
                                               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                              payLoad + "</h3>" +
+                                              "[&nbsp;<i class='fa fa-exclamation'></i>" + "&nbsp;Violation&nbsp;]&nbsp;&nbsp;" + payLoad + "</h3>" +
                                           "</div>"
                             } else {
                               var addObj= "<div class=''>" +
@@ -220,7 +228,7 @@
                               var addObj= "<div class='' style='color: #ff0000'>" +
                                               "<h3 class='panel-title'>" + timestamp +
                                               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                              payLoad + "</h3>" +
+                                              "[&nbsp;<i class='fa fa-exclamation'></i>" + "&nbsp;Violation&nbsp;]&nbsp;&nbsp;" + payLoad + "</h3>" +
                                           "</div>"
                             } else {
                               var addObj= "<div class=''>" +
@@ -269,7 +277,7 @@
                               var addObj= "<div class='' style='color: #ff0000'>" +
                                               "<h3 class='panel-title'>" + timestamp +
                                               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                              payLoad + "</h3>" +
+                                              "[&nbsp;<i class='fa fa-exclamation'></i>" + "&nbsp;Violation&nbsp;]&nbsp;&nbsp;" + payLoad + "</h3>" +
                                           "</div>"
                             } else {
                               var addObj= "<div class=''>" +
@@ -314,7 +322,7 @@
                               var addObj= "<div class='' style='color: #ff0000'>" +
                                               "<h3 class='panel-title'>" + timestamp +
                                               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                              payLoad + "</h3>" +
+                                              "[&nbsp;<i class='fa fa-exclamation'></i>" + "&nbsp;Violation&nbsp;]&nbsp;&nbsp;" + payLoad + "</h3>" +
                                           "</div>"
                             } else {
                               var addObj= "<div class=''>" +
