@@ -171,11 +171,19 @@
                             var logId = log.id,
                                 timestamp = log.event_time,
                                 payLoad = log.text;
-                            var addObj= "<div class=''>" +
-                                            "<h3 class='panel-title'>" + timestamp +
-                                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                            payLoad + "</h3>" +
-                                        "</div>"
+                            if (log.typ == 1) {
+                              var addObj= "<div class='' style='color: #ff0000'>" +
+                                              "<h3 class='panel-title'>" + timestamp +
+                                              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                              payLoad + "</h3>" +
+                                          "</div>"
+                            } else {
+                              var addObj= "<div class=''>" +
+                                              "<h3 class='panel-title'>" + timestamp +
+                                              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                              payLoad + "</h3>" +
+                                          "</div>"
+                            }
 
                             $(".accordionInAT1").append(addObj);
                           });
@@ -208,11 +216,19 @@
                             var logId = log.id,
                                 timestamp = log.event_time,
                                 payLoad = log.text;
-                            var addObj= "<div class=''>" +
-                                            "<h3 class='panel-title'>" + timestamp +
-                                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                            payLoad + "</h3>" +
-                                        "</div>"
+                            if (log.typ == 1) {
+                              var addObj= "<div class='' style='color: #ff0000'>" +
+                                              "<h3 class='panel-title'>" + timestamp +
+                                              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                              payLoad + "</h3>" +
+                                          "</div>"
+                            } else {
+                              var addObj= "<div class=''>" +
+                                              "<h3 class='panel-title'>" + timestamp +
+                                              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                              payLoad + "</h3>" +
+                                          "</div>"
+                            }
 
                             $(".accordionOutAT1").append(addObj);
                           });
@@ -249,11 +265,19 @@
                             var logId = log.id,
                                 timestamp = log.event_time,
                                 payLoad = log.text;
-                            var addObj= "<div class=''>" +
-                                            "<h3 class='panel-title'>" + timestamp +
-                                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                            payLoad + "</h3>" +
-                                        "</div>"
+                            if (log.typ == 1) {
+                              var addObj= "<div class='' style='color: #ff0000'>" +
+                                              "<h3 class='panel-title'>" + timestamp +
+                                              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                              payLoad + "</h3>" +
+                                          "</div>"
+                            } else {
+                              var addObj= "<div class=''>" +
+                                              "<h3 class='panel-title'>" + timestamp +
+                                              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                              payLoad + "</h3>" +
+                                          "</div>"
+                            }
 
                             $(".accordionInAT2").append(addObj);
                           });
@@ -286,11 +310,19 @@
                             var logId = log.id,
                                 timestamp = log.event_time,
                                 payLoad = log.text;
-                            var addObj= "<div class=''>" +
-                                            "<h3 class='panel-title'>" + timestamp +
-                                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                            payLoad + "</h3>" +
-                                        "</div>"
+                            if (log.typ == 1) {
+                              var addObj= "<div class='' style='color: #ff0000'>" +
+                                              "<h3 class='panel-title'>" + timestamp +
+                                              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                              payLoad + "</h3>" +
+                                          "</div>"
+                            } else {
+                              var addObj= "<div class=''>" +
+                                              "<h3 class='panel-title'>" + timestamp +
+                                              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                              payLoad + "</h3>" +
+                                          "</div>"
+                            }
 
                             $(".accordionOutAT2").append(addObj);
                           });
