@@ -547,7 +547,7 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
       WORKER_COUNT.set_data(bus_id, user_id, event_data)
       _set_expire_cache(user_id, user_name)
       # BUS_CACHE input, and later, beacon detected then count down
-    else:
+    elif device_id in IN_LIST:
       user_data = WORKER_COUNT.get_data(org_id, user_id)
       text = WORKER_ALREADY_CHECK_IN_TEXT.format(user_name,
                                                  str(user_data['event_time']))
@@ -555,6 +555,9 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
                                                        event_data, text,
                                                        ALREADY_CHECK, org_id)
       logging.debug("%s device_id is IN type device. user name : %s",
+                    device_id, user_name)
+    else:
+      logging.debug("%s device_id is IN type or Nont type device. user name : %s",
                     device_id, user_name)
   else:
     # User enter
@@ -571,12 +574,15 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
       bus_id = BUS_CHECKING_LIST[device_id]
       WORKER_COUNT.set_data(bus_id, user_id, event_data)
       _set_expire_cache(user_id, user_name)
-    else:
+    elif device_id in OUT_LIST:
       text = WORKER_ALREADY_CHECK_OUT_TEXT.format(user_name)
       log = in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
                                                        event_data, text,
                                                        ALREADY_CHECK, org_id)
       logging.debug("%s device_id is OUT type device. user name : %s",
+                    device_id, user_name)
+    else:
+      logging.debug("%s device_id is OUT type or None type device. user name : %s",
                     device_id, user_name)
 
 
