@@ -107,7 +107,7 @@ def delete_schedule(_id):
     db.session.commit()
 
 
-def create_enterence_worker_log(inout, access_point, data, text,
+def create_enterence_worker_log(inout, access_point, data, text, typ,
                                 organization_id):
   cur_time = get_datetime()
   event_time = datetime.datetime.strptime(data['server_datetime'],
@@ -122,6 +122,7 @@ def create_enterence_worker_log(inout, access_point, data, text,
                            device_id=data['device_id']['id'],
                            device_name=data['device_id']['name'],
                            text=text,
+                           typ=typ,
                            organization_id=organization_id)
   db.session.add(log)
   db.session.commit()
@@ -137,6 +138,7 @@ def create_enterence_worker_log(inout, access_point, data, text,
     "device_id": log.device_id,
     "device_name": log.device_name,
     "text": log.text,
+    "typ": log.typ,
     "organization_id": log.organization_id
   }
 

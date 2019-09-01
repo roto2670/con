@@ -65,6 +65,9 @@ BUS_ACCESS_2_ID = 5
 
 BUS_USER_GROUP_ID = '''1013'''
 
+NORMAL_CHECK = 0
+ALREADY_CHECK = 1
+
 # Using operator count
 ACCESS_1_OPERATOR_ID = 3
 ACCESS_2_OPERATOR_ID = 4
@@ -494,6 +497,8 @@ def clear_all_of_sc():
 WORKER_ENTER_TEXT = "{} entered {}"
 WORKER_EXIT_TEXT = "{} came out {}"
 WORKER_EXIT_TEXT_2 = "{} came out {}. But it entered {}"
+WORKER_ALREADY_CHECK_IN_TEXT = "{} already check-in. Last check-in time at {}"
+WORKER_ALREADY_CHECK_OUT_TEXT = "{} already check-out"
 
 
 def _set_expire_cache(user_id, user_name):
@@ -517,7 +522,8 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
         ret = WORKER_COUNT.delete_data(org_id, user_id)
         text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
         log = in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
-                                                         event_data, text, org_id)
+                                                         event_data, text,
+                                                         NORMAL_CHECK, org_id)
         _set_expire_cache(user_id, user_name)
         _send_worker_log(log)
       elif WORKER_COUNT.has_data(REVERSE_ACCESS_POINT[key], user_id):
@@ -527,7 +533,8 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
         text = WORKER_EXIT_TEXT_2.format(user_name, ACCESS_POINT[key],
                                          ACCESS_POINT[reverse_key])
         log = in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
-                                                         event_data, text, org_id)
+                                                         event_data, text,
+                                                         NORMAL_CHECK, org_id)
         _set_expire_cache(user_id, user_name)
         _send_worker_log(log)
     elif device_id in BUS_AT_1_DEVICE_LIST and device_id in BUS_CHECKING_LIST:
@@ -541,6 +548,12 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
       _set_expire_cache(user_id, user_name)
       # BUS_CACHE input, and later, beacon detected then count down
     else:
+      user_data = WORKER_COUNT.get_data(org_id, user_id)
+      text = WORKER_ALREADY_CHECK_IN_TEXT.format(user_name,
+                                                 str(user_data['event_time']))
+      log = in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key,
+                                                       event_data, text,
+                                                       ALREADY_CHECK, org_id)
       logging.debug("%s device_id is IN type device. user name : %s",
                     device_id, user_name)
   else:
@@ -550,7 +563,7 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
       ret = WORKER_COUNT.set_data(org_id, user_id, user_name)
       text = WORKER_ENTER_TEXT.format(user_name, ACCESS_POINT[key])
       log = in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
-                                                       text, org_id)
+                                                       text, NORMAL_CHECK, org_id)
       _set_expire_cache(user_id, user_name)
       _send_worker_log(log)
     elif device_id in BUS_WORKSHOP_DEVICE_LIST and device_id in BUS_CHECKING_LIST:
@@ -559,6 +572,10 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
       WORKER_COUNT.set_data(bus_id, user_id, event_data)
       _set_expire_cache(user_id, user_name)
     else:
+      text = WORKER_ALREADY_CHECK_OUT_TEXT.format(user_name)
+      log = in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
+                                                       event_data, text,
+                                                       ALREADY_CHECK, org_id)
       logging.debug("%s device_id is OUT type device. user name : %s",
                     device_id, user_name)
 
@@ -689,7 +706,8 @@ def _set_equip_count(key, org_id, gid, hid):
             # TODO: Change text? exit with bus?
             u_text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
             log = in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
-                                                             event_data, u_text, org_id)
+                                                             event_data, u_text,
+                                                             NORMAL_CHECK, org_id)
             _set_expire_cache(user_id, user_name)
             _send_worker_log(log)
             WORKER_COUNT.hdel(bus_id, user_id)
@@ -720,7 +738,8 @@ def _set_equip_count(key, org_id, gid, hid):
             # TODO: Change text? exit with bus?
             u_text = WORKER_EXIT_TEXT.format(user_name, ACCESS_POINT[key])
             log = in_config_apis.create_enterence_worker_log(OUT_SETTING_ID, key,
-                                                             event_data, u_text, org_id)
+                                                             event_data, u_text,
+                                                             NORMAL_CHECK, org_id)
             _set_expire_cache(user_id, user_name)
             _send_worker_log(log)
             WORKER_COUNT.hdel(bus_id, user_id)
@@ -749,7 +768,7 @@ def _set_equip_count(key, org_id, gid, hid):
         # TODO: Change text? enter with bus?
         u_text = WORKER_ENTER_TEXT.format(user_name, ACCESS_POINT[key])
         log = in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
-                                                         u_text, org_id)
+                                                         u_text, NORMAL_CHECK, org_id)
         WORKER_COUNT.hdel(bus_id, user_id)
         _send_worker_log(log)
 
