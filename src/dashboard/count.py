@@ -497,7 +497,7 @@ def clear_all_of_sc():
 WORKER_ENTER_TEXT = "{} entered {}"
 WORKER_EXIT_TEXT = "{} came out {}"
 WORKER_EXIT_TEXT_2 = "{} came out {}. But it entered {}"
-WORKER_ALREADY_CHECK_IN_TEXT = "{} already check-in. Last check-in time at {}"
+WORKER_ALREADY_CHECK_IN_TEXT = "{} already check-in."
 WORKER_ALREADY_CHECK_OUT_TEXT = "{} already check-out"
 
 
@@ -548,9 +548,7 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
       _set_expire_cache(user_id, user_name)
       # BUS_CACHE input, and later, beacon detected then count down
     elif device_id in IN_LIST:
-      user_data = WORKER_COUNT.get_data(org_id, user_id)
-      text = WORKER_ALREADY_CHECK_IN_TEXT.format(user_name,
-                                                 str(user_data['event_time']))
+      text = WORKER_ALREADY_CHECK_IN_TEXT.format(user_name)
       log = in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key,
                                                        event_data, text,
                                                        ALREADY_CHECK, org_id)
