@@ -19,7 +19,7 @@
       <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel tile" style="border:0;">
           <div class="x_title">
-            <h3>Tunnel Entrance Control System</h3>
+              <a href="/dashboard/count"><h3 style="color:#1b94e2;">Tunnel Entrance Control System</h3></a>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -52,7 +52,7 @@
         <div class="col-md-8 col-sm-8 col-xs-12">
           <div class="x_panel tile" style="height: 840px">
             <div class="x_title">
-              <h3>Location Tracking</h3>
+              <a href="/dashboard/location"><h3 style="color:#1b94e2;">Location Tracking</h3></a>
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -66,7 +66,7 @@
         <div class="col-md-4 col-sm-4 col-xs-12">
           <div class="x_panel tile" style="height: 410px;">
             <div class="x_title">
-              <h3>Notice Board</h3>
+              <a href="/dashboard/board/notice"><h3 style="color:#1b94e2;">Notice Board</h3></a>
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -75,6 +75,7 @@
                   <tr>
                     <th style="width:2%"></th>
                     <th>Title</th>
+                    <th>Date</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -95,6 +96,9 @@
                         </a>
                         </div>
                       </td>
+                      <td>
+                        {{ notice.created_time|usDateFormatOnlyDate }}
+                      </td>
                     </tr>
                   {% endfor %}
                 </tbody>
@@ -106,7 +110,7 @@
         <div class="col-md-4 col-sm-4 col-xs-12">
           <div class="x_panel tile" style="height: 410px;">
             <div class="x_title">
-              <h3>Schedule Board</h3>
+              <a href="/dashboard/board/schedule"><h3 style="color:#1b94e2;">Schedule Board</h3></a>
               <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -115,6 +119,7 @@
                   <tr>
                     <th style="width:2%"></th>
                     <th>Title</th>
+                    <th>Date</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -134,6 +139,9 @@
                           {% endif %}
                         </a>
                         </div>
+                      </td>
+                      <td>
+                        {{ schedule.created_time|usDateFormatOnlyDate }}
                       </td>
                     </tr>
                   {% endfor %}

@@ -222,6 +222,14 @@ def detail_count():
                          date_msg=EMERGENCY[DATE_MSG_KEY])
 
 
+def get_worker_data_list(ap):
+  return WORKER_COUNT.get_data_of_values(ap)
+
+
+def get_equip_data_list(ap):
+  return BEACONS_COUNT.get_data_of_values(ap)
+
+
 def _get_device_list(org_id):
   resp = local_apis.get_suprema_device_list()
   device_list = resp['DeviceCollection']['rows']

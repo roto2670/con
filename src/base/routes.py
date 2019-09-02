@@ -183,3 +183,7 @@ def datetime_check(value):
 
 def change_us_format(value):
   return value.strftime("%m/%d/%Y  %H:%M:%S")
+
+
+def change_us_format_for_date(value):
+  return value.strftime("%m/%d/%Y")
