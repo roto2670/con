@@ -197,3 +197,95 @@ def get_suprema_device_list():
   except:
     logging.exception("Failed to get device list.")
     return {}
+
+
+def register_pa(gadget_info):
+  hid = REG_HUB_ID
+  url = "{base}hubs/{hid}/event".format(base=BASE_URL, hid=hid)
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=hid)
+  }
+  body = {
+    "topic": "gadget.added",
+    "value": gadget_info
+  }
+  try:
+    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    if resp.ok:
+      logging.info("register pa speaker successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed register pa speaker. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while register pa speaker. Body : %s",
+                      body)
+    return None
+
+
+def update_pa_information(pa_id, name, kind=None, data=None):
+  hid = REG_HUB_ID
+  url = "{base}gadgets/{pa_id}".format(base=BASE_URL, pa_id=pa_id)
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=hid)
+  }
+  body = {
+    "name": name,
+    "custom": {}
+  }
+  if kind:
+    body['tags'] = [kind]
+
+  if data:
+    body['custom'] = data['custom']
+  else:
+    _pa = dashboard.count.get_pa(pa_id)
+    _custom = _pa['custom']
+    body['custom'] = _custom
+
+  try:
+    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    if resp.ok:
+      logging.info("update pa speaker information successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed update pa speaker information. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while update pa speaker information. Body : %s",
+                      body)
+    return None
+
+
+def remove_pa(pa_id):
+  hid = REG_HUB_ID
+  _pa = dashboard.count.get_pa(pa_id)
+  url = "{base}hubs/{hid}/event".format(base=BASE_URL, hid=hid)
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=hid)
+  }
+  body = {
+    "topic": "gadget.removed",
+    "value": _pa
+  }
+  try:
+    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    if resp.ok:
+      logging.info("remove pa speaker successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed remove pa speaker. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while remove pa speaker. Body : %s",
+                      body)
+    return None

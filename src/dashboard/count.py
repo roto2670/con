@@ -339,6 +339,16 @@ def ipcam_list():
   return data_list
 
 
+def pa_list():
+  raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
+  data_list = []
+  for raw_data in raw_datas.values():
+    # TODO:
+    if raw_data['kind'] == 'speaker':
+      data_list.append(raw_data)
+  return data_list
+
+
 def get_beacon(gid):
   data = BEACONS_COUNT.get_data(DEVICE_DATA_KEY, gid)
   return data
@@ -351,6 +361,11 @@ def get_scanner(hid):
 
 def get_ipcam(ipcam_id):
   data = BEACONS_COUNT.get_data(DEVICE_DATA_KEY, ipcam_id)
+  return data
+
+
+def get_pa(pa_id):
+  data = BEACONS_COUNT.get_data(DEVICE_DATA_KEY, pa_id)
   return data
 
 

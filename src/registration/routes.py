@@ -266,7 +266,8 @@ def ipcam_delete_route(ipcam_id):
 @blueprint.route('/pa', methods=['GET'])
 @util.require_login
 def pa_list_route():
-  return render_template("pa_list.html")
+  pa_list = count.pa_list()
+  return render_template("pa_list.html", pa_list=pa_list)
 
 
 @blueprint.route('/pa/create', methods=['GET', 'POST'])
@@ -323,7 +324,7 @@ def reg_pa():
       },
       "img_url": ""
     }
-    #TODO: register pa speaker
-    # ret = local_apis.register_ipcam(value)
-    # logging.info("Register paspeaker resp : %s", ret)
+    ret = local_apis.register_pa(value)
+    logging.info("Register PA Speaker resp : %s", ret)
+    local_apis.update_pa_information(new_id, name, data=value)
     return redirect("/registration/pa")

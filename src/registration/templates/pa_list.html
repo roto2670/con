@@ -92,6 +92,7 @@
             <table id="pa-table" class="table table-striped projects">
               <thead>
                 <tr>
+                  <th></th>
                   <th>
                     <button type="button" class="btn btn-default btn-xs"
                         onclick="register()"
@@ -110,18 +111,23 @@
                   </th>
                 </tr>
                 <tr>
+                  <th></th>
                   <th>Name</th>
                   <th>IP Address</th>
                   <th>Group</th>
                 </tr>
               </thead>
               <tbody>
+                {% for pa in pa_list %}
                 <tr>
                   <td></td>
-                  <td></td>
+                  <td>{{ pa.name }}</td>
+                  <td>{{ pa.custom.ip }}</td>
                   <td></td>
                 </tr>
+                {% endfor %}
                 <tr>
+                  <td></td>
                   <td> Total </td>
                   <td></td>
                   <td></td>
