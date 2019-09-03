@@ -10,6 +10,7 @@
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
 import json
+import logging
 
 from flask import request
 from flask_login import current_user
@@ -39,9 +40,8 @@ def get_location_inforamtion():
       "stage": current_user.level
   }
   req_host = request.headers['Host']
-  req_host = req_host.strip()
-  host = "{}:5000".format(SERVER_ADDR['internal'])
-  if req_host == SERVER_ADDR['internal'] or req_host == host:
+  req_host = req_host.strip().split(":")[0]
+  if req_host == SERVER_ADDR['internal']:
     data['internal'] = True
   else:
     data['internal'] = False
