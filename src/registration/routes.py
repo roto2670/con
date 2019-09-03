@@ -240,7 +240,6 @@ def reg_ipcam():
     return redirect("/registration/ipcam")
 
 
-
 @blueprint.route('/ipcam/<ipcam_id>/update', methods=['GET', 'POST'])
 @util.require_login
 def ipcam_update_route(ipcam_id):
@@ -328,3 +327,22 @@ def reg_pa():
     logging.info("Register PA Speaker resp : %s", ret)
     local_apis.update_pa_information(new_id, name, data=value)
     return redirect("/registration/pa")
+
+
+@blueprint.route('/pa/<pa_id>/update', methods=['GET', 'POST'])
+@util.require_login
+def pa_update_route(pa_id):
+  if request.method == "GET":
+    pa = count.get_pa(pa_id)
+    return render_template("update_pa.html", pa=pa)
+  else:
+    name = request.form.get('name')
+    local_apis.update_pa_information(pa_id, name)
+    return redirect("/registration/pa")
+
+
+@blueprint.route('/pa/<pa_id>/delete', methods=['GET'])
+@util.require_login
+def pa_delete_route(pa_id):
+  local_apis.remove_pa(pa_id)
+  return redirect("/registration/pa")

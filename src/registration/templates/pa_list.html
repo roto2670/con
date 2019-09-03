@@ -121,7 +121,11 @@
                 {% for pa in pa_list %}
                 <tr>
                   <td></td>
-                  <td>{{ pa.name }}</td>
+                  <td>
+                    <a href="/registration/pa/{{ pa.id }}/update">
+                      {{ pa.name }}
+                    </a>
+                  </td>
                   <td>{{ pa.custom.ip }}</td>
                   <td></td>
                 </tr>

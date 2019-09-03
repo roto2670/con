@@ -1,0 +1,62 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_registration.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block title %} Update PA Speaker {% endblock title %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+
+      <div class="row">  <!-- Start row -->
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">  <!-- start x_panel -->
+
+            <div class="x_title">
+              <div class="x_title_left_div">
+                <h3>PA Speaker</h3>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+
+
+            <div class="x_content">  <!-- start x_content -->
+
+              <form id="hook" action="/registration/pa/{{ pa.id }}/update"
+                class="form-horizontal form-label-left" method="post">
+                <div class="col-md-9">
+                  <br>
+                  <div class="item form-group">
+                    <label class="control-label col-md-4" for="name">Name
+                    </label>
+                    <div class="col-md-8">
+                      <input type="text" id="name" name="name" value="{{ pa.name }}"
+                          class="form-control col-md-6 col-xs-6" maxlength="30">
+                    </div>
+                  </div>
+                  <br>
+                  <input type="hidden" id="hid" name="hid" value="{{ pa.hub_id }}"
+                      class="form-control col-md-6 col-xs-6">
+                  <div style="text-align: right">
+                    <button type="submit" class="btn btn-default">Update</button>
+                    <a href="/registration/pa/{{ pa.id }}/delete">
+                      <button type="button" class="btn btn-danger">Remove</button>
+                    </a>
+                  </div>
+                </div>
+              </form>
+
+            </div>  <!-- End x_content -->
+
+          </div>  <!-- End x_panel -->
+        </div>
+      </div>  <!-- End row-->
+
+    </div>
+  </div>
+
+{% endblock content %}
