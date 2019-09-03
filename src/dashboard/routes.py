@@ -11,6 +11,7 @@
 
 import os, stat
 import json
+import uuid
 import datetime
 import logging
 
@@ -80,64 +81,6 @@ def detail_count():
 @util.require_login
 def reset_count():
   return count.clear_all()
-
-
-@blueprint.route('/workschedule', methods=['GET'])
-@util.require_login
-def default_workschedule():
-  base_path = util.get_static_path()
-  org_path = os.path.join(base_path, 'dashboard', 'workschedule',
-                          current_user.organization_id)
-  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
-  if os.path.exists(file_path):
-    path = '/static/dashboard/workschedule/' + current_user.organization_id + \
-         "/" + SCHEDULE_COMMON_FILE_NAME
-  else:
-    path = ""
-  return render_template("workschedule.html", img_src=path)
-
-
-@blueprint.route('/workschedule/detail', methods=['GET'])
-@util.require_login
-def default_workschedule_detail():
-  base_path = util.get_static_path()
-  org_path = os.path.join(base_path, 'dashboard', 'workschedule_d',
-                          current_user.organization_id)
-  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
-  if os.path.exists(file_path):
-    path = '/static/dashboard/workschedule_d/' + current_user.organization_id + \
-         "/" + SCHEDULE_COMMON_FILE_NAME
-  else:
-    path = ""
-  return render_template("workschedule_detail.html", img_src=path)
-
-
-@blueprint.route('/workschedule/view', methods=['GET'])
-@util.require_login
-def get_workschedule():
-  base_path = util.get_static_path()
-  org_path = os.path.join(base_path, 'dashboard', 'workschedule',
-                          current_user.organization_id)
-  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
-  if os.path.exists(file_path):
-    return '/static/dashboard/workschedule/' + current_user.organization_id + \
-         "/" + SCHEDULE_COMMON_FILE_NAME
-  else:
-    return ""
-
-
-@blueprint.route('/workschedule/detail/view', methods=['GET'])
-@util.require_login
-def get_workschedule_detail():
-  base_path = util.get_static_path()
-  org_path = os.path.join(base_path, 'dashboard', 'workschedule_d',
-                          current_user.organization_id)
-  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
-  if os.path.exists(file_path):
-    return '/static/dashboard/workschedule_d/' + current_user.organization_id + \
-         "/" + SCHEDULE_COMMON_FILE_NAME
-  else:
-    return ""
 
 
 @blueprint.route('/count/settings/facescanner', methods=['GET'])
@@ -223,44 +166,6 @@ def get_total_equip_count():
   return json.dumps(total_equip_count)
 
 
-@blueprint.route('/workschedule/upload', methods=['POST'])
-@util.require_login
-def upload_workschedule():
-  upload_file = request.files['file']
-  content = upload_file.read()
-  base_path = util.get_static_path()
-  org_path = os.path.join(base_path, 'dashboard', 'workschedule',
-                          current_user.organization_id)
-  if not os.path.exists(org_path):
-    os.makedirs(org_path)
-  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
-  if os.path.exists(file_path):
-    os.remove(file_path)
-  with open(file_path, 'wb') as f:
-    f.write(content)
-  os.chmod(file_path, stat.S_IREAD)
-  return redirect("/dashboard/workschedule")
-
-
-@blueprint.route('/workschedule/detail/upload', methods=['POST'])
-@util.require_login
-def upload_workschedule_detail():
-  upload_file = request.files['file']
-  content = upload_file.read()
-  base_path = util.get_static_path()
-  org_path = os.path.join(base_path, 'dashboard', 'workschedule_d',
-                          current_user.organization_id)
-  if not os.path.exists(org_path):
-    os.makedirs(org_path)
-  file_path = os.path.join(org_path, SCHEDULE_COMMON_FILE_NAME)
-  if os.path.exists(file_path):
-    os.remove(file_path)
-  with open(file_path, 'wb') as f:
-    f.write(content)
-  os.chmod(file_path, stat.S_IREAD)
-  return redirect("/dashboard/workschedule/detail")
-
-
 @blueprint.route('/location', methods=['GET'])
 @util.require_login
 def default_location():
@@ -270,16 +175,11 @@ def default_location():
 @blueprint.route('/location/view', methods=['GET'])
 @util.require_login
 def get_location_map():
-  base_path = util.get_static_path("dashboard")
-  org_path = os.path.join(base_path, 'location',
-                          current_user.organization_id)
-  file_path = os.path.join(org_path, LOCATION_MAP_COMMON_FILE_NAME)
-  if os.path.exists(file_path):
-    uri = LOCATION_MAP_URI.format(org_id=current_user.organization_id,
-                                  file_name=LOCATION_MAP_COMMON_FILE_NAME)
-    return uri
-  else:
-    return ""
+  map_data = in_config_apis.get_latest_location_map()
+  uri = ""
+  if map_data:
+    uri = map_data.file_path
+  return uri
 
 
 @blueprint.route('/location/upload', methods=['POST'])
@@ -292,14 +192,16 @@ def upload_location_map():
                           current_user.organization_id)
   if not os.path.exists(org_path):
     os.makedirs(org_path)
-  file_path = os.path.join(org_path, LOCATION_MAP_COMMON_FILE_NAME)
+  file_name = "{}.png".format(uuid.uuid4().hex)
+  file_path = os.path.join(org_path, file_name)
   if os.path.exists(file_path):
     os.remove(file_path)
   with open(file_path, 'wb') as f:
     f.write(content)
   os.chmod(file_path, stat.S_IREAD)
   uri = LOCATION_MAP_URI.format(org_id=current_user.organization_id,
-                                file_name=LOCATION_MAP_COMMON_FILE_NAME)
+                                file_name=file_name)
+  in_config_apis.create_map_data(uri)
   return uri
 
 

@@ -19,6 +19,7 @@ from sqlalchemy import desc
 
 from base import db
 from constants import ORG_ID
+from config_models import _LocationMap as LocationMap
 from config_models import _NoticeBoard as NoticeBoard
 from config_models import _ScheduleBoard as ScheduleBoard
 from config_models import _EnterenceWorkerLog as EnterenceWorkerLog
@@ -33,6 +34,19 @@ def get_datetime():
 
 def get_servertime():
   return datetime.datetime.now().replace(microsecond=0)
+
+
+def create_map_data(file_path):
+  cur_time = get_servertime()
+  content = LocationMap(file_path=file_path,
+                        created_time=cur_time)
+  db.session.add(content)
+  db.session.commit()
+
+
+def get_latest_location_map():
+  map_data = LocationMap.query.order_by(desc(LocationMap.id)).first()
+  return map_data
 
 
 def create_notice_content(title, category, writer, department, file_path,
