@@ -42,7 +42,7 @@
                     <label class="control-label col-md-4" for="location">Location
                     </label>
                     <div class="col-md-8">
-                      <select id="location" name="location" class="form-control" disabled>
+                      <select id="location" name="location" class="form-control">
                         {% for k, v in location.items() %}
                           {% if k == scanner.tags[0] %}
                             <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
