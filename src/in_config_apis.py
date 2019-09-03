@@ -170,7 +170,7 @@ def get_enterence_out_worker_log_list(organization_id, access_point, page_num=1,
   return log_list
 
 
-def search_worker_log(_id, worker_name, datetime_list, ap, inout):
+def search_worker_log(_id, worker_name, datetime_list, ap, inout, violation):
   st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
   end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
   filter_list = [
@@ -185,6 +185,8 @@ def search_worker_log(_id, worker_name, datetime_list, ap, inout):
     filter_list.append(EnterenceWorkerLog.access_point == ap)
   if inout != 0:
     filter_list.append(EnterenceWorkerLog.inout == inout)
+  if violation != "100":
+    filter_list.append(EnterenceWorkerLog.typ == int(inout))
   log_list = EnterenceWorkerLog.query.\
       filter(*filter_list).\
       order_by(desc(EnterenceWorkerLog.created_time)).all()

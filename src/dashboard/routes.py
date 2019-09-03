@@ -325,10 +325,12 @@ def get_worker_search_page():
     name = request.form.get('username')
     ap = request.form.get('ap')
     inout = request.form.get('inout')
+    violation = request.form.get('violation')
     datetime_list = request.form.get('datetime')
     datetime_list = json.loads(datetime_list)
     worker_log_list = in_config_apis.search_worker_log(_id, name, datetime_list,
-                                                       int(ap), int(inout))
+                                                       int(ap), int(inout),
+                                                       violation)
     return render_template("search_worker.html", log_list=worker_log_list)
 
 
