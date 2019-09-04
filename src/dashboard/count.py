@@ -156,7 +156,7 @@ GADGET_INFO = {
 }
 
 SCANNER_LOCATION = {
-    "0": "None",
+    "0": "PORTAL",
     "1": "AT1",
     "2": "AT2"
 }

@@ -22,9 +22,11 @@ import base
 import util
 import in_apis
 import local_apis
+import in_config_apis
 from dashboard import count
 from registration import blueprint
 from constants import REG_HUB_ID, REG_ACCOUNT_ID, BEACON_SPEC
+from config_models import SCANNER_TYPE
 
 
 IPCAM_KIND = {
@@ -135,7 +137,22 @@ def scanner_update_route(hid):
     name = request.form.get('name')
     location = request.form.get('location')
     is_count = request.form.get('count')
-    local_apis.update_scanner_information(hid, name, location, is_count)
+    ret = local_apis.update_scanner_information(hid, name, location, is_count)
+    if ret:
+      # Same internal/routes.py
+      hub_data = count.get_scanner(hid)
+      custom = hub_data['custom']
+      if 'is_counted_hub' in custom and custom['is_counted_hub']:
+        # 0, 0 is none -> default
+        device_setting = in_config_apis.get_count_device(hub_data['id'])
+        access_point = device_setting.access_point if device_setting else 0
+        in_config_apis.create_or_update_count_device_setting(hub_data['id'],
+                                                             SCANNER_TYPE,
+                                                             0, access_point,
+                                                             name=hub_data['name'])
+      elif 'is_counted_hub' in custom and not custom['is_counted_hub']:
+        # TODO: delete count setting and delete redis ...
+        dashboard.count.delete_device(hub_data['id'], SCANNER_TYPE)
     return redirect("/registration/scanner")
 
 
