@@ -205,7 +205,7 @@ def search_worker_log(_id, worker_name, datetime_list, ap, inout, violation,
   if violation != "100":
     filter_list.append(EnterenceWorkerLog.typ == int(violation))
   if group:
-    filter_list.append(EnterenceWorkerLog.worker_group == group)
+    filter_list.append(EnterenceWorkerLog.worker_group.like("%" + group + "%"))
   log_list = EnterenceWorkerLog.query.\
       filter(*filter_list).\
       order_by(desc(EnterenceWorkerLog.created_time)).all()
