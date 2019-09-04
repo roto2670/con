@@ -26,6 +26,7 @@ from config_models import SCANNER_TYPE
 def internal_update_scanner():
   try:
     raw_data = request.get_data()
+    logging.info("Update scanner data. raw data : %s", raw_data)
     hub_data = json.loads(raw_data.decode('utf-8'))
     custom = hub_data['custom']
     if 'is_counted_hub' in custom and custom['is_counted_hub']:
