@@ -340,6 +340,7 @@
                   <th></th>
                   <th></th>
                   <th></th>
+                  <th></th>
                   <th>
                     <button type="button" class="btn btn-default btn-xs"
                         onclick="exportTableToCsv('pa-table', 'Worker Log')"
@@ -351,6 +352,7 @@
                 <tr>
                   <th>ID</th>
                   <th>Name</th>
+                  <th>Department</th>
                   <th>Time</th>
                   <th>In / Out</th>
                   <th>Access</th>
@@ -363,6 +365,11 @@
                   <tr>
                     <td>{{ log.worker_id }}</td>
                     <td>{{ log.worker_name }}</td>
+                    <td>
+                      {% if log.worker_group %}
+                        {{ log.worker_group }}
+                      {% endif %}
+                    </td>
                     <td>{{ log.event_time }}</td>
                     <td>{{ log.inout }}</td>
                     <td>{{ log.access_point }}</td>
@@ -373,6 +380,7 @@
                 <tr>
                   <td> Total </td>
                   <td>{{ log_list|length }}</td>
+                  <td></td>
                   <td></td>
                   <td></td>
                   <td></td>
