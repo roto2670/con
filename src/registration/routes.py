@@ -142,7 +142,7 @@ def scanner_update_route(hid):
       # Same internal/routes.py
       hub_data = count.get_scanner(hid)
       custom = hub_data['custom']
-      if 'is_counted_hub' in custom and custom['is_counted_hub']:
+      if 'is_counted_hub' in custom and custom['is_counted_hub'] and int(is_count) == 1:
         # 0, 0 is none -> default
         device_setting = in_config_apis.get_count_device(hub_data['id'])
         access_point = device_setting.access_point if device_setting else 0

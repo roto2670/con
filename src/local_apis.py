@@ -76,7 +76,8 @@ def update_scanner_information(hid, name, location, count):
   if int(count) == 1:
     _custom['is_counted_hub'] = True
   else:
-    _custom['is_counted_hub'] = False
+    if 'is_counted_hub' in _custom:
+      del _custom['is_counted_hub']
   body['custom'] = _custom
 
   try:
@@ -142,7 +143,8 @@ def update_ipcam_information(ipcam_id, name, moi, kind, data=None):
     if int(moi) == 1:
       _custom['is_visible_moi'] = True
     else:
-      _custom['is_visible_moi'] = False
+      if 'is_visible_moi' in _custom:
+        del _custom['is_visible_moi']
     body['custom'] = _custom
 
   try:
