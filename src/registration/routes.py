@@ -152,7 +152,7 @@ def scanner_update_route(hid):
                                                              name=hub_data['name'])
       elif 'is_counted_hub' in custom and not custom['is_counted_hub']:
         # TODO: delete count setting and delete redis ...
-        dashboard.count.delete_device(hub_data['id'], SCANNER_TYPE)
+        count.delete_device(hub_data['id'], SCANNER_TYPE)
     return redirect("/registration/scanner")
 
 
