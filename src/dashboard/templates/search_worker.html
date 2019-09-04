@@ -299,16 +299,16 @@
                   <select id="violation" name="violation" class="form-control">
                     {% if data.violation == "0" %}
                       <option id="100" value="100">ALL</option>
-                      <option id="0" value="0" selected>True</option>
-                      <option id="1" value="1">False</option>
+                      <option id="0" value="0" selected>Normal</option>
+                      <option id="1" value="1">Violation</option>
                     {% elif data.violation == "1" %}
                       <option id="100" value="100">ALL</option>
-                      <option id="0" value="0">True</option>
-                      <option id="1" value="1" selected>False</option>
+                      <option id="0" value="0">Normal</option>
+                      <option id="1" value="1" selected>Violation</option>
                     {% else %}
                       <option id="100" value="100" selected>ALL</option>
-                      <option id="0" value="0">True</option>
-                      <option id="1" value="1">False</option>
+                      <option id="0" value="0">Normal</option>
+                      <option id="1" value="1">Violation</option>
                     {% endif %}
                   </select>
                 </div>
