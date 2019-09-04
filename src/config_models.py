@@ -79,6 +79,7 @@ class _EnterenceWorkerLog(db.Model):
   text = Column(Text)
   organization_id = Column(String(75))
   typ = Column(Integer)
+  worker_group = Column(String(75))
 
 
 FACE_STATION_TYPE = 1

@@ -225,6 +225,7 @@ def get_worker_search_page():
   else:
     _id = request.form.get('userid')
     name = request.form.get('username')
+    group = request.form.get('group')
     ap = request.form.get('ap')
     inout = request.form.get('inout')
     violation = request.form.get('violation')
@@ -232,9 +233,9 @@ def get_worker_search_page():
     datetime_list = json.loads(datetime_list)
     worker_log_list = in_config_apis.search_worker_log(_id, name, datetime_list,
                                                        int(ap), int(inout),
-                                                       violation)
+                                                       violation, group)
     data = {
-      "id": _id, "name": name, "ap": ap, "inout": inout,
+      "id": _id, "name": name, "ap": ap, "inout": inout, "group": group,
       "violation": violation
     }
     start_date = "-".join(datetime_list[0].split(",")[:3])

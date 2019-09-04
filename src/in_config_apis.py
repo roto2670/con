@@ -133,6 +133,7 @@ def create_enterence_worker_log(inout, access_point, data, text, typ,
                            created_time=cur_time,
                            worker_id=data['user_id']['user_id'],
                            worker_name=data['user_id']['name'],
+                           worker_group=data['user_group_id']['name'],
                            device_id=data['device_id']['id'],
                            device_name=data['device_id']['name'],
                            text=text,
@@ -149,6 +150,7 @@ def create_enterence_worker_log(inout, access_point, data, text, typ,
     "created_time": str(log.created_time),
     "worker_id": log.worker_id,
     "worker_name": log.worker_name,
+    "worker_group": log.worker_group,
     "device_id": log.device_id,
     "device_name": log.device_name,
     "text": log.text,
@@ -184,7 +186,8 @@ def get_enterence_out_worker_log_list(organization_id, access_point, page_num=1,
   return log_list
 
 
-def search_worker_log(_id, worker_name, datetime_list, ap, inout, violation):
+def search_worker_log(_id, worker_name, datetime_list, ap, inout, violation,
+                      group):
   st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
   end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
   filter_list = [
@@ -201,6 +204,8 @@ def search_worker_log(_id, worker_name, datetime_list, ap, inout, violation):
     filter_list.append(EnterenceWorkerLog.inout == inout)
   if violation != "100":
     filter_list.append(EnterenceWorkerLog.typ == int(inout))
+  if group:
+    filter_list.append(EnterenceWorkerLog.worker_group == group)
   log_list = EnterenceWorkerLog.query.\
       filter(*filter_list).\
       order_by(desc(EnterenceWorkerLog.created_time)).all()
