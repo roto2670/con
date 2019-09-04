@@ -238,9 +238,13 @@ def get_worker_search_page():
       "violation": violation
     }
     start_date = "-".join(datetime_list[0].split(",")[:3])
+    start_time = ":".join(datetime_list[0].split(",")[3:])
     end_date = "-".join(datetime_list[1].split(",")[:3])
+    end_time = ":".join(datetime_list[1].split(",")[3:])
+    start = "{} {}".format(start_date, start_time)
+    end = "{} {}".format(end_date, end_time)
     return render_template("search_worker.html", log_list=worker_log_list,
-                           data=data, start_date=start_date, end_date=end_date)
+                           data=data, start_date=start, end_date=end)
 
 
 @blueprint.route('/search/equip', methods=["GET", "POST"])
@@ -262,10 +266,14 @@ def get_equip_search_page():
       "name": name, "ap": ap, "inout": inout, "kind": kind
     }
     start_date = "-".join(datetime_list[0].split(",")[:3])
+    start_time = ":".join(datetime_list[0].split(",")[3:])
     end_date = "-".join(datetime_list[1].split(",")[:3])
+    end_time = ":".join(datetime_list[1].split(",")[3:])
+    start = "{} {}".format(start_date, start_time)
+    end = "{} {}".format(end_date, end_time)
     return render_template("search_equip.html", log_list=equip_log_list,
                            kind_dict=count.GADGET_INFO, data=data,
-                           start_date=start_date, end_date=end_date)
+                           start_date=start, end_date=end)
 
 
 def _get_notice_list_summary():
