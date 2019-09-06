@@ -228,22 +228,6 @@
       divCount.innerText = parseInt(divEquip.innerText) + parseInt(divWorker.innerText);
     }
 
-    function getWorkSchedule() {
-      jQuery.get("/dashboard/workschedule/view").done(function(data){
-        var divWorkSchedule = document.getElementById("workSchedule");
-        divWorkSchedule.src = data;
-      });
-    }
-    getWorkSchedule();
-
-    function getWorkScheduleDetail() {
-      jQuery.get("/dashboard/workschedule/detail/view").done(function(data){
-        var divWorkSchedule = document.getElementById("workSchedule-detail");
-        divWorkSchedule.src = data;
-      });
-    }
-    getWorkScheduleDetail();
-
     $(document).ready(function(){
       var host = window.location.hostname;
       var sock = io.connect('http://' + host + ':5000/ws/count');
