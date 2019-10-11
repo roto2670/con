@@ -534,6 +534,7 @@ def _send_worker_log(log):
 
 
 def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
+  event_data['event_time'] = in_config_apis.get_server_time()
   if WORKER_COUNT.has_data(org_id, user_id):
     # User exit
     if device_id in OUT_LIST:
@@ -580,8 +581,8 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
   else:
     # User enter
     if device_id in IN_LIST:
-      ret = WORKER_COUNT.set_data(key, user_id, user_name)
-      ret = WORKER_COUNT.set_data(org_id, user_id, user_name)
+      ret = WORKER_COUNT.set_data(key, user_id, event_data)
+      ret = WORKER_COUNT.set_data(org_id, user_id, event_data)
       text = WORKER_ENTER_TEXT.format(user_name, ACCESS_POINT[key])
       log = in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
                                                        text, NORMAL_CHECK, org_id)
@@ -678,7 +679,7 @@ def _check_equip_operator_count(tags):
   return False
 
 
-def _handle_operator_count(operator_key, gid, name):
+def _handle_operator_count(operator_key, gid, name=None):
   if WORKER_COUNT.has_data(operator_key, gid):
     WORKER_COUNT.delete_data(operator_key, gid)
   else:
@@ -711,7 +712,7 @@ def _set_equip_count(key, org_id, gid, hid):
       # Equip operator count
       if has_count_operator:
         operator_key = OPERATOR_COUNT_KEY[key]
-        _handle_operator_count(operator_key, gid, device_name)
+        _handle_operator_count(operator_key, gid)
       text = EQUIP_EXIT_TEXT.format(device_name, ACCESS_POINT[key])
       log = in_config_apis.create_entrance_equip_log(OUT_SETTING_ID, key, device_tag,
                                                      hid, scanner_name, gid,
@@ -742,7 +743,7 @@ def _set_equip_count(key, org_id, gid, hid):
       # Equip operator count
       if has_count_operator:
         operator_key = OPERATOR_COUNT_KEY[reverse_key]
-        _handle_operator_count(operator_key, gid, device_name)
+        _handle_operator_count(operator_key, gid)
       text = EQUIP_EXIT_TEXT_2.format(device_name, ACCESS_POINT[key],
                                       ACCESS_POINT[reverse_key])
       log = in_config_apis.create_entrance_equip_log(OUT_SETTING_ID, key, device_tag,
@@ -769,12 +770,16 @@ def _set_equip_count(key, org_id, gid, hid):
             WORKER_COUNT.hdel(bus_id, user_id)
   else:
     # equip enter
-    ret = BEACONS_COUNT.set_data(key, gid, device_name)
-    ret = BEACONS_COUNT.set_data(org_id, gid, device_name)
+    device_data = {
+        "device_name": device_name, "tag": device_tag,
+        "event_time": in_config_apis.get_servertime()
+    }
+    ret = BEACONS_COUNT.set_data(key, gid, device_data)
+    ret = BEACONS_COUNT.set_data(org_id, gid, device_data)
     # Equip operator count
     if has_count_operator:
       operator_key = OPERATOR_COUNT_KEY[key]
-      _handle_operator_count(operator_key, gid, device_name)
+      _handle_operator_count(operator_key, gid, device_data)
     text = EQUIP_ENTER_TEXT.format(device_name, ACCESS_POINT[key])
     log = in_config_apis.create_entrance_equip_log(IN_SETTING_ID, key, device_tag,
                                                    hid, scanner_name, gid, device_name,
@@ -787,8 +792,8 @@ def _set_equip_count(key, org_id, gid, hid):
       bus_user_list = WORKER_COUNT.get_all(bus_id)  # {user_id: event_data, ..}
       for user_id, event_data in bus_user_list.items():
         user_name = event_data['user_id']['name']
-        WORKER_COUNT.set_data(key, user_id, user_name)
-        WORKER_COUNT.set_data(org_id, user_id, user_name)
+        WORKER_COUNT.set_data(key, user_id, event_data)
+        WORKER_COUNT.set_data(org_id, user_id, event_data)
         # TODO: Change text? enter with bus?
         u_text = WORKER_ENTER_TEXT.format(user_name, ACCESS_POINT[key])
         log = in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,

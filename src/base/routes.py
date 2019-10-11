@@ -151,9 +151,14 @@ def _get_current_product():
     return None
 
 
+def _get_server_time():
+  return datetime.datetime.now().replace(microsecond=0)
+
+
 def about_product():
   return dict(current_product=_get_current_product(),
-              product_list=_get_product_list())
+              product_list=_get_product_list(),
+              server_time=_get_server_time())
 
 
 ## Jinja template
