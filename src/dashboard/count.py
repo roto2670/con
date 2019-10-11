@@ -22,6 +22,7 @@ import constants
 import local_apis
 import in_config_apis
 from util import RedisStore
+from constants import KIND_IPCAM, KIND_SPEAKER
 from config_models import FACE_STATION_TYPE
 from config_models import SCANNER_TYPE
 
@@ -313,7 +314,6 @@ def scanner_list():
   raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
   data_list = []
   for raw_data in raw_datas.values():
-    # TODO:
     if 'issuer' in raw_data and raw_data['issuer'] == 'com.thenaran.skec':
       data_list.append(raw_data)
   return data_list
@@ -323,7 +323,6 @@ def beacon_list():
   raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
   data_list = []
   for raw_data in raw_datas.values():
-    # TODO:
     if raw_data['kind'] == 'mibsskec':
       data_list.append(raw_data)
   return data_list
@@ -333,8 +332,7 @@ def ipcam_list():
   raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
   data_list = []
   for raw_data in raw_datas.values():
-    # TODO:
-    if raw_data['kind'] == 'ipcam':
+    if raw_data['kind'] == KIND_IPCAM:
       data_list.append(raw_data)
   return data_list
 
@@ -343,8 +341,7 @@ def pa_list():
   raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
   data_list = []
   for raw_data in raw_datas.values():
-    # TODO:
-    if raw_data['kind'] == 'speaker':
+    if raw_data['kind'] == KIND_SPEAKER:
       data_list.append(raw_data)
   return data_list
 

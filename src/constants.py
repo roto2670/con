@@ -28,4 +28,5 @@ else:
   BEACON_SPEC = '''d526b46a-854d-018d-355b-90ee2527fd4e'''
 
 ORG_ID = '''ac983bfaa401d89475a45952e0a642cf'''
-
+KIND_IPCAM = '''ipcam'''
+KIND_SPEAKER = '''speaker'''

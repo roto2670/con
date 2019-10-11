@@ -26,6 +26,7 @@ import in_config_apis
 from dashboard import count
 from registration import blueprint
 from constants import REG_HUB_ID, REG_ACCOUNT_ID, BEACON_SPEC
+from constants import KIND_IPCAM, KIND_SPEAKER
 from config_models import SCANNER_TYPE
 
 
@@ -217,11 +218,11 @@ def reg_ipcam():
       "id": new_id,
       "mac": mac_addr,
       "name": name,
-      "kind": "ipcam",
+      "kind": KIND_IPCAM,
       "protocol": 0,
       "firmware_version": "0.0.0",
       "model_number": 0,
-      "model_name": "ipcam",
+      "model_name": KIND_IPCAM,
       "sdk_version": "0.3",
       "beacon": REG_ACCOUNT_ID,
       "security": security,
@@ -309,11 +310,11 @@ def reg_pa():
       "id": new_id,
       "mac": mac_addr,
       "name": name,
-      "kind": "paspeaker",
+      "kind": KIND_SPEAKER,
       "protocol": 0,
       "firmware_version": "0.0.0",
       "model_number": 0,
-      "model_name": "paspeaker",
+      "model_name": KIND_SPEAKER,
       "sdk_version": "0.3",
       "beacon": REG_ACCOUNT_ID,
       "security": security,
