@@ -16,7 +16,6 @@ import tempfile
 import subprocess
 
 import apis
-import requests
 import sendgrid  # noqa : pylint: disable=import-error
 from OpenSSL import crypto  # noqa : pylint: disable=import-error
 from intelhex import IntelHex  # noqa : pylint: disable=import-error

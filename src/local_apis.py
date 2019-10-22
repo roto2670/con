@@ -45,7 +45,7 @@ def update_beacon_information(gid, hid, name, kind, moi, ipcam_id):
   body['custom'] = _custom
 
   try:
-    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
     if resp.ok:
       logging.info("update beacon information successful. Code : %s, Text : %s",
                    resp.status_code, resp.text)
@@ -81,7 +81,7 @@ def update_scanner_information(hid, name, location, count):
   body['custom'] = _custom
 
   try:
-    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
     if resp.ok:
       logging.info("update scanner information successful. Code : %s, Text : %s",
                    resp.status_code, resp.text)
@@ -108,7 +108,7 @@ def register_ipcam(gadget_info):
     "value": gadget_info
   }
   try:
-    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
     if resp.ok:
       logging.info("register ipcam successful. Code : %s, Text : %s",
                    resp.status_code, resp.text)
@@ -148,7 +148,7 @@ def update_ipcam_information(ipcam_id, name, moi, kind, data=None):
     body['custom'] = _custom
 
   try:
-    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
     if resp.ok:
       logging.info("update ipcam information successful. Code : %s, Text : %s",
                    resp.status_code, resp.text)
@@ -176,7 +176,7 @@ def remove_ipcam(ipcam_id):
     "value": _ipcam
   }
   try:
-    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
     if resp.ok:
       logging.info("remove ipcam successful. Code : %s, Text : %s",
                    resp.status_code, resp.text)
@@ -194,7 +194,7 @@ def remove_ipcam(ipcam_id):
 def get_suprema_device_list():
   try:
     url = "{}/device_list".format(constants.SUPREMA_ADDR)
-    resp = requests.get(url)
+    resp = requests.get(url, verify=False)
     return resp.json()
   except:
     logging.exception("Failed to get device list.")
@@ -213,7 +213,7 @@ def register_pa(gadget_info):
     "value": gadget_info
   }
   try:
-    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
     if resp.ok:
       logging.info("register pa speaker successful. Code : %s, Text : %s",
                    resp.status_code, resp.text)
@@ -250,7 +250,7 @@ def update_pa_information(pa_id, name, kind=None, data=None):
     body['custom'] = _custom
 
   try:
-    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
     if resp.ok:
       logging.info("update pa speaker information successful. Code : %s, Text : %s",
                    resp.status_code, resp.text)
@@ -278,7 +278,7 @@ def remove_pa(pa_id):
     "value": _pa
   }
   try:
-    resp = requests.post(url, headers=headers, data=json.dumps(body))
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
     if resp.ok:
       logging.info("remove pa speaker successful. Code : %s, Text : %s",
                    resp.status_code, resp.text)

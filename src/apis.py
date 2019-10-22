@@ -62,7 +62,7 @@ def get_user(email_addr):
       return _test_data
     else:
       logging.info("Get user Request. Url : %s, params : %s", url, params)
-      resp = requests.get(url, headers=HEADERS, params=params)
+      resp = requests.get(url, headers=HEADERS, params=params, verify=False)
       if resp.ok:
         value = resp.json()
         logging.warning("Get User Resp : %s", value)
@@ -120,7 +120,7 @@ def get_gadget_list_by_tester(product_id):
       return _test_data
     else:
       logging.info("Get gadget list by tester Request. Url : %s", url)
-      resp = requests.get(url, headers=HEADERS)
+      resp = requests.get(url, headers=HEADERS, verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Get gadget list by tester resp : %s", value)
@@ -280,7 +280,7 @@ def get_gadget_list(product_id):
     else:
       headers = _get_user_header(is_json=True)
       logging.info("Get gadget list Request. Url : %s", url)
-      resp = requests.get(url, headers=headers)
+      resp = requests.get(url, headers=headers, verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Get gadget list resp : %s", value)
@@ -312,7 +312,7 @@ def update_android_key(organization_id, kind, secret, availables):
       return _test_data
     else:
       logging.info("Update android key Request. Url : %s, data : %s", url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Update android key resp : %s", value)
@@ -336,7 +336,7 @@ def delete_android_key(organization_id, kind):
       return _test_data
     else:
       logging.info("Delete android key Request. Url : %s", url)
-      resp = requests.delete(url, headers=HEADERS)
+      resp = requests.delete(url, headers=HEADERS, verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Delete android key resp : %s", value)
@@ -367,7 +367,7 @@ def update_ios_key(organization_id, kind, cert, secret, is_dev, availables):
       return _test_data
     else:
       logging.info("Update ios key Request. Url : %s, data : %s", url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Update ios key resp %s", value)
@@ -391,7 +391,7 @@ def delete_ios_key(organization_id, kind):
       return _test_data
     else:
       logging.info("Delete ios key Request. Url : %s", url)
-      resp = requests.delete(url, headers=HEADERS)
+      resp = requests.delete(url, headers=HEADERS, verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Delete ios key resp : %s", value)
@@ -417,7 +417,7 @@ def update_allow_noti_key(organization_id, kind, availables):
     else:
       logging.info("Update allow noti key Request. Url : %s, data : %s",
                    url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Update ios key resp : %s", value)
@@ -448,7 +448,7 @@ def register_specifications(product_id, version, specification):
     else:
       logging.info("Register specifications Request. Url : %s, data : %s",
                    url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Register specifications resp : %s", value)
@@ -467,7 +467,7 @@ def call_endpoint(gadget_id, endpoint_name, data):
   url = BASE_URL + "gadgets/" + gadget_id + "/endpoints/" + endpoint_name
   try:
     logging.info("Call endpoint request. Url : %s, data : %s", url, data)
-    resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+    resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
     if resp.ok:
       value = resp.json()
       logging.info("Call endpoint resp : %s", value)
@@ -487,7 +487,7 @@ def get_endpoint_result(gadget_id, task_id):
   url = BASE_URL + "gadgets/" + gadget_id + "/results/" + task_id
   try:
     logging.info("Get endpoint result request. Url : %s", url)
-    resp = requests.get(url, headers=HEADERS)
+    resp = requests.get(url, headers=HEADERS, verify=False)
     if resp.ok:
       value = resp.json()
       logging.info("Get endpoint result resp : %s", value)
@@ -529,7 +529,7 @@ def create_product(product_id, keyword, developer_id):
       return _test_data
     else:
       logging.info("Create product request. url : %s, data : %s", url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Create product resp : %s", value)
@@ -558,7 +558,7 @@ def update_about_hook(product_id, stage, hook_url=None, hook_client_key=None):
   else:
     try:
       logging.info("Update about hook request. url : %s, data : %s", url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Update about hook resp : %s", value)
@@ -587,7 +587,7 @@ def update_product_stage(product_id, product_stage, model_number_dict, stage):
   else:
     try:
       logging.info("Update product stage request. url : %s, data : %s", url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Update product stage resp : %s", value)
@@ -620,7 +620,7 @@ def create_model(product_id, model_number, model_name):
       return _test_data
     else:
       logging.info("Create model request. url : %s, data : %s", url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Create model resp : %s", value)
@@ -659,7 +659,7 @@ def create_org(email):
       return _test_data
     else:
       logging.info("Create org request. url : %s, data : %s", url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Create org resp : %s", value)
@@ -688,7 +688,7 @@ def get_org(organization_id):
       return _test_data
     else:
       logging.info("Get org request. url : %s", url)
-      resp = requests.get(url, headers=HEADERS)
+      resp = requests.get(url, headers=HEADERS, verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Get org resp : %s", value)
@@ -723,7 +723,7 @@ def register_firmware(product_id, model_number, firmware_version, firmware_binar
       return _test_data
     else:
       logging.info("Register firmware request. url : %s", url)
-      resp = requests.post(url, headers=headers, data=firmware_binary)
+      resp = requests.post(url, headers=headers, data=firmware_binary, verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Register firmware resp : %s", value)
@@ -745,7 +745,7 @@ def delete_firmware(product_id, model_number, firmware_version):
       return True
     else:
       logging.info("Delete firmware request. url :%s", url)
-      resp = requests.delete(url, headers=HEADERS)
+      resp = requests.delete(url, headers=HEADERS, verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Delete firmware resp : %s", value)
@@ -778,7 +778,7 @@ def register_tester(organization_id, product_id, tester_email, stage):
       return _test_data
     else:
       logging.info("Register tester request. url : %s, data : %s", url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Register tester resp %s", value)
@@ -808,7 +808,7 @@ def delete_tester(organization_id, product_id, tester_email):
       return _test_data
     else:
       logging.info("Delete tester request. url : %s, param : %s", url, params)
-      resp = requests.delete(url, headers=HEADERS, params=params)
+      resp = requests.delete(url, headers=HEADERS, params=params, verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Delete Tester resp : %s", value)
@@ -848,7 +848,7 @@ def get_logs(product_id, keyword=None, token=None, limit=None):
       return _test_data
     else:
       headers = {}
-      resp = requests.get(url, headers=headers, params=params)
+      resp = requests.get(url, headers=headers, params=params, verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Get logs. url : %s", url)
@@ -872,7 +872,7 @@ def get_logs_with_gadget(product_id, gadget_id, keyword=None, token=None,
       return _test_data
     else:
       headers = {}
-      resp = requests.get(url, headers=headers, params=params)
+      resp = requests.get(url, headers=headers, params=params, verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Get logs with gadget. url : %s", url)
@@ -902,7 +902,7 @@ def register_sub_domain(gadget_id, sub_name, domain_name):
     else:
       headers = _get_user_header(is_json=True)
       logging.info("Register sub domain request. url : %s, data : %s", url, data)
-      resp = requests.post(url, headers=headers, data=json.dumps(data))
+      resp = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Register sub domain resp : %s", value)
@@ -932,7 +932,7 @@ def register_or_update_stream_product(product_id, hub_kind, up_product, down_mod
     else:
       logging.info("Register or update stream product request. url : %s, data : %s",
                    url, data)
-      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data))
+      resp = requests.post(url, headers=JSON_HEADERS, data=json.dumps(data), verify=False)
       if resp.ok:
         value = resp.json()
         logging.info("Register or update product stream resp : %s", value)
