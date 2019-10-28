@@ -279,11 +279,24 @@ def ipcam_delete_route(ipcam_id):
   return redirect("/registration/ipcam")
 
 
-@blueprint.route('/pa', methods=['GET'])
+@blueprint.route('/pa', methods=['GET', 'POST'])
 @util.require_login
 def pa_list_route():
   pa_list = count.pa_list()
-  return render_template("pa_list.html", pa_list=pa_list)
+  if request.method == "GET":
+    return render_template("pa_list.html", pa_list=pa_list,
+                           selected_onoff=100)
+  else:
+    selected_onoff = int(request.form['onoff'])
+    new_list = []
+    if selected_onoff != 100:
+      for pa_speaker in pa_list:
+        if pa_speaker['status'] == selected_onoff:
+          new_list.append(pa_speaker)
+    else:
+      new_list = pa_list
+    return render_template("pa_list.html", pa_list=new_list,
+                           selected_onoff=selected_onoff)
 
 
 @blueprint.route('/pa/create', methods=['GET', 'POST'])

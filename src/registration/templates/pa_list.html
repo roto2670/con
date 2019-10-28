@@ -33,7 +33,17 @@
               }
               else {
                   columnData = columnData.toString().replace(/"/g, '""'); // escape double quotes
+                  if (columnData.indexOf('vstatus=""on""') >= 0) {
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                      columnData += "ON";
+                  } else if (columnData.indexOf('vstatus=""off""') >= 0){
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                      columnData += "OFF";
+                  } else {
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                  }
               }
+              columnData = columnData.replace(/(^\s*)|(\s*$)/gi, "");
               csvString = csvString + '"' + columnData + '",';
           }
           csvString = csvString.substring(0, csvString.length - 1);
@@ -102,9 +112,28 @@
                   </th>
                   <th>
                   </th>
+                  <form id="category" action="/registration/pa" method="POST">
+                    <th>
+                      <select id="onoff" name="onoff" onchange="this.form.submit()">
+                        {% if selected_onoff == 0 %}
+                          <option id="100" value="100">All</option>
+                          <option id="1" value="1">ON</option>
+                          <option id="0" value="0" selected>OFF</option>
+                        {% elif selected_onoff == 100 %}
+                          <option id="100" value="100" selected>All</option>
+                          <option id="1" value="1">ON</option>
+                          <option id="0" value="0">OFF</option>
+                        {% else %}
+                          <option id="100" value="100">All</option>
+                          <option id="1" value="1" selected>ON</option>
+                          <option id="0" value="0">OFF</option>
+                        {% endif %}
+                      </select>
+                    </th>
+                  </form>
                   <th>
                     <button type="button" class="btn btn-default btn-xs"
-                        onclick="exportTableToCsv('pa-table', 'Beacon Tag')"
+                        onclick="exportTableToCsv('pa-table', 'PA Speaker')"
                         style="margin-bottom: 0;">
                       CSV Download
                     </button>
@@ -114,6 +143,7 @@
                   <th></th>
                   <th>Name</th>
                   <th>IP Address</th>
+                  <th>Status</th>
                   <th>Group</th>
                 </tr>
               </thead>
@@ -127,12 +157,21 @@
                     </a>
                   </td>
                   <td>{{ pa.custom.ip }}</td>
+                  <!-- status -->
+                  {% if pa.status == 0 %}
+                    <td style="padding-left: 20px;"><img src="/static/images/off.png"
+                        style="width:16px; border: 2px solid #000000; border-radius: 100%" vstatus="off"></td>
+                  {% else %}
+                    <td style="padding-left: 20px;"><img src="/static/images/on.png"
+                        style="width:16px; border: 2px solid #000000; border-radius: 100%" vstatus="on"></td>
+                  {% endif %}
                   <td></td>
                 </tr>
                 {% endfor %}
                 <tr>
                   <td></td>
                   <td> Total </td>
+                  <td> {{ pa_list|length }} </td>
                   <td></td>
                   <td></td>
                 </tr>
