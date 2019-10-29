@@ -220,7 +220,7 @@ def search_equip_log(equip_name, kind, datetime_list, ap, inout):
     EntranceEquipLog.event_time < end_date
   ]
   if equip_name:
-    filter_list.append(EntranceEquipLog.gadget_name_name.like("%" + equip_name + "%"))
+    filter_list.append(EntranceEquipLog.gadget_name.like("%" + equip_name + "%"))
   if kind != "100":
     filter_list.append(EntranceEquipLog.kind == kind)
   if ap != 0:
