@@ -17,6 +17,7 @@ import logging
 
 from flask import render_template, request, redirect  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
+from flask import make_response
 
 import util
 import in_config_apis
@@ -229,14 +230,23 @@ def get_worker_search_page():
     ap = request.form.get('ap')
     inout = request.form.get('inout')
     violation = request.form.get('violation')
-    datetime_list = request.form.get('datetime')
-    datetime_list = json.loads(datetime_list)
+    raw_datetime_list = request.form.get('datetime')
+    datetime_list = json.loads(raw_datetime_list)
+    page = request.form.get('page')
+    next_num = request.form.get('next_num')
+    prev_num = request.form.get('prev_num')
+    page_num = None
+    if page == "1":
+      page_num = prev_num
+    elif page == "2":
+      page_num = next_num
+
     worker_log_list = in_config_apis.search_worker_log(_id, name, datetime_list,
                                                        int(ap), int(inout),
-                                                       violation, group)
+                                                       violation, group, page_num)
     data = {
       "id": _id, "name": name, "ap": ap, "inout": inout, "group": group,
-      "violation": violation
+      "violation": violation, "datetime": raw_datetime_list
     }
     start_date = "-".join(datetime_list[0].split(",")[:3])
     start_time = ":".join(datetime_list[0].split(",")[3:])
@@ -246,6 +256,34 @@ def get_worker_search_page():
     end = "{} {}".format(end_date, end_time)
     return render_template("search_worker.html", log_list=worker_log_list,
                            data=data, start_date=start, end_date=end)
+
+
+@blueprint.route('/search/worker/download', methods=["GET"])
+@util.require_login
+def download_worker_log():
+  _id = request.args.get('userid')
+  name = request.args.get('username')
+  group = request.args.get('group')
+  ap = request.args.get('ap')
+  inout = request.args.get('inout')
+  violation = request.args.get('violation')
+  datetime_list = request.args.get('datetime')
+  datetime_list = json.loads(datetime_list)
+  csv_log_list = in_config_apis.csv_worker_log(_id, name, datetime_list,
+                                               int(ap), int(inout),
+                                               violation, group)
+  filename = str(in_config_apis.get_servertime())
+  csv_str = "\uFEFF"
+  csv_str += "ID,Name,Department,Time,In/Out,Access,Violation,DeviceName\n"
+  for r in csv_log_list:
+    row_string = str(r)
+    csv_str += row_string + "\n"
+  resp = make_response(csv_str, 200)
+  resp.headers['Cache-Control'] = 'no-cache'
+  resp.headers['Content-Type'] = 'text/csv'
+  resp.headers['Content-Disposition'] = 'attachment; filename={}.csv'.format(filename)
+  resp.headers['Content-Length'] = len(csv_str)
+  return resp
 
 
 @blueprint.route('/search/equip', methods=["GET", "POST"])
@@ -259,12 +297,23 @@ def get_equip_search_page():
     name = request.form.get('equipname')
     ap = request.form.get('ap')
     inout = request.form.get('inout')
-    datetime_list = request.form.get('datetime')
-    datetime_list = json.loads(datetime_list)
+    raw_datetime_list = request.form.get('datetime')
+    datetime_list = json.loads(raw_datetime_list)
+    page = request.form.get('page')
+    next_num = request.form.get('next_num')
+    prev_num = request.form.get('prev_num')
+    page_num = None
+    if page == "1":
+      page_num = prev_num
+    elif page == "2":
+      page_num = next_num
+
     equip_log_list = in_config_apis.search_equip_log(name, kind, datetime_list,
-                                                     int(ap), int(inout))
+                                                     int(ap), int(inout),
+                                                     page_num)
     data = {
-      "name": name, "ap": ap, "inout": inout, "kind": kind
+      "name": name, "ap": ap, "inout": inout, "kind": kind,
+      "datetime": raw_datetime_list
     }
     start_date = "-".join(datetime_list[0].split(",")[:3])
     start_time = ":".join(datetime_list[0].split(",")[3:])
@@ -275,6 +324,31 @@ def get_equip_search_page():
     return render_template("search_equip.html", log_list=equip_log_list,
                            kind_dict=count.GADGET_INFO, data=data,
                            start_date=start, end_date=end)
+
+
+@blueprint.route('/search/equip/download', methods=["GET"])
+@util.require_login
+def download_equip_log():
+  kind = request.args.get('kind')
+  name = request.args.get('equipname')
+  ap = request.args.get('ap')
+  inout = request.args.get('inout')
+  raw_datetime_list = request.args.get('datetime')
+  datetime_list = json.loads(raw_datetime_list)
+  csv_log_list = in_config_apis.csv_equip_log(name, kind, datetime_list,
+                                              int(ap), int(inout))
+  filename = str(in_config_apis.get_servertime())
+  csv_str = "\uFEFF"
+  csv_str += "Name,TypeName,TypeCode,Time,In/Out,Access,DeviceName\n"
+  for r in csv_log_list:
+    row_string = str(r)
+    csv_str += row_string + "\n"
+  resp = make_response(csv_str, 200)
+  resp.headers['Cache-Control'] = 'no-cache'
+  resp.headers['Content-Type'] = 'text/csv'
+  resp.headers['Content-Disposition'] = 'attachment; filename={}.csv'.format(filename)
+  resp.headers['Content-Length'] = len(csv_str)
+  return resp
 
 
 def _get_notice_list_summary():

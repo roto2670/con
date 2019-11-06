@@ -23,71 +23,22 @@
       window.location.href = "/dashboard/search/equip";
     }
 
-    function exportTableToCsv(tableId, filename) {
-      var curDate = new Date(),
-          dateString = " " + (curDate.getMonth() + 1) + '-' + curDate.getDate() + '-' + curDate.getFullYear();
-      if (filename == null || typeof filename == undefined)
-          filename = tableId;
-      filename += dateString;
-      filename += ".csv";
+    function exportCsv(kind, equipName, ap, inout, datetime) {
+      var url = "/dashboard/search/equip/download?";
+          args = "kind=" + kind + "&name=" + equipName + "&ap=" + ap + "&inout=" + inout +
+                 "&datetime=" + datetime;
+      window.location.href = url + args;
+    }
 
-      var BOM = "\uFEFF";
-
-      var table = document.getElementById(tableId);
-      var csvString = BOM;
-      for (var rowCnt = 1; rowCnt < table.rows.length; rowCnt++) {
-          var rowData = table.rows[rowCnt].cells;
-          for (var colCnt = 0; colCnt < rowData.length; colCnt++) {
-              var columnData = rowData[colCnt].innerHTML;
-              if (columnData == null || columnData.length == 0) {
-                  columnData = "".replace(/"/g, '""');
-              }
-              else {
-                  columnData = columnData.toString().replace(/"/g, '""'); // escape double quotes
-                  columnData = columnData.replace(/(<([^>]+)>)/ig,"");
-              }
-              columnData = columnData.replace(/(^\s*)|(\s*$)/gi, "");
-              csvString = csvString + '"' + columnData + '",';
-          }
-          csvString = csvString.substring(0, csvString.length - 1);
-          csvString = csvString + "\r\n";
-      }
-      csvString = csvString.substring(0, csvString.length - 1);
-
-      // IE 10, 11, Edge Run
-      if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-
-          var blob = new Blob([decodeURIComponent(csvString)], {
-              type: 'text/csv;charset=utf8'
-          });
-
-          window.navigator.msSaveOrOpenBlob(blob, filename);
-
-      } else if (window.Blob && window.URL) {
-          // HTML5 Blob
-          var blob = new Blob([csvString], { type: 'text/csv;charset=utf8' });
-          var csvUrl = URL.createObjectURL(blob);
-          var a = document.createElement('a');
-          a.setAttribute('style', 'display:none');
-          a.setAttribute('href', csvUrl);
-          a.setAttribute('download', filename);
-          document.body.appendChild(a);
-
-          a.click()
-          a.remove();
+    function handlePage(value) {
+      // 1 -> prev
+      // 2 -> next
+      if (value === "1") {
+          document.getElementById('page').value = "1";
+          document.getElementById('prev').submit();
       } else {
-          // Data URI
-          var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
-          var blob = new Blob([csvString], { type: 'text/csv;charset=utf8' });
-          var csvUrl = URL.createObjectURL(blob);
-          var a = document.createElement('a');
-          a.setAttribute('style', 'display:none');
-          a.setAttribute('target', '_blank');
-          a.setAttribute('href', csvData);
-          a.setAttribute('download', filename);
-          document.body.appendChild(a);
-          a.click()
-          a.remove();
+          document.getElementById('page').value = "2";
+          document.getElementById('next').submit();
       }
     }
 
@@ -203,7 +154,7 @@
                       Name
                     </label>
                     <div class="col-md-4">
-                      <input type="text" id="equipname" name="equipname" value=""
+                      <input type="text" id="equipname" name="equipname" value="{{ data.name }}"
                           class="form-control col-md-6 col-xs-6" >
                     </div>
 
@@ -214,7 +165,11 @@
                       <select id="kind" name="kind" class="form-control">
                         <option id="100" value="100">ALL</option>
                         {% for k, v in kind_dict.items()%}
-                          <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
+                          {% if data.kind == k %}
+                            <option id="{{ k }}" value="{{ k }}" selected>{{ v }}</option>
+                          {% else %}
+                            <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
+                          {% endif %}
                         {% endfor %}
                       </select>
                     </div>
@@ -226,9 +181,19 @@
                     </label>
                     <div class="col-md-4">
                       <select id="inout" name="inout" class="form-control">
-                        <option id="0" value="0">ALL</option>
-                        <option id="1" value="1">IN</option>
-                        <option id="2" value="2">OUT</option>
+                        {% if data['inout'] == "1" %}
+                          <option id="0" value="0">ALL</option>
+                          <option id="1" value="1" selected>IN</option>
+                          <option id="2" value="2">OUT</option>
+                        {% elif data["inout"] == "2" %}
+                          <option id="0" value="0">ALL</option>
+                          <option id="1" value="1">IN</option>
+                          <option id="2" value="2" selected>OUT</option>
+                        {% else %}
+                          <option id="0" value="0" selected>ALL</option>
+                          <option id="1" value="1">IN</option>
+                          <option id="2" value="2">OUT</option>
+                        {% endif %}
                       </select>
                     </div>
 
@@ -237,9 +202,19 @@
                     </label>
                     <div class="col-md-4">
                       <select id="ap" name="ap" class="form-control">
-                        <option id="0" value="0">ALL</option>
-                        <option id="1" value="1">AT1</option>
-                        <option id="2" value="2">AT2</option>
+                        {% if data['ap'] == "1" %}
+                          <option id="0" value="0">ALL</option>
+                          <option id="1" value="1" selected>AT1</option>
+                          <option id="2" value="2">AT2</option>
+                        {% elif data['ap'] == "2" %}
+                          <option id="0" value="0">ALL</option>
+                          <option id="1" value="1">AT1</option>
+                          <option id="2" value="2"selected>AT2</option>
+                        {% else %}
+                          <option id="0" value="0" selected>ALL</option>
+                          <option id="1" value="1">AT1</option>
+                          <option id="2" value="2">AT2</option>
+                        {% endif %}
                       </select>
                     </div>
                   </div>
@@ -257,17 +232,19 @@
                           class="form-control col-md-6 col-xs-6" >
                     </div>
                   </div>
+                  <div class="item form-group">
+                    <input id="page" name="page" type="hidden" value="0">
+                  </div>
 
               <div style="text-align: right">
                 <button type="submit" class="btn btn-default">Search</button>
               </div>
             </div>
-          </form>
 
-          <div class="ln_solid"></div>
         </div>  <!-- End x_content -->
 
         <div class="x_content">  <!-- x_content 1 -->
+          <div class="ln_solid"></div>
 
             <table id="pa-table" class="table table-striped projects">
               <thead>
@@ -286,7 +263,7 @@
                   <th></th>
                   <th>
                     <button type="button" class="btn btn-default btn-xs"
-                        onclick="exportTableToCsv('pa-table', 'Equipment Log')"
+                        onclick="exportCsv('{{ data.kind }}', '{{ data.name }}', '{{ data.ap }}', '{{ data.inout }}', '{{ data.datetime }}')"
                         style="margin-bottom: 0;">
                       CSV Download
                     </button>
@@ -303,7 +280,7 @@
                 </tr>
               </thead>
               <tbody>
-                {% for log in log_list %}
+                {% for log in log_list.items %}
                   <tr>
                     <td>{{ log.gadget_name }}</td>
                     <td>{{ kind_dict[log.kind] }}</td>
@@ -315,18 +292,35 @@
                   </tr>
                 {% endfor %}
                 <tr>
-                  <td> Total </td>
-                  <td>{{ log_list|length }}</td>
+                  {% if log_list.has_prev %}
+                    <td style="text-align:left;">
+                      <input id="prev_num" name="prev_num" type="hidden" value="{{log_list.prev_num}}">
+                      <button id="prev" type="submit" class="btn btn-default" onclick="handlePage('1')">Prev</button>
+                    </td>
+                  {% else %}
+                    <td></td>
+                  {% endif %}
                   <td></td>
                   <td></td>
+                  <td style="text-align:center;vertical-align:middle;">
+                    {% if log_list.has_next %} {{log_list.page * 100}} {% else %} {{log_list.total}} {% endif %} / {{log_list.total}}
+                  </td>
                   <td></td>
                   <td></td>
-                  <td></td>
+                  {% if log_list.has_next %}
+                    <td style="text-align:right;">
+                      <input id="next_num" name="next_num" type="hidden" value="{{ log_list.next_num }}">
+                      <button id="next" type="submit" class="btn btn-default" onclick="handlePage('2')">Next</button>
+                    </td>
+                  {% else %}
+                    <td></td>
+                  {% endif %}
                 </tr>
               </tbody>
             </table>
 
         </div>  <!-- end x_content 1 -->
+        </form>
       </div>  <!-- end x_panel -->
     </div>
 
