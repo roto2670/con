@@ -16,6 +16,29 @@ from sqlalchemy import Column, DateTime, String, Text, Integer  # noqa : pylint:
 from base import db
 
 
+GADGET_INFO = {
+    "1": "JUMBO DRILL(2B)",
+    "2": "JUMBO DRILL(3B)",
+    "3": "CHARGING CAR",
+    "4": "WHEEL LOADER",
+    "5": "DUMP TRUCK",
+    "6": "EXCAVATOR(WHEEL)",
+    "7": "EXCAVATOR(CRAWLER)",
+    "8": "SHOTCRETE MACHINE",
+    "9": "JCB",
+    "10": "CORE DRILLING MACHINE",
+    "11": "DOZER",
+    "12": "GROUTING MACHINE",
+    "13": "MAI PUMP",
+    "14": "MOBILE PRODUCTION UNIT",
+    "15": "CHARGING PUMP UNIT",
+    "16": "BUS",
+    "17": "WCBH Drilling Machine",
+    "18": "Explosive Van",
+    "19": "Concrete Mixer Truck"
+}
+
+
 class _LocationMap(db.Model):
   __tablename__ = '_location_map'
 
@@ -81,6 +104,12 @@ class _EnterenceWorkerLog(db.Model):
   typ = Column(Integer)
   worker_group = Column(String(75))
 
+  def __str__(self):
+    form = "{},{},{},{},{},{},{},{}"
+    return form.format(self.worker_id, self.worker_name, self.worker_group,
+                       self.event_time, self.inout, self.access_point,
+                       self.typ, self.device_id)
+
 
 FACE_STATION_TYPE = 1
 SCANNER_TYPE = 2
@@ -115,3 +144,10 @@ class _EntranceEquipLog(db.Model):
   gadget_name = Column(String(75))
   text = Column(Text)
   organization_id = Column(String(75))
+
+  def __str__(self):
+    form = "{},{},{},{},{},{},{}"
+    gadget_type_name = GADGET_INFO[self.kind]
+    return form.format(self.gadget_name, gadget_type_name, self.kind,
+                       self.event_time, self.inout, self.access_point,
+                       self.hub_name)

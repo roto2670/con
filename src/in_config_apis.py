@@ -187,7 +187,36 @@ def get_enterence_out_worker_log_list(organization_id, access_point, page_num=1,
 
 
 def search_worker_log(_id, worker_name, datetime_list, ap, inout, violation,
-                      group):
+                      group, next_num=None):
+  st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
+  end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
+  filter_list = [
+    EnterenceWorkerLog.event_time > st_date,
+    EnterenceWorkerLog.event_time < end_date
+  ]
+  if not next_num:
+    next_num = 1
+  if _id:
+    filter_list.append(EnterenceWorkerLog.worker_id == _id)
+  if worker_name:
+    filter_list.append(EnterenceWorkerLog.worker_name.like("%" + worker_name + "%"))
+  if ap != 0:
+    filter_list.append(EnterenceWorkerLog.access_point == ap)
+  if inout != 0:
+    filter_list.append(EnterenceWorkerLog.inout == inout)
+  if violation != "100":
+    filter_list.append(EnterenceWorkerLog.typ == int(violation))
+  if group:
+    filter_list.append(EnterenceWorkerLog.worker_group.like("%" + group + "%"))
+  log_list = EnterenceWorkerLog.query.\
+      filter(*filter_list).\
+      order_by(desc(EnterenceWorkerLog.created_time)).paginate(int(next_num),
+                                                               100, False)
+  return log_list
+
+
+def csv_worker_log(_id, worker_name, datetime_list, ap, inout, violation,
+                   group):
   st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
   end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
   filter_list = [
@@ -212,7 +241,32 @@ def search_worker_log(_id, worker_name, datetime_list, ap, inout, violation,
   return log_list
 
 
-def search_equip_log(equip_name, kind, datetime_list, ap, inout):
+
+def search_equip_log(equip_name, kind, datetime_list, ap, inout, next_num=None):
+  st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
+  end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
+  filter_list = [
+    EntranceEquipLog.event_time > st_date,
+    EntranceEquipLog.event_time < end_date
+  ]
+  if not next_num:
+    next_num = 1
+  if equip_name:
+    filter_list.append(EntranceEquipLog.gadget_name.like("%" + equip_name + "%"))
+  if kind != "100":
+    filter_list.append(EntranceEquipLog.kind == kind)
+  if ap != 0:
+    filter_list.append(EntranceEquipLog.access_point == ap)
+  if inout != 0:
+    filter_list.append(EntranceEquipLog.inout == inout)
+  log_list = EntranceEquipLog.query.\
+      filter(*filter_list).\
+      order_by(desc(EntranceEquipLog.created_time)).paginate(int(next_num),
+                                                             100, False)
+  return log_list
+
+
+def csv_equip_log(equip_name, kind, datetime_list, ap, inout):
   st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
   end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
   filter_list = [
