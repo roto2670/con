@@ -1,0 +1,93 @@
+{% extends "base_site.html" %}
+
+{% block title %} Worker List{% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_dashboard.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+  {{ super() }}
+{% endblock stylesheets %}
+
+{% block javascripts %}
+  {{ super() }}
+  <script>
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col" role="main">
+  <div class="row">  <!-- start row -->
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel tile">
+
+        <div class="x_content">  <!-- x_content -->
+            <table id="pa-table" class="table table-striped projects">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Kind</th>
+                  <th>Entrance Time</th>
+                  <th>Working Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for value in equips %}
+                  {% if value|isDict %}
+                    <tr>
+                      <td>
+                        {{ value.device_name }}
+                      </td>
+                      <td>
+                        {{ kind[value.tag] }}
+                      </td>
+                      <td>
+                        {{ value.event_time }}
+                      </td>
+                      {% if (value.event_time|duringTime).days > 0 %}
+                        <td style="color:#ff0000;">
+                          {{ value.event_time|duringTime }}
+                        </td>
+                      {% elif (value.event_time|duringTime).seconds > 43200 %}
+                        <td style="color:#ff0000;">
+                          {{ value.event_time|duringTime }}
+                        </td>
+                      {% else %}
+                        <td>
+                          {{ value.event_time|duringTime }}
+                        </td>
+                      {% endif %}
+                      <td></td>
+                    </tr>
+                  {% else %}
+                    <tr>
+                      <td>
+                        {{ value }}
+                      </td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+                <tr>
+                  <td>Total</td>
+                  <td>{{equips|length}}</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+        </div>  <!-- end x_content -->
+      </div>  <!-- end x_panel -->
+    </div>
+
+  </div>  <!-- End row -->
+</div>
+
+{% endblock content %}

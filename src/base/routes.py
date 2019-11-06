@@ -192,3 +192,15 @@ def change_us_format(value):
 
 def change_us_format_for_date(value):
   return value.strftime("%m/%d/%Y")
+
+
+def during_time(value):
+  form = "%Y-%m-%d %H:%M:%S"
+  value_time = datetime.datetime.strptime(value, form)
+  cur_time = in_config_apis.get_servertime()
+  ret = cur_time - value_time
+  return ret
+
+
+def is_dict(value):
+  return isinstance(value, dict)

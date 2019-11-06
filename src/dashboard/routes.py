@@ -167,6 +167,21 @@ def get_total_equip_count():
   return json.dumps(total_equip_count)
 
 
+@blueprint.route('/count/worker/list/<key>', methods=['GET'])
+@util.require_login
+def get_worker_list(key):
+  worker_list = count.get_worker_data_list(key)
+  return render_template("worker_list.html", workers=worker_list)
+
+
+@blueprint.route('/count/equip/list/<key>', methods=['GET'])
+@util.require_login
+def get_equip_list(key):
+  equip_list = count.get_equip_data_list(key)
+  return render_template("equip_list.html", equips=equip_list,
+                         kind=count.GADGET_INFO)
+
+
 @blueprint.route('/location', methods=['GET'])
 @util.require_login
 def default_location():
