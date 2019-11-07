@@ -19,6 +19,7 @@ import util
 import constants
 import in_config_apis
 from dash import blueprint
+from dashboard import count
 
 SERVER_ADDR = {}
 
@@ -126,3 +127,29 @@ def get_entrance_out_equip_log(ap):
     trans_dict['created_time'] = str(trans_dict['created_time'])
     new_list.append(trans_dict)
   return json.dumps(new_list)
+
+
+@blueprint.route('/gadget/count/list', methods=["GET"])
+@util.require_login
+def get_gadget_count_list():
+  ap1_list = count.get_equip_data_list(1)
+  ap2_list = count.get_equip_data_list(2)
+  data = {
+      "at1": {
+          "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[], "9":[], "10":[],
+          "11":[], "12":[], "13":[], "14":[], "15":[], "16":[], "17":[], "18":[], "19":[]
+      },
+      "at2": {
+          "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[], "9":[], "10":[],
+          "11":[], "12":[], "13":[], "14":[], "15":[], "16":[], "17":[], "18":[], "19":[]
+      },
+      "kind": count.SHOT_GADGET_INFO
+  }
+  for e in ap1_list:
+    if isinstance(e, dict):
+      data['at1'][e['tag']].append(e)
+  for e in ap2_list:
+    if isinstance(e, dict):
+      data['at2'][e['tag']].append(e)
+  return json.dumps(data)
+
