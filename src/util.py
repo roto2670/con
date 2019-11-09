@@ -339,6 +339,14 @@ class RedisStore(object):
   def set(self, name, value, expire_time):
     self.store.set(name, json.dumps(value), expire_time)
 
+  def get_values(self):
+    keys = self.store.keys()
+    ret = self.store.mget(keys)
+    ret_list = []
+    for v in ret:
+      ret_list.append(json.loads(v.decode('utf-8')))
+    return ret_list
+
   def hkeys(self, name):
     return self.store.hkeys(name)
 

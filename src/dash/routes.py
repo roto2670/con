@@ -130,10 +130,10 @@ def get_entrance_out_equip_log(ap):
 
 
 @blueprint.route('/gadget/count/list', methods=["GET"])
-@util.require_login
 def get_gadget_count_list():
-  ap1_list = count.get_equip_data_list(1)
-  ap2_list = count.get_equip_data_list(2)
+  in_tunnel_list = []
+  ap1_list = count.get_all_equips(1)
+  ap2_list = count.get_all_equips(2)
   data = {
       "at1": {
           "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[], "9":[], "10":[],
@@ -143,13 +143,26 @@ def get_gadget_count_list():
           "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[], "9":[], "10":[],
           "11":[], "12":[], "13":[], "14":[], "15":[], "16":[], "17":[], "18":[], "19":[]
       },
+      "other": {
+          "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[], "9":[], "10":[],
+          "11":[], "12":[], "13":[], "14":[], "15":[], "16":[], "17":[], "18":[], "19":[]
+      },
       "kind": count.SHOT_GADGET_INFO
   }
-  for e in ap1_list:
+  for k, e in ap1_list.items():
     if isinstance(e, dict):
       data['at1'][e['tag']].append(e)
-  for e in ap2_list:
+      in_tunnel_list.append(k)
+
+  for e in ap2_list.items():
     if isinstance(e, dict):
       data['at2'][e['tag']].append(e)
+      in_tunnel_list.append(k)
+  detect_gadget_list = count.get_all_gadget_count_equips()
+  for e in detect_gadget_list:
+    if e['id'] not in in_tunnel_list:
+      value = {"device_name": e['name'], "tag": e['tags'][0],
+               "event_time": str(in_config_apis.get_servertime())}
+      data['other'][value['tag']].append(value)
   return json.dumps(data)
 

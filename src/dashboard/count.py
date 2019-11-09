@@ -34,6 +34,8 @@ WORKER_REDIS_DB = 2
 EXPIRE_REDIS_DB = 3
 DATA_INFO_EXPIRE_REDIS_DB = 4
 STREAMING_REDIS_DB = 5  # Using API Server
+GADGET_COUNT_LIST_EXPIRE_REDIS_DB = 6
+
 
 # AT1 : 1 , AT2: 2
 BEACONS_COUNT = RedisStore(REDIS_HOST, REDIS_PORT, BEACONS_REDIS_DB)
@@ -42,6 +44,9 @@ WORKER_COUNT = RedisStore(REDIS_HOST, REDIS_PORT, WORKER_REDIS_DB)
 EXPIRE_CACHE = RedisStore(REDIS_HOST, REDIS_PORT, EXPIRE_REDIS_DB)
 DATA_INFO_EXPIRE_CACHE = RedisStore(REDIS_HOST, REDIS_PORT,
                                     DATA_INFO_EXPIRE_REDIS_DB)
+GADGET_COUNT_LIST_EXPIRE_CACHE = RedisStore(REDIS_HOST, REDIS_PORT,
+                                            GADGET_COUNT_LIST_EXPIRE_REDIS_DB)
+
 
 EXPIRE_TIME = 3  # 3s
 EQUIP_EXPIRE_TIME = 120  # 2m
@@ -250,6 +255,15 @@ def get_worker_data_list(ap):
 
 def get_equip_data_list(ap):
   return BEACONS_COUNT.get_data_of_values(ap)
+
+
+def get_all_equips(ap):
+  return BEACONS_COUNT.get_all(ap)
+
+
+def get_all_gadget_count_equips():
+  # Gadget count list. Expired 20s.
+  return GADGET_COUNT_LIST_EXPIRE_CACHE.get_values()
 
 
 def _get_device_list(org_id):
