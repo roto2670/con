@@ -154,7 +154,7 @@ def get_gadget_count_list():
       data['at1'][e['tag']].append(e)
       in_tunnel_list.append(k)
 
-  for e in ap2_list.items():
+  for k, e in ap2_list.items():
     if isinstance(e, dict):
       data['at2'][e['tag']].append(e)
       in_tunnel_list.append(k)
