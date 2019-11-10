@@ -228,7 +228,7 @@ def download_current_equip_list(key):
     count_kind = "Yes" if v['tag'] in count_equip_list else ""
     r_str = "{},{},{},{},{}\n".format(v['device_name'],
                                       count.GADGET_INFO[v['tag']],
-                                      v['user_group_id']['name'],
+                                      count_kind,
                                       v['event_time'],
                                       str(working_time).replace(",", " "))
     csv_str += r_str
