@@ -1,6 +1,6 @@
 {% extends "base_site.html" %}
 
-{% block title %} Worker List{% endblock title %}
+{% block title %} Equipment List{% endblock title %}
 
 {% block sidebar %}
   <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
@@ -15,6 +15,10 @@
 {% block javascripts %}
   {{ super() }}
   <script>
+    function exportCsv(key) {
+      var url = "/dashboard/count/equip/list/download/" + key;
+      window.location.href = url;
+    }
   </script>
 {% endblock javascripts %}
 
@@ -29,14 +33,42 @@
             <table id="pa-table" class="table table-striped projects">
               <thead>
                 <tr>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  {% if current_user.level == 0 %}
+                    <th></th>
+                    <th>
+                      <button type="button" class="btn btn-default btn-xs"
+                          onclick="exportCsv('{{ ap }}')"
+                          style="margin-bottom: 0;">
+                        CSV Download
+                      </button>
+                    </th>
+                  {% else %}
+                    <th>
+                      <button type="button" class="btn btn-default btn-xs"
+                          onclick="exportCsv()"
+                          style="margin-bottom: 0;">
+                        CSV Download
+                      </button>
+                    </th>
+                  {% endif %}
+                </tr>
+                <tr>
                   <th>Name</th>
                   <th>Kind</th>
+                  <th>Count</th>
                   <th>Entrance Time</th>
                   <th>Working Time</th>
+                  {% if current_user.level == 0 %}
+                    <th>Remove</th>
+                  {% endif %}
                 </tr>
               </thead>
               <tbody>
-                {% for value in equips %}
+                {% for id, value in equips.items() %}
                   {% if value|isDict %}
                     <tr>
                       <td>
@@ -45,6 +77,11 @@
                       <td>
                         {{ kind[value.tag] }}
                       </td>
+                      {% if value.tag in equip_setting_list %}
+                        <td>Yes</td>
+                      {% else %}
+                        <td></td>
+                      {% endif %}
                       <td>
                         {{ value.event_time }}
                       </td>
@@ -61,7 +98,14 @@
                           {{ value.event_time|duringTime }}
                         </td>
                       {% endif %}
-                      <td></td>
+                      {% if current_user.level == 0 %}
+                        <td>
+                          <a href="/dashboard/count/equip/list/{{ ap }}/{{ id }}/{{ value.tag }}"
+                              class="btn btn-danger btn-xs">
+                            <i class="fa fa-remove"></i> Remove
+                          </a>
+                        </td>
+                      {% endif %}
                     </tr>
                   {% else %}
                     <tr>
@@ -71,6 +115,15 @@
                       <td></td>
                       <td></td>
                       <td></td>
+                      <td></td>
+                      {% if current_user.level == 0 %}
+                        <td>
+                          <a href="/dashboard/count/equip/list/{{ ap }}/{{ id }}/{{ value.tag }}"
+                              class="btn btn-danger btn-xs">
+                            <i class="fa fa-remove"></i> Remove
+                          </a>
+                        </td>
+                      {% endif %}
                     </tr>
                   {% endif %}
                 {% endfor %}
@@ -80,6 +133,10 @@
                   <td></td>
                   <td></td>
                   <td></td>
+                  <td></td>
+                  {% if current_user.level == 0 %}
+                    <td></td>
+                  {% endif %}
                 </tr>
               </tbody>
             </table>

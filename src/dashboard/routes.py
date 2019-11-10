@@ -20,15 +20,26 @@ from flask_login import current_user  # noqa : pylint: disable=import-error
 from flask import make_response
 
 import util
+import base.routes
 import in_config_apis
 from dashboard import count
 from dashboard import blueprint
+from constants import ORG_ID
 
 
 NOTICE_COMMON_FILE_NAME = '''notice'''
 SCHEDULE_COMMON_FILE_NAME = '''schedule'''
 LOCATION_MAP_COMMON_FILE_NAME = '''location.png'''
 LOCATION_MAP_URI = "/dashboard/static/location/{org_id}/{file_name}"
+
+
+def _get_download_csv_response(csv_str, filename):
+  resp = make_response(csv_str, 200)
+  resp.headers['Cache-Control'] = 'no-cache'
+  resp.headers['Content-Type'] = 'text/csv'
+  resp.headers['Content-Disposition'] = 'attachment; filename={}.csv'.format(filename)
+  resp.headers['Content-Length'] = len(csv_str)
+  return resp
 
 
 @blueprint.route('/testcheck/bus', methods=['GET'])
@@ -170,16 +181,72 @@ def get_total_equip_count():
 @blueprint.route('/count/worker/list/<key>', methods=['GET'])
 @util.require_login
 def get_worker_list(key):
-  worker_list = count.get_worker_data_list(key)
-  return render_template("worker_list.html", workers=worker_list)
+  worker_list = count.get_all_workers(key)
+  return render_template("worker_list.html", workers=worker_list, ap=key)
 
 
 @blueprint.route('/count/equip/list/<key>', methods=['GET'])
 @util.require_login
 def get_equip_list(key):
-  equip_list = count.get_equip_data_list(key)
+  equip_list = count.get_all_equips(key)
+  count_equip_list = count.get_equip_operator_count_settings()
   return render_template("equip_list.html", equips=equip_list,
-                         kind=count.GADGET_INFO)
+                         kind=count.GADGET_INFO, ap=key,
+                         equip_setting_list = count_equip_list)
+
+
+@blueprint.route('/count/worker/list/download/<key>', methods=["GET"])
+@util.require_login
+def download_current_worker_list(key):
+  worker_list = count.get_all_workers(key)
+  filename = "AT{} Worker List_{}".format(key,
+                                          str(in_config_apis.get_servertime()))
+  csv_str = "\uFEFF"
+  csv_str += "ID,Name,Group,EntranceTime,WorkingTime\n"
+  for k, v in worker_list.items():
+    working_time = base.routes.during_time(v['event_time'])
+    r_str = "{},{},{},{},{}\n".format(v['user_id']['user_id'],
+                                      v['user_id']['name'],
+                                      v['user_group_id']['name'],
+                                      v['event_time'],
+                                      str(working_time).replace(",", " "))
+    csv_str += r_str
+  return _get_download_csv_response(csv_str, filename)
+
+
+@blueprint.route('/count/equip/list/download/<key>', methods=["GET"])
+@util.require_login
+def download_current_equip_list(key):
+  equip_list = count.get_all_equips(key)
+  count_equip_list = count.get_equip_operator_count_settings()
+  filename = "AT{} Equip List_{}".format(key,
+                                         str(in_config_apis.get_servertime()))
+  csv_str = "\uFEFF"
+  csv_str += "Name,Kind,Count,EntranceTiem,WorkingTime\n"
+  for k, v in equip_list.items():
+    working_time = base.routes.during_time(v['event_time'])
+    count_kind = "Yes" if v['tag'] in count_equip_list else ""
+    r_str = "{},{},{},{},{}\n".format(v['device_name'],
+                                      count.GADGET_INFO[v['tag']],
+                                      v['user_group_id']['name'],
+                                      v['event_time'],
+                                      str(working_time).replace(",", " "))
+    csv_str += r_str
+  return _get_download_csv_response(csv_str, filename)
+
+
+@blueprint.route('/count/worker/list/<key>/<worker_id>', methods=['GET'])
+@util.require_login
+def remove_woker_in_list(key, worker_id):
+  count.delete_in_worker(ORG_ID, key, worker_id)
+  return redirect("/dashboard/count/worker/list/{}".format(key))
+
+
+@blueprint.route('/count/equip/list/<key>/<equip_id>/<tag>', methods=['GET'])
+@util.require_login
+def remove_equip_in_list(key, equip_id, tag):
+  count.delete_in_equip(ORG_ID, key, equip_id, tag)
+  return redirect("/dashboard/count/equip/list/{}".format(key))
 
 
 @blueprint.route('/location', methods=['GET'])
@@ -287,18 +354,13 @@ def download_worker_log():
   csv_log_list = in_config_apis.csv_worker_log(_id, name, datetime_list,
                                                int(ap), int(inout),
                                                violation, group)
-  filename = str(in_config_apis.get_servertime())
+  filename = "Worker Search_{}".format(str(in_config_apis.get_servertime()))
   csv_str = "\uFEFF"
   csv_str += "ID,Name,Department,Time,In/Out,Access,Violation,DeviceName\n"
   for r in csv_log_list:
     row_string = str(r)
     csv_str += row_string + "\n"
-  resp = make_response(csv_str, 200)
-  resp.headers['Cache-Control'] = 'no-cache'
-  resp.headers['Content-Type'] = 'text/csv'
-  resp.headers['Content-Disposition'] = 'attachment; filename={}.csv'.format(filename)
-  resp.headers['Content-Length'] = len(csv_str)
-  return resp
+  return _get_download_csv_response(csv_str, filename)
 
 
 @blueprint.route('/search/equip', methods=["GET", "POST"])
@@ -352,18 +414,13 @@ def download_equip_log():
   datetime_list = json.loads(raw_datetime_list)
   csv_log_list = in_config_apis.csv_equip_log(name, kind, datetime_list,
                                               int(ap), int(inout))
-  filename = str(in_config_apis.get_servertime())
+  filename = "Equipments Search_{}".format(str(in_config_apis.get_servertime()))
   csv_str = "\uFEFF"
   csv_str += "Name,TypeName,TypeCode,Time,In/Out,Access,DeviceName\n"
   for r in csv_log_list:
     row_string = str(r)
     csv_str += row_string + "\n"
-  resp = make_response(csv_str, 200)
-  resp.headers['Cache-Control'] = 'no-cache'
-  resp.headers['Content-Type'] = 'text/csv'
-  resp.headers['Content-Disposition'] = 'attachment; filename={}.csv'.format(filename)
-  resp.headers['Content-Length'] = len(csv_str)
-  return resp
+  return _get_download_csv_response(csv_str, filename)
 
 
 def _get_notice_list_summary():

@@ -15,6 +15,10 @@
 {% block javascripts %}
   {{ super() }}
   <script>
+    function exportCsv(key) {
+      var url = "/dashboard/count/worker/list/download/" + key;
+      window.location.href = url;
+    }
   </script>
 {% endblock javascripts %}
 
@@ -29,15 +33,42 @@
             <table id="pa-table" class="table table-striped projects">
               <thead>
                 <tr>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  {% if current_user.level == 0 %}
+                    <th></th>
+                    <th>
+                      <button type="button" class="btn btn-default btn-xs"
+                          onclick="exportCsv('{{ ap }}')"
+                          style="margin-bottom: 0;">
+                        CSV Download
+                      </button>
+                    </th>
+                  {% else %}
+                    <th>
+                      <button type="button" class="btn btn-default btn-xs"
+                          onclick="exportCsv()"
+                          style="margin-bottom: 0;">
+                        CSV Download
+                      </button>
+                    </th>
+                  {% endif %}
+                </tr>
+                <tr>
                   <th>ID</th>
                   <th>Name</th>
                   <th>Group</th>
                   <th>Entrance Time</th>
                   <th>Working Time</th>
+                  {% if current_user.level == 0 %}
+                    <th>Remove</th>
+                  {% endif %}
                 </tr>
               </thead>
               <tbody>
-                {% for value in workers %}
+                {% for key, value in workers.items() %}
                   {% if value|isDict %}
                     <tr>
                       <td>
@@ -65,6 +96,14 @@
                           {{ value.event_time|duringTime }}
                         </td>
                       {% endif %}
+                      {% if current_user.level == 0 %}
+                        <td>
+                          <a href="/dashboard/count/worker/list/{{ ap }}/{{ id }}"
+                              class="btn btn-danger btn-xs">
+                            <i class="fa fa-remove"></i> Remove
+                          </a>
+                        </td>
+                      {% endif %}
                     </tr>
                   {% else %}
                       <td>
@@ -74,6 +113,14 @@
                       <td></td>
                       <td></td>
                       <td></td>
+                      {% if current_user.level == 0 %}
+                        <td>
+                          <a href="/dashboard/count/worker/list/{{ ap }}/{{ id }}"
+                              class="btn btn-danger btn-xs">
+                            <i class="fa fa-remove"></i> Remove
+                          </a>
+                        </td>
+                      {% endif %}
                     </tr>
                   {% endif %}
                 {% endfor %}
@@ -83,6 +130,9 @@
                   <td></td>
                   <td></td>
                   <td></td>
+                  {% if current_user.level == 0 %}
+                    <td></td>
+                  {% endif %}
                 </tr>
               </tbody>
             </table>

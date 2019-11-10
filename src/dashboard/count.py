@@ -257,6 +257,10 @@ def get_equip_data_list(ap):
   return BEACONS_COUNT.get_data_of_values(ap)
 
 
+def get_all_workers(ap):
+  return WORKER_COUNT.get_all(ap)
+
+
 def get_all_equips(ap):
   return BEACONS_COUNT.get_all(ap)
 
@@ -547,6 +551,20 @@ def clear_keys_of_sc(key):
 def clear_all_of_sc():
   BEACONS_COUNT.flushdb()
   return redirect("/dashboard/count/settings/facescanner")
+
+
+def delete_in_worker(org_id, ap, worker_id):
+  WORKER_COUNT.delete_data(ap, worker_id)
+  WORKER_COUNT.delete_data(org_id, worker_id)
+
+
+def delete_in_equip(org_id, ap, equip_id, tag):
+  BEACONS_COUNT.delete_data(ap, equip_id)
+  BEACONS_COUNT.delete_data(org_id, equip_id)
+  count_equip_list = get_equip_operator_count_settings()
+  if tag in count_equip_list:
+    operator_key = OPERATOR_COUNT_KEY[ap]
+    WORKER_COUNT.delete_data(operator_key, equip_id)
 
 
 WORKER_ENTER_TEXT = "{} entered {}"
