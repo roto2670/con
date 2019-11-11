@@ -68,6 +68,7 @@
                 </tr>
               </thead>
               <tbody>
+                <!-- worker list -->
                 {% for key, value in workers.items() %}
                   {% if value|isDict %}
                     <tr>
@@ -79,6 +80,67 @@
                       </td>
                       <td>
                         {{ value.user_group_id.name }}
+                      </td>
+                      <td>
+                        {{ value.event_time }}
+                      </td>
+                      {% if (value.event_time|duringTime).days > 0 %}
+                        <td style="color:#ff0000;">
+                          {{ value.event_time|duringTime }}
+                        </td>
+                      {% elif (value.event_time|duringTime).seconds > 43200 %}
+                        <td style="color:#ff0000;">
+                          {{ value.event_time|duringTime }}
+                        </td>
+                      {% else %}
+                        <td>
+                          {{ value.event_time|duringTime }}
+                        </td>
+                      {% endif %}
+                      {% if current_user.level == 0 %}
+                        <td>
+                          <!--
+                          <a href="/dashboard/count/worker/list/{{ ap }}/{{ id }}"
+                              class="btn btn-danger btn-xs">
+                            <i class="fa fa-remove"></i> Remove
+                          </a>
+                          -->
+                        </td>
+                      {% endif %}
+                    </tr>
+                  {% else %}
+                      <td>
+                        {{ value }}
+                      </td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      {% if current_user.level == 0 %}
+                        <td>
+                          <!--
+                          <a href="/dashboard/count/worker/list/{{ ap }}/{{ id }}"
+                              class="btn btn-danger btn-xs">
+                            <i class="fa fa-remove"></i> Remove
+                          </a>
+                          -->
+                        </td>
+                      {% endif %}
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+                <!-- operator list -->
+                {% for key, value in operators.items() %}
+                  {% if value|isDict %}
+                    <tr>
+                      <td>
+                        {{ value.device_name }}
+                      </td>
+                      <td>
+                        {{ value.device_name }}
+                      </td>
+                      <td>
+                        {{ kind[value.tag] }}
                       </td>
                       <td>
                         {{ value.event_time }}

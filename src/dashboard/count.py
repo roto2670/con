@@ -265,6 +265,11 @@ def get_all_equips(ap):
   return BEACONS_COUNT.get_all(ap)
 
 
+def get_all_equip_operators(ap):
+  key = OPERATOR_COUNT_KEY[int(ap)]
+  return WORKER_COUNT.get_all(key)
+
+
 def get_all_gadget_count_equips():
   # Gadget count list. Expired 20s.
   return GADGET_COUNT_LIST_EXPIRE_CACHE.get_values()
@@ -732,11 +737,11 @@ def _check_equip_operator_count(tags):
   return False
 
 
-def _handle_operator_count(operator_key, gid, name=None):
+def _handle_operator_count(operator_key, gid, device_data=None):
   if WORKER_COUNT.has_data(operator_key, gid):
     WORKER_COUNT.delete_data(operator_key, gid)
   else:
-    WORKER_COUNT.set_data(operator_key, gid, name)
+    WORKER_COUNT.set_data(operator_key, gid, device_data)
 
 
 def _send_equip_log(log):

@@ -182,7 +182,9 @@ def get_total_equip_count():
 @util.require_login
 def get_worker_list(key):
   worker_list = count.get_all_workers(key)
-  return render_template("worker_list.html", workers=worker_list, ap=key)
+  operator_list = count.get_all_equip_operators(key)
+  return render_template("worker_list.html", workers=worker_list, ap=key,
+                         operators=operator_list, kind=count.GADGET_INFO)
 
 
 @blueprint.route('/count/equip/list/<key>', methods=['GET'])
@@ -199,6 +201,7 @@ def get_equip_list(key):
 @util.require_login
 def download_current_worker_list(key):
   worker_list = count.get_all_workers(key)
+  operator_list = count.get_all_equip_operators(key)
   filename = "AT{} Worker List_{}".format(key,
                                           str(in_config_apis.get_servertime()))
   csv_str = "\uFEFF"
@@ -208,6 +211,14 @@ def download_current_worker_list(key):
     r_str = "{},{},{},{},{}\n".format(v['user_id']['user_id'],
                                       v['user_id']['name'],
                                       v['user_group_id']['name'],
+                                      v['event_time'],
+                                      str(working_time).replace(",", " "))
+    csv_str += r_str
+  for k, v in operator_list.items():
+    working_time = base.routes.during_time(v['event_time'])
+    r_str = "{},{},{},{},{}\n".format(v['device_name'],
+                                      v['device_name'],
+                                      count.GADGET_INFO[v['tag']],
                                       v['event_time'],
                                       str(working_time).replace(",", " "))
     csv_str += r_str
