@@ -436,8 +436,10 @@ def download_equip_log():
 
 def _get_notice_list_summary():
   notice_list = in_config_apis.get_notice_list()
-  if len(notice_list) > 7:
-    notice_list = notice_list[:7]
+  if len(notice_list.items) > 7:
+    notice_list = notice_list.items[:7]
+  else:
+    notice_list = notice_list.items
   return notice_list
 
 
@@ -517,8 +519,10 @@ def delete_notice(notice_id):
 
 def _get_schedule_list_summary():
   schedule_list = in_config_apis.get_schedule_list()
-  if len(schedule_list) > 7:
-    schedule_list = schedule_list[:7]
+  if len(schedule_list.items) > 7:
+    schedule_list = schedule_list.items[:7]
+  else:
+    schedule_list = schedule_list.items
   return schedule_list
 
 
