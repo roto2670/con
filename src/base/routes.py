@@ -30,7 +30,7 @@ import in_apis
 import constants
 import in_config_apis
 from base import blueprint
-from base import db, login_manager, auth
+from base import db, login_manager
 from models import _User as User
 from models import _Permission as Permission
 

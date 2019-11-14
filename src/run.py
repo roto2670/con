@@ -26,7 +26,7 @@ import common
 import base.routes
 import dash.routes
 import dashboard.count
-from base import db, auth, login_manager, socket_io
+from base import db, login_manager, socket_io
 from config import DebugConfig, ProductionConfig
 
 
@@ -38,7 +38,6 @@ ADDR_CHK_PORT = 80
 def register_extensions(app):
   db.init_app(app)
   db.app = app
-  auth.init_app(app)
   login_manager.init_app(app)
   # custom
   app.context_processor(base.routes.about_product)

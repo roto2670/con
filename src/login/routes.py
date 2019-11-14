@@ -76,11 +76,6 @@ def sign_in_progress():
     return redirect("/auth/login?error=true")
 
 
-@blueprint.route('/sign-in', methods={'POST'})
-def sign_in():
-  return current_app.extensions['firebase_auth'].sign_in()
-
-
 @blueprint.route('/sign-out')
 def sign_out():
   logout_user()

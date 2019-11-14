@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017-2018 Naran Inc. All rights reserved.
+# Copyright 2017-2020 Naran Inc. All rights reserved.
 #  __    _ _______ ______   _______ __    _
 # |  |  | |   _   |    _ | |   _   |  |  | |
 # |   |_| |  |_|  |   | || |  |_|  |   |_| |
@@ -14,8 +14,6 @@ from flask_login import LoginManager  # noqa : pylint: disable=import-error
 from flask_sqlalchemy import SQLAlchemy  # noqa : pylint: disable=import-error
 from flask_socketio import SocketIO
 
-from login import FirebaseAuth
-
 blueprint = Blueprint(
     'base_blueprint',
     __name__,
@@ -25,6 +23,5 @@ blueprint = Blueprint(
 )
 
 db = SQLAlchemy()
-auth = FirebaseAuth()
 login_manager = LoginManager()
 socket_io = SocketIO()
