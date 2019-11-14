@@ -41,18 +41,7 @@
     gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 -b 0.0.0.0:5000 run:__app
 
 
-# Using MySQL for Google Cloud SQL
-    wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
-    chmod +x cloud_sql_proxy
-    ./cloud_sql_proxy -instances=protacloud:us-west1:console=tcp:3306 -credential_file=console_db.json
-
-
 # Live Run
-    cd console/cloud_sql
-    nohup ./cloud_sql_proxy -instances=protacloud:us-west1:console=tcp:3306 -credential_file=console_db.json
     cd src
     nohup gunicorn -w 3 -k gevent --certfile ssl/mib_io.crt --keyfile ssl/mib_io.key -b 127.0.0.1:5000 run:__app
-    nohup celery -A worker.worker worker --loglevel=debug
 
-
-# DataBase![](res/cs_db190605.png)
