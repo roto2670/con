@@ -33,12 +33,7 @@
       <div class="x_panel">
         <div class="x_content">  <!-- x_content 1 -->
 
-          <form id="search" action="/dashboard/board/schedule"
-            class="form-horizontal form-label-left" method="post">
           <div class="x_content">  <!-- x_content 2 -->
-            <div class="item form-group">
-              <input id="page" name="page" type="hidden" value="0">
-            </div>
             {% if current_user.level in [0, 1] %}
               <div style="text-align: right;">
                 <a href="/dashboard/board/schedule/register">
@@ -73,6 +68,11 @@
                   </tr>
                 {% endfor %}
                 <tr>
+          <form id="search" action="/dashboard/board/schedule"
+            class="form-horizontal form-label-left" method="post">
+            <div class="item form-group">
+              <input id="page" name="page" type="hidden" value="0">
+            </div>
                   <td></td>
                   {% if schedule_list.has_prev %}
                     <td style="text-align:left;">
@@ -96,10 +96,10 @@
                     <td></td>
                   {% endif %}
                 </tr>
+          </form>
               </tbody>
             </table>
           </div>  <!-- end x_content 2 -->
-          </form>
 
         </div>  <!-- end x_content 1 -->
       </div>  <!-- end x_panel -->
