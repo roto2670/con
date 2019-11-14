@@ -1,5 +1,22 @@
 {% extends "base_site.html" %}
 
+{% block javascripts %}
+  {{ super() }}
+  <script>
+    function handlePage(value) {
+      // 1 -> prev
+      // 2 -> next
+      if (value === "1") {
+          document.getElementById('page').value = "1";
+          document.getElementById('prev').submit();
+      } else {
+          document.getElementById('page').value = "2";
+          document.getElementById('next').submit();
+      }
+    }
+  </script>
+{% endblock javascripts %}
+
 {% block title %} Notice List {% endblock title %}
 
 {% block sidebar %}
@@ -16,7 +33,12 @@
       <div class="x_panel">
         <div class="x_content">  <!-- x_content 1 -->
 
+          <form id="search" action="/dashboard/board/notice"
+            class="form-horizontal form-label-left" method="post">
           <div class="x_content">  <!-- x_content 2 -->
+            <div class="item form-group">
+              <input id="page" name="page" type="hidden" value="0">
+            </div>
             {% if current_user.level in [0, 1] %}
               <div style="text-align: right;">
                 <a href="/dashboard/board/notice/register">
@@ -36,7 +58,7 @@
                 </tr>
               </thead>
               <tbody>
-                {% for notice in notice_list %}
+                {% for notice in notice_list.items %}
                   <tr>
                     <td>
                       {% if notice.created_time|datetimeCheck %}
@@ -50,9 +72,34 @@
                     <td>{{ notice.created_time|usDateFormat }}</td>
                   </tr>
                 {% endfor %}
+                <tr>
+                  <td></td>
+                  {% if notice_list.has_prev %}
+                    <td style="text-align:left;">
+                      <input id="prev_num" name="prev_num" type="hidden" value="{{ notice_list.prev_num }}">
+                      <button id="prev" type="submit" class="btn btn-default" onclick="handlePage('1')">Prev</button>
+                    </td>
+                  {% else %}
+                    <td></td>
+                  {% endif %}
+                  <td>
+                    {% if notice_list.has_next %} {{ notice_list.page * 30 }} {% else %} {{ notice_list.total }} {% endif %} / {{ notice_list.total }}
+                  </td>
+                  <td></td>
+                  <td></td>
+                  {% if notice_list.has_next %}
+                    <td style="text-align:right;">
+                      <input id="next_num" name="next_num" type="hidden" value="{{ notice_list.next_num }}">
+                      <button id="next" type="submit" class="btn btn-default" onclick="handlePage('2')">Next</button>
+                    </td>
+                  {% else %}
+                    <td></td>
+                  {% endif %}
+                </tr>
               </tbody>
             </table>
           </div>  <!-- end x_content 2 -->
+          </form>
 
         </div>  <!-- end x_content 1 -->
       </div>  <!-- end x_panel -->

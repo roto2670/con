@@ -6,6 +6,22 @@
   </div>
 {% endblock sidebar %}
 
+{% block javascripts %}
+  {{ super() }}
+  <script>
+    function validation() {
+        var fi = document.getElementById('file'),
+            fileSize = (fi.files[0].size / 1024 / 1024).toFixed(2);
+        if (fileSize > 2) {
+            document.getElementById('send').disabled = true;
+            alert("The file size is too large. Please upload a file that is less than 4MB. ( Current file size : " + fileSize + " MB )")
+        } else {
+            document.getElementById('send').disabled = false;
+        }
+    }
+  </script>
+{% endblock javascripts %}
+
 {% block title %} Register Notice {% endblock title %}
 
 {% block content %}
@@ -63,7 +79,7 @@
                     <div class="item form-group">
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="file">File
                       </label>
-                      <input type="file" id="file" name="file" accept="image/jpeg, image/png"
+                      <input type="file" id="file" name="file" accept="image/jpeg, image/png" onchange="validation();"
                           class="control-label col-md-3 col-sm-3 col-xs-12"/>
                     </div>
 

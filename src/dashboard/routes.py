@@ -448,11 +448,23 @@ def get_notice_content(notice_id):
   return render_template("show_notice.html", notice=notice)
 
 
-@blueprint.route('/board/notice', methods=["GET"])
+@blueprint.route('/board/notice', methods=["GET", "POST"])
 @util.require_login
 def get_notice_list():
-  notice_list = in_config_apis.get_notice_list()
-  return render_template("notice_list.html", notice_list=notice_list)
+  if request.method == "GET":
+    notice_list = in_config_apis.get_notice_list()
+    return render_template("notice_list.html", notice_list=notice_list)
+  else:
+    page = request.form.get('page')
+    next_num = request.form.get('next_num')
+    prev_num = request.form.get('prev_num')
+    page_num = None
+    if page == "1":
+      page_num = prev_num
+    elif page == "2":
+      page_num = next_num
+    notice_list = in_config_apis.get_notice_list(int(page_num))
+    return render_template("notice_list.html", notice_list=notice_list)
 
 
 @blueprint.route('/board/notice/register', methods=["GET", "POST"])
@@ -493,6 +505,12 @@ def register_notice():
 @blueprint.route('/board/notice/<notice_id>/delete', methods=["GET"])
 @util.require_login
 def delete_notice(notice_id):
+  _notice = in_config_apis.get_notice(int(notice_id))
+  if _notice.file_path:
+    base_path = util.get_static_path()
+    file_path = os.path.join(base_path, _notice.file_path)
+    if os.path.exists(file_path):
+      os.remove(file_path)
   in_config_apis.delete_notice(notice_id)
   return redirect("/dashboard/board/notice")
 
@@ -511,10 +529,22 @@ def get_schedule_content(schedule_id):
   return render_template("show_schedule.html", schedule=schedule)
 
 
-@blueprint.route('/board/schedule', methods=["GET"])
+@blueprint.route('/board/schedule', methods=["GET", "POST"])
 @util.require_login
 def get_schedule_list():
-  schedule_list = in_config_apis.get_schedule_list()
+  if request.method == "GET":
+    schedule_list = in_config_apis.get_schedule_list()
+    return render_template("schedule_list.html", schedule_list=schedule_list)
+  else:
+    page = request.form.get('page')
+    next_num = request.form.get('next_num')
+    prev_num = request.form.get('prev_num')
+    page_num = None
+    if page == "1":
+      page_num = prev_num
+    elif page == "2":
+      page_num = next_num
+    schedule_list = in_config_apis.get_schedule_list(int(page_num))
   return render_template("schedule_list.html", schedule_list=schedule_list)
 
 
@@ -533,7 +563,6 @@ def register_schedule():
     if content:
       name = upload_file.filename
       base_path = util.get_static_path()
-
       org_path = os.path.join(base_path, 'dashboard', 'schedule',
                               current_user.organization_id)
       if not os.path.exists(org_path):
@@ -556,5 +585,11 @@ def register_schedule():
 @blueprint.route('/board/schedule/<schedule_id>/delete', methods=["GET"])
 @util.require_login
 def delete_schedule(schedule_id):
+  _schedule = in_config_apis.get_schedule(int(schedule_id))
+  if _schedule.file_path:
+    base_path = util.get_static_path()
+    file_path = os.path.join(base_path, _schedule.file_path)
+    if os.path.exists(file_path):
+      os.remove(file_path)
   in_config_apis.delete_schedule(schedule_id)
   return redirect("/dashboard/board/schedule")
