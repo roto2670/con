@@ -37,12 +37,6 @@ IPCAM_KIND = {
 }
 
 
-@blueprint.route('/')
-@util.require_login
-def route_default():
-  return render_template("registration_home.html")
-
-
 @blueprint.route('/beacon', methods=['GET', 'POST'])
 @util.require_login
 def beacon_list_route():
