@@ -308,15 +308,17 @@ def delete_bus_setting(_id, bus_beacon_id):
   return redirect("/dashboard/count/settings/beaconscanner")
 
 
-def facescanner_list():
+def device_list():
   _org_id = current_user.organization_id
+
+  # Facestation
   device_list = []  # facestation
-  setting_id_list = []
-  settings_dict = {}
-  settings = in_config_apis.get_count_device_setting(FACE_STATION_TYPE)
-  for setting in settings:
-    setting_id_list.append(setting.device_id)
-    settings_dict[setting.device_id] = setting
+  fs_setting_id_list = []
+  fs_settings_dict = {}
+  fs_settings = in_config_apis.get_count_device_setting(FACE_STATION_TYPE)
+  for setting in fs_settings:
+    fs_setting_id_list.append(setting.device_id)
+    fs_settings_dict[setting.device_id] = setting
   if _org_id in DEVICE_LIST_TIME:
     if (time.time() - DEVICE_LIST_TIME[_org_id]) >= INTERVAL_TIME:
       device_list = _get_device_list(_org_id)
@@ -324,15 +326,8 @@ def facescanner_list():
       device_list = DEVICE_LIST[_org_id]
   else:
     device_list = _get_device_list(_org_id)
-  return render_template("face_settings.html", device_list=device_list,
-                         in_out_setting=IN_OUT_SETTING_ID,
-                         access_point=ACCESS_POINT,
-                         setting_id_list=setting_id_list,
-                         settings_dict=settings_dict)
 
-
-def device_list():
-  _org_id = current_user.organization_id
+  # Beacon
   setting_id_list = []
   settings_dict = {}
   equip_kind_settings = get_equip_operator_count_settings()
@@ -351,7 +346,10 @@ def device_list():
                          equip_kind_list=GADGET_INFO,
                          equip_kind_settings=equip_kind_settings,
                          bus_list=bus_list,
-                         bus_setting_list=bus_setting_list)
+                         bus_setting_list=bus_setting_list,
+                         device_list=device_list,
+                         fs_setting_id_list=fs_setting_id_list,
+                         fs_settings_dict=fs_settings_dict)
 
 
 def scanner_list():

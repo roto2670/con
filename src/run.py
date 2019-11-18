@@ -64,6 +64,7 @@ def register_blueprints(app):
       'dash',
       'openapi',
       'registration',
+      'maintenance',
       'moi',
       'pa',
       'internal',
