@@ -161,25 +161,21 @@ GADGET_INFO = {
     "19": "Concrete Mixer Truck"
 }
 SHOT_GADGET_INFO = {
-    "1": "JD-2B",
-    "2": "JD-3B",
-    "3": "CHARGING CAR",
-    "4": "WHEEL LOADER",
-    "5": "DUMP TRUCK",
-    "6": "EXCAVATOR(WHEEL)",
-    "7": "EXCAVATOR(CRAWLER)",
-    "8": "SHOTCRETE",
-    "9": "JCB",
-    "10": "CORE DRILLING",
-    "11": "DOZER",
-    "12": "GROUTING",
-    "13": "MAI PUMP",
+    "1": "Jumbo Drill 2B",
+    "2": "Jumbo Drill 3B",
+    "3": "Charging Car",
     "14": "MPU",
     "15": "CPU",
-    "16": "BUS",
-    "17": "WCBH Drilling",
     "18": "Explosive Van",
-    "19": "Concrete Mixer"
+    "8": "Shotcrete Mch.",
+    "19": "Concrete Mixer",
+    "12": "Grouting Rig",
+    "17": "WCBH Drilling",
+    "4": "Wheel Loader",
+    "5": "Dump Truck",
+    "6": "Excavator(Wheel)",
+    "7": "Excavator(Crawler)",
+    "100": "Miscellaneous"
 }
 
 SCANNER_LOCATION = {

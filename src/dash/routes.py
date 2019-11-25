@@ -136,33 +136,45 @@ def get_gadget_count_list():
   ap2_list = count.get_all_equips(2)
   data = {
       "at1": {
-          "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[], "9":[], "10":[],
-          "11":[], "12":[], "13":[], "14":[], "15":[], "16":[], "17":[], "18":[], "19":[]
+          "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[],
+          "12":[], "14":[], "15":[], "17":[], "18":[], "19":[], "100": []
       },
       "at2": {
-          "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[], "9":[], "10":[],
-          "11":[], "12":[], "13":[], "14":[], "15":[], "16":[], "17":[], "18":[], "19":[]
+          "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[],
+          "12":[], "14":[], "15":[], "17":[], "18":[], "19":[], "100": []
       },
       "other": {
-          "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[], "9":[], "10":[],
-          "11":[], "12":[], "13":[], "14":[], "15":[], "16":[], "17":[], "18":[], "19":[]
+          "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[], "8":[],
+          "12":[], "14":[], "15":[], "17":[], "18":[], "19":[], "100": []
       },
       "kind": count.SHOT_GADGET_INFO
   }
+  MISCELLANEOUS = ['9', '10', '11', '16']
+
+  # 9, 10, 11, 16 -> 100
   for k, e in ap1_list.items():
     if isinstance(e, dict):
-      data['at1'][e['tag']].append(e)
+      if e['tag'] in MISCELLANEOUS:
+        data['at1']['100'].append(e)
+      else:
+        data['at1'][e['tag']].append(e)
       in_tunnel_list.append(k)
 
   for k, e in ap2_list.items():
     if isinstance(e, dict):
-      data['at2'][e['tag']].append(e)
+      if e['tag'] in MISCELLANEOUS:
+        data['at2']['100'].append(e)
+      else:
+        data['at2'][e['tag']].append(e)
       in_tunnel_list.append(k)
   detect_gadget_list = count.get_all_gadget_count_equips()
   for e in detect_gadget_list:
     if e['id'] not in in_tunnel_list:
       value = {"device_name": e['name'], "tag": e['tags'][0],
                "event_time": str(in_config_apis.get_servertime())}
-      data['other'][value['tag']].append(value)
+      if value['tag'] in MISCELLANEOUS:
+        data['other']['100'].append(value)
+      else:
+        data['other'][value['tag']].append(value)
   return json.dumps(data)
 
