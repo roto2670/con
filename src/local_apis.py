@@ -291,3 +291,95 @@ def remove_pa(pa_id):
     logging.exception("Raise error while remove pa speaker. Body : %s",
                       body)
     return None
+
+
+def register_router(gadget_info):
+  hid = REG_HUB_ID
+  url = "{base}hubs/{hid}/event".format(base=BASE_URL, hid=hid)
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=hid)
+  }
+  body = {
+    "topic": "gadget.added",
+    "value": gadget_info
+  }
+  try:
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
+    if resp.ok:
+      logging.info("register router successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed register router. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while register router. Body : %s",
+                      body)
+    return None
+
+
+def update_router_information(router_id, name, kind=None, data=None):
+  hid = REG_HUB_ID
+  url = "{base}gadgets/{router_id}".format(base=BASE_URL, router_id=router_id)
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=hid)
+  }
+  body = {
+    "name": name,
+    "custom": {}
+  }
+  if kind:
+    body['tags'] = [kind]
+
+  if data:
+    body['custom'] = data['custom']
+  else:
+    _router = dashboard.count.get_router(router_id)
+    _custom = _router['custom']
+    body['custom'] = _custom
+
+  try:
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
+    if resp.ok:
+      logging.info("update router information successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed update router information. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while update router information. Body : %s",
+                      body)
+    return None
+
+
+def remove_router(router_id):
+  hid = REG_HUB_ID
+  _router = dashboard.count.get_router(router_id)
+  url = "{base}hubs/{hid}/event".format(base=BASE_URL, hid=hid)
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=hid)
+  }
+  body = {
+    "topic": "gadget.removed",
+    "value": _router
+  }
+  try:
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
+    if resp.ok:
+      logging.info("remove router successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed remove router. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while remove router. Body : %s",
+                      body)
+    return None

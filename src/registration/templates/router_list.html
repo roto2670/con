@@ -1,0 +1,192 @@
+{% extends "base_site.html" %}
+
+{% block title %} Router {% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_registration.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block javascripts %}
+  {{ super() }}
+  <script>
+    function register() {
+      window.location.href = "/registration/router/create";
+    }
+
+    function exportTableToCsv(tableId, filename) {
+      if (filename == null || typeof filename == undefined)
+          filename = tableId;
+      filename += ".csv";
+
+      var BOM = "\uFEFF";
+
+      var table = document.getElementById(tableId);
+      var csvString = BOM;
+      for (var rowCnt = 0; rowCnt < table.rows.length; rowCnt++) {
+          var rowData = table.rows[rowCnt].cells;
+          for (var colCnt = 0; colCnt < rowData.length; colCnt++) {
+              var columnData = rowData[colCnt].innerHTML;
+              if (columnData == null || columnData.length == 0) {
+                  columnData = "".replace(/"/g, '""');
+              }
+              else {
+                  columnData = columnData.toString().replace(/"/g, '""'); // escape double quotes
+                  if (columnData.indexOf('vstatus=""on""') >= 0) {
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                      columnData += "ON";
+                  } else if (columnData.indexOf('vstatus=""off""') >= 0){
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                      columnData += "OFF";
+                  } else {
+                      columnData = columnData.replace(/(<([^>]+)>)/ig,"");
+                  }
+              }
+              columnData = columnData.replace(/(^\s*)|(\s*$)/gi, "");
+              csvString = csvString + '"' + columnData + '",';
+          }
+          csvString = csvString.substring(0, csvString.length - 1);
+          csvString = csvString + "\r\n";
+      }
+      csvString = csvString.substring(0, csvString.length - 1);
+
+      // IE 10, 11, Edge Run
+      if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+
+          var blob = new Blob([decodeURIComponent(csvString)], {
+              type: 'text/csv;charset=utf8'
+          });
+
+          window.navigator.msSaveOrOpenBlob(blob, filename);
+
+      } else if (window.Blob && window.URL) {
+          // HTML5 Blob
+          var blob = new Blob([csvString], { type: 'text/csv;charset=utf8' });
+          var csvUrl = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.setAttribute('style', 'display:none');
+          a.setAttribute('href', csvUrl);
+          a.setAttribute('download', filename);
+          document.body.appendChild(a);
+
+          a.click()
+          a.remove();
+      } else {
+          // Data URI
+          var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
+          var blob = new Blob([csvString], { type: 'text/csv;charset=utf8' });
+          var csvUrl = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.setAttribute('style', 'display:none');
+          a.setAttribute('target', '_blank');
+          a.setAttribute('href', csvData);
+          a.setAttribute('download', filename);
+          document.body.appendChild(a);
+          a.click()
+          a.remove();
+      }
+    }
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col" role="main">
+  <div class="row">  <!-- start row -->
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_content">  <!-- x_content 1 -->
+
+          <div class="x_content">  <!-- x_content 2 -->
+            <table id="router-table" class="table table-striped projects">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>
+                    <button type="button" class="btn btn-default btn-xs"
+                        onclick="register()"
+                        style="margin-bottom: 0;">
+                      Register
+                    </button>
+                  </th>
+                  <th></th>
+                  <th></th>
+                  <!--
+                  <form id="category" action="/registration/router" method="POST">
+                    <th>
+                      <select id="onoff" name="onoff" onchange="this.form.submit()">
+                        {% if selected_onoff == 0 %}
+                          <option id="100" value="100">All</option>
+                          <option id="1" value="1">ON</option>
+                          <option id="0" value="0" selected>OFF</option>
+                        {% elif selected_onoff == 100 %}
+                          <option id="100" value="100" selected>All</option>
+                          <option id="1" value="1">ON</option>
+                          <option id="0" value="0">OFF</option>
+                        {% else %}
+                          <option id="100" value="100">All</option>
+                          <option id="1" value="1" selected>ON</option>
+                          <option id="0" value="0">OFF</option>
+                        {% endif %}
+                      </select>
+                    </th>
+                  </form>
+                  <th>
+                    <button type="button" class="btn btn-default btn-xs"
+                        onclick="exportTableToCsv('router-table', 'Router')"
+                        style="margin-bottom: 0;">
+                      CSV Download
+                    </button>
+                  </th>
+                  -->
+                </tr>
+                <tr>
+                  <th></th>
+                  <th>Name</th>
+                  <th>IP Address</th>
+                  <!--<th>Status</th>-->
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for router in router_list %}
+                <tr>
+                  <td></td>
+                  <td>
+                    <a href="/registration/router/{{ router.id }}/update">
+                      {{ router.name }}
+                    </a>
+                  </td>
+                  <td>{{ router.custom.ip }}</td>
+                  <!-- status
+                  {% if router.status == 0 %}
+                    <td style="padding-left: 20px;"><img src="/static/images/off.png"
+                        style="width:16px; border: 2px solid #000000; border-radius: 100%" vstatus="off"></td>
+                  {% else %}
+                    <td style="padding-left: 20px;"><img src="/static/images/on.png"
+                        style="width:16px; border: 2px solid #000000; border-radius: 100%" vstatus="on"></td>
+                  {% endif %}
+                  -->
+                  <td></td>
+                </tr>
+                {% endfor %}
+                <tr>
+                  <td></td>
+                  <td> Total </td>
+                  <td> {{ router_list|length }} </td>
+                  <!--<td></td>-->
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>  <!-- end x_content 2 -->
+
+        </div>  <!-- end x_content 1 -->
+      </div>  <!-- end x_panel -->
+    </div>
+
+  </div>  <!-- End row -->
+</div>
+
+{% endblock content %}

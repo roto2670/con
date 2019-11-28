@@ -30,3 +30,4 @@ else:
 ORG_ID = '''ac983bfaa401d89475a45952e0a642cf'''
 KIND_IPCAM = '''ipcam'''
 KIND_SPEAKER = '''speaker'''
+KIND_ROUTER = '''router'''

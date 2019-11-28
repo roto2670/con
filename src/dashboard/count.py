@@ -22,7 +22,7 @@ import constants
 import local_apis
 import in_config_apis
 from util import RedisStore
-from constants import KIND_IPCAM, KIND_SPEAKER
+from constants import KIND_IPCAM, KIND_SPEAKER, KIND_ROUTER
 from config_models import FACE_STATION_TYPE
 from config_models import SCANNER_TYPE
 
@@ -384,6 +384,15 @@ def pa_list():
   return data_list
 
 
+def router_list():
+  raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
+  data_list = []
+  for raw_data in raw_datas.values():
+    if raw_data['kind'] == KIND_ROUTER:
+      data_list.append(raw_data)
+  return data_list
+
+
 def get_beacon(gid):
   data = BEACONS_COUNT.get_data(DEVICE_DATA_KEY, gid)
   return data
@@ -401,6 +410,11 @@ def get_ipcam(ipcam_id):
 
 def get_pa(pa_id):
   data = BEACONS_COUNT.get_data(DEVICE_DATA_KEY, pa_id)
+  return data
+
+
+def get_router(router_id):
+  data = BEACONS_COUNT.get_data(DEVICE_DATA_KEY, router_id)
   return data
 
 

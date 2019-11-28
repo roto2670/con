@@ -26,7 +26,7 @@ import in_config_apis
 from dashboard import count
 from registration import blueprint
 from constants import REG_HUB_ID, REG_ACCOUNT_ID, BEACON_SPEC
-from constants import KIND_IPCAM, KIND_SPEAKER
+from constants import KIND_IPCAM, KIND_SPEAKER, KIND_ROUTER
 from config_models import SCANNER_TYPE
 
 
@@ -300,8 +300,6 @@ def reg_pa():
     return render_template("register_pa.html")
   else:
     ip = request.form.get('ip')
-    _id = request.form.get('id')
-    password = request.form.get('password')
     name = request.form.get('name')
     mac_hash = hashlib.md5()
     mac_hash.update(ip.encode('utf-8'))
@@ -370,3 +368,100 @@ def pa_update_route(pa_id):
 def pa_delete_route(pa_id):
   local_apis.remove_pa(pa_id)
   return redirect("/registration/pa")
+
+
+@blueprint.route('/router', methods=['GET', 'POST'])
+@util.require_login
+def router_list_route():
+  router_list = count.router_list()
+  if request.method == "GET":
+    return render_template("router_list.html", router_list=router_list,
+                           selected_onoff=100)
+  else:
+    selected_onoff = int(request.form['onoff'])
+    new_list = []
+    if selected_onoff != 100:
+      for _router in router_list:
+        if _router['status'] == selected_onoff:
+          new_list.append(_router)
+    else:
+      new_list = router_list
+    return render_template("router_list.html", router_list=new_list,
+                           selected_onoff=selected_onoff)
+
+
+@blueprint.route('/router/create', methods=['GET', 'POST'])
+@util.require_login
+def reg_router():
+  if request.method == "GET":
+    return render_template("register_router.html")
+  else:
+    ip = request.form.get('ip')
+    name = request.form.get('name')
+    mac_hash = hashlib.md5()
+    mac_hash.update(ip.encode('utf-8'))
+    mac_addr = mac_hash.hexdigest()[:12]
+
+    new_id_hash = hashlib.md5()
+    new_id_hash.update(mac_addr.encode('utf-8'))
+    new_id = new_id_hash.hexdigest()
+
+    security = uuid.uuid4().hex[:24]
+
+    value = {
+      "id": new_id,
+      "mac": mac_addr,
+      "name": name,
+      "kind": KIND_ROUTER,
+      "protocol": 0,
+      "firmware_version": "0.0.0",
+      "model_number": 0,
+      "model_name": KIND_ROUTER,
+      "sdk_version": "0.3",
+      "beacon": REG_ACCOUNT_ID,
+      "security": security,
+      "hub_id": REG_HUB_ID,
+      "account_id": REG_ACCOUNT_ID,
+      "status": 0,
+      "locale": "US",
+      "rssi": 0,
+      "battery": 0,
+      "progress": 0,
+      "latest_version": "0.0.0",
+      "is_depr": 0,
+      "custom": {
+          "ip": ip
+      },
+      "tags": [],
+      "beacon_spec": {
+          "uuid": BEACON_SPEC,
+          "major": 36805,
+          "minor": 36533,
+          "interval": 700,
+          "during_second": 0
+      },
+      "img_url": ""
+    }
+    ret = local_apis.register_router(value)
+    logging.info("Register Router resp : %s", ret)
+    local_apis.update_router_information(new_id, name, data=value)
+    return redirect("/registration/router")
+
+
+@blueprint.route('/router/<router_id>/update', methods=['GET', 'POST'])
+@util.require_login
+def router_update_route(router_id):
+  if request.method == "GET":
+    _router = count.get_router(router_id)
+    return render_template("update_router.html", router=_router)
+  else:
+    name = request.form.get('name')
+    local_apis.update_router_information(router_id, name)
+    return redirect("/registration/router")
+
+
+@blueprint.route('/router/<router_id>/delete', methods=['GET'])
+@util.require_login
+def router_delete_route(router_id):
+  local_apis.remove_router(router_id)
+  return redirect("/registration/router")
