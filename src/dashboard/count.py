@@ -158,7 +158,9 @@ GADGET_INFO = {
     "16": "BUS",
     "17": "WCBH Drilling Machine",
     "18": "Explosive Van",
-    "19": "Concrete Mixer Truck"
+    "19": "Concrete Mixer Truck",
+    "20": "Shuttle",
+    "21": "Worker"
 }
 SHOT_GADGET_INFO = {
     "1": "Jumbo Drill 2B",
