@@ -20,6 +20,7 @@ from importlib import import_module
 
 from flask import Flask  # noqa : pylint: disable=import-error
 from flask import session
+from flask_cors import CORS
 
 import apis
 import common
@@ -68,7 +69,8 @@ def register_blueprints(app):
       'moi',
       'pa',
       'internal',
-      'login'
+      'login',
+      'work'
   ]
   for blueprint in blueprints:
     module = import_module('{}.routes'.format(blueprint))
@@ -120,6 +122,7 @@ def set_local_address():
 def create_app():
   app = Flask(__name__, static_folder='base/static')
   if apis.IS_DEV:
+    CORS(app)
     app.config.from_object(DebugConfig)
   else:
     app.config.from_object(ProductionConfig)
@@ -151,7 +154,7 @@ if  __name__ == '__main__':
   _app = create_app()
   if apis.IS_DEV:
     _app.debug = True
-    # CORS(_app)
+    CORS(_app)
     #_app.run(host='127.0.0.1', port=5000, use_reloader=False)
     socket_io.run(_app, host='0.0.0.0', port=5000)
   else:

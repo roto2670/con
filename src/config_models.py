@@ -11,7 +11,7 @@
 
 # 3rd party
 from sqlalchemy import ForeignKey  # noqa : pylint: disable=import-error
-from sqlalchemy import Column, DateTime, String, Text, Integer  # noqa : pylint: disable=import-error
+from sqlalchemy import Column, DateTime, String, Text, Integer, Float  # noqa : pylint: disable=import-error
 
 from base import db
 

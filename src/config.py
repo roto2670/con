@@ -18,8 +18,16 @@ class Config(object):
   SECRET_KEY = 'skfksrltnf1'
   if apis.IS_DEV:
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:qlalfqjsgh1!@127.0.0.1:3306/mib_console'  # LOCAL MySQL New
+    SQLALCHEMY_BINDS = {
+      'mib_console': 'mysql+pymysql://root:qlalfqjsgh1!@127.0.0.1:3306/mib_console',
+      'smart_work': 'mysql+pymysql://root:qlalfqjsgh1!@127.0.0.1:3306/work_prog'  # TODO: change work_prog
+    }
   else:
     SQLALCHEMY_DATABASE_URI = '''mysql+pymysql://console:skfksxpzm1@localhost:3306/mib_console'''  # Google Cloud SQL
+    SQLALCHEMY_BINDS = {
+      'mib_console': 'mysql+pymysql://root:skfksxpzm1@127.0.0.1:3306/mib_console',
+      'smart_work': 'mysql+pymysql://root:skfksxpzm1@127.0.0.1:3306/work_prog'  # TODO: change work_prog
+    }
   SQLALCHEMY_TRACK_MODIFICATIONS = False
   if apis.IS_DEV:
     LOG_PATH = '/tmp/console.log'
