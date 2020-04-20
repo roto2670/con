@@ -297,13 +297,13 @@ def set_bus_setting(bus_user_id, bus_user_name, bus_beacon_id):
                                                    bus_beacon_id, beacon_data.name,
                                                    org_id)
   __add_bus_setting(bus_beacon_id, bus_user_id)
-  return redirect("/dashboard/count/settings/beaconscanner")
+  return redirect("/dashboard/count/settings/entrance")
 
 
 def delete_bus_setting(_id, bus_beacon_id):
   in_config_apis.delete_bus_setting_data(_id, current_user.organization_id)
   __delete_bus_setting(bus_beacon_id)
-  return redirect("/dashboard/count/settings/beaconscanner")
+  return redirect("/dashboard/count/settings/entrance")
 
 
 def device_list():
@@ -494,11 +494,11 @@ def set_device(device_id):
   if typ == FACE_STATION_TYPE:
     __fs_set_inout(inout, device_id)
     __fs_set_access_point(ap, device_id)
-    return redirect("/dashboard/count/settings/facescanner")
+    return redirect("/dashboard/count/settings/entrance")
   elif typ == SCANNER_TYPE:
     __sc_set_access_point(ap, device_id)
-    return redirect("/dashboard/count/settings/beaconscanner")
-  return redirect("/dashboard/count/settings/facescanner")
+    return redirect("/dashboard/count/settings/entrance")
+  return redirect("/dashboard/count/settings/entrance")
 
 
 def _delete_device_of_facestation(device_id):
@@ -533,12 +533,12 @@ def delete_device(device_id, typ):
   if typ == FACE_STATION_TYPE:
     in_config_apis.delete_count_device_setting(device_id)
     _delete_device_of_facestation(device_id)
-    return redirect("/dashboard/count/settings/facescanner")
+    return redirect("/dashboard/count/settings/entrance")
   elif typ == SCANNER_TYPE:
     in_config_apis.delete_count_device_setting(device_id)
     _delete_device_of_scanner(device_id)
-    return redirect("/dashboard/count/settings/beaconscanner")
-  return redirect("/dashboard/count/settings/facescanner")
+    return redirect("/dashboard/count/settings/entrance")
+  return redirect("/dashboard/count/settings/entrance")
 
 
 def clear_keys(key):
@@ -565,7 +565,7 @@ def clear_keys_of_sc(key):
 
 def clear_all_of_sc():
   BEACONS_COUNT.flushdb()
-  return redirect("/dashboard/count/settings/facescanner")
+  return redirect("/dashboard/count/settings/entrance")
 
 
 def delete_in_worker(org_id, ap, worker_id):
@@ -899,7 +899,7 @@ def set_equip_operator_count(key, value):
       BEACONS_COUNT.delete_data(EQUIP_OPERATOR_COUNT_KEY, key)
   else:
     BEACONS_COUNT.set_data(EQUIP_OPERATOR_COUNT_KEY, key, value)
-  return redirect("/dashboard/count/settings/beaconscanner")
+  return redirect("/dashboard/count/settings/entrance")
 
 
 def get_equip_operator_count_settings():
