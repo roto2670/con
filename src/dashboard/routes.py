@@ -141,6 +141,7 @@ def default_count_delete(device_id, typ):
 @util.require_login
 def default_equip_operator_count_setting(equip_key):
   value = request.form.get('equip_worker_count')
+  logging.info("Set euqipment operator count. User : %s", current_user.email)
   return count.set_equip_operator_count(equip_key, value)
 
 
