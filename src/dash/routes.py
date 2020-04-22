@@ -152,7 +152,7 @@ def get_gadget_count_list():
       },
       "kind": count.SHOT_GADGET_INFO
   }
-  MISCELLANEOUS = ['9', '10', '11', '16', '20', '21']
+  MISCELLANEOUS = ['9', '10', '11', '13', '16', '20', '21']
 
   # 9, 10, 11, 16 -> 100
   for k, e in ap1_list.items():
