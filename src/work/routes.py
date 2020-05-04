@@ -11,14 +11,14 @@
 
 import json
 import time
-import uuid
 import logging
 import requests
-from flask import request
+from flask import request, render_template, redirect
 
 import util
 import constants
 import work_apis
+import dashboard.count
 from work import blueprint
 from constants import API_SERVER
 from constants import WORK_STATE_STOP, WORK_STATE_IN_PROGRESS
@@ -46,6 +46,15 @@ WORK_REMOVE = '''work.removed'''
 WORK_HISTORY_ADD = '''workhistory.added'''
 WORK_HISTORY_UPDATE = '''workhistory.updated'''
 WORK_HISTORY_REMOVE = '''workhistory.removed'''
+PAUSE_HISTORY_ADD = '''pausehistory.added'''
+PAUSE_HISTORY_UPDATE = '''pausehistory.updated'''
+PAUSE_HISTORY_REMOVE = '''pausehistory.removed'''
+WORK_OPERATOR_ADD = '''workoperator.added'''
+WORK_OPERATOR_UPDATE = '''workoperator.updated'''
+WORK_OPERATOR_REMOVE = '''workoperator.removed'''
+WORK_EQUIPMENT_ADD = '''workequipment.added'''
+WORK_EQUIPMENT_UPDATE = '''workequipment.updated'''
+WORK_EQUIPMENT_REMOVE = '''workequipment.removed'''
 
 
 def _convert_dict_by_basepoint(data):
@@ -60,16 +69,26 @@ def _convert_dict_by_basepoint(data):
 
 
 def _convert_dict_by_tunnel(data):
-  return {
+  ret = {
       "id": data.id,
       "name": data.name,
+      "category": data.category,
       "direction": data.direction,
+      "length": data.length,
+      "tunnel_id": data.tunnel_id,
+      "b_accum_length": data.b_accum_length,
+      "initial_b_time": str(data.initial_b_time).replace(' ', 'T'),
       "x_loc": data.x_loc,
       "y_loc": data.y_loc,
       "width": data.width,
       "height": data.height,
       "basepoint_id": data.basepoint_id
   }
+  blast_list = []
+  for blast in data.blast_list:
+    blast_list.append(_convert_dict_by_blast(blast))
+  ret['blast_list'] = blast_list
+  return ret
 
 
 def _convert_dict_by_blast(data):
@@ -81,6 +100,9 @@ def _convert_dict_by_blast(data):
       "height": data.height,
       "state": data.state,
       "accum_time": data.accum_time,
+      "m_accum_time": data.m_accum_time,
+      "s_accum_time": data.s_accum_time,
+      "i_accum_time": data.i_accum_time,
       "tunnel_id": data.tunnel_id,
       "blast_info": _convert_dict_by_blast_info(data.blast_info_list[0])
   }
@@ -92,7 +114,7 @@ def _convert_dict_by_blast_info(data):
       "explosive": data.explosive,
       "detonator": data.detonator,
       "drilling_depth": data.drilling_depth,
-      "blasting_time": data.blasting_time,
+      "blasting_time": str(data.blasting_time) if data.blasting_time else None,
       "start_point": data.start_point,
       "finish_point": data.finish_point,
       "blasting_length": data.blasting_length,
@@ -107,12 +129,26 @@ def _convert_dict_by_work(data):
       "typ": data.typ,
       "state": data.state,
       "accum_time": data.accum_time,
+      "p_accum_time": data.p_accum_time,
+      "last_updated_time": str(data.last_updated_time).replace(' ', 'T'),
       "blast_id": data.blast_id
   }
   history_list = []
   for work_history in data.work_history_list:
     history_list.append(_convert_dict_by_work_history(work_history))
   ret['work_history_list'] = history_list
+  pause_list = []
+  for pause_history in data.pause_history_list:
+    pause_list.append(_convert_dict_by_pause_history(pause_history))
+  ret['pause_history_list'] = pause_list
+  work_operator_list = []
+  for work_operator in data.work_operator_list:
+    work_operator_list.append(_convert_dict_by_work_operator(work_operator))
+  ret['work_operator_list'] = work_operator_list
+  work_equipment_list = []
+  for work_equipment in data.work_equipment_list:
+    work_equipment_list.append(_convert_dict_by_work_equipment(work_equipment))
+  ret['work_equipment_list'] = work_equipment_list
   return ret
 
 
@@ -124,6 +160,65 @@ def _convert_dict_by_work_history(data):
       "timestamp": str(data.timestamp).replace(' ', 'T'),
       "accum_time": data.accum_time,
       "work_id": data.work_id
+  }
+
+
+def _convert_dict_by_pause_history(data):
+  return {
+      "id": data.id,
+      "start_time": str(data.start_time).replace(' ', 'T'),
+      "end_time": str(data.end_time).replace(' ', 'T'),
+      "accum_time": data.accum_time,
+      "message": data.message,
+      "work_id": data.work_id
+  }
+
+
+def _convert_dict_by_activity(data):
+  return {
+      "id": data.id,
+      "name": data.name,
+      "category": data.category,
+      "order": data.order
+  }
+
+
+def _convert_dict_by_equipment(data):
+  return {
+      "id": data.id,
+      "name": data.name,
+      "category": data.category,
+      "equipment_id": data.equipment_id
+  }
+
+
+def _convert_dict_by_operator(data):
+  return {
+      "id": data.id,
+      "name": data.name,
+      "operator_id": data.operator_id,
+      "department": data.department,
+      "category": data.category
+  }
+
+
+def _convert_dict_by_work_operator(data):
+  return {
+    "id": data.id,
+    "operator_id": data.operator_id,
+    "accum_time": data.accum_time,
+    "p_accum_time": data.p_accum_time,
+    "work_id": data.work_id
+  }
+
+
+def _convert_dict_by_work_equipment(data):
+  return {
+    "id": data.id,
+    "equipment_id": data.equipment_id,
+    "accum_time": data.accum_time,
+    "p_accum_time": data.p_accum_time,
+    "work_id": data.work_id
   }
 
 
@@ -258,11 +353,12 @@ def add_blast():
     # Blast Data
     blast_data = data['blast']
     work_apis.create_blast(blast_data)
-    send_request(BLAST_ADD, [blast_data])
     # Blast Info Data
     blast_info_data = data['info']
     work_apis.create_blast_info(blast_info_data)
+
     send_request(BLAST_INFO_ADD, [blast_info_data])
+    send_request(BLAST_ADD, [blast_data])
     return json.dumps(True)
   except:
     logging.exception("Fail to add blast.")
@@ -274,7 +370,7 @@ def add_blast():
 def update_blast():
   data = request.get_json()
   try:
-    # TODO: 
+    # TODO:
     ret = work_apis.update_blast(data)
     resp_data = _convert_dict_by_blast(ret)
     send_request(BLAST_UPDATE, [resp_data])
@@ -319,9 +415,6 @@ def get_blast_list():
   datas = work_apis.get_all_blast()
   try:
     for data in datas:
-      for w in data.work_list:
-        logging.info("### typ : %s, created : %s", w.typ, w.created_time)
-      ret_data = _convert_dict_by_blast(data)
       ret_list.append(_convert_dict_by_blast(data))
     return json.dumps(ret_list)
   except:
@@ -334,8 +427,8 @@ def get_blast_list():
 def add_blast_info():
   data = request.get_json()
   try:
-    work_apis.create_blast_info(data)
-    send_request(BLAST_INFO_ADD, [data])
+    data = work_apis.create_blast_info(data)
+    send_request(BLAST_INFO_ADD, [_convert_dict_by_blast_info(data)])
     return json.dumps(True)
   except:
     logging.exception("Fail to add blast info.")
@@ -347,10 +440,30 @@ def add_blast_info():
 def update_blast_info():
   data = request.get_json()
   try:
-    # TODO: 
+    old_info = work_apis.get_blast_info(data['id'])
+    old_length = old_info.blasting_length
+    old_b_time = old_info.blasting_time
+
     ret = work_apis.update_blast_info(data)
-    resp_data = _convert_dict_by_blast_info(ret) 
+    resp_data = _convert_dict_by_blast_info(ret)
     send_request(BLAST_INFO_UPDATE, [resp_data])
+
+    init_b_time = ret.blast.tunnel.initial_b_time
+    blasting_length = ret.blast.tunnel.b_accum_length
+    if not init_b_time:
+      init_b_time = ret.blasting_time
+    elif init_b_time == old_b_time:
+      init_b_time = ret.blasting_time
+
+    if int(old_length) != 0:
+      if old_length != data['blasting_length']:
+        blasting_length -= old_length
+        blasting_length += data['blasting_length']
+    else:
+      blasting_length += data['blasting_length']
+    t_ret = work_apis.update_tunnel_blast_info(ret.blast.tunnel.id,
+                                               init_b_time, blasting_length)
+    send_request(TUNNEL_UPDATE, [_convert_dict_by_tunnel(t_ret)])
     return json.dumps(True)
   except:
     logging.exception("Fail to update blast info. id : %s", data['id'])
@@ -423,7 +536,7 @@ def add_work():
 def update_work():
   data = request.get_json()
   try:
-    # TODO: 
+    # TODO:
     ret = work_apis.update_work(data)
     resp_data = _convert_dict_by_work(ret)
     send_request(WORK_UPDATE, [resp_data])
@@ -480,8 +593,8 @@ def get_work_list():
 def add_work_history():
   data = request.get_json()
   try:
-    work_apis.create_work_history(data)
-    send_request(WORK_HISTORY_ADD, [data])
+    data = work_apis.create_work_history(data)
+    send_request(WORK_HISTORY_ADD, [_convert_dict_by_work_history(data)])
     return json.dumps(True)
   except:
     logging.exception("Fail to add work history.")
@@ -493,10 +606,11 @@ def add_work_history():
 def update_work_history():
   data = request.get_json()
   try:
-    # TODO: 
+    # TODO:
     ret = work_apis.update_work_history(data)
     resp_data = _convert_dict_by_work_history(ret)
-    send_request(WORK_HISTORY_UPDATE, [resp_data])
+    send_request(WORK_HISTORY_UPDATE,
+                 [_convert_dict_by_work_history(resp_data)])
     return json.dumps(True)
   except:
     logging.exception("Fail to update work history. id : %s", data['id'])
@@ -545,6 +659,36 @@ def get_work_history_list():
     return json.dumps(ret_list)
 
 
+@blueprint.route('/pausehistory/get/list', methods=["GET"])
+#@util.require_login
+def get_pause_history_list():
+  data = request.get_json()
+  ret_list = []
+  try:
+    datas = work_apis.get_all_pause_history()
+    for data in datas:
+      ret_list.append(_convert_dict_by_pause_history(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to get pause history list.")
+    return json.dumps(ret_list)
+
+
+@blueprint.route('/pausehistory/get/list/work', methods=["POST"])
+#@util.require_login
+def get_pause_history_list_by_work():
+  data = request.get_json()
+  ret_list = []
+  try:
+    datas = work_apis.get_pause_history_list_by_work(data['work_id'])
+    for data in datas:
+      ret_list.append(_convert_dict_by_pause_history(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to get pause history list by work.")
+    return json.dumps(ret_list)
+
+
 @blueprint.route('/work/start', methods=["POST"])
 #@util.require_login
 def start_work():
@@ -572,11 +716,27 @@ def start_work():
         history_data['state'] = WORK_STATE_IN_PROGRESS
         history_data['timestamp'] = work_apis.get_servertime()
         history_data['accum_time'] = _data.accum_time
-        work_apis.create_work_history(history_data)
-        send_request(WORK_HISTORY_ADD, [history_data])
+        _data = work_apis.create_work_history(history_data)
+        send_request(WORK_HISTORY_ADD,
+                     [_convert_dict_by_work_history(_data)])
+        # Handle pause data
+        pause_time = 0
+        if latest_work.pause_history_list:
+          _pause_data = latest_work.pause_history_list[0]
+          if not _pause_data.end_time:
+            pause_time = history_data['timestamp'] - _pause_data.start_time
+            pause_time = pause_time.seconds
+            work_apis.update_pause_history_end_time(_pause_data.id,
+                                                    history_data['timestamp'],
+                                                    pause_time)
+            send_request(PAUSE_HISTORY_UPDATE,
+                         [_convert_dict_by_pause_history(_pause_data)])
+
+        pause_time += latest_work.p_accum_time
         work_data = work_apis.update_state_and_accum(data['id'],
                                                      history_data['state'],
-                                                     history_data['accum_time'])
+                                                     history_data['accum_time'],
+                                                     pause_time)
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
         ret = True
     else:
@@ -584,11 +744,14 @@ def start_work():
       history_data['state'] = WORK_STATE_IN_PROGRESS
       history_data['timestamp'] = work_apis.get_servertime()
       history_data['accum_time'] = 0
-      work_apis.create_work_history(history_data)
-      send_request(WORK_HISTORY_ADD, [history_data])
+      pause_time = 0
+      _data = work_apis.create_work_history(history_data)
+      send_request(WORK_HISTORY_ADD,
+                  [_convert_dict_by_work_history(_data)])
       work_data = work_apis.update_state_and_accum(data['id'],
                                                    history_data['state'],
-                                                   history_data['accum_time'])
+                                                   history_data['accum_time'],
+                                                   pause_time)
       send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
       ret = True
     return json.dumps(ret)
@@ -617,16 +780,32 @@ def stop_work():
       _data = latest_work.work_history_list[0]
       if _data.state == WORK_STATE_IN_PROGRESS:
         # Stop work history
-        history_data['state'] = WORK_STATE_STOP 
+        history_data['state'] = WORK_STATE_STOP
         history_data['timestamp'] = work_apis.get_servertime()
         work_time = history_data['timestamp'] - _data.timestamp
         history_data['accum_time'] = _data.accum_time + work_time.seconds
-        work_apis.create_work_history(history_data)
-        send_request(WORK_HISTORY_ADD, [history_data])
+        _data = work_apis.create_work_history(history_data)
+        send_request(WORK_HISTORY_ADD,
+                     [_convert_dict_by_work_history(_data)])
+
+        pause_time = 0
+        pause_data = {
+            "start_time": history_data['timestamp'],
+            "end_time": None,
+            "accum_time": pause_time,
+            "message": data['message'],
+            "work_id": data['id']
+        }
+        _data = work_apis.create_pause_history(pause_data)
+        send_request(PAUSE_HISTORY_ADD,
+                     [_convert_dict_by_pause_history(_data)])
+
         # TODO: handle work data
+        pause_time += latest_work.p_accum_time
         work_data = work_apis.update_state_and_accum(data['id'],
                                                      history_data['state'],
-                                                     history_data['accum_time'])
+                                                     history_data['accum_time'],
+                                                     pause_time)
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
         ret = True
       elif _data.state == WORK_STATE_FINISH:
@@ -664,13 +843,38 @@ def finish_work():
         history_data['timestamp'] = work_apis.get_servertime()
         work_time = history_data['timestamp'] - _data.timestamp
         history_data['accum_time'] = _data.accum_time + work_time.seconds
-        work_apis.create_work_history(history_data)
-        send_request(WORK_HISTORY_ADD, [history_data])
+        _data = work_apis.create_work_history(history_data)
+        send_request(WORK_HISTORY_ADD,
+                     [_convert_dict_by_work_history(_data)])
+        # Handle pause data
+        pause_time = 0
+        if latest_work.pause_history_list:
+          _pause_data = latest_work.pause_history_list[0]
+          if not _pause_data.end_time:
+            pause_time = history_data['timestamp'] - _pause_data.start_time
+            pause_time = pause_time.seconds
+            work_apis.update_pause_history_end_time(_pause_data.id,
+                                                    history_data['timestamp'],
+                                                    pause_time)
+            send_request(PAUSE_HISTORY_UPDATE,
+                         [_convert_dict_by_pause_history(_pause_data)])
+
         # TODO: handle work data
+        pause_time += latest_work.p_accum_time
         work_data = work_apis.update_state_and_accum(data['id'],
                                                      history_data['state'],
-                                                     history_data['accum_time'])
+                                                     history_data['accum_time'],
+                                                     pause_time)
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
+        if data['typ'] == 112:  # finish work
+          blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
+                                                              history_data['accum_time'],
+                                                              latest_work.category)
+        else:
+          blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 1,
+                                                              history_data['accum_time'],
+                                                              latest_work.category)
+        send_request(BLAST_UPDATE, [_convert_dict_by_blast(blast_data)])
         ret = True
       elif _data.state == WORK_STATE_FINISH:
         ret = False
@@ -679,25 +883,178 @@ def finish_work():
         history_data['state'] = WORK_STATE_FINISH
         history_data['timestamp'] = work_apis.get_servertime()
         history_data['accum_time'] = _data.accum_time
-        work_apis.create_work_history(history_data)
-        send_request(WORK_HISTORY_ADD, [history_data])
+        _data = work_apis.create_work_history(history_data)
+        send_request(WORK_HISTORY_ADD,
+                     [_convert_dict_by_work_history(_data)])
+        # Handle pause data
+        pause_time = 0
+        if latest_work.pause_history_list:
+          _pause_data = latest_work.pause_history_list[0]
+          if not _pause_data.end_time:
+            pause_time = history_data['timestamp'] - _pause_data.start_time
+            pause_time = pause_time.seconds
+            work_apis.update_pause_history_end_time(_pause_data.id,
+                                                    history_data['timestamp'],
+                                                    pause_time)
+            send_request(PAUSE_HISTORY_UPDATE,
+                         [_convert_dict_by_pause_history(_pause_data)])
         # TODO: handle work data
+        pause_time += latest_work.p_accum_time
         work_data = work_apis.update_state_and_accum(data['id'],
                                                      history_data['state'],
-                                                     history_data['accum_time'])
+                                                     history_data['accum_time'],
+                                                     pause_time)
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
         # TODO: handle blast data
-        if data['typ'] == 111:
+        if data['typ'] == 112:  # finish work
           blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
-                                                              history_data['accum_time'])
+                                                              history_data['accum_time'],
+                                                              latest_work.category)
         else:
           blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 1,
-                                                              history_data['accum_time'])
+                                                              history_data['accum_time'],
+                                                              latest_work.category)
         send_request(BLAST_UPDATE, [_convert_dict_by_blast(blast_data)])
         ret = True
     return json.dumps(ret)
   except:
     logging.exception("Failed to stop work. Data : %s", data)
+    return json.dumps(False)
+
+
+@blueprint.route('/activity/get/list', methods=["GET"])
+#@util.require_login
+def get_activity_list():
+  ret_list = []
+  try:
+    datas = work_apis.get_all_activity()
+    for data in datas:
+      ret_list.append(_convert_dict_by_activity(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to get activity list.")
+    return json.dumps(ret_list)
+
+
+@blueprint.route('/equipment/get/list', methods=["GET"])
+#@util.require_login
+def get_equipment_list():
+  ret_list = []
+  try:
+    datas = work_apis.get_all_equipment()
+    for data in datas:
+      ret_list.append(_convert_dict_by_equipment(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to get equipment list.")
+    return json.dumps(ret_list)
+
+
+@blueprint.route('/operator/get/list', methods=["GET"])
+#@util.require_login
+def get_operator_list():
+  ret_list = []
+  try:
+    datas = work_apis.get_all_operator()
+    for data in datas:
+      ret_list.append(_convert_dict_by_operator(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to get operator list.")
+    return json.dumps(ret_list)
+
+
+@blueprint.route('/equipment/info/get/list', methods=["GET"])
+#@util.require_login
+def get_eqiupment_info_list():
+  ret_list = []
+  try:
+    datas = dashboard.count.GADGET_INFO
+    return json.dumps(datas)
+  except:
+    logging.exception("Fail to get equipment info list.")
+    return json.dumps(ret_list)
+
+
+@blueprint.route('/work/operator/add', methods=["POST"])
+#@util.require_login
+def add_work_operator():
+  data = request.get_json()
+  try:
+    data = work_apis.create_work_operator(data)
+    send_request(WORK_OPERATOR_ADD, [_convert_dict_by_work_operator(data)])
+    return json.dumps(True)
+  except:
+    logging.exception("Fail to add work operator.")
+    return json.dumps(False)
+
+
+@blueprint.route('/work/operator/get/list/work', methods=["POST"])
+#@util.require_login
+def get_work_operator_by_work():
+  data = request.get_json()
+  work_id = data['work_id']
+  try:
+    datas = work_apis.get_work_operator_list_by_work(work_id)
+    ret_list = []
+    for data in datas:
+      ret_list.append(_convert_dict_by_work_operator(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to add work operator.")
+    return json.dumps(False)
+
+
+@blueprint.route('/work/equipment/add', methods=["POST"])
+#@util.require_login
+def add_work_equipment():
+  data = request.get_json()
+  try:
+    data = work_apis.create_work_equipment(data)
+    send_request(WORK_EQUIPMENT_ADD, [_convert_dict_by_work_equipment(data)])
+    return json.dumps(True)
+  except:
+    logging.exception("Fail to add work equipment.")
+    return json.dumps(False)
+
+
+@blueprint.route('/work/equipment/get/list/work', methods=["POST"])
+#@util.require_login
+def get_work_equipment_by_work():
+  data = request.get_json()
+  work_id = data['work_id']
+  try:
+    datas = work_apis.get_work_equipment_list_by_work(work_id)
+    ret_list = []
+    for data in datas:
+      ret_list.append(_convert_dict_by_work_equipment(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to add work equipment.")
+    return json.dumps(False)
+
+
+@blueprint.route('/work/workdata/get/list/work', methods=["POST"])
+#@util.require_login
+def get_work_data_by_work():
+  # Return by work operator and work equipment
+  data = request.get_json()
+  work_id = data['work_id']
+  try:
+    ret_data = {}
+    e_datas = work_apis.get_work_equipment_list_by_work(work_id)
+    e_list = []
+    for data in e_datas:
+      e_list.append(_convert_dict_by_work_equipment(data))
+    ret_data['equipment'] = e_list
+    o_datas = work_apis.get_work_operator_list_by_work(work_id)
+    o_list = []
+    for data in o_datas:
+      o_list.append(_convert_dict_by_work_operator(data))
+    ret_data['operator'] = o_list
+    return json.dumps(ret_data)
+  except:
+    logging.exception("Fail to add work data.")
     return json.dumps(False)
 
 
@@ -742,3 +1099,185 @@ def _default(obj):
     )
     return millis
   raise TypeError('Not sure how to serialize %s' % (obj,))
+
+
+### { UI API
+
+
+ACTIVITY_NAME = {
+    101: "VENTILATION",
+    102: "FIRST MUCKING",
+    103: "MECHANICAL_SCALING",
+    104: "MENUAL SCALING",
+    105: "SECOND MUCKING",
+    106: "GEO MAPPING",
+    107: "WATER SPRAY",
+    108: "SHOTCRETE",
+    109: "PROBHOLES",
+    110: "BOTTOM CLEANING",
+    111: "FACE DRILLING",
+    112: "BLASTING",
+    200: "SHOTCRETE",
+    201: "ROCK BOLT MARKING",
+    202: "ROCK BOLT DRILLING",
+    203: "ROCK BOLT INJECTION",
+    204: "DRILLING FOR GROUTING",
+    205: "GROUTING",
+    206: "GROUTING CURING",
+    207: "GROUTING CHECK HOLES",
+    208: "CORE DRILLING",
+    300: "TBM",
+    301: "INTERFERENCE",
+    302: "EVACUATION",
+    303: "EQUIPMENT BREAKEDOWN",
+    304: "NO WORK",
+    305: "PREPERATION",
+    306: "RESOURCE NOT AVAILABLE",
+    307: "SHIFT CHANGE",
+    308: "EXPLOSIVE_DELIVERY",
+    309: "OTHERS",
+    310: "NONE",
+}
+TUNNEL_CATEGORY = {
+    100: "TOP HD",
+    101: "BOTTOM 1",
+    102: "BOTTOM 2"
+}
+TUNNEL_DIRECTION = {
+    0: "EAST",
+    1: "WEST"
+}
+
+
+@blueprint.route('/')
+#@util.require_login
+def route_default():
+  return render_template("work_home.html")
+
+
+@blueprint.route('/search/work', methods=["GET", "POST"])
+@util.require_login
+def get_work_search_page():
+
+  if request.method == "GET":
+    return render_template("search_work_prepare.html")
+  else:
+    tunnel_id = request.form.get('tunnelId')
+    tunnel = request.form.get('tunnel')
+    direction = request.form.get('direction')
+    raw_datetime_list = request.form.get('datetime')
+    datetime_list = json.loads(raw_datetime_list)
+
+    page = request.form.get('page')
+    next_num = request.form.get('next_num')
+    prev_num = request.form.get('prev_num')
+    page_num = None
+    if page == "1":
+      page_num = prev_num
+    elif page == "2":
+      page_num = next_num
+
+    logging.info("## tid : %s, t : %s, d : %s", tunnel_id, tunnel, direction)
+    work_list = work_apis.search(tunnel_id, int(tunnel), int(direction),
+                                 datetime_list,
+                                 page_num)
+    data = {
+      "tunnel_id": tunnel_id, "tunnel": tunnel,
+      "direction": direction, "datetime": raw_datetime_list,
+      "tunnel_category": TUNNEL_CATEGORY, "tunnel_direction":TUNNEL_DIRECTION ,
+      "activity_name": ACTIVITY_NAME
+    }
+    start_date = "-".join(datetime_list[0].split(",")[:3])
+    start_time = ":".join(datetime_list[0].split(",")[3:])
+    end_date = "-".join(datetime_list[1].split(",")[:3])
+    end_time = ":".join(datetime_list[1].split(",")[3:])
+    start = "{} {}".format(start_date, start_time)
+    end = "{} {}".format(end_date, end_time)
+    return render_template("search_work.html", data=data,
+                           work_list=work_list,
+                           start_date=start, end_date=end)
+
+
+### }
+
+
+@blueprint.route('/analyze')
+#@util.require_login
+def route_analyze():
+  return render_template("work_analyze.html")
+
+
+@blueprint.route('/reg/activity')
+#@util.require_login
+def route_reg_activity():
+  activity_list = work_apis.get_all_activity()
+  return render_template("reg_activity_list.html",
+                         activity_list=activity_list)
+
+
+@blueprint.route('/reg/activity/create', methods=['GET', 'POST'])
+#@util.require_login
+def route_reg_activity_create():
+  if request.method == "GET":
+    return render_template("create_activity.html")
+  else:
+    name = request.form['name']
+    category = request.form['category']
+    activity_data = {
+       "name": name,
+       "category": int(category)
+    }
+    work_apis.create_activity(activity_data)
+    return redirect("/work/reg/activity")
+
+
+@blueprint.route('/reg/equipment')
+#@util.require_login
+def route_reg_equipment():
+  equipment_list = work_apis.get_all_equipment()
+  return render_template("reg_equipment_list.html",
+                         equipment_list=equipment_list)
+
+
+@blueprint.route('/reg/equipment/create', methods=['GET', 'POST'])
+#@util.require_login
+def route_reg_equipment_create():
+  if request.method == "GET":
+    return render_template("create_equipment.html")
+  else:
+    name = request.form['name']
+    category = request.form['category']
+    equipment_id = request.form['equipmentId']
+    equipment_data = {
+       "name": name,
+       "equipment_id" : equipment_id,
+       "category": int(category)
+    }
+    work_apis.create_equipment(equipment_data)
+    return redirect("/work/reg/equipment")
+
+
+@blueprint.route('/reg/operator')
+#@util.require_login
+def route_reg_operator():
+  operator_list = work_apis.get_all_operator()
+  return render_template("reg_operator_list.html",
+                         operator_list=operator_list)
+
+
+@blueprint.route('/reg/operator/create', methods=['GET', 'POST'])
+#@util.require_login
+def route_reg_operator_create():
+  if request.method == "GET":
+    return render_template("create_operator.html")
+  else:
+    name = request.form['name']
+    operator_id = request.form['operatorId']
+    department = request.form['department']
+    operator_data = {
+       "name": name,
+       "operator_id" : operator_id,
+       "department": department
+    }
+    work_apis.create_operator(operator_data)
+    return redirect("/work/reg/operator")

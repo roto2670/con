@@ -1,0 +1,329 @@
+{% extends "base_site.html" %}
+
+{% block title %} Time Machine{% endblock title %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_progress.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+  {{ super() }}
+  <!-- bootstrap-daterangepicker -->
+  <link href="{{ url_for('static', filename='vendors/bootstrap-daterangepicker/daterangepicker.css') }}" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block javascripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='vendors/moment/min/moment.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendors/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+  <script>
+    function search() {
+      window.location.href = "/dashboard/search/worker";
+    }
+
+    function exportCsv(userId, userName, group, ap, inout, violation, datetime) {
+      var url = "/dashboard/search/worker/download?";
+          args = "userid=" + userId + "&username=" + userName + "&group=" + group +
+                 "&ap=" + ap + "&inout=" + inout + "&violation=" + violation +
+                 "&datetime=" + datetime;
+      window.location.href = url + args;
+    }
+
+    function handlePage(value) {
+      // 1 -> prev
+      // 2 -> next
+      if (value === "1") {
+          document.getElementById('page').value = "1";
+          document.getElementById('prev').submit();
+      } else {
+          document.getElementById('page').value = "2";
+          document.getElementById('next').submit();
+      }
+    }
+
+	  function init_daterangepicker_right(startDate, endDate) {
+
+				if( typeof ($.fn.daterangepicker) === 'undefined'){ return; }
+				//console.log('init_daterangepicker_right');
+
+				var cb = function(start, end, label) {
+				  //console.log("CB : " , start.toISOString(), end.toISOString(), label);
+				  $('#reportrange_right span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+				};
+
+				var optionSet1 = {
+				  //startDate: moment().subtract(29, 'days'),
+				  startDate: moment(startDate),
+				  endDate: moment(endDate),
+				  minDate: '01/01/2019',
+				  maxDate: '12/31/2025',
+				  dateLimit: {
+            days: 30
+				  },
+				  showDropdowns: true,
+				  showWeekNumbers: true,
+				  timePicker: false,
+				  timePickerIncrement: 1,
+				  timePicker12Hour: true,
+				  ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()]
+            //'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+				  },
+				  opens: 'right',
+				  buttonClasses: ['btn btn-default'],
+				  applyClass: 'btn-small btn-primary',
+				  cancelClass: 'btn-small',
+				  format: 'MM/DD/YYYY',
+				  separator: ' to ',
+          autoApply: true,
+          showCustomRangeLabel: true,
+				  locale: {
+            applyLabel: 'Submit',
+            cancelLabel: 'Clear',
+            fromLabel: 'From',
+            toLabel: 'To',
+            customRangeLabel: 'Custom',
+            daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+            monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            firstDay: 1
+				  }
+				};
+
+				$('#reportrange_right span').html(moment(startDate).format('MMMM D, YYYY') + ' - ' + moment(endDate).format('MMMM D, YYYY'));
+        document.getElementById('datetime').value = JSON.stringify([
+          moment(startDate).format('YYYY,MM,DD') + ',00,00,00',
+          moment(endDate).format('YYYY,MM,DD,HH,mm,ss')
+        ]);
+
+				$('#reportrange_right').daterangepicker(optionSet1, cb);
+
+				$('#reportrange_right').on('show.daterangepicker', function() {
+				  //console.log("show event fired");
+				});
+				$('#reportrange_right').on('hide.daterangepicker', function() {
+				  //console.log("hide event fired");
+				});
+				$('#reportrange_right').on('apply.daterangepicker', function(ev, picker) {
+				  //console.log("apply event fired, start/end dates are " + picker.startDate.format('MMMM D, YYYY') + " to " + picker.endDate.format('MMMM D, YYYY'));
+				  //console.log("apply event fired, start/end dates are " + picker.startDate.format('YYYY-MM-DD HH:mm:ss') + " to " + picker.endDate.format('MMMM D, YYYY'));
+          var datetimeList = [
+            picker.startDate.format('YYYY,MM,DD,HH,mm,ss'),
+            picker.endDate.format('YYYY,MM,DD,HH,mm,ss')
+          ];
+          document.getElementById('datetime').value = JSON.stringify(datetimeList);
+          // SET data
+				});
+				$('#reportrange_right').on('cancel.daterangepicker', function(ev, picker) {
+				  //console.log("cancel event fired");
+          document.getElementById('datetime').value = JSON.stringify([]);
+          // REMOVE data
+				});
+	  }
+	  init_daterangepicker_right("{{ start_date }}", "{{ end_date }}");
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col" role="main">
+  <div class="row">  <!-- start row -->
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel tile">
+        <div class="x_title">
+          <div class="x_title_left_div">
+            <h3>Work Time Machine</h3>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+
+          <form id="search" action="/work/search/work"
+            class="form-horizontal form-label-left" method="post">
+        <div class="x_content">  <!-- start x_content -->
+
+            <div class="col-md-12">
+                  <div class="item form-group">
+                    <label class="control-label col-md-1">
+                      Tunnel ID
+                    </label>
+                    <div class="col-md-3">
+                      <input type="text" id="tunnelId" name="tunnelId" value="{{ data.tunnel_id }}"
+                          class="form-control col-md-6 col-xs-6" >
+                    </div>
+
+                    <label class="control-label col-md-1">
+                      Tunnel
+                    </label>
+                    <div class="col-md-3">
+                      <select id="tunnel" name="tunnel" class="form-control">
+                        {% if data.tunnel == "100" %}
+                          <option id="10000" value="10000">ALL</option>
+                          <option id="100" value="100" selected>TH</option>
+                          <option id="101" value="101">B1</option>
+                          <option id="102" value="102">B2</option>
+                        {% elif data.tunnel == "101" %}
+                          <option id="10000" value="10000">ALL</option>
+                          <option id="100" value="100">TH</option>
+                          <option id="101" value="101" selected>B1</option>
+                          <option id="102" value="102">B2</option>
+                        {% elif data.tunnel == "102" %}
+                          <option id="10000" value="10000">ALL</option>
+                          <option id="100" value="100">TH</option>
+                          <option id="101" value="101">B1</option>
+                          <option id="102" value="102" selected>B2</option>
+                        {% else %}
+                          <option id="10000" value="10000" selected>ALL</option>
+                          <option id="100" value="100">TH</option>
+                          <option id="101" value="101">B1</option>
+                          <option id="102" value="102">B2</option>
+                        {% endif %}
+                      </select>
+                    </div>
+
+                    <label class="control-label col-md-1">
+                      Direction
+                    </label>
+                    <div class="col-md-3">
+                      <select id="direction" name="direction" class="form-control">
+                        {% if data.direction == "0"%}
+                          <option id="10000" value="10000">ALL</option>
+                          <option id="0" value="0" selected>EAST</option>
+                          <option id="1" value="1">WEST</option>
+                        {% elif data.direction == "1" %}
+                          <option id="10000" value="10000">ALL</option>
+                          <option id="0" value="0">EAST</option>
+                          <option id="1" value="1" selected>WEST</option>
+                        {% else %}
+                          <option id="10000" value="10000" selected>ALL</option>
+                          <option id="0" value="0">EAST</option>
+                          <option id="1" value="1">WEST</option>
+                        {% endif %}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="item form-group">
+                    <label class="control-label col-md-1">
+                      Date
+                    </label>
+                    <div class="col-md-11">
+                      <div id="reportrange_right" class="pull-left" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                        <span>December 30, 2014 - January 28, 2015</span> <b class="caret"></b>
+                      </div>
+                      <input type="hidden" id="datetime" name="datetime" value="[]"
+                          class="form-control col-md-6 col-xs-6" >
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <input id="page" name="page" type="hidden" value="0">
+                  </div>
+
+              <div style="text-align: right">
+                <button type="submit" class="btn btn-default">Search</button>
+              </div>
+            </div>
+
+        </div>  <!-- End x_content -->
+
+        <div class="x_content">  <!-- x_content 1 -->
+          <div class="ln_solid"></div>
+            <table id="pa-table" class="table table-striped projects">
+              <thead>
+                <tr>
+                  <th>
+                    <button type="button" class="btn btn-default btn-xs"
+                        onclick="search()"
+                        style="margin-bottom: 0;">
+                      Reset
+                    </button>
+                  </th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th>
+                    <button type="button" class="btn btn-default btn-xs"
+                        onclick="exportCsv('{{data.id}}', '{{ data.name }}', '{{data.group}}', '{{data.ap}}', '{{data.inout}}', '{{data.violation}}', '{{data.datetime}}')"
+                        style="margin-bottom: 0;">
+                      CSV Download
+                    </button>
+                  </th>
+                </tr>
+                <tr>
+                  <th></th>
+                  <th></th>
+                  <th>Tunnel</th>
+                  <th>Blasting Time</th>
+                  <th>Start</th>
+                  <th>Finish</th>
+                  <th>Actual L</th>
+                  <th>Total T</th>
+                  <th>Typ</th>
+                  <th>T</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% set tmp_dict = {} %}
+                {% for work in work_list.items %}
+                  <tr>
+                    <td>{{ data.tunnel_category[work.work.blast.tunnel.category] }}</td>
+                    <td>{{ data.tunnel_direction[work.work.blast.tunnel.direction] }}</td>
+                    <td>{{ work.work.blast.tunnel.tunnel_id }}</td>
+                    <td>{{ work.work.blast.blast_info_list[0].blasting_time }}</td>
+                    <td>{{ work.work.blast.blast_info_list[0].start_point }}</td>
+                    <td>{{ work.work.blast.blast_info_list[0].finish_point }}</td>
+                    <td>{{ work.work.blast.blast_info_list[0].blasting_length }}</td>
+                    <td>{{ work.work.blast.accum_time|secondToTimeFormat }}</td>
+                    <td>{{ data.activity_name[work.typ] }}</td>
+                    <td>{{ work.accum_time|secondToTimeFormat }}</td>
+                  </tr>
+                {% endfor %}
+                <tr>
+                  {% if work_list.has_prev %}
+                    <td style="text-align:left;">
+                      <input id="prev_num" name="prev_num" type="hidden" value="{{ work_list.prev_num }}">
+                      <button id="prev" type="submit" class="btn btn-default" onclick="handlePage('1')">Prev</button>
+                    </td>
+                  {% else %}
+                    <td></td>
+                  {% endif %}
+                  <td></td>
+                  <td></td>
+                  <td style="text-align:right;vertical-align:middle;">
+                    {% if work_list.has_next %} {{ work_list.page * 100 }} {% else %} {{ work_list.total }} {% endif %} / {{ work_list.total }}
+                  </td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  {% if work_list.has_next %}
+                    <td style="text-align:right;">
+                      <input id="next_num" name="next_num" type="hidden" value="{{ work_list.next_num }}">
+                      <button id="next" type="submit" class="btn btn-default" onclick="handlePage('2')">Next</button>
+                    </td>
+                  {% else %}
+                    <td></td>
+                  {% endif %}
+                </tr>
+              </tbody>
+            </table>
+        </div>  <!-- end x_content 1 -->
+        </form>
+      </div>  <!-- end x_panel -->
+    </div>
+
+  </div>  <!-- End row -->
+</div>
+
+{% endblock content %}

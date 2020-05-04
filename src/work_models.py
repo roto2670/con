@@ -38,7 +38,12 @@ class _Tunnel(db.Model):
 
   id = Column(String(75), primary_key=True)
   name = Column(String(75))
+  category = Column(Integer)
   direction = Column(Integer)
+  length = Column(Float)
+  tunnel_id = Column(String(75))
+  b_accum_length = Column(Float)
+  initial_b_time = Column(DateTime)
   x_loc = Column(Float)
   y_loc = Column(Float)
   width = Column(Float)
@@ -63,6 +68,9 @@ class _Blast(db.Model):
   height = Column(Float)
   state = Column(Integer)
   accum_time = Column(Integer)
+  m_accum_time = Column(Integer)
+  s_accum_time = Column(Integer)
+  i_accum_time = Column(Integer)
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
@@ -101,13 +109,23 @@ class _Work(db.Model):
   typ = Column(Integer)
   state = Column(Integer)
   accum_time = Column(Integer)
+  p_accum_time = Column(Integer)
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   blast_id = Column(String(75), ForeignKey('_blast.id'))
   work_history_list = relationship("_WorkHistory", backref="work",
+                                   cascade="all, delete",
+                                   order_by="desc(_WorkHistory.created_time)")
+  pause_history_list = relationship("_PauseHistory", backref="work",
                                     cascade="all, delete",
-                                    order_by="desc(_WorkHistory.created_time)")
+                                    order_by="desc(_PauseHistory.created_time)")
+  work_operator_list = relationship("_WorkOperator", backref="work",
+                                    cascade="all, delete",
+                                    order_by="asc(_WorkOperator.created_time)")
+  work_equipment_list = relationship("_WorkEquipment", backref="work",
+                                     cascade="all, delete",
+                                     order_by="asc(_WorkEquipment.created_time)")
 
 
 class _WorkHistory(db.Model):
@@ -123,3 +141,84 @@ class _WorkHistory(db.Model):
   last_updated_user = Column(String(75))
   work_id = Column(String(75), ForeignKey('_work.id'))
 
+
+class _PauseHistory(db.Model):
+  __tablename__ = '_pause_history'
+  __bind_key__ = 'smart_work'
+
+  id = Column(Integer, primary_key=True)
+  start_time = Column(DateTime)
+  end_time = Column(DateTime)
+  accum_time = Column(Integer)
+  message = Column(String(512))
+  created_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  work_id = Column(String(75), ForeignKey('_work.id'))
+
+
+class _Activity(db.Model):
+  __tablename__ = '_activity'
+  __bind_key__ = 'smart_work'
+
+  id = Column(Integer, primary_key=True)
+  name = Column(String(75))
+  category = Column(Integer)
+  order = Column(Integer)
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+
+
+class _Equipment(db.Model):
+  __tablename__ = '_equipment'
+  __bind_key__ = 'smart_work'
+
+  id = Column(Integer, primary_key=True)
+  name = Column(String(75))
+  category = Column(Integer)
+  equipment_id = Column(String(75))
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+
+
+class _Operator(db.Model):
+  __tablename__ = '_operator'
+  __bind_key__ = 'smart_work'
+
+  id = Column(Integer, primary_key=True)
+  name = Column(String(75))
+  operator_id = Column(String(75))
+  department = Column(String(75))
+  category = Column(Integer)
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+
+
+class _WorkOperator(db.Model):
+  __tablename__ = '_work_operator'
+  __bind_key__ = 'smart_work'
+
+  id = Column(Integer, primary_key=True)
+  operator_id = Column(String(75))
+  accum_time = Column(Integer)
+  p_accum_time = Column(Integer)
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  work_id = Column(String(75), ForeignKey('_work.id'))
+
+
+class _WorkEquipment(db.Model):
+  __tablename__ = '_work_equipment'
+  __bind_key__ = 'smart_work'
+
+  id = Column(Integer, primary_key=True)
+  equipment_id = Column(String(75))
+  accum_time = Column(Integer)
+  p_accum_time = Column(Integer)
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+  work_id = Column(String(75), ForeignKey('_work.id'))

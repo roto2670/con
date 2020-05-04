@@ -204,3 +204,7 @@ def during_time(value):
 
 def is_dict(value):
   return isinstance(value, dict)
+
+
+def second_to_time_format(value):
+  return str(datetime.timedelta(seconds=value))

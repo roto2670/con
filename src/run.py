@@ -51,6 +51,7 @@ def register_extensions(app):
   app.jinja_env.filters['usDateFormatOnlyDate'] = base.routes.change_us_format_for_date
   app.jinja_env.filters['duringTime'] = base.routes.during_time
   app.jinja_env.filters['isDict'] = base.routes.is_dict
+  app.jinja_env.filters['secondToTimeFormat'] = base.routes.second_to_time_format
 
 
 def register_blueprints(app):

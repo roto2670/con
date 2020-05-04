@@ -16,6 +16,7 @@ xunit.xml
 .test/
 _t/
 *.db
+*.rdb
 __pycache__
 backup_db
 
