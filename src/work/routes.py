@@ -357,8 +357,9 @@ def add_blast():
     blast_info_data = data['info']
     work_apis.create_blast_info(blast_info_data)
 
+    blast_data = work_apis.get_blast(blast_data['id'])
     send_request(BLAST_INFO_ADD, [blast_info_data])
-    send_request(BLAST_ADD, [blast_data])
+    send_request(BLAST_ADD, [_convert_dict_by_blast(blast_data)])
     return json.dumps(True)
   except:
     logging.exception("Fail to add blast.")
