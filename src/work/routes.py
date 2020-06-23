@@ -92,7 +92,7 @@ def _convert_dict_by_tunnel(data):
 
 
 def _convert_dict_by_blast(data):
-  return {
+  ret = {
       "id": data.id,
       "x_loc": data.x_loc,
       "y_loc": data.y_loc,
@@ -106,6 +106,11 @@ def _convert_dict_by_blast(data):
       "tunnel_id": data.tunnel_id,
       "blast_info": _convert_dict_by_blast_info(data.blast_info_list[0])
   }
+  work_list = []
+  for work in data.work_list:
+    work_list.append(_convert_dict_by_work(work))
+  ret['work_list'] = work_list
+  return ret
 
 
 def _convert_dict_by_blast_info(data):
