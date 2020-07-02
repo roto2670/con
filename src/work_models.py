@@ -222,3 +222,29 @@ class _WorkEquipment(db.Model):
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   work_id = Column(String(75), ForeignKey('_work.id'))
+
+
+class _Team(db.Model):
+  __tablename__ = '_team'
+  __bind_key__ = 'smart_work'
+
+  id = Column(Integer, primary_key=True)
+  category = Column(Integer)
+  name = Column(String(75))
+  engineer = Column(String(75))
+  member = Column(Integer)
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))
+
+
+class _Message(db.Model):
+  __tablename__ = '_message'
+  __bind_key__ = 'smart_work'
+
+  id = Column(Integer, primary_key=True)
+  category = Column(Integer)
+  message = Column(String(125))
+  created_time = Column(DateTime)
+  last_updated_time = Column(DateTime)
+  last_updated_user = Column(String(75))

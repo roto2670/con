@@ -28,6 +28,8 @@ from work_models import _Equipment as Equipment
 from work_models import _Operator as Operator
 from work_models import _WorkEquipment as WorkEquipment
 from work_models import _WorkOperator as WorkOperator
+from work_models import _Team as Team
+from work_models import _Message as Message
 
 
 def get_servertime():
@@ -628,3 +630,63 @@ def search(tunnel_id, tunnel, direction, datetime_list, next_num=None):
     return work_list
   except:
     logging.exception("Raise Error by Search.")
+
+
+def create_team(data):
+  cur_time = get_servertime()
+  data = Team(category=data['category'],
+              name=data['name'],
+              engineer=data['engineer'],
+              member=data['member'],
+              created_time=cur_time,
+              #last_updated_user=current_user.email,
+              last_updated_time=cur_time)
+  db.session.add(data)
+  db.session.commit()
+  return data
+
+
+def remove_team(_id):
+  ret = get_team(_id)
+  if ret:
+    db.session.delete(ret)
+    db.session.commit()
+
+
+def get_team(_id):
+  data = Team.query.filter_by(id=_id).one_or_none()
+  return data
+
+
+def get_all_team():
+  data_list = Team.query.all()
+  return data_list
+
+
+def create_message(data):
+  cur_time = get_servertime()
+  data = Message(category=data['category'],
+                 message=data['message'],
+                 created_time=cur_time,
+                 #last_updated_user=current_user.email,
+                 last_updated_time=cur_time)
+  db.session.add(data)
+  db.session.commit()
+  return data
+
+
+def remove_message(_id):
+  ret = get_message(_id)
+  if ret:
+    db.session.delete(ret)
+    db.session.commit()
+
+
+def get_message(_id):
+  data = Message.query.filter_by(id=_id).one_or_none()
+  return data
+
+
+def get_all_message():
+  data_list = Message.query.all()
+  return data_list
