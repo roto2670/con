@@ -55,6 +55,12 @@ WORK_OPERATOR_REMOVE = '''workoperator.removed'''
 WORK_EQUIPMENT_ADD = '''workequipment.added'''
 WORK_EQUIPMENT_UPDATE = '''workequipment.updated'''
 WORK_EQUIPMENT_REMOVE = '''workequipment.removed'''
+MESSAGE_ADD = '''message.added'''
+MESSAGE_UPDATE = '''message.updated'''
+MESSAGE_REMOVE = '''message.removed'''
+TEAM_ADD = '''team.added'''
+TEAM_UPDATE = '''team.updated'''
+TEAM_REMOVE = '''team.removed'''
 
 
 def _convert_dict_by_basepoint(data):
@@ -224,6 +230,24 @@ def _convert_dict_by_work_equipment(data):
     "accum_time": data.accum_time,
     "p_accum_time": data.p_accum_time,
     "work_id": data.work_id
+  }
+
+
+def _convert_dict_by_message(data):
+  return {
+      "id": data.id,
+      "category": data.category,
+      "message": data.message
+  }
+
+
+def _convert_dict_by_team(data):
+  return {
+      "id": data.id,
+      "category": data.category,
+      "name": data.name,
+      "engineer": data.engineer,
+      "member": data.member
   }
 
 
@@ -970,6 +994,34 @@ def get_operator_list():
     return json.dumps(ret_list)
 
 
+@blueprint.route('/message/get/list', methods=["GET"])
+#@util.require_login
+def get_message_list():
+  ret_list = []
+  try:
+    datas = work_apis.get_all_message()
+    for data in datas:
+      ret_list.append(_convert_dict_by_message(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to get message list.")
+    return json.dumps(ret_list)
+
+
+@blueprint.route('/team/get/list', methods=["GET"])
+#@util.require_login
+def get_team_list():
+  ret_list = []
+  try:
+    datas = work_apis.get_all_team()
+    for data in datas:
+      ret_list.append(_convert_dict_by_team(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to get team list.")
+    return json.dumps(ret_list)
+
+
 @blueprint.route('/equipment/info/get/list', methods=["GET"])
 #@util.require_login
 def get_eqiupment_info_list():
@@ -1287,3 +1339,59 @@ def route_reg_operator_create():
     }
     work_apis.create_operator(operator_data)
     return redirect("/work/reg/operator")
+
+
+@blueprint.route('/reg/team')
+#@util.require_login
+def route_reg_team():
+  team_list = work_apis.get_all_team()
+  return render_template("reg_team_list.html",
+                         team_list=team_list)
+
+
+@blueprint.route('/reg/team/create', methods=['GET', 'POST'])
+#@util.require_login
+def route_reg_team_create():
+  if request.method == "GET":
+    return render_template("create_team.html")
+  else:
+    # category = request.form['category']
+    category = 0
+    name = request.form['name']
+    engineer = request.form['engineer']
+    member = request.form['member']
+    team_data = {
+        "category": int(category),
+        "name": name,
+        "engineer": engineer,
+        "member": int(member)
+    }
+    data = work_apis.create_team(team_data)
+    send_request(TEAM_ADD, [_convert_dict_by_team(data)])
+    return redirect("/work/reg/team")
+
+
+@blueprint.route('/reg/message')
+#@util.require_login
+def route_reg_message():
+  message_list = work_apis.get_all_message()
+  return render_template("reg_message_list.html",
+                         message_list=message_list)
+
+
+@blueprint.route('/reg/message/create', methods=['GET', 'POST'])
+#@util.require_login
+def route_reg_message_create():
+  if request.method == "GET":
+    return render_template("create_message.html")
+  else:
+    # category = request.form['category']
+    category = 0
+    message = request.form['message']
+    message_data = {
+       "category": int(category),
+       "message": message
+    }
+    data = work_apis.create_message(message_data)
+    send_request(MESSAGE_ADD, [_convert_dict_by_message(data)])
+    return redirect("/work/reg/message")
