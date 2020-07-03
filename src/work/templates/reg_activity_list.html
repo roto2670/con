@@ -13,50 +13,122 @@
 {% block title %} Activity List {% endblock title %}
 
 {% block content %}
-  <div id="scroll-style-hidden" class="right_col" role="main">
+<div id="scroll-style-hidden" class="right_col" role="main">
     <div class="">
-      <!-- start row -->
-      <div class="row">
+        <!-- start row -->
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_content">
 
-        <div class="col-md-12 col-sm-12 col-xs-12">
-          <div class="x_panel">
-            <div class="x_content">
+                        <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+                            <div class="panel">
+                                <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion"
+                                    href="#main" aria-expanded="true" aria-controls="main">
+                                    <h3 class="panel-title">Main Work</h3>
+                                </a>
+                                <div id="main" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                    <div class="panel-body">
+                                        <table class="table table-striped projects">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Name</th>
+                                                    <th>Edit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for activity in activity_list %}
+                                                {% if activity.category == 0 %}
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{ activity.name }}</td>
+                                                    <td></td>
+                                                </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div> <!-- end main panel -->
 
-                <table class="table table-striped projects">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>Name</th>
-                      <th>Category</th>
-                      <th>Edit</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {% for activity in activity_list %}
-                    <tr>
-                      <td></td>
-                      <td>{{ activity.name }}</td>
-                      <td>{{ activity.category }}</td>
-                      <td></td>
-                    </tr>
-                  {% endfor %}
-                  </tbody>
-                </table>
+                            <div class="panel">
+                                <a class="panel-heading" role="tab" id="headingTwo" data-toggle="collapse" data-parent="#accordion"
+                                    href="#supporting" aria-expanded="true" aria-controls="supporting">
+                                    <h3 class="panel-title">Supporting Work</h3>
+                                </a>
+                                <div id="supporting" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                    <div class="panel-body">
+                                        <table class="table table-striped projects">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Name</th>
+                                                    <th>Edit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for activity in activity_list %}
+                                                {% if activity.category == 1 %}
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{ activity.name }}</td>
+                                                    <td></td>
+                                                </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div> <!-- end supporting panel -->
 
-              <div style="text-align: right">
-                <a href="/work/reg/activity/create">
-                  <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bs-example-modal-sm">Create</button>
-                </a>
-              </div>
+                            <div class="panel">
+                                <a class="panel-heading" role="tab" id="headingThree" data-toggle="collapse" data-parent="#accordion"
+                                    href="#idle" aria-expanded="true" aria-controls="idle">
+                                    <h3 class="panel-title">Idling Activity</h3>
+                                </a>
+                                <div id="idle" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                                    <div class="panel-body">
+                                        <table class="table table-striped projects">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Name</th>
+                                                    <th>Edit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for activity in activity_list %}
+                                                {% if activity.category == 2 %}
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{ activity.name }}</td>
+                                                    <td></td>
+                                                </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div> <!-- end idle panel -->
+                        </div>
 
-            </div>  <!-- end x_content -->
-          </div>  <!-- end x_panel -->
-        </div>
+                        <div style="text-align: right">
+                            <a href="/work/reg/activity/create">
+                                <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bs-example-modal-sm">Create</button>
+                            </a>
+                        </div>
 
-      </div>  <!-- End row -->
+                    </div>  <!-- end x_content -->
+                </div>  <!-- end x_panel -->
+            </div>
 
+        </div>  <!-- End row -->
     </div>
-  </div>
+</div>
 
 {% endblock content %}
 

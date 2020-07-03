@@ -87,13 +87,16 @@ class _BlastInfo(db.Model):
   __bind_key__ = 'smart_work'
 
   id = Column(String(75), primary_key=True)
-  explosive = Column(Float)
+  explosive_bulk = Column(Float)
+  explosive_cartridge = Column(Float)
   detonator = Column(Float)
   drilling_depth = Column(Float)
   blasting_time = Column(DateTime)
   start_point = Column(Float)
   finish_point = Column(Float)
   blasting_length = Column(Float)
+  team_id = Column(Integer)
+  team_nos = Column(Integer)
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
@@ -120,9 +123,6 @@ class _Work(db.Model):
   pause_history_list = relationship("_PauseHistory", backref="work",
                                     cascade="all, delete",
                                     order_by="desc(_PauseHistory.created_time)")
-  work_operator_list = relationship("_WorkOperator", backref="work",
-                                    cascade="all, delete",
-                                    order_by="asc(_WorkOperator.created_time)")
   work_equipment_list = relationship("_WorkEquipment", backref="work",
                                      cascade="all, delete",
                                      order_by="asc(_WorkEquipment.created_time)")
@@ -196,26 +196,13 @@ class _Operator(db.Model):
   last_updated_user = Column(String(75))
 
 
-class _WorkOperator(db.Model):
-  __tablename__ = '_work_operator'
-  __bind_key__ = 'smart_work'
-
-  id = Column(Integer, primary_key=True)
-  operator_id = Column(String(75))
-  accum_time = Column(Integer)
-  p_accum_time = Column(Integer)
-  created_time = Column(DateTime)
-  last_updated_time = Column(DateTime)
-  last_updated_user = Column(String(75))
-  work_id = Column(String(75), ForeignKey('_work.id'))
-
-
 class _WorkEquipment(db.Model):
   __tablename__ = '_work_equipment'
   __bind_key__ = 'smart_work'
 
   id = Column(Integer, primary_key=True)
   equipment_id = Column(String(75))
+  operator_id = Column(String(75))
   accum_time = Column(Integer)
   p_accum_time = Column(Integer)
   created_time = Column(DateTime)
