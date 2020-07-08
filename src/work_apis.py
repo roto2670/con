@@ -27,7 +27,6 @@ from work_models import _Activity as Activity
 from work_models import _Equipment as Equipment
 from work_models import _Operator as Operator
 from work_models import _WorkEquipment as WorkEquipment
-from work_models import _WorkOperator as WorkOperator
 from work_models import _Team as Team
 from work_models import _Message as Message
 
@@ -218,13 +217,16 @@ def get_all_blast():
 def create_blast_info(data):
   cur_time = get_servertime()
   data = BlastInfo(id=data['id'],
-                   explosive=data['explosive'],
+                   explosive_bulk=data['explosive_bulk'],
+                   explosive_cartridge=data['explosive_cartridge'],
                    detonator=data['detonator'],
                    drilling_depth=data['drilling_depth'],
                    blasting_time=None,
                    start_point=data['start_point'],
                    finish_point=data['finish_point'],
                    blasting_length=data['blasting_length'],
+                   team_id=data['team_id'],
+                   team_nos=data['team_nos'],
                    created_time=cur_time,
                    last_updated_time=cur_time,
                    #last_updated_user=current_user.email,
@@ -239,13 +241,16 @@ def update_blast_info(data):
   _id = data['id']
   cur_time = get_servertime()
   _data = get_blast_info(_id)
-  _data.explosive = data['explosive']
+  _data.explosive_bulk = data['explosive_bulk']
+  _data.explosive_cartridge = data['explosive_cartridge']
   _data.detonator = data['detonator']
   _data.drilling_depth = data['drilling_depth']
   _data.blasting_time = data['blasting_time']
   _data.start_point = data['start_point']
   _data.finish_point = data['finish_point']
   _data.blasting_length = data['blasting_length']
+  _data.team_id = data['team_id']
+  _data.team_nos = data['team_nos']
   _data.last_updated_time = cur_time
   db.session.commit()
   return _data
@@ -533,45 +538,10 @@ def get_all_operator():
   return data_list
 
 
-def create_work_operator(data):
-  cur_time = get_servertime()
-  data = WorkOperator(operator_id=data['operator_id'],
-                      accum_time=data['accum_time'],
-                      p_accum_time=data['p_accum_time'],
-                      created_time=cur_time,
-                      #last_updated_user=current_user.email,
-                      last_updated_time=cur_time,
-                      work_id=data['work_id'])
-  db.session.add(data)
-  db.session.commit()
-  return data
-
-
-def remove_work_operator(_id):
-  ret = get_work_operator(_id)
-  if ret:
-    db.session.delete(ret)
-    db.session.commit()
-
-
-def get_work_operator(_id):
-  data = WorkOperator.query.filter_by(id=_id).one_or_none()
-  return data
-
-
-def get_work_operator_list_by_work(work_id):
-  data = WorkOperator.query.filter_by(work_id=work_id).all()
-  return data
-
-
-def get_all_work_operator():
-  data_list = WorkOperator.query.all()
-  return data_list
-
-
 def create_work_equipment(data):
   cur_time = get_servertime()
   data = WorkEquipment(equipment_id=data['equipment_id'],
+                       operator_id=data['operator_id'],
                        accum_time=data['accum_time'],
                        p_accum_time=data['p_accum_time'],
                        created_time=cur_time,

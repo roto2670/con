@@ -2,65 +2,68 @@
 {% extends "base_site.html" %}
 
 {% block sidebar %}
-  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+<div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
     {% include "site_template/sidebar_progress.html" %}
-  </div>
+</div>
 {% endblock sidebar %}
 
 {% block title %} Activity {% endblock title %}
 
 {% block content %}
-  <div id="scroll-style-hidden" class="right_col" role="main">
+<div id="scroll-style-hidden" class="right_col" role="main">
     <div class="">
 
-      <div class="row">  <!-- start row -->
-        <div class="col-md-12 col-sm-12 col-xs-12">
-          <div class="x_panel tile">  <!-- start x_panel -->
+        <div class="row">  <!-- start row -->
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel tile">  <!-- start x_panel -->
 
-            <div class="x_title">
-              <h3>Create </h3>
-              <div class="clearfix"></div>
+                    <div class="x_title">
+                        <h3>Create </h3>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div class="x_content">  <!-- start x_content -->
+                        <br />
+                        <form class="form-horizontal form-label-left" method="post"
+                            action="/work/reg/activity/create">
+
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Name <span class="required">*</span>
+                                </label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <input type="text" id="name" name="name" required="required" maxlength="32"
+                                      onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g,'');" class="form-control col-md-7 col-xs-12">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">Category <span class="required">*</span>
+                                </label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <select class="form-control" id="category" name="category">
+                                    {% for key, value in activity_category.items() %}
+                                        <option id="{{ key }}" value="{{ key }}">{{ value }}</option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="ln_solid"></div>
+                            <div class="form-group">
+                                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                                    <a href="/work/reg/activity"><button class="btn btn-primary" type="button">Cancel</button></a>
+                                    <button type="submit" class="btn btn-success">Create</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>  <!-- end x_content-->
+
+                </div>  <!-- End x_panel -->
             </div>
-
-            <div class="x_content">  <!-- start x_content -->
-              <br />
-              <form class="form-horizontal form-label-left" method="post"
-                  action="/work/reg/activity/create">
-
-                <div class="form-group">
-                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Name <span class="required">*</span>
-                  </label>
-                  <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" id="name" name="name" required="required" maxlength="32"
-                        onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g,'');" class="form-control col-md-7 col-xs-12">
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Category <span class="required">*</span>
-                  </label>
-                  <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" id="category" name="category" required="required" maxlength="32"
-                        onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9\s]/g,'');" class="form-control col-md-7 col-xs-12">
-                  </div>
-                </div>
-
-                <div class="ln_solid"></div>
-                <div class="form-group">
-                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                    <a href="/work/reg/activity"><button class="btn btn-primary" type="button">Cancel</button></a>
-                    <button type="submit" class="btn btn-success">Create</button>
-                  </div>
-                </div>
-
-              </form>
-            </div>  <!-- end x_content-->
-
-          </div>  <!-- End x_panel -->
-        </div>
-      </div>  <!-- End row -->
+        </div>  <!-- End row -->
 
     </div>
-  </div>
+</div>
 
 {% endblock content %}

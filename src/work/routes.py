@@ -49,9 +49,6 @@ WORK_HISTORY_REMOVE = '''workhistory.removed'''
 PAUSE_HISTORY_ADD = '''pausehistory.added'''
 PAUSE_HISTORY_UPDATE = '''pausehistory.updated'''
 PAUSE_HISTORY_REMOVE = '''pausehistory.removed'''
-WORK_OPERATOR_ADD = '''workoperator.added'''
-WORK_OPERATOR_UPDATE = '''workoperator.updated'''
-WORK_OPERATOR_REMOVE = '''workoperator.removed'''
 WORK_EQUIPMENT_ADD = '''workequipment.added'''
 WORK_EQUIPMENT_UPDATE = '''workequipment.updated'''
 WORK_EQUIPMENT_REMOVE = '''workequipment.removed'''
@@ -122,13 +119,16 @@ def _convert_dict_by_blast(data):
 def _convert_dict_by_blast_info(data):
   return {
       "id": data.id,
-      "explosive": data.explosive,
+      "explosive_bulk": data.explosive_bulk,
+      "explosive_cartridge": data.explosive_cartridge,
       "detonator": data.detonator,
       "drilling_depth": data.drilling_depth,
       "blasting_time": str(data.blasting_time) if data.blasting_time else None,
       "start_point": data.start_point,
       "finish_point": data.finish_point,
       "blasting_length": data.blasting_length,
+      "team_id": data.team_id,
+      "team_nos": data.team_nos,
       "blast_id": data.blast_id
   }
 
@@ -152,10 +152,6 @@ def _convert_dict_by_work(data):
   for pause_history in data.pause_history_list:
     pause_list.append(_convert_dict_by_pause_history(pause_history))
   ret['pause_history_list'] = pause_list
-  work_operator_list = []
-  for work_operator in data.work_operator_list:
-    work_operator_list.append(_convert_dict_by_work_operator(work_operator))
-  ret['work_operator_list'] = work_operator_list
   work_equipment_list = []
   for work_equipment in data.work_equipment_list:
     work_equipment_list.append(_convert_dict_by_work_equipment(work_equipment))
@@ -213,20 +209,11 @@ def _convert_dict_by_operator(data):
   }
 
 
-def _convert_dict_by_work_operator(data):
-  return {
-    "id": data.id,
-    "operator_id": data.operator_id,
-    "accum_time": data.accum_time,
-    "p_accum_time": data.p_accum_time,
-    "work_id": data.work_id
-  }
-
-
 def _convert_dict_by_work_equipment(data):
   return {
     "id": data.id,
     "equipment_id": data.equipment_id,
+    "operator_id": data.operator_id,
     "accum_time": data.accum_time,
     "p_accum_time": data.p_accum_time,
     "work_id": data.work_id
@@ -1034,35 +1021,6 @@ def get_eqiupment_info_list():
     return json.dumps(ret_list)
 
 
-@blueprint.route('/work/operator/add', methods=["POST"])
-#@util.require_login
-def add_work_operator():
-  data = request.get_json()
-  try:
-    data = work_apis.create_work_operator(data)
-    send_request(WORK_OPERATOR_ADD, [_convert_dict_by_work_operator(data)])
-    return json.dumps(True)
-  except:
-    logging.exception("Fail to add work operator.")
-    return json.dumps(False)
-
-
-@blueprint.route('/work/operator/get/list/work', methods=["POST"])
-#@util.require_login
-def get_work_operator_by_work():
-  data = request.get_json()
-  work_id = data['work_id']
-  try:
-    datas = work_apis.get_work_operator_list_by_work(work_id)
-    ret_list = []
-    for data in datas:
-      ret_list.append(_convert_dict_by_work_operator(data))
-    return json.dumps(ret_list)
-  except:
-    logging.exception("Fail to add work operator.")
-    return json.dumps(False)
-
-
 @blueprint.route('/work/equipment/add', methods=["POST"])
 #@util.require_login
 def add_work_equipment():
@@ -1105,11 +1063,6 @@ def get_work_data_by_work():
     for data in e_datas:
       e_list.append(_convert_dict_by_work_equipment(data))
     ret_data['equipment'] = e_list
-    o_datas = work_apis.get_work_operator_list_by_work(work_id)
-    o_list = []
-    for data in o_datas:
-      o_list.append(_convert_dict_by_work_operator(data))
-    ret_data['operator'] = o_list
     return json.dumps(ret_data)
   except:
     logging.exception("Fail to add work data.")
@@ -1205,7 +1158,11 @@ TUNNEL_DIRECTION = {
     0: "EAST",
     1: "WEST"
 }
-
+ACTIVITY_CATEGORY = {
+    0: "Main Work",
+    1: "Supporting Work",
+    2: "Idling Activity"
+}
 
 @blueprint.route('/')
 #@util.require_login
@@ -1277,7 +1234,8 @@ def route_reg_activity():
 #@util.require_login
 def route_reg_activity_create():
   if request.method == "GET":
-    return render_template("create_activity.html")
+    return render_template("create_activity.html",
+                           activity_category=ACTIVITY_CATEGORY)
   else:
     name = request.form['name']
     category = request.form['category']
