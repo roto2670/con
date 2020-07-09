@@ -471,7 +471,8 @@ def create_operator(data):
   cur_time = get_servertime()
   data = Operator(name=data['name'],
                   operator_id=data['operator_id'],
-                  department=data['department'],
+                  # department=data['department'],
+                  category=data['category'],
                   created_time=cur_time,
                   #last_updated_user=current_user.email,
                   last_updated_time=cur_time)

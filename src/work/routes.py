@@ -1251,15 +1251,19 @@ def route_reg_activity_create():
 #@util.require_login
 def route_reg_equipment():
   equipment_list = work_apis.get_all_equipment()
+  equipment_info = dashboard.count.GADGET_INFO
   return render_template("reg_equipment_list.html",
-                         equipment_list=equipment_list)
+                         equipment_list=equipment_list,
+                         equipment_info=equipment_info)
 
 
 @blueprint.route('/reg/equipment/create', methods=['GET', 'POST'])
 #@util.require_login
 def route_reg_equipment_create():
   if request.method == "GET":
-    return render_template("create_equipment.html")
+    equipment_info = dashboard.count.GADGET_INFO
+    return render_template("create_equipment.html",
+                           equipment_info=equipment_info)
   else:
     name = request.form['name']
     category = request.form['category']
@@ -1277,23 +1281,29 @@ def route_reg_equipment_create():
 #@util.require_login
 def route_reg_operator():
   operator_list = work_apis.get_all_operator()
+  equipment_info = dashboard.count.GADGET_INFO
   return render_template("reg_operator_list.html",
-                         operator_list=operator_list)
+                         operator_list=operator_list,
+                         equipment_info=equipment_info)
 
 
 @blueprint.route('/reg/operator/create', methods=['GET', 'POST'])
 #@util.require_login
 def route_reg_operator_create():
   if request.method == "GET":
-    return render_template("create_operator.html")
+    equipment_info = dashboard.count.GADGET_INFO
+    return render_template("create_operator.html",
+                           equipment_info=equipment_info)
   else:
     name = request.form['name']
     operator_id = request.form['operatorId']
-    department = request.form['department']
+    category = request.form['category']
+    # department = request.form['department']
     operator_data = {
        "name": name,
        "operator_id" : operator_id,
-       "department": department
+       "category": int(category)
+      #  "department": department
     }
     work_apis.create_operator(operator_data)
     return redirect("/work/reg/operator")

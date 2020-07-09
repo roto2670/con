@@ -1,67 +1,78 @@
 {% extends "base_site.html" %}
 
 {% block sidebar %}
-  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
-    {% include "site_template/sidebar_progress.html" %}
-  </div>
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_progress.html" %}
+    </div>
 {% endblock sidebar %}
 
 {% block stylesheets %}
-  {{ super() }}
+    {{ super() }}
 {% endblock stylesheets %}
 
 {% block title %} Operator List {% endblock title %}
 
 {% block content %}
-  <div id="scroll-style-hidden" class="right_col" role="main">
+<div id="scroll-style-hidden" class="right_col" role="main">
     <div class="">
-      <!-- start row -->
-      <div class="row">
+        <!-- start row -->
+        <div class="row">
 
-        <div class="col-md-12 col-sm-12 col-xs-12">
-          <div class="x_panel">
-            <div class="x_content">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_content">
+                        <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+                        {% for key, value in equipment_info.items() %}
+                            <div class="panel">
+                                <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion"
+                                    href="#{{key}}" aria-expanded="true" aria-controls="main">
+                                    <h3 class="panel-title">{{ value }}</h3>
+                                </a>
+                                <div id="{{ key }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                    <div class="panel-body">
+                                        <table class="table table-striped projects">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Name</th>
+                                                    <th>Edit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for operator in operator_list %}
+                                                {% if operator.category == key|int %}
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{ operator.name }}</td>
+                                                    <td></td>
+                                                </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div> <!-- end jumboDrill panel -->
+                        {% endfor %}
+                        </div>  <!-- End accordion -->
 
-                <table class="table table-striped projects">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>Operator ID</th>
-                      <th>Name</th>
-                      <th>Department</th>
-                      <th>Edit</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {% for operator in operator_list %}
-                    <tr>
-                      <td></td>
-                      <td>{{ operator.operator_id }}</td>
-                      <td>{{ operator.name }}</td>
-                      <td>{{ operator.department }}</td>
-                      <td></td>
-                    </tr>
-                  {% endfor %}
-                  </tbody>
-                </table>
+                        <div style="text-align: right">
+                            <a href="/work/reg/operator/create">
+                                <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bs-example-modal-sm">Create</button>
+                            </a>
+                        </div>
 
-              <div style="text-align: right">
-                <a href="/work/reg/operator/create">
-                  <button type="button" class="btn btn-default" data-toggle="modal" data-target=".bs-example-modal-sm">Create</button>
-                </a>
-              </div>
+                    </div>  <!-- end x_content -->
+                </div>  <!-- end x_panel -->
+            </div>
 
-            </div>  <!-- end x_content -->
-          </div>  <!-- end x_panel -->
-        </div>
-
-      </div>  <!-- End row -->
+        </div>  <!-- End row -->
 
     </div>
-  </div>
+</div>
 
 {% endblock content %}
 
 {% block javascripts %}
-  {{ super() }}
+    {{ super() }}
 {% endblock javascripts %}
