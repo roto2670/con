@@ -245,22 +245,25 @@ def get_all_blast():
 
 def create_blast_info(data):
   cur_time = get_servertime()
-  data = BlastInfo(id=data['id'],
-                   explosive_bulk=data['explosive_bulk'],
-                   explosive_cartridge=data['explosive_cartridge'],
-                   detonator=data['detonator'],
-                   drilling_depth=data['drilling_depth'],
-                   blasting_time=None,
-                   start_point=data['start_point'],
-                   finish_point=data['finish_point'],
-                   blasting_length=data['blasting_length'],
-                   team_id=data['team_id'],
-                   team_nos=data['team_nos'],
-                   created_time=cur_time,
-                   last_updated_time=cur_time,
-                   #last_updated_user=current_user.email,
-                   blast_id=data['blast_id'])
-  db.session.add(data)
+  blasting_time = data['blasting_date'] + " " + data['blasting_time']
+  _data = BlastInfo(id=data['id'],
+                    explosive_bulk=data['explosive_bulk'],
+                    explosive_cartridge=data['explosive_cartridge'],
+                    detonator=data['detonator'],
+                    drilling_depth=data['drilling_depth'],
+                    blasting_time=blasting_time,
+                    start_point=data['start_point'],
+                    finish_point=data['finish_point'],
+                    blasting_length=data['blasting_length'],
+                    team_id=data['team_id'],
+                    team_nos=data['team_nos'],
+                    created_time=cur_time,
+                    last_updated_time=cur_time,
+                    #last_updated_user=current_user.email,
+                    blast_id=data['blast_id'])
+  db.session.add(_data)
+  blast_data = get_blast(data['blast_id'])
+  blast_data.blasting_time = blasting_time
   db.session.commit()
   return data
 
