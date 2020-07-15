@@ -1,0 +1,32 @@
+{% extends "base_site.html" %}
+
+{% block title %} License Expired {% endblock title %}
+
+{% block stylesheets %}
+  {{ super() }}
+{% endblock stylesheets %}
+
+{% block topSidebar %}{% endblock topSidebar%}
+{% block sidebar %}{% endblock sidebar %}
+{% block top_navigation %}{% endblock top_navigation %}
+
+{% block content %}
+  <div class="col-md-12 info_page">
+    <div class="col-middle">
+      <div class="text-center text-center">
+        <h1 class="error-number">License Expired</h1>
+        <!--<h2>License Expired</h2>-->
+        <h2>
+        <p>License has expired. Please contact administrator.
+        </p>
+        </h2>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block footer %}{% endblock footer %}
+
+{% block javascripts %}
+  {{ super() }}
+{% endblock javascripts %}

@@ -85,6 +85,13 @@ def route_errors(error):
   return render_template('errors/page_{}.html'.format(error))
 
 
+@blueprint.route('/expire/refresh')
+def route_expire_refresh():
+  util._refresh_expire()
+  return redirect('/')
+
+
+
 ## Errors
 
 
@@ -96,6 +103,11 @@ def unauthorized_handler():
 @blueprint.app_errorhandler(400)
 def bad_request(error):
   return render_template('errors/page_400.html'), 400
+
+
+@blueprint.app_errorhandler(401)
+def license_expired_request(error):
+  return render_template('errors/page_401.html'), 401
 
 
 @blueprint.app_errorhandler(403)
