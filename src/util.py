@@ -15,13 +15,16 @@
 
 import os
 import json
+import time
 import logging
 from copy import deepcopy
 from functools import wraps
 
 import redis
-from flask import redirect, request, session, url_for
+from flask import abort, redirect, request, session, url_for
 from flask_login import current_user
+
+T_CACHE = {'ept': 0, 'refresh': 0}  # {'ept' : 12313, 'refresh' : 28392}
 
 
 class Settings(object):
@@ -268,10 +271,31 @@ def get_ip_addr():
     return request.remote_addr
 
 
+def _refresh_expire():
+  path = os.path.join(get_res_path(), 'ept')
+  with open(path, 'r') as f:
+    _t = f.read()
+  T_CACHE['ept'] = int(_t)
+  T_CACHE['refresh'] = time.time() + 43200 # 12h
+  logging.info("Update Expire information. Info : %s", T_CACHE)
+
+
+def _is_expire():
+  if time.time() >= T_CACHE['refresh']:
+    _refresh_expire()
+  if time.time() >= T_CACHE['ept']:
+    logging.warning("License Expired. c : %s, ept : %s",
+                    time.time(), T_CACHE['ept'])
+    return True
+  return False
+
+
 def require_login(f):
   @wraps(f)
   def check_email_auth(*args, **kwargs):
-    if current_user is None:
+    if _is_expire():
+      return abort(401)
+    elif current_user is None:
       return redirect(url_for('login_blueprint.login', next=request.url))
     elif current_user.is_anonymous:
       return redirect(url_for('login_blueprint.login', next=request.url))
