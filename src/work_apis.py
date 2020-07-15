@@ -81,6 +81,8 @@ def create_tunnel(data):
   cur_time = get_servertime()
   data = Tunnel(id=data['id'],
                 name=data['name'],
+                section = data['section'],
+                part = data['part'],
                 category=data['category'],
                 direction=data['direction'],
                 length=data['length'],
@@ -139,6 +141,33 @@ def get_tunnel_list_by_basepoint(basepoint_id):
 def get_all_tunnel():
   data_list = Tunnel.query.all()
   return data_list
+
+
+def get_all_tunnel_for_csv():
+  ret = {
+      "C1": {},
+      "C2": {},
+      "C3": {}}
+  data_list = Tunnel.query.order_by(Tunnel.section).all()
+  for data in data_list:
+    for blast in data.blast_list:
+      if blast.blast_info_list[0].blasting_time:
+        ret[data.section][blast] = blast.blast_info_list[0].blasting_time.\
+            strftime("%Y-%m-%d, %H:%M:%S")
+      else:
+        ret[data.section][blast] = "0"
+  return ret
+
+
+def get_blast_list_for_csv(tunnel_id):
+  if tunnel_id:
+    blast_list = db.session.query(Blast).join(Tunnel).\
+        filter_by(tunnel_id=tunnel_id).\
+        order_by(Tunnel.section, Blast.blasting_time).all()
+  else:
+    blast_list = db.session.query(Blast).join(Tunnel).\
+        order_by(Tunnel.section, Blast.blasting_time).all()
+  return blast_list
 
 
 def create_blast(data):
@@ -252,6 +281,8 @@ def update_blast_info(data):
   _data.team_id = data['team_id']
   _data.team_nos = data['team_nos']
   _data.last_updated_time = cur_time
+  blast_data = get_blast(_data.blast_id)
+  blast_data.blasting_time = _data.blasting_time
   db.session.commit()
   return _data
 
@@ -596,7 +627,7 @@ def search(tunnel_id, tunnel, direction, datetime_list, next_num=None):
     filter_list.append(Tunnel.direction == direction)
   try:
     work_list = db.session.query(WorkHistory).filter(*t_filter_list).\
-        join(Work).join(Blast).join(Tunnel).filter_by(*filter_list).\
+        join(Work).join(Blast).join(Tunnel).filter(*filter_list).\
         paginate(int(next_num), 100, False)
     return work_list
   except:
@@ -661,3 +692,21 @@ def get_message(_id):
 def get_all_message():
   data_list = Message.query.all()
   return data_list
+
+
+def csv_work_log(tunnel_id, tunnel, direction, datetime_list):
+  st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
+  end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
+  filter_list = []
+  t_filter_list = [
+    WorkHistory.timestamp > st_date,
+    WorkHistory.timestamp < end_date
+  ]
+  if tunnel != 10000:
+    filter_list.append(Tunnel.category == tunnel)
+  if direction != 10000:
+    filter_list.append(Tunnel.direction == direction)
+  log_list = db.session.query(WorkHistory).filter(*t_filter_list). \
+              join(Work).join(Blast).join(Tunnel).filter(*filter_list). \
+              order_by(Tunnel.tunnel_id, WorkHistory.created_time).all()
+  return log_list

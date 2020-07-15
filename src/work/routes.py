@@ -13,11 +13,14 @@ import json
 import time
 import logging
 import requests
+import datetime
 from flask import request, render_template, redirect
+from flask import make_response
 
 import util
 import constants
 import work_apis
+import in_config_apis
 import dashboard.count
 from work import blueprint
 from constants import API_SERVER
@@ -58,6 +61,7 @@ MESSAGE_REMOVE = '''message.removed'''
 TEAM_ADD = '''team.added'''
 TEAM_UPDATE = '''team.updated'''
 TEAM_REMOVE = '''team.removed'''
+INIT_DATA = '''0'''
 
 
 def _convert_dict_by_basepoint(data):
@@ -75,6 +79,8 @@ def _convert_dict_by_tunnel(data):
   ret = {
       "id": data.id,
       "name": data.name,
+      "section": data.section,
+      "part": data.part,
       "category": data.category,
       "direction": data.direction,
       "length": data.length,
@@ -1163,6 +1169,49 @@ ACTIVITY_CATEGORY = {
     1: "Supporting Work",
     2: "Idling Activity"
 }
+CSV_INDEX = {
+    101: 2,
+    102: 3,
+    103: 4,
+    104: 5,
+    105: 6,
+    106: 7,
+    107: 8,
+    108: 9,
+    109: 10,
+    110: 11,
+    111: 12,
+    112: 1,
+    200: 1,
+    201: 2,
+    202: 3,
+    203: 4,
+    204: 5,
+    205: 6,
+    206: 7,
+    207: 8,
+    208: 9,
+    300: 1,
+    301: 2,
+    302: 3,
+    303: 4,
+    304: 5,
+    305: 6,
+    306: 7,
+    307: 8,
+    308: 9,
+    309: 10,
+    310: 11,
+}
+MAIN_TYPES = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]
+SUPPORTING_TYPES = [200, 201, 202, 203, 204, 205, 206, 207, 208]
+IDLE_TYPES = [300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310]
+TUNNEL_TYPE_STR = {
+    "C1": "Main Cavern 1",
+    "C2": "Main Cavern 2",
+    "C3": "Main Cavern 3"
+}
+
 
 @blueprint.route('/')
 #@util.require_login
@@ -1363,3 +1412,148 @@ def route_reg_message_create():
     data = work_apis.create_message(message_data)
     send_request(MESSAGE_ADD, [_convert_dict_by_message(data)])
     return redirect("/work/reg/message")
+
+
+@blueprint.route('/search/worklog/download', methods=["POST"])
+#@util.require_login
+def download_work_log():
+  tunnel_id = request.form.get('tunnel_id')
+  tunnel = request.form.get('tunnel')
+  direction = request.form.get('direction')
+  raw_datetime_list = request.form.get('datetime')
+  datetime_list = json.loads(raw_datetime_list)
+  work_log_list = work_apis.csv_work_log(tunnel_id, int(tunnel), int(direction),
+                                         datetime_list)
+
+  filename = "Work Search_{}".format(str(in_config_apis.get_servertime()))
+  csv_str = "\uFEFF"
+  csv_str += "Tunnel Type,Tunnel,Date,Time,Explosive Bulk,Explosive Cartridge,"\
+             "Detonator Qty,Drilling Depth,Start,Finish,Actual L(m),Date,Time,"\
+             "Overall A=(1-2),Excvt.T,Blst,VT,MU,Mc.SC,Mn.SC,MU-2,MP,"\
+             "WS,SCT,PH,B.CL,F.DR,Supporting,SC_Spraying,RB_Marking,"\
+             "RB_Drilling,RB_Injection,GT_Drilling,GT_Injection,GT_Curing,"\
+             "GT_Check Hole,CD_Core Drilling,Idle,TBM,Interference,Evacuation,"\
+             "Equipment B/D,Preperation,Resource not available,Shift Change,"\
+             "Explosive Delivery,No Work,Others\n"
+  ret_csv_str = csv_str_formatting(csv_str, work_log_list, tunnel_id)
+  return _get_download_csv_response(ret_csv_str, filename)
+
+
+def csv_str_formatting(csv_str, work_log_list, tunnel_id):
+  sorted_blast_list = work_apis.get_blast_list_for_csv(tunnel_id)
+
+  if not sorted_blast_list:
+    return csv_str
+
+  for _blast in sorted_blast_list:
+    blast_list = _blast.tunnel.blast_list
+    blast_index = blast_list.index(_blast)
+    blast_info = _blast.blast_info_list[0]
+    main_work_times = ["0" for index in range(13)]
+    support_times = ["0" for index in range(10)]
+    idle_times = ["0" for index in range(11)]
+    log_data_list = []
+    total_data_list = []
+    main_total_times = 0
+    support_total_times = 0
+    idle_total_times = 0
+
+    for log in work_log_list:
+      if log.work.blast.tunnel.id == _blast.tunnel.id and log.accum_time and \
+          log.work.blast.id == _blast.id:
+        if log.state == constants.WORK_STATE_FINISH:
+          if log.typ in MAIN_TYPES:
+            del main_work_times[CSV_INDEX[log.typ]]
+            main_work_times.insert(CSV_INDEX[log.typ],
+                                   second_to_time_format(log.accum_time))
+            main_total_times += log.accum_time
+          elif log.typ in SUPPORTING_TYPES:
+            del support_times[CSV_INDEX[log.typ]]
+            support_times.insert(CSV_INDEX[log.typ],
+                                 second_to_time_format(log.accum_time))
+            support_total_times += log.accum_time
+          elif log.typ in IDLE_TYPES:
+            del idle_times[CSV_INDEX[log.typ]]
+            idle_times.insert(CSV_INDEX[log.typ],
+                              second_to_time_format(log.accum_time))
+            idle_total_times += log.accum_time
+        log_data_list.append(log)
+
+    if main_total_times or support_total_times or idle_total_times:
+      del main_work_times[0]
+      del support_times[0]
+      del idle_times[0]
+      main_work_times.insert(0, second_to_time_format(main_total_times))
+      support_times.insert(0, second_to_time_format(support_total_times))
+      idle_times.insert(0, second_to_time_format(idle_total_times))
+      tunnel_type = _blast.tunnel.name[0:2]
+      total_data_list.append(TUNNEL_TYPE_STR[tunnel_type])
+      total_data_list.append(_blast.tunnel.tunnel_id)
+      if blast_info.blasting_time:
+        total_data_list.append(blast_info.
+                               blasting_time.strftime("%Y-%m-%d"))
+        total_data_list.append(blast_info.
+                               blasting_time.strftime("%I:%M %p"))
+      else:
+        total_data_list.append("")
+        total_data_list.append("")
+
+      if log_data_list:
+        total_data_list.append(str(blast_info.explosive_bulk))
+        total_data_list.append(str(blast_info.explosive_cartridge))
+        total_data_list.append(str(blast_info.detonator))
+        total_data_list.append(str(blast_info.drilling_depth))
+        total_data_list.append(str(blast_info.start_point))
+        total_data_list.append(str(blast_info.finish_point))
+        total_data_list.append(str(blast_info.blasting_length))
+      else:
+        for _index in range(6):
+          total_data_list.append(INIT_DATA)
+
+      #TODO: value set == overall indexing
+      if len(_blast.tunnel.blast_list) == 1:
+        total_data_list.append(INIT_DATA)  # Previous Blasting Date
+        total_data_list.append(INIT_DATA)  # Previous Blasting Time
+        total_data_list.append(INIT_DATA)  # Overall A=(1-2)
+      else:
+        if len(_blast.tunnel.blast_list) > blast_index + 1:
+          current_blasting_time = blast_list[blast_index].blast_info_list[0].\
+              blasting_time
+          pre_blasting_time = blast_list[blast_index + 1].blast_info_list[0].\
+              blasting_time
+          total_data_list.append(pre_blasting_time.strftime("%Y-%m-%d"))
+          total_data_list.append(pre_blasting_time.strftime("%I:%M %p"))
+          if current_blasting_time and pre_blasting_time:
+            overall = str(current_blasting_time - pre_blasting_time)
+            overall = overall.replace(",", ".")
+            total_data_list.append(overall[0:-3])
+          else:
+            total_data_list.append(INIT_DATA)
+        else:
+          total_data_list.append(INIT_DATA)
+          total_data_list.append(INIT_DATA)
+          total_data_list.append(INIT_DATA)
+
+      _row_string = ",".join(total_data_list)
+      work_time_str = ",".join(main_work_times)
+      support_time_str = ",".join(support_times)
+      idle_time_str = ",".join(idle_times)
+      csv_str += _row_string + "," + work_time_str + "," + support_time_str +\
+                 "," + idle_time_str + "," + "\n"
+  return csv_str
+
+
+def second_to_time_format(value):
+  time_data = str(datetime.timedelta(seconds=value))
+  ret = time_data[0:-3]
+  return ret
+
+
+def _get_download_csv_response(csv_str, filename):
+  resp = make_response(csv_str, 200)
+  resp.headers['Cache-Control'] = 'no-cache'
+  resp.headers['Content-Type'] = 'text/csv'
+  resp.headers['Content-Disposition'] = 'attachment; filename={}.csv'.\
+      format(filename)
+  resp.headers['Content-Length'] = len(csv_str)
+  return resp

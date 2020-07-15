@@ -38,6 +38,8 @@ class _Tunnel(db.Model):
 
   id = Column(String(75), primary_key=True)
   name = Column(String(75))
+  section = Column(String(75))
+  part = Column(String(75))
   category = Column(Integer)
   direction = Column(Integer)
   length = Column(Float)
@@ -71,6 +73,7 @@ class _Blast(db.Model):
   m_accum_time = Column(Integer)
   s_accum_time = Column(Integer)
   i_accum_time = Column(Integer)
+  blasting_time = Column(DateTime)
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
