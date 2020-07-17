@@ -52,12 +52,14 @@ def create_basepoint(data):
 
 def update_basepoint(data):
   # TODO:
-  _id = None
+  _id = data['id']
   cur_time = get_servertime()
-  data = get_basepoint(_id)
-  data.last_updated_time = cur_time
+  _data = get_basepoint(_id)
+  _data.name = data['name']
+  _data.last_updated_time = cur_time
+  # data.last_updated_user = current_user.email
   db.session.commit()
-  return data
+  return _data
 
 
 def remove_basepoint(_id):
@@ -353,6 +355,23 @@ def update_state_and_accum(work_id, state, accum_time, pause_time):
 def remove_work(_id):
   ret = get_work(_id)
   if ret:
+    blast_data = get_blast(ret.blast_id)
+    if ret.category == 0:
+      blast_data.m_accum_time -= ret.accum_time
+    elif ret.category == 1:
+      blast_data.s_accum_time -= ret.accum_time
+    else:
+      blast_data.i_accum_time -= ret.accum_time
+    blast_data.accum_time -= ret.accum_time
+    work_history_list = get_work_history_list_by_work(_id)
+    work_equipment_list = get_work_equipment_list_by_work(_id)
+    pause_history_list =  get_pause_history_list_by_work(_id)
+    for work_history in work_history_list:
+      db.session.delete(work_history)
+    for work_equipment in work_equipment_list:
+      db.session.delete(work_equipment)
+    for pause_history in pause_history_list:
+      db.session.delete(pause_history)
     db.session.delete(ret)
     db.session.commit()
 
@@ -415,6 +434,7 @@ def remove_work_history(_id):
 def get_work_history(_id):
   data = WorkHistory.query.filter_by(id=_id).one_or_none()
   return data
+
 
 def get_work_history_list_by_work(work_id):
   data_list = WorkHistory.query.filter_by(work_id=work_id).all()
@@ -542,18 +562,6 @@ def get_equipment(_id):
 def get_all_equipment():
   data_list = Equipment.query.all()
   return data_list
-
-
-def create_operator(data):
-  cur_time = get_servertime()
-  data = Operator(name=data['name'],
-                  operator_id=data['operator_id'],
-                  department=data['department'],
-                  created_time=cur_time,
-                  #last_updated_user=current_user.email,
-                  last_updated_time=cur_time)
-  db.session.add(data)
-  db.session.commit()
 
 
 def remove_operator(_id):

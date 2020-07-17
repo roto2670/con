@@ -304,7 +304,8 @@ def add_tunnel():
   data = request.get_json()
   try:
     work_apis.create_tunnel(data)
-    send_request(TUNNEL_ADD, [data])
+    send_data = work_apis.get_tunnel(data['id'])
+    send_request(TUNNEL_ADD, [_convert_dict_by_tunnel(send_data)])
     return json.dumps(True)
   except:
     logging.exception("Fail to add tunnel.")
@@ -548,6 +549,9 @@ def add_work():
     #  work_apis.create_work(data)
     work_apis.create_work(data)
     send_request(WORK_ADD, [data])
+    blast_data = work_apis.get_blast(data['blast_id'])
+    _blast_data = _convert_dict_by_blast(blast_data)
+    send_request(BLAST_UPDATE, [_blast_data])
     return json.dumps(True)
   except:
     logging.exception("Fail to add work.")
@@ -574,8 +578,12 @@ def update_work():
 def remove_work():
   data = request.get_json()
   try:
+    blast_id = work_apis.get_work(data['id']).blast_id
     work_apis.remove_work(data['id'])
     send_request(WORK_REMOVE, [data['id']])
+    blast_data = work_apis.get_blast(blast_id)
+    _blast_data = _convert_dict_by_blast(blast_data)
+    send_request(BLAST_UPDATE, [_blast_data])
     return json.dumps(True)
   except:
     logging.exception("Fail to remove work. id : %s", data['id'])
