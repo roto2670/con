@@ -889,7 +889,7 @@ def finish_work():
                                                      history_data['accum_time'],
                                                      pause_time)
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
-        if data['typ'] == 112:  # finish work
+        if data['typ'] == 114:  # finish work
           blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
                                                               history_data['accum_time'],
                                                               latest_work.category)
@@ -929,7 +929,7 @@ def finish_work():
                                                      pause_time)
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
         # TODO: handle blast data
-        if data['typ'] == 112:  # finish work
+        if data['typ'] == 114:  # finish work
           blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
                                                               history_data['accum_time'],
                                                               latest_work.category)
@@ -1133,7 +1133,10 @@ ACTIVITY_NAME = {
     109: "PROBHOLES",
     110: "BOTTOM CLEANING",
     111: "FACE DRILLING",
-    112: "BLASTING",
+    112: "SURVEYING & MARKING",
+    113: "CHARGING",
+    114: "BLASTING",
+    115: "UNDER CUT BREAKING",
     200: "SHOTCRETE",
     201: "ROCK BOLT MARKING",
     202: "ROCK BOLT DRILLING",
@@ -1170,18 +1173,21 @@ ACTIVITY_CATEGORY = {
     2: "Idling Activity"
 }
 CSV_INDEX = {
-    101: 2,
-    102: 3,
-    103: 4,
-    104: 5,
-    105: 6,
-    106: 7,
-    107: 8,
-    108: 9,
-    109: 10,
-    110: 11,
-    111: 12,
+    101: 4,
+    102: 5,
+    103: 6,
+    104: 7,
+    105: 8,
+    106: 9,
+    107: 10,
+    108: 11,
+    109: 12,
+    110: 13,
+    111: 14,
     112: 1,
+    113: 2,
+    114: 3,
+    115: 15,
     200: 1,
     201: 2,
     202: 3,
@@ -1203,7 +1209,8 @@ CSV_INDEX = {
     309: 10,
     310: 11,
 }
-MAIN_TYPES = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]
+MAIN_TYPES = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,
+              114, 115]
 SUPPORTING_TYPES = [200, 201, 202, 203, 204, 205, 206, 207, 208]
 IDLE_TYPES = [300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310]
 TUNNEL_TYPE_STR = {
@@ -1429,8 +1436,8 @@ def download_work_log():
   csv_str = "\uFEFF"
   csv_str += "Tunnel Type,Tunnel,Date,Time,Explosive Bulk,Explosive Cartridge,"\
              "Detonator Qty,Drilling Depth,Start,Finish,Actual L(m),Date,Time,"\
-             "Overall A=(1-2),Excvt.T,Blst,VT,MU,Mc.SC,Mn.SC,MU-2,MP,"\
-             "WS,SCT,PH,B.CL,F.DR,Supporting,SC_Spraying,RB_Marking,"\
+             "Overall A=(1-2),Excvt.T,SV&MK,CG,Blst,VT,MU,Mc.SC,Mn.SC,MU-2,MP,"\
+             "WS,SCT,PH,B.CL,F.DR,U.BK,Supporting,SC_Spraying,RB_Marking,"\
              "RB_Drilling,RB_Injection,GT_Drilling,GT_Injection,GT_Curing,"\
              "GT_Check Hole,CD_Core Drilling,Idle,TBM,Interference,Evacuation,"\
              "Equipment B/D,Preperation,Resource not available,Shift Change,"\
@@ -1449,7 +1456,7 @@ def csv_str_formatting(csv_str, work_log_list, tunnel_id):
     blast_list = _blast.tunnel.blast_list
     blast_index = blast_list.index(_blast)
     blast_info = _blast.blast_info_list[0]
-    main_work_times = ["0" for index in range(13)]
+    main_work_times = ["0" for index in range(16)]
     support_times = ["0" for index in range(10)]
     idle_times = ["0" for index in range(11)]
     log_data_list = []
@@ -1483,10 +1490,13 @@ def csv_str_formatting(csv_str, work_log_list, tunnel_id):
       del main_work_times[0]
       del support_times[0]
       del idle_times[0]
-      main_work_times.insert(0, second_to_time_format(main_total_times))
-      support_times.insert(0, second_to_time_format(support_total_times))
-      idle_times.insert(0, second_to_time_format(idle_total_times))
-      tunnel_type = _blast.tunnel.name[0:2]
+      main_work_times.insert(0, second_to_time_format(main_total_times).
+                             replace(",", "."))
+      support_times.insert(0, second_to_time_format(support_total_times).
+                           replace(",", "."))
+      idle_times.insert(0, second_to_time_format(idle_total_times).
+                        replace(",", "."))
+      tunnel_type = _blast.tunnel.section
       total_data_list.append(TUNNEL_TYPE_STR[tunnel_type])
       total_data_list.append(_blast.tunnel.tunnel_id)
       if blast_info.blasting_time:
