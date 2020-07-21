@@ -1,0 +1,70 @@
+<div class="left_col scroll-view">
+  {% if current_user.level != 0 %}
+    <script>
+      window.location.href = "/";
+    </script>
+  {% endif %}
+
+  <!-- sidebar menu -->
+  <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+    <div class="nav_title nav_sm_hidden sub_side_top_tile">
+      <div style="display: inline-block">
+        <i class="fa fa-pencil-square-o"></i>
+      </div>
+      <div style="display: inline-block">
+        Progress
+      </div>
+    </div>
+    <br>
+    <br>
+    <br>
+
+    <div class="menu_section">
+      <ul class="nav side-menu nav_sm_hidden">
+          <li>
+            <a href="/work">
+              <i class="fa fa-keyboard-o"></i>Tunnel Operation
+            </a>
+          </li>
+          <li>
+            <a href="/work/search/work">
+              <i class="fa fa-search"></i>Time Machine
+            </a>
+          </li>
+          <!--
+          <li>
+            <a href="/work/analyze">
+              <i class="fa fa-bar-chart"></i>Work Analyze
+            </a>
+          </li>
+          -->
+          <li>
+            <a href="/work/reg/activity">
+              <i class="fa fa-bars"></i>Activity Registration
+            </a>
+          </li>
+          <li>
+            <a href="/work/reg/equipment">
+              <i class="fa fa-bus"></i>Equipment Registration
+            </a>
+          </li>
+          <li>
+            <a href="/work/reg/operator">
+              <i class="fa fa-user"></i>Operator Registration
+            </a>
+          </li>
+          <li>
+            <a href="/work/reg/team">
+              <i class="fa fa-users"></i>Team Registration
+            </a>
+          </li>
+          <li>
+            <a href="/work/reg/message">
+              <i class="fa fa-edit"></i>Message Registration
+            </a>
+          </li>
+      </ul>
+    </div>
+  </div>
+
+</div>
