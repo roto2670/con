@@ -225,6 +225,8 @@ def update_blast_state_and_accum(blast_id, state, accum_time, category):
 def remove_blast(_id):
   ret = get_blast(_id)
   if ret:
+    blast_info = get_blast_info_by_blast(_id)
+    db.session.delete(blast_info)
     db.session.delete(ret)
     db.session.commit()
 

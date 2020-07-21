@@ -409,8 +409,12 @@ def update_blast():
 def remove_blast():
   data = request.get_json()
   try:
+    tunnel_id = work_apis.get_blast(data['id']).tunnel_id
     work_apis.remove_blast(data['id'])
     send_request(BLAST_REMOVE, [data['id']])
+    tunnel_data = work_apis.get_tunnel(tunnel_id)
+    _tunnel_data = _convert_dict_by_tunnel(tunnel_data)
+    send_request(TUNNEL_UPDATE, [_tunnel_data])
     return json.dumps(True)
   except:
     logging.exception("Fail to remove blast. id : %s", data['id'])
