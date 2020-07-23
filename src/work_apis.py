@@ -249,7 +249,10 @@ def get_all_blast():
 
 def create_blast_info(data):
   cur_time = get_servertime()
-  blasting_time = data['blasting_date'] + " " + data['blasting_time']
+  if data['blasting_date'] and data['blasting_time']:
+    blasting_time = data['blasting_date'] + " " + data['blasting_time']
+  else:
+    blasting_time = None
   _data = BlastInfo(id=data['id'],
                     explosive_bulk=data['explosive_bulk'],
                     explosive_cartridge=data['explosive_cartridge'],
