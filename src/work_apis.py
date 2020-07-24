@@ -30,6 +30,11 @@ from work_models import _WorkEquipment as WorkEquipment
 from work_models import _Team as Team
 from work_models import _Message as Message
 
+MAIN_TYPES = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,
+              114, 115]
+SUPPORTING_TYPES = [200, 201, 202, 203, 204, 205, 206, 207, 208]
+IDLE_TYPES = [300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310]
+
 
 def get_servertime():
   return datetime.datetime.now().replace(microsecond=0)
@@ -105,19 +110,31 @@ def create_tunnel(data):
 
 def update_tunnel(data):
   # TODO:
-  _id = None
+  _id = data['id']
   cur_time = get_servertime()
-  data = get_tunnel(_id)
-  data.last_updated_time = cur_time
+  _data = get_tunnel(_id)
+  _data.name = data['tunnelName']
+  _data.section = data['tunnelSection']
+  _data.part = data['tunnelPart']
+  _data.category = data['category']
+  _data.direction = data['tunnelDirection']
+  _data.length = data['tunnelLength']
+  _data.tunnel_id = data['tunnelId']
+  _data.x_loc = data['x_loc']
+  _data.y_loc = data['y_loc']
+  _data.width = data['width']
+  _data.height = data['height']
+  _data.last_updated_time = cur_time
   db.session.commit()
-  return data
+  return _data
 
 
 def update_tunnel_blast_info(_id, initial_b_time, blasting_length):
   cur_time = get_servertime()
   data = get_tunnel(_id)
   data.initial_b_time = initial_b_time
-  data.b_accum_length = blasting_length
+  #TODO
+  #data.b_accum_length = blasting_length
   data.last_updated_time = cur_time
   db.session.commit()
   return data
@@ -194,12 +211,21 @@ def create_blast(data):
 
 def update_blast(data):
   # TODO:
-  _id = None
+  _id = data['id']
   cur_time = get_servertime()
-  data = get_blast(_id)
-  data.last_updated_time = cur_time
+  _data = get_blast(_id)
+  _data.x_loc = data['x_loc']
+  _data.y_loc = data['y_loc']
+  _data.width = data['width']
+  _data.height = data['height']
+  _data.state = data['state']
+  _data.accum_time = data['accum_time']
+  _data.m_accum_time = data['m_accum_time']
+  _data.s_accum_time = data['i_accum_time']
+  _data.i_accum_time = data['s_accum_time']
+  _data.last_updated_time = cur_time
   db.session.commit()
-  return data
+  return _data
 
 
 def update_blast_state_and_accum(blast_id, state, accum_time, category):
@@ -337,9 +363,42 @@ def create_work(data):
 
 def update_work(data):
   # TODO:
-  _id = None
+  _id = data['id']
   cur_time = get_servertime()
   _data = get_work(_id)
+  _work_history_list = get_work_history_list_by_work(_id)
+  _blast_data = get_blast(data['blast_id'])
+  original_accum_time = 0
+  for _work_history in _work_history_list:
+    if _work_history.state == 1:
+      start_history = _work_history
+    elif _work_history.state == 2:
+      finish_history = _work_history
+      original_accum_time = finish_history.accum_time
+  if 'start_time' in data:
+    start_history.timestamp = datetime.datetime.\
+        fromtimestamp(data['start_time'])
+  if 'finish_time' in data:
+    finish_history.timestamp = datetime.datetime.\
+        fromtimestamp(data['finish_time'])
+
+  finish_history.accum_time = \
+      finish_history.timestamp.timestamp() - start_history.timestamp.timestamp()
+  _data.accum_time = finish_history.accum_time
+
+  if data['typ'] in MAIN_TYPES:
+    _blast_data.m_accum_time = _blast_data.m_accum_time - original_accum_time +\
+                               _data.accum_time
+  elif data['typ'] in SUPPORTING_TYPES:
+    _blast_data.s_accum_time = _blast_data.m_accum_time - original_accum_time +\
+                               _data.accum_time
+  elif data['typ'] in IDLE_TYPES:
+    _blast_data.i_accum_time = _blast_data.m_accum_time - original_accum_time +\
+                               _data.accum_time
+  _blast_data.accum_time = _blast_data.m_accum_time + _blast_data.s_accum_time \
+                           + _blast_data.i_accum_time
+  _data.category = data['category']
+  _data.state = data['state']
   _data.last_updated_time = cur_time
   db.session.commit()
   return _data
@@ -377,6 +436,8 @@ def remove_work(_id):
       db.session.delete(work_equipment)
     for pause_history in pause_history_list:
       db.session.delete(pause_history)
+    if ret.typ == 114:
+      blast_data.state = 1
     db.session.delete(ret)
     db.session.commit()
 
