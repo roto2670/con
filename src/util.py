@@ -20,6 +20,8 @@ import logging
 from copy import deepcopy
 from functools import wraps
 
+import in_apis
+
 import redis
 from flask import abort, redirect, request, session, url_for
 from flask_login import current_user
@@ -281,6 +283,8 @@ def _refresh_expire():
 
 
 def _is_expire():
+  if in_apis.is_authorized():
+    return False
   if time.time() >= T_CACHE['refresh']:
     _refresh_expire()
   if time.time() >= T_CACHE['ept']:
@@ -288,6 +292,10 @@ def _is_expire():
                     time.time(), T_CACHE['ept'])
     return True
   return False
+
+
+def get_expire_time():
+  return T_CACHE['ept']
 
 
 def require_login(f):

@@ -9,11 +9,13 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import time
 
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
 import util
+import in_apis
 from management import blueprint
 from management import organization
 from management import settings
@@ -151,5 +153,19 @@ def register_domain():
 def default_setting():
   return settings.default_route()
 
+
+# }}}
+
+
+# {{{ Settings
+
+
+@blueprint.route('/license', methods=['GET'])
+@util.require_login
+def license():
+  if in_apis.is_authorized():
+    return render_template("license_authorized.html")
+  else:
+    return render_template("license.html", expire=time.ctime(util.get_expire_time()))
 
 # }}}
