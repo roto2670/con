@@ -472,3 +472,13 @@ class _SubDomain(db.Model):
       if hasattr(value, '__iter__') and not isinstance(value, str):
         value = value[0]
       setattr(self, property, value)
+
+
+class _License(db.Model):
+  __tablename__ = '_license'
+
+  id = Column(Integer, primary_key=True)
+  key = Column(String(75))
+  authorized = Column(Boolean, default=False)
+  authorized_time = Column(DateTime)
+  authorized_ip = Column(String(75))

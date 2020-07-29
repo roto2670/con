@@ -11,6 +11,7 @@
 
 import json
 import uuid
+import hashlib
 import logging
 import datetime
 
@@ -43,6 +44,7 @@ from models import _SubDomain as SubDomain
 from models import _Domain as Domain
 from models import _ForkProduct as ForkProduct
 from models import _Permission as Permission
+from models import _License as License
 
 
 def get_datetime():
@@ -1126,3 +1128,43 @@ def has_domain_by_domain(domain_name):
 
 
 #}}}
+
+
+SALT = '''d4822b475f222b019287238a45ad5428'''
+KEY_LIST = [
+  '27f2d3b7c57a0c97ea08dba710ae8cb1',
+  '0569d232bb983a70f613ce4558e5140e',
+  '8d2c4c8503f0b0bc47aa1f0bc1f46283'
+]
+
+
+def is_authorized():
+  ret = License.query.all()
+  if not ret:
+    return False
+  else:
+    for license in ret:
+      if license.authorized:
+        return True
+    return False
+
+
+def _check_license(key):
+  enc = hashlib.md5()
+  enc.update(SALT.encode('utf8'))
+  enc.update(key.encode('utf8'))
+  ret = enc.hexdigest()
+  return ret in KEY_LIST
+
+
+def set_license(key):
+  if _check_license(key):
+    license = License(key=key,
+                      authorized=True,
+                      authorized_time=get_datetime(),
+                      authorized_ip=util.get_ip_addr())
+    db.session.add(license)
+    db.session.commit()
+    return True
+  else:
+    return False

@@ -1,0 +1,40 @@
+
+{% extends "base_site.html" %}
+{% block title %} License Authenticate {% endblock title %}
+
+{% block topSidebar %}{% endblock topSidebar%}
+{% block sidebar %}{% endblock sidebar %}
+{% block top_navigation %}{% endblock top_navigation %}
+
+{% block content %}
+  {% if error %}
+    <script>
+      window.alert("{{ msg }}");
+    </script>
+  {% endif %}
+  <div class="col-md-12 info_page">
+    <div class="col-middle">
+      <div class="text-center text-center">
+        <h1>Enter a license key</h1>
+        <br>
+        <form id="create" action="/authenticate"
+          class="form-horizontal form-label-left" method="post">
+          <div class="item form-group">
+              <label class="control-label col-md-4" for="key">
+                Key <span class="required">*</span>
+              </label>
+              <div class="col-md-4">
+                <input type="text" id="key" name="key" value=""
+                    class="form-control col-md-4 col-xs-4" required="required">
+              </div>
+          </div>
+          <div style="text-align: center">
+            <button type="submit" class="btn btn-default">Activate Now</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block footer %}{% endblock footer %}
