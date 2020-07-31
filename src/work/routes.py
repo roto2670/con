@@ -467,29 +467,32 @@ def add_blast_info():
 #@util.require_login
 def update_blast_info():
   data = request.get_json()
+  _blast_info = data['info']
+  _blast = data['blast']
   try:
-    old_info = work_apis.get_blast_info(data['id'])
+    old_info = work_apis.get_blast_info(_blast_info['id'])
     old_length = old_info.blasting_length
     old_b_time = old_info.blasting_time
 
-    ret = work_apis.update_blast_info(data)
-    resp_data = _convert_dict_by_blast_info(ret)
+    work_apis.update_blast_info(_blast_info)
+    ret = work_apis.update_blast(_blast)
+    resp_data = _convert_dict_by_blast(ret)
     send_request(BLAST_INFO_UPDATE, [resp_data])
 
-    init_b_time = ret.blast.tunnel.initial_b_time
-    blasting_length = ret.blast.tunnel.b_accum_length
+    init_b_time = ret.tunnel.initial_b_time
+    blasting_length = ret.tunnel.b_accum_length
     if not init_b_time:
       init_b_time = ret.blasting_time
     elif init_b_time == old_b_time:
       init_b_time = ret.blasting_time
 
     if int(old_length) != 0:
-      if old_length != data['blasting_length']:
+      if old_length != _blast_info['blasting_length']:
         blasting_length -= old_length
-        blasting_length += data['blasting_length']
+        blasting_length += _blast_info['blasting_length']
     else:
-      blasting_length += data['blasting_length']
-    t_ret = work_apis.update_tunnel_blast_info(ret.blast.tunnel.id,
+      blasting_length += _blast_info['blasting_length']
+    t_ret = work_apis.update_tunnel_blast_info(ret.tunnel.id,
                                                init_b_time, blasting_length)
     send_request(TUNNEL_UPDATE, [_convert_dict_by_tunnel(t_ret)])
     return json.dumps(True)
@@ -570,7 +573,9 @@ def update_work():
     # TODO:
     ret = work_apis.update_work(data)
     resp_data = _convert_dict_by_work(ret)
+    blast_data = work_apis.get_blast(ret.blast_id)
     send_request(WORK_UPDATE, [resp_data])
+    send_request(BLAST_UPDATE, [blast_data])
     return json.dumps(True)
   except:
     logging.exception("Fail to update work. id : %s", data['id'])
