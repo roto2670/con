@@ -151,6 +151,10 @@ def _convert_dict_by_work(data):
       "blast_id": data.blast_id
   }
   history_list = []
+  if len(data.work_history_list) == 2:
+    if data.work_history_list[0].state == 1:
+      data.work_history_list.append(data.work_history_list[0])
+      del data.work_history_list[0]
   for work_history in data.work_history_list:
     history_list.append(_convert_dict_by_work_history(work_history))
   ret['work_history_list'] = history_list
@@ -245,7 +249,7 @@ def _convert_dict_by_team(data):
 
 
 @blueprint.route('/basepoint/add', methods=["POST"])
-#@util.require_login
+@util.require_login
 def add_basepoint():
   data = request.get_json()
   try:
@@ -258,7 +262,7 @@ def add_basepoint():
 
 
 @blueprint.route('/basepoint/update', methods=["POST"])
-#@util.require_login
+@util.require_login
 def update_basepoint():
   data = request.get_json()
   try:
@@ -272,7 +276,7 @@ def update_basepoint():
 
 
 @blueprint.route('/basepoint/remove', methods=["POST"])
-#@util.require_login
+@util.require_login
 def remove_basepoint():
   data = request.get_json()
   try:
@@ -285,7 +289,7 @@ def remove_basepoint():
 
 
 @blueprint.route('/basepoint/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_basepoint_list():
   ret_list = []
   datas = work_apis.get_all_basepoint()
@@ -299,7 +303,7 @@ def get_basepoint_list():
 
 
 @blueprint.route('/tunnel/add', methods=["POST"])
-#@util.require_login
+@util.require_login
 def add_tunnel():
   data = request.get_json()
   try:
@@ -313,7 +317,7 @@ def add_tunnel():
 
 
 @blueprint.route('/tunnel/update', methods=["POST"])
-#@util.require_login
+@util.require_login
 def update_tunnel():
   data = request.get_json()
   try:
@@ -327,7 +331,7 @@ def update_tunnel():
 
 
 @blueprint.route('/tunnel/remove', methods=["POST"])
-#@util.require_login
+@util.require_login
 def remove_tunnel():
   data = request.get_json()
   try:
@@ -340,7 +344,7 @@ def remove_tunnel():
 
 
 @blueprint.route('/tunnel/get/list/basepoint', methods=["POST"])
-#@util.require_login
+@util.require_login
 def get_tunnel_list_by_basepoint():
   data = request.get_json()
   ret_list = []
@@ -355,7 +359,7 @@ def get_tunnel_list_by_basepoint():
 
 
 @blueprint.route('/tunnel/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_tunnel_list():
   ret_list = []
   datas = work_apis.get_all_tunnel()
@@ -369,7 +373,7 @@ def get_tunnel_list():
 
 
 @blueprint.route('/blast/add', methods=["POST"])
-#@util.require_login
+@util.require_login
 def add_blast():
   data = request.get_json()
   try:
@@ -381,8 +385,10 @@ def add_blast():
     work_apis.create_blast_info(blast_info_data)
 
     blast_data = work_apis.get_blast(blast_data['id'])
+    _tunnel_data = work_apis.get_tunnel(blast_data.tunnel_id)
     send_request(BLAST_INFO_ADD, [blast_info_data])
     send_request(BLAST_ADD, [_convert_dict_by_blast(blast_data)])
+    send_request(TUNNEL_UPDATE, [_convert_dict_by_tunnel(_tunnel_data)])
     return json.dumps(True)
   except:
     logging.exception("Fail to add blast.")
@@ -390,7 +396,7 @@ def add_blast():
 
 
 @blueprint.route('/blast/update', methods=["POST"])
-#@util.require_login
+@util.require_login
 def update_blast():
   data = request.get_json()
   try:
@@ -405,7 +411,7 @@ def update_blast():
 
 
 @blueprint.route('/blast/remove', methods=["POST"])
-#@util.require_login
+@util.require_login
 def remove_blast():
   data = request.get_json()
   try:
@@ -422,7 +428,7 @@ def remove_blast():
 
 
 @blueprint.route('/blast/get/list/tunnel', methods=["POST"])
-#@util.require_login
+@util.require_login
 def get_blast_list_by_tunnel():
   data = request.get_json()
   ret_list = []
@@ -437,7 +443,7 @@ def get_blast_list_by_tunnel():
 
 
 @blueprint.route('/blast/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_blast_list():
   ret_list = []
   datas = work_apis.get_all_blast()
@@ -451,7 +457,7 @@ def get_blast_list():
 
 
 @blueprint.route('/blastinfo/add', methods=["POST"])
-#@util.require_login
+@util.require_login
 def add_blast_info():
   data = request.get_json()
   try:
@@ -464,7 +470,7 @@ def add_blast_info():
 
 
 @blueprint.route('/blastinfo/update', methods=["POST"])
-#@util.require_login
+@util.require_login
 def update_blast_info():
   data = request.get_json()
   _blast_info = data['info']
@@ -502,7 +508,7 @@ def update_blast_info():
 
 
 @blueprint.route('/blastinfo/remove', methods=["POST"])
-#@util.require_login
+@util.require_login
 def remove_blast_info():
   data = request.get_json()
   try:
@@ -515,7 +521,7 @@ def remove_blast_info():
 
 
 @blueprint.route('/blastinfo/get/blast', methods=["POST"])
-#@util.require_login
+@util.require_login
 def get_blast_info_by_blast():
   data = request.get_json()
   try:
@@ -527,7 +533,7 @@ def get_blast_info_by_blast():
 
 
 @blueprint.route('/blastinfo/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_blast_info_list():
   ret_list = []
   datas = work_apis.get_all_blast_info()
@@ -541,7 +547,7 @@ def get_blast_info_list():
 
 
 @blueprint.route('/work/add', methods=["POST"])
-#@util.require_login
+@util.require_login
 def add_work():
   data = request.get_json()
   try:
@@ -565,8 +571,94 @@ def add_work():
     return json.dumps(False)
 
 
+@blueprint.route('/work/add/completed', methods=["POST"])
+@util.require_login
+def add_completed_work():
+  data = request.get_json()
+  try:
+    #TODO: send : work -> blast -> start -> finish
+    work_apis.create_work(data)
+    send_request(WORK_ADD, [data])
+    blast_data = work_apis.get_blast(data['blast_id'])
+    _blast_data = _convert_dict_by_blast(blast_data)
+    send_request(BLAST_UPDATE, [_blast_data])
+    _create_start_work_log(data)
+    _create_finish_work_log(data)
+
+    return json.dumps(True)
+  except:
+    logging.exception("Fail to add work.")
+    return json.dumps(False)
+
+
+def _create_start_work_log(data):
+  try:
+    history_data = {
+        'typ': data['typ'],
+        'work_id': data['id']
+    }
+    latest_work = work_apis.get_latest_work_by_blast(data['blast_id'],
+                                                     data['typ'])
+    if latest_work and latest_work.work_history_list:
+      _data = latest_work.work_history_list[0]
+      # Start work History
+      history_data['state'] = WORK_STATE_IN_PROGRESS
+      history_data['timestamp'] = data['start_time']
+      history_data['accum_time'] = 0
+      _data = work_apis.create_complete_start_work_history(history_data)
+      send_request(WORK_HISTORY_ADD,
+                   [_convert_dict_by_work_history(_data)])
+    else:
+      # Init data
+      history_data['state'] = WORK_STATE_IN_PROGRESS
+      history_data['timestamp'] = data['start_time']
+      history_data['accum_time'] = 0
+      pause_time = 0
+      _data = work_apis.create_complete_start_work_history(history_data)
+      send_request(WORK_HISTORY_ADD,
+                  [_convert_dict_by_work_history(_data)])
+  except:
+    logging.exception("Failed to start work. Data : %s", data)
+
+
+def _create_finish_work_log(data):
+  try:
+    history_data = {
+        'typ': data['typ'],
+        'work_id': data['id']
+    }
+    latest_work = work_apis.get_latest_work_by_blast(data['blast_id'],
+                                                     data['typ'])
+    if latest_work and latest_work.work_history_list:
+      _data = latest_work.work_history_list[0]
+      # Finish work history
+      history_data['state'] = WORK_STATE_FINISH
+      history_data['timestamp'] = data['finish_time']
+      history_data['accum_time'] = data['accum_time']
+      _data = work_apis.create_complete_finish_work_history(history_data)
+      send_request(WORK_HISTORY_ADD,
+                   [_convert_dict_by_work_history(_data)])
+      pause_time = 0
+      work_data = work_apis.update_state_and_accum(data['id'],
+                                                   history_data['state'],
+                                                   history_data['accum_time'],
+                                                   pause_time)
+      send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
+      if data['typ'] == 114:  # finish work
+        blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
+                                                            history_data['accum_time'],
+                                                            latest_work.category)
+      else:
+        blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 1,
+                                                            history_data['accum_time'],
+                                                            latest_work.category)
+      send_request(BLAST_UPDATE, [_convert_dict_by_blast(blast_data)])
+  except:
+    logging.exception("Failed to stop work. Data : %s", data)
+
+
 @blueprint.route('/work/update', methods=["POST"])
-#@util.require_login
+@util.require_login
 def update_work():
   data = request.get_json()
   try:
@@ -583,7 +675,7 @@ def update_work():
 
 
 @blueprint.route('/work/remove', methods=["POST"])
-#@util.require_login
+@util.require_login
 def remove_work():
   data = request.get_json()
   try:
@@ -600,7 +692,7 @@ def remove_work():
 
 
 @blueprint.route('/work/get/list/blast', methods=["POST"])
-#@util.require_login
+@util.require_login
 def get_work_list_by_blast():
   data = request.get_json()
   ret_list = []
@@ -615,7 +707,7 @@ def get_work_list_by_blast():
 
 
 @blueprint.route('/work/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_work_list():
   ret_list = []
   try:
@@ -629,7 +721,7 @@ def get_work_list():
 
 
 @blueprint.route('/workhistory/add', methods=["POST"])
-#@util.require_login
+@util.require_login
 def add_work_history():
   data = request.get_json()
   try:
@@ -642,7 +734,7 @@ def add_work_history():
 
 
 @blueprint.route('/workhistory/update', methods=["POST"])
-#@util.require_login
+@util.require_login
 def update_work_history():
   data = request.get_json()
   try:
@@ -658,7 +750,7 @@ def update_work_history():
 
 
 @blueprint.route('/workhistory/remove', methods=["POST"])
-#@util.require_login
+@util.require_login
 def remove_work_history():
   data = request.get_json()
   try:
@@ -671,7 +763,7 @@ def remove_work_history():
 
 
 @blueprint.route('/workhistory/get/list/work', methods=["POST"])
-#@util.require_login
+@util.require_login
 def get_work_history_list_by_work():
   data = request.get_json()
   ret_list = []
@@ -686,7 +778,7 @@ def get_work_history_list_by_work():
 
 
 @blueprint.route('/workhistory/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_work_history_list():
   ret_list = []
   try:
@@ -700,7 +792,7 @@ def get_work_history_list():
 
 
 @blueprint.route('/pausehistory/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_pause_history_list():
   data = request.get_json()
   ret_list = []
@@ -715,7 +807,7 @@ def get_pause_history_list():
 
 
 @blueprint.route('/pausehistory/get/list/work', methods=["POST"])
-#@util.require_login
+@util.require_login
 def get_pause_history_list_by_work():
   data = request.get_json()
   ret_list = []
@@ -730,7 +822,7 @@ def get_pause_history_list_by_work():
 
 
 @blueprint.route('/work/start', methods=["POST"])
-#@util.require_login
+@util.require_login
 def start_work():
   """
   data = {'id': str, 'category': int, 'typ': int, 'blast_id': str}
@@ -801,7 +893,7 @@ def start_work():
 
 
 @blueprint.route('/work/stop', methods=["POST"])
-#@util.require_login
+@util.require_login
 def stop_work():
   """
   data = {'id': str, 'category': int, 'typ': int, 'blast_id': str}
@@ -859,7 +951,7 @@ def stop_work():
 
 
 @blueprint.route('/work/finish', methods=["POST"])
-#@util.require_login
+@util.require_login
 def finish_work():
   """
   data = {'id': str, 'category': int, 'typ': int, 'blast_id': str}
@@ -963,7 +1055,7 @@ def finish_work():
 
 
 @blueprint.route('/activity/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_activity_list():
   ret_list = []
   try:
@@ -977,7 +1069,7 @@ def get_activity_list():
 
 
 @blueprint.route('/equipment/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_equipment_list():
   ret_list = []
   try:
@@ -991,7 +1083,7 @@ def get_equipment_list():
 
 
 @blueprint.route('/operator/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_operator_list():
   ret_list = []
   try:
@@ -1005,7 +1097,7 @@ def get_operator_list():
 
 
 @blueprint.route('/message/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_message_list():
   ret_list = []
   try:
@@ -1019,7 +1111,7 @@ def get_message_list():
 
 
 @blueprint.route('/team/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_team_list():
   ret_list = []
   try:
@@ -1033,7 +1125,7 @@ def get_team_list():
 
 
 @blueprint.route('/equipment/info/get/list', methods=["GET"])
-#@util.require_login
+@util.require_login
 def get_eqiupment_info_list():
   ret_list = []
   try:
@@ -1045,7 +1137,7 @@ def get_eqiupment_info_list():
 
 
 @blueprint.route('/work/equipment/add', methods=["POST"])
-#@util.require_login
+@util.require_login
 def add_work_equipment():
   data = request.get_json()
   try:
@@ -1058,7 +1150,7 @@ def add_work_equipment():
 
 
 @blueprint.route('/work/equipment/get/list/work', methods=["POST"])
-#@util.require_login
+@util.require_login
 def get_work_equipment_by_work():
   data = request.get_json()
   work_id = data['work_id']
@@ -1074,7 +1166,7 @@ def get_work_equipment_by_work():
 
 
 @blueprint.route('/work/workdata/get/list/work', methods=["POST"])
-#@util.require_login
+@util.require_login
 def get_work_data_by_work():
   # Return by work operator and work equipment
   data = request.get_json()
@@ -1238,7 +1330,7 @@ TUNNEL_TYPE_STR = {
 
 
 @blueprint.route('/')
-#@util.require_login
+@util.require_login
 def route_default():
   return render_template("work_home.html")
 
@@ -1290,13 +1382,13 @@ def get_work_search_page():
 
 
 @blueprint.route('/analyze')
-#@util.require_login
+@util.require_login
 def route_analyze():
   return render_template("work_analyze.html")
 
 
 @blueprint.route('/reg/activity')
-#@util.require_login
+@util.require_login
 def route_reg_activity():
   activity_list = work_apis.get_all_activity()
   return render_template("reg_activity_list.html",
@@ -1304,7 +1396,7 @@ def route_reg_activity():
 
 
 @blueprint.route('/reg/activity/create', methods=['GET', 'POST'])
-#@util.require_login
+@util.require_login
 def route_reg_activity_create():
   if request.method == "GET":
     return render_template("create_activity.html",
@@ -1321,7 +1413,7 @@ def route_reg_activity_create():
 
 
 @blueprint.route('/reg/equipment')
-#@util.require_login
+@util.require_login
 def route_reg_equipment():
   equipment_list = work_apis.get_all_equipment()
   equipment_info = dashboard.count.GADGET_INFO
@@ -1331,7 +1423,7 @@ def route_reg_equipment():
 
 
 @blueprint.route('/reg/equipment/create', methods=['GET', 'POST'])
-#@util.require_login
+@util.require_login
 def route_reg_equipment_create():
   if request.method == "GET":
     equipment_info = dashboard.count.GADGET_INFO
@@ -1351,7 +1443,7 @@ def route_reg_equipment_create():
 
 
 @blueprint.route('/reg/operator')
-#@util.require_login
+@util.require_login
 def route_reg_operator():
   operator_list = work_apis.get_all_operator()
   equipment_info = dashboard.count.GADGET_INFO
@@ -1361,7 +1453,7 @@ def route_reg_operator():
 
 
 @blueprint.route('/reg/operator/create', methods=['GET', 'POST'])
-#@util.require_login
+@util.require_login
 def route_reg_operator_create():
   if request.method == "GET":
     equipment_info = dashboard.count.GADGET_INFO
@@ -1383,7 +1475,7 @@ def route_reg_operator_create():
 
 
 @blueprint.route('/reg/team')
-#@util.require_login
+@util.require_login
 def route_reg_team():
   team_list = work_apis.get_all_team()
   return render_template("reg_team_list.html",
@@ -1391,7 +1483,7 @@ def route_reg_team():
 
 
 @blueprint.route('/reg/team/create', methods=['GET', 'POST'])
-#@util.require_login
+@util.require_login
 def route_reg_team_create():
   if request.method == "GET":
     return render_template("create_team.html")
@@ -1413,7 +1505,7 @@ def route_reg_team_create():
 
 
 @blueprint.route('/reg/message')
-#@util.require_login
+@util.require_login
 def route_reg_message():
   message_list = work_apis.get_all_message()
   return render_template("reg_message_list.html",
@@ -1421,7 +1513,7 @@ def route_reg_message():
 
 
 @blueprint.route('/reg/message/create', methods=['GET', 'POST'])
-#@util.require_login
+@util.require_login
 def route_reg_message_create():
   if request.method == "GET":
     return render_template("create_message.html")
@@ -1439,7 +1531,7 @@ def route_reg_message_create():
 
 
 @blueprint.route('/search/worklog/download', methods=["POST"])
-#@util.require_login
+@util.require_login
 def download_work_log():
   tunnel_id = request.form.get('tunnel_id')
   tunnel = request.form.get('tunnel')

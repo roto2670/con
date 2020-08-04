@@ -29,6 +29,7 @@ from work_models import _Operator as Operator
 from work_models import _WorkEquipment as WorkEquipment
 from work_models import _Team as Team
 from work_models import _Message as Message
+from constants import WORK_STATE_STOP, WORK_STATE_IN_PROGRESS, WORK_STATE_FINISH
 
 MAIN_TYPES = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,
               114, 115]
@@ -49,8 +50,8 @@ def create_basepoint(data):
                    width=data['width'],
                    height=data['height'],
                    created_time=cur_time,
-                   last_updated_time=cur_time)
-                   #last_updated_user=current_user.email)
+                   last_updated_time=cur_time,
+                   last_updated_user=current_user.email)
   db.session.add(data)
   db.session.commit()
 
@@ -102,7 +103,7 @@ def create_tunnel(data):
                 height=data['height'],
                 created_time=cur_time,
                 last_updated_time=cur_time,
-                #last_updated_user=current_user.email,
+                last_updated_user=current_user.email,
                 basepoint_id=data['basepoint_id'])
   db.session.add(data)
   db.session.commit()
@@ -203,7 +204,7 @@ def create_blast(data):
                i_accum_time=data['s_accum_time'],
                created_time=cur_time,
                last_updated_time=cur_time,
-               #last_updated_user=current_user.email,
+               last_updated_user=current_user.email,
                tunnel_id=data['tunnel_id'])
   db.session.add(data)
   db.session.commit()
@@ -292,7 +293,7 @@ def create_blast_info(data):
                     team_nos=data['team_nos'],
                     created_time=cur_time,
                     last_updated_time=cur_time,
-                    #last_updated_user=current_user.email,
+                    last_updated_user=current_user.email,
                     blast_id=data['blast_id'])
   db.session.add(_data)
   blast_data = get_blast(data['blast_id'])
@@ -355,7 +356,7 @@ def create_work(data):
               p_accum_time=data['p_accum_time'],
               created_time=cur_time,
               last_updated_time=cur_time,
-              #last_updated_user=current_user.email,
+              last_updated_user=current_user.email,
               blast_id=data['blast_id'])
   db.session.add(data)
   db.session.commit()
@@ -473,7 +474,37 @@ def create_work_history(data):
                      timestamp=data['timestamp'],
                      accum_time=data['accum_time'],
                      created_time=cur_time,
-                     #last_updated_user=current_user.email,
+                     last_updated_user=current_user.email,
+                     work_id=data['work_id'])
+  db.session.add(data)
+  db.session.commit()
+  return data
+
+
+def create_complete_start_work_history(data):
+  cur_time = get_servertime()
+  start_time = datetime.datetime.fromtimestamp(int(data['timestamp']))
+  data = WorkHistory(typ=data['typ'],
+                     state=WORK_STATE_IN_PROGRESS,
+                     timestamp=start_time,
+                     accum_time=data['accum_time'],
+                     created_time=cur_time,
+                     last_updated_user=current_user.email,
+                     work_id=data['work_id'])
+  db.session.add(data)
+  db.session.commit()
+  return data
+
+
+def create_complete_finish_work_history(data):
+  cur_time = get_servertime()
+  finish_time = datetime.datetime.fromtimestamp(int(data['timestamp']))
+  data = WorkHistory(typ=data['typ'],
+                     state=WORK_STATE_FINISH,
+                     timestamp=finish_time,
+                     accum_time=data['accum_time'],
+                     created_time=cur_time,
+                     last_updated_user=current_user.email,
                      work_id=data['work_id'])
   db.session.add(data)
   db.session.commit()
@@ -519,7 +550,7 @@ def create_pause_history(data):
                       accum_time=data['accum_time'],
                       message=data['message'],
                       created_time=cur_time,
-                      #last_updated_user=current_user.email,
+                      last_updated_user=current_user.email,
                       work_id=data['work_id'])
   db.session.add(data)
   db.session.commit()
@@ -564,7 +595,7 @@ def create_activity(data):
   data = Activity(name=data['name'],
                   category=data['category'],
                   created_time=cur_time,
-                  #last_updated_user=current_user.email,
+                  last_updated_user=current_user.email,
                   last_updated_time=cur_time)
   db.session.add(data)
   db.session.commit()
@@ -594,7 +625,7 @@ def create_operator(data):
                   # department=data['department'],
                   category=data['category'],
                   created_time=cur_time,
-                  #last_updated_user=current_user.email,
+                  last_updated_user=current_user.email,
                   last_updated_time=cur_time)
   db.session.add(data)
   db.session.commit()
@@ -607,7 +638,7 @@ def create_equipment(data):
                    category=data['category'],
                    equipment_id=data['equipment_id'],
                    created_time=cur_time,
-                   #last_updated_user=current_user.email,
+                   last_updated_user=current_user.email,
                    last_updated_time=cur_time)
   db.session.add(data)
   db.session.commit()
@@ -654,7 +685,7 @@ def create_work_equipment(data):
                        accum_time=data['accum_time'],
                        p_accum_time=data['p_accum_time'],
                        created_time=cur_time,
-                       #last_updated_user=current_user.email,
+                       last_updated_user=current_user.email,
                        last_updated_time=cur_time,
                        work_id=data['work_id'])
   db.session.add(data)
@@ -718,7 +749,7 @@ def create_team(data):
               engineer=data['engineer'],
               member=data['member'],
               created_time=cur_time,
-              #last_updated_user=current_user.email,
+              last_updated_user=current_user.email,
               last_updated_time=cur_time)
   db.session.add(data)
   db.session.commit()
@@ -747,7 +778,7 @@ def create_message(data):
   data = Message(category=data['category'],
                  message=data['message'],
                  created_time=cur_time,
-                 #last_updated_user=current_user.email,
+                 last_updated_user=current_user.email,
                  last_updated_time=cur_time)
   db.session.add(data)
   db.session.commit()
