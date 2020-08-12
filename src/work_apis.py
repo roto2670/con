@@ -63,7 +63,7 @@ def update_basepoint(data):
   _data = get_basepoint(_id)
   _data.name = data['name']
   _data.last_updated_time = cur_time
-  # data.last_updated_user = current_user.email
+  data.last_updated_user = current_user.email
   db.session.commit()
   return _data
 
@@ -244,7 +244,7 @@ def update_blast_state_and_accum(blast_id, state, accum_time, category):
     # Idle Time
     data.i_accum_time += accum_time
   data.last_updated_time = cur_time
-  #_data.last_updated_user = currrent_user.email
+  _data.last_updated_user = currrent_user.email
   db.session.commit()
   return data
 
@@ -383,18 +383,17 @@ def update_work(data):
     finish_history.timestamp = datetime.datetime.\
         fromtimestamp(data['finish_time'])
 
-  finish_history.accum_time = \
-      finish_history.timestamp.timestamp() - start_history.timestamp.timestamp()
-  _data.accum_time = finish_history.accum_time
+  finish_history.accum_time = data['finish_time'] - data['start_time']
+  _data.accum_time = data['finish_time'] - data['start_time']
 
   if data['typ'] in MAIN_TYPES:
     _blast_data.m_accum_time = _blast_data.m_accum_time - original_accum_time +\
                                _data.accum_time
   elif data['typ'] in SUPPORTING_TYPES:
-    _blast_data.s_accum_time = _blast_data.m_accum_time - original_accum_time +\
-                               _data.accum_time
+    _blast_data.s_accum_time = _blast_data.s_accum_time - original_accum_time +\
+                                _data.accum_time
   elif data['typ'] in IDLE_TYPES:
-    _blast_data.i_accum_time = _blast_data.m_accum_time - original_accum_time +\
+    _blast_data.i_accum_time = _blast_data.i_accum_time - original_accum_time +\
                                _data.accum_time
   _blast_data.accum_time = _blast_data.m_accum_time + _blast_data.s_accum_time \
                            + _blast_data.i_accum_time
@@ -412,7 +411,7 @@ def update_state_and_accum(work_id, state, accum_time, pause_time):
   data.accum_time = accum_time
   data.p_accum_time = pause_time
   data.last_updated_time = cur_time
-  #_data.last_updated_user = currrent_user.email
+  data.last_updated_user = currrent_user.email
   db.session.commit()
   return data
 
@@ -631,6 +630,16 @@ def create_operator(data):
   db.session.commit()
 
 
+def update_operator(data):
+  cur_time = get_servertime()
+  _data = get_operator(data['id'])
+  _data.name = data['name']
+  _data.category = data['category']
+  _data.operator_id = data['operator_id']
+  _data.last_updated_time = cur_time
+  _data.last_updated_user = current_user.email
+  db.session.commit()
+
 
 def create_equipment(data):
   cur_time = get_servertime()
@@ -641,6 +650,17 @@ def create_equipment(data):
                    last_updated_user=current_user.email,
                    last_updated_time=cur_time)
   db.session.add(data)
+  db.session.commit()
+
+
+def update_equipment(data):
+  cur_time = get_servertime()
+  _data = get_equipment(data['id'])
+  _data.name = data['name']
+  _data.category = data['category']
+  _data.equipment_id = data['equipment_id']
+  _data.last_updated_time = cur_time
+  _data.last_updated_user = current_user.email
   db.session.commit()
 
 
@@ -756,6 +776,17 @@ def create_team(data):
   return data
 
 
+def update_team(data):
+  cur_time = get_servertime()
+  _data = get_team(data['id'])
+  _data.name = data['name']
+  _data.engineer = data['engineer']
+  _data.member = data['member']
+  _data.last_updated_time = cur_time
+  _data.last_updated_user = current_user.email
+  db.session.commit()
+
+
 def remove_team(_id):
   ret = get_team(_id)
   if ret:
@@ -783,6 +814,15 @@ def create_message(data):
   db.session.add(data)
   db.session.commit()
   return data
+
+
+def update_message(data):
+  cur_time = get_servertime()
+  _data = get_message(data['id'])
+  _data.message = data['message']
+  _data.last_updated_time = cur_time
+  _data.last_updated_user = current_user.email
+  db.session.commit()
 
 
 def remove_message(_id):

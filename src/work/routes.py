@@ -666,8 +666,9 @@ def update_work():
     ret = work_apis.update_work(data)
     resp_data = _convert_dict_by_work(ret)
     blast_data = work_apis.get_blast(ret.blast_id)
+    _blast_data = _convert_dict_by_blast(blast_data)
     send_request(WORK_UPDATE, [resp_data])
-    send_request(BLAST_UPDATE, [blast_data])
+    send_request(BLAST_UPDATE, [_blast_data])
     return json.dumps(True)
   except:
     logging.exception("Fail to update work. id : %s", data['id'])
@@ -915,7 +916,8 @@ def stop_work():
         history_data['state'] = WORK_STATE_STOP
         history_data['timestamp'] = work_apis.get_servertime()
         work_time = history_data['timestamp'] - _data.timestamp
-        history_data['accum_time'] = _data.accum_time + work_time.seconds
+        history_data['accum_time'] = _data.accum_time + \
+                                     int(work_time.total_seconds())
         _data = work_apis.create_work_history(history_data)
         send_request(WORK_HISTORY_ADD,
                      [_convert_dict_by_work_history(_data)])
@@ -974,7 +976,8 @@ def finish_work():
         history_data['state'] = WORK_STATE_FINISH
         history_data['timestamp'] = work_apis.get_servertime()
         work_time = history_data['timestamp'] - _data.timestamp
-        history_data['accum_time'] = _data.accum_time + work_time.seconds
+        history_data['accum_time'] = _data.accum_time + \
+                                     int(work_time.total_seconds())
         _data = work_apis.create_work_history(history_data)
         send_request(WORK_HISTORY_ADD,
                      [_convert_dict_by_work_history(_data)])
@@ -1422,6 +1425,29 @@ def route_reg_equipment():
                          equipment_info=equipment_info)
 
 
+@blueprint.route('/reg/equipment/edit/<eid>', methods=['GET', 'POST'])
+@util.require_login
+def route_reg_equipment_edit(eid):
+  if request.method == "GET":
+    equipment_info = dashboard.count.GADGET_INFO
+    equipment_data = work_apis.get_equipment(eid)
+    return render_template("edit_equipment.html",
+                           equipment_data=equipment_data,
+                           equipment_info=equipment_info)
+  else:
+    name = request.form['name']
+    category = request.form['category']
+    equipment_id = request.form['equipment_id']
+    equipment_data = {
+       "id": eid,
+       "name": name,
+       "equipment_id" : equipment_id,
+       "category": int(category)
+    }
+    work_apis.update_equipment(equipment_data)
+    return redirect("/work/reg/equipment")
+
+
 @blueprint.route('/reg/equipment/create', methods=['GET', 'POST'])
 @util.require_login
 def route_reg_equipment_create():
@@ -1450,6 +1476,29 @@ def route_reg_operator():
   return render_template("reg_operator_list.html",
                          operator_list=operator_list,
                          equipment_info=equipment_info)
+
+
+@blueprint.route('/reg/operator/edit/<oid>', methods=['GET', 'POST'])
+@util.require_login
+def route_reg_operator_edit(oid):
+  if request.method == "GET":
+    equipment_info = dashboard.count.GADGET_INFO
+    operator_data = work_apis.get_operator(oid)
+    return render_template("edit_operator.html",
+                           operator_data=operator_data,
+                           equipment_info=equipment_info)
+  else:
+    name = request.form['name']
+    category = request.form['category']
+    operator_id = request.form['operator_id']
+    operator_data = {
+       "id": oid,
+       "name": name,
+       "operator_id" : operator_id,
+       "category": int(category)
+    }
+    work_apis.update_operator(operator_data)
+    return redirect("/work/reg/operator")
 
 
 @blueprint.route('/reg/operator/create', methods=['GET', 'POST'])
@@ -1504,12 +1553,50 @@ def route_reg_team_create():
     return redirect("/work/reg/team")
 
 
+@blueprint.route('/reg/team/edit/<tid>', methods=['GET', 'POST'])
+# @util.require_login
+def route_reg_team_edit(tid):
+  if request.method == "GET":
+    team_data = work_apis.get_team(tid)
+    return render_template("edit_team.html",
+                           team_data=team_data)
+  else:
+    name = request.form['name']
+    engineer = request.form['engineer']
+    member = request.form['member']
+    team_data = {
+       "id": tid,
+       "name": name,
+       "engineer" : engineer,
+       "member": int(member)
+    }
+    work_apis.update_team(team_data)
+    return redirect("/work/reg/team")
+
+
 @blueprint.route('/reg/message')
 @util.require_login
 def route_reg_message():
   message_list = work_apis.get_all_message()
   return render_template("reg_message_list.html",
                          message_list=message_list)
+
+
+@blueprint.route('/reg/message/edit/<mid>', methods=['GET', 'POST'])
+@util.require_login
+def route_reg_message_edit(mid):
+  if request.method == "GET":
+    message_data = work_apis.get_message(mid)
+    return render_template("edit_message.html",
+                           message_data=message_data)
+  else:
+    message = request.form['message']
+    message_data = {
+       "id": mid,
+       "message": message
+    }
+    work_apis.update_message(message_data)
+    return redirect("/work/reg/message")
 
 
 @blueprint.route('/reg/message/create', methods=['GET', 'POST'])
