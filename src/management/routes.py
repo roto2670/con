@@ -164,7 +164,11 @@ def default_setting():
 @util.require_login
 def license():
   if in_apis.is_authorized():
-    return render_template("license_authorized.html")
+    expire_time = in_apis.get_expire_time()
+    if expire_time:
+      return render_template("license.html", expire=time.ctime(expire_time))
+    else:
+      return render_template("license_authorized.html")
   else:
     return render_template("license.html", expire=time.ctime(util.get_expire_time()))
 

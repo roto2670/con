@@ -273,16 +273,30 @@ def get_ip_addr():
     return request.remote_addr
 
 
+def refresh_expire():
+  _refresh_expire()
+
+
 def _refresh_expire():
-  path = os.path.join(get_res_path(), 'ept')
-  with open(path, 'r') as f:
-    _t = f.read()
-  T_CACHE['ept'] = int(_t)
-  T_CACHE['refresh'] = time.time() + 43200 # 12h
-  logging.info("Update Expire information. Info : %s", T_CACHE)
+  if in_apis.is_authorized():
+    expire_time = in_apis.get_expire_time()
+    T_CACHE['ept'] = expire_time
+    T_CACHE['refresh'] = time.time() + 43200 # 12h
+    logging.info("Authorized update Expire information. Info : %s", T_CACHE)
+  else:
+    path = os.path.join(get_res_path(), 'ept')
+    with open(path, 'r') as f:
+      _t = f.read()
+    T_CACHE['ept'] = int(_t)
+    T_CACHE['refresh'] = time.time() + 43200 # 12h
+    logging.info("Not Authoriezed update Expire information. Info : %s",
+                 T_CACHE)
 
 
 def _is_expire():
+  if True:
+    # TODO: Unconditional acceptance
+    return False
   if in_apis.is_authorized():
     return False
   if time.time() >= T_CACHE['refresh']:

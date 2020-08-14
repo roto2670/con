@@ -479,6 +479,7 @@ class _License(db.Model):
 
   id = Column(Integer, primary_key=True)
   key = Column(String(75))
+  expire_time = Column(Integer)
   authorized = Column(Boolean, default=False)
   authorized_time = Column(DateTime)
   authorized_ip = Column(String(75))
