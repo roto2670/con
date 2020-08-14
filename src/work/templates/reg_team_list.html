@@ -39,6 +39,13 @@
                                     <td>{{ team.name }}</td>
                                     <td>{{ team.engineer }}</td>
                                     <td>{{ team.member }}</td>
+                                    <td>
+                                      <a href="team/edit/{{ team.id }}">
+                                        <button type="button" class="btn-info btn-xs">
+                                          Edit
+                                        </button>
+                                      </a>
+                                    </td>
                                     <td></td>
                                 </tr>
                             {% endfor %}

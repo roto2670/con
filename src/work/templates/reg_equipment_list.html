@@ -45,7 +45,14 @@
                                                 <tr>
                                                     <td></td>
                                                     <td>{{ equipment.name }}</td>
-                                                    <td>{{ equipment.eqiupment_id }}</td>
+                                                    <td>{{ equipment.equipment_id }}</td>
+                                                    <td>
+                                                      <a href="equipment/edit/{{ equipment.id }}">
+                                                        <button type="button" class="btn-info btn-xs">
+                                                          Edit
+                                                        </button>
+                                                      </a>
+                                                    </td>
                                                     <td></td>
                                                 </tr>
                                                 {% endif %}

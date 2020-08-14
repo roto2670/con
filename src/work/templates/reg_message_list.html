@@ -33,6 +33,13 @@
                                 <tr>
                                     <td></td>
                                     <td>{{ message.message }}</td>
+                                    <td>
+                                    <a href="message/edit/{{ message.id }}">
+                                        <button type="button" class="btn-info btn-xs">
+                                          Edit
+                                        </button>
+                                    </a>
+                                    </td>
                                     <td></td>
                                 </tr>
                             {% endfor %}
