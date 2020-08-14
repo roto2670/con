@@ -94,13 +94,15 @@ def route_expire_refresh():
 @blueprint.route('/authenticate', methods=['GET', 'POST'])
 def authenticate():
   if in_apis.is_authorized():
-    return redirect('/management/license')
+    if not in_apis.get_expire_time():
+      return redirect('/management/license')
   if request.method == "GET":
     return render_template('authenticate.html', error=False, msg="")
   else:
     key = request.form['key']
     ret = in_apis.set_license(key)
     if ret:
+      util.refresh_expire()
       return redirect('/management/license')
     else:
       return render_template('authenticate.html', error=True, msg="Invalid Key")

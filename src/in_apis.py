@@ -1131,11 +1131,14 @@ def has_domain_by_domain(domain_name):
 
 
 SALT = '''d4822b475f222b019287238a45ad5428'''
-KEY_LIST = [
+NO_LIMIT_KEY_LIST = [
   '27f2d3b7c57a0c97ea08dba710ae8cb1',
   '0569d232bb983a70f613ce4558e5140e',
   '8d2c4c8503f0b0bc47aa1f0bc1f46283'
 ]
+ONE_YEAR_KEY_LIST = {
+  '79197a640e52a6741321b25d51305ab3': 1625083199 # UAE time 2021/06/30 23:59:59
+}
 
 
 def is_authorized():
@@ -1149,17 +1152,62 @@ def is_authorized():
     return False
 
 
-def _check_license(key):
+def get_expire_time():
+  ret = License.query.all()
+  if not ret:
+    return None
+  else:
+    for license in ret:
+      return license.expire_time
+    return None
+
+
+def _check_no_limit_license(key):
   enc = hashlib.md5()
   enc.update(SALT.encode('utf8'))
   enc.update(key.encode('utf8'))
   ret = enc.hexdigest()
-  return ret in KEY_LIST
+  return ret in NO_LIMIT_KEY_LIST
+
+
+def _check_limit_license(key):
+  enc = hashlib.md5()
+  enc.update(SALT.encode('utf8'))
+  enc.update(key.encode('utf8'))
+  ret = enc.hexdigest()
+  return ret in ONE_YEAR_KEY_LIST
+
+
+def _get_expire_time(key):
+  enc = hashlib.md5()
+  enc.update(SALT.encode('utf8'))
+  enc.update(key.encode('utf8'))
+  ret = enc.hexdigest()
+  return ONE_YEAR_KEY_LIST[ret]
+
+
+def _clear_license():
+  ret = License.query.all()
+  for license in ret:
+    db.session.delete(license)
+  db.session.commit()
 
 
 def set_license(key):
-  if _check_license(key):
+  if _check_no_limit_license(key):
+    _clear_license()
     license = License(key=key,
+                      expire_time=0,
+                      authorized=True,
+                      authorized_time=get_datetime(),
+                      authorized_ip=util.get_ip_addr())
+    db.session.add(license)
+    db.session.commit()
+    return True
+  elif _check_limit_license(key):
+    _clear_license()
+    license = License(key=key,
+                      expire_time=_get_expire_time(key),
                       authorized=True,
                       authorized_time=get_datetime(),
                       authorized_ip=util.get_ip_addr())
