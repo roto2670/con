@@ -244,7 +244,7 @@ def update_blast_state_and_accum(blast_id, state, accum_time, category):
     # Idle Time
     data.i_accum_time += accum_time
   data.last_updated_time = cur_time
-  _data.last_updated_user = currrent_user.email
+  data.last_updated_user = current_user.email
   db.session.commit()
   return data
 
@@ -411,7 +411,7 @@ def update_state_and_accum(work_id, state, accum_time, pause_time):
   data.accum_time = accum_time
   data.p_accum_time = pause_time
   data.last_updated_time = cur_time
-  data.last_updated_user = currrent_user.email
+  data.last_updated_user = current_user.email
   db.session.commit()
   return data
 
