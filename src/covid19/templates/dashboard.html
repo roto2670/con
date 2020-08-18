@@ -1,0 +1,26 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+{% endblock stylesheets %}
+
+{% block title %} Operator List {% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+      test hello
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+{% endblock javascripts %}
