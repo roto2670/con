@@ -8,14 +8,138 @@
 
 {% block stylesheets %}
     {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/dashboard.css">
 {% endblock stylesheets %}
 
-{% block title %} Operator List {% endblock title %}
+{% block title %}{% endblock title %}
 
 {% block content %}
-<div id="scroll-style-hidden" class="right_col" role="main">
-    <div class="">
-      test hello
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="sub-title-container">
+        Overview
+    </div>
+
+    <!-- Status widget -->
+    <div class="content-container status-widgets">
+        <div class="w-upper-container">
+            <div class="status-widget big">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon actptv"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-25%</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Active/Positive
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget big warn">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon suspected"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-25%</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Suspected Cases
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget big">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon quarantined"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-25%</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Quarantined
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="w-lower-container">
+            <div class="status-widget">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon confirmed"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-25%</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Confirmed
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon recovered"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-25%</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Recovered
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget alert">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon death"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-up status-w-pct-icon ngtv"></i>
+                            <div class="status-w-pct-label">-25%</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Deaths
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sub-title-container">
+        Alerts 
+    </div>
+
+    <div class="content-container alerts">
+
     </div>
 </div>
 
@@ -23,4 +147,10 @@
 
 {% block javascripts %}
     {{ super() }}
+
+    <script>
+        (function() {
+            // TODO: item?
+        })();
+    </script>
 {% endblock javascripts %}

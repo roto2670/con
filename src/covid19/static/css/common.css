@@ -1,0 +1,17 @@
+.base {
+    color: #2e2e2e;
+}
+
+.sub-title-container {
+    width: 100%;
+    font-weight: 500;
+    font-size: 1.8em;
+    border-bottom: 1px solid #E9C7A2;
+    padding: 0.3em 0;
+    box-sizing: border-box;
+    margin-bottom: 0.6em;
+}
+
+.content-container {
+    width: 100%;
+}

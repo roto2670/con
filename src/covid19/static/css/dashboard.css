@@ -1,0 +1,127 @@
+.w-upper-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.w-lower-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.8em;
+}
+
+.status-widget {
+    min-width: 18em;
+    width: 32.5%;
+    height: 8em;
+    display: inline-flex;
+    box-sizing: border-box;
+    padding: 1em 1.6em;
+    background-color: #3FB744;
+    color: white;
+    box-shadow: #929292 0.2em 0.2em 0.2em;
+    transition: background-color 500ms ease-in-out;
+}
+.status-widget.big {
+    height: 10em;
+}
+.status-widget.good {
+    background-color: #3FB744;
+}
+.status-widget.warn {
+    background-color: #E3B616;
+}
+.status-widget.alert {
+    background-color: #FF4A4A;
+}
+
+.status-w-left-container {
+    width: 4.8em;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-items: center;
+}
+
+.status-widget-icon {
+    width: 6em;
+    height: 6em;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.status-widget-icon.actptv {
+    background-image: url(../img/icn_activepositive.svg);
+}
+.status-widget-icon.suspected {
+    background-image: url(../img/icn_suspected.svg);
+}
+.status-widget-icon.quarantined {
+    background-image: url(../img/icn_quarantined.svg);
+}
+.status-widget-icon.confirmed {
+    background-image: url(../img/icn_confirm.svg);
+}
+.status-widget-icon.recovered {
+    background-image: url(../img/icn_recovery.svg);
+}
+.status-widget-icon.death {
+    background-image: url(../img/icn_death.svg);
+}
+
+.status-w-right-container {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: flex-end;
+    align-self: center;
+    flex-direction: column;
+}
+
+.status-w-right-upper-container {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.status-w-value-label {
+    display: inline-flex;
+    font-size: 2.4em;
+    font-weight: 400;
+    padding-right: 0.2em;
+}
+.big .status-w-value-label {
+    font-size: 3em;
+}
+
+.status-w-pct-container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;    
+}
+
+.status-w-pct-icon {
+    color: #77FF95;
+    font-size: 1.5em;
+    margin-bottom: -0.3em; 
+}
+
+.status-w-pct-icon.pstv {
+    color: #77FF95;
+}
+
+.status-w-pct-icon.ngtv {
+    color: #FFCECE;
+}
+
+.status-w-pct-label {
+    color: #EAEAEA;
+}
+
+.status-w-title-label {
+    color: #EDEDED;
+    font-size: 1.6em;
+    font-weight: 400;
+}
+.big .status-w-title-label {
+    font-size: 1.8em;
+}
