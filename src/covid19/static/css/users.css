@@ -1,0 +1,66 @@
+.top-container {
+
+}
+
+.content-container {
+
+}
+
+.user-item {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    border-bottom: 1px solid #E8E8E8;
+    padding: 0.2em 0.4em;
+    box-sizing: border-box;
+}
+
+.user-item-checkbox {
+}
+
+.user-item-avatar {
+    width: 3em;
+    height: 3em;
+    background-image: url(../img/icn_default_profile.svg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    padding: 0 3em;
+    box-sizing: border-box;
+}
+
+.user-item-name-container {
+    width: 10em;
+    padding: 0 0.4em;
+    overflow: hidden;
+}
+
+.user-item-name-label {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-item-id-label {
+    font-size: 0.85em;
+    color: #8A8A8A;
+}
+
+.user-item-locate-container {
+    width: 8em;
+}
+
+.user-item-phone-label {
+    margin: auto;
+}
+
+.user-item-status-label {
+    margin: auto;
+}
+
+.user-item-camp-label {
+    margin: auto;
+}
+
+.user-item-timeago-label {
+    margin-left: auto;
+}

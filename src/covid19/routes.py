@@ -27,3 +27,8 @@ from covid19 import blueprint
 @util.require_login
 def route_default():
   return render_template("dashboard.html")
+
+@blueprint.route('/users')
+@util.require_login
+def route_users():
+  return render_template("users.html")

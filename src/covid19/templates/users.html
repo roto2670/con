@@ -1,0 +1,52 @@
+
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/users.css">
+{% endblock stylesheets %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="top-container"></div>
+    <div class="content-container">
+        <!-- User Item -->
+        <div class="user-item">
+            <input type="checkbox" class="user-item-checkbox">
+            <div class="user-item-avatar"></div> 
+            <div class="user-item-name-container">
+                <div class="user-item-name-label">
+                    Anshlynn Aminoff
+                </div>
+                <div class="user-item-id-label">
+                    1737657
+                </div>
+            </div>
+            <div class="user-item-locate-container"></div>
+            <div class="user-item-phone-label"></div>
+            <div class="user-item-status-label">Good</div>
+            <div class="user-item-camp-label">A</div>
+            <div class="user-item-timeago-label">17 hours ago</div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+
+    <script>
+        (function() {
+            // TODO: 
+        })();
+    </script>
+{% endblock javascripts %}
