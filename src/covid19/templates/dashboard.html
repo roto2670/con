@@ -134,12 +134,42 @@
         </div>
     </div>
 
+    <!-- Alerts message items -->
     <div class="sub-title-container">
         Alerts 
     </div>
-
     <div class="content-container alerts">
+        <!-- Alert item -->
+        {%for n in range(10) %}
+            <div class="a-item">
+                <div class="a-item-left-container">
+                    <div class="a-item-avatar"></div>
+                </div>
+                <div class="a-item-name-container">
+                    <div class="a-item-id-label">
+                        30285
+                    </div>
+                    <div class="a-item-name-label">
+                        Makenna Dorwart
+                    </div>
+                    <div class="a-item-locate-container">
 
+                    </div>
+                </div>
+                <div class="a-item-text-container">
+                    <div class="a-item-title-label">
+                        Self-assessment indicates suspected infection
+                    </div>
+                    <div class="a-item-desc-label">
+                        blah blah blahblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah  
+                    </div>
+                </div>
+                <div class="a-item-right-container">
+                    <div class="a-item-close-btn"></div>
+                    <div class="a-item-timeago-label">10 hours ago</div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 </div>
 
