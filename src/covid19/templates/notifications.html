@@ -1,0 +1,50 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/notifications.css">
+{% endblock stylesheets %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="top-container"></div>
+    <div class="content-container">
+        <!-- Notification item -->
+        <div class="noty-item">
+            <div class="noty-item-avatar"></div>
+            <div class="noty-item-content-container">
+                <div class="noty-item-name-label">
+                    Jaxon Calzoni
+                </div>
+                <div class="noty-item-desc-label">
+                    bblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah lah 
+                </div>
+                <div class="noty-item-lcoate-container">
+                    <div class="noty-item-timeago-label">10 hours ago</div>
+                </div>
+            </div>
+            <div class="noty-item-msg-btn"></div>
+            <div class="noty-item-close-btn"></div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+
+    <script>
+        (function() {
+            // TODO: 
+        })();
+    </script>
+{% endblock javascripts %}

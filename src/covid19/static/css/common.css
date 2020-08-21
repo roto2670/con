@@ -2,6 +2,14 @@
     color: #2e2e2e;
 }
 
+.btn {
+    background-color: #EF8009;
+    cursor: pointer;
+    padding: 0.2em 0.4em;
+    color: white;
+    font-weight: 300;
+}
+
 .sub-title-container {
     width: 100%;
     font-weight: 500;

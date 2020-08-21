@@ -32,3 +32,8 @@ def route_default():
 @util.require_login
 def route_users():
   return render_template("users.html")
+
+@blueprint.route('/notifications')
+@util.require_login
+def route_notifications():
+  return render_template("notifications.html")
