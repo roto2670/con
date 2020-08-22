@@ -29,7 +29,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-value-label">{{ stats['active_positives'] }}</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-25%</div>
@@ -47,7 +47,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-value-label">{{ stats['suspected'] }}</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-25%</div>
@@ -65,7 +65,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-value-label">{{ stats['quarantined'] }}</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-25%</div>
@@ -84,7 +84,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-value-label">{{ stats['confirmed'] }}</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-25%</div>
@@ -102,7 +102,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-value-label">{{ stats['recovered'] }}</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-25%</div>
@@ -120,7 +120,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">544</div>
+                        <div class="status-w-value-label">{{ stats['deaths'] }}</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-up status-w-pct-icon ngtv"></i>
                             <div class="status-w-pct-label">-25%</div>
@@ -181,6 +181,9 @@
     <script>
         (function() {
             // TODO: item?
+            $.get("./stats", function(data) {
+                console.error(data);
+            });
         })();
     </script>
 {% endblock javascripts %}

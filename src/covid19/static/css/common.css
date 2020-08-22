@@ -10,6 +10,10 @@
     font-weight: 300;
 }
 
+.hidden-textfield {
+    border: 0px none;
+}
+
 .sub-title-container {
     width: 100%;
     font-weight: 500;

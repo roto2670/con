@@ -16,8 +16,37 @@
 
 {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
-    <div class="top-container"></div>
+    <div class="top-container">
+        <div class="user-searchbox-container">
+            <input type="text" class="hidden-textfield">
+            <div class="searchbox-icon"></div>
+        </div>
+        <div class="user-filter-container">
+            <div class="user-filter-btn">Good</div>
+            <div class="user-filter-btn">Quarantined</div>
+            <div class="user-filter-btn">Recovered</div>
+            <div class="user-filter-btn">Active/Positive</div>
+            <div class="user-filter-btn">Hospitalized</div>
+            <div class="user-filter-btn">Terminated</div>
+            <div class="user-filter-btn">Not Reported</div>
+            <div class="user-filter-btn">Being Tested</div>
+        </div>
+        <div class="user-new-btn">
+            <div class="user-new-btn-icn"></div>
+            <div class="user-new-btn-label">New</div>
+        </div>
+    </div>
     <div class="content-container">
+        <!-- filter item -->
+        <div class="user-item-header-container">
+            <div class="user-item-header-label">Name</div>
+            <div class="user-item-header-label">Location</div>
+            <div class="user-item-header-label">Phone Number</div>
+            <div class="user-item-header-label">Status</div>
+            <div class="user-item-header-label">Camp</div>
+            <div class="user-item-header-label">Last Updated</div>
+        </div>
+
         <!-- User Item -->
         <div class="user-item">
             <input type="checkbox" class="user-item-checkbox">
