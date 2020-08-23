@@ -48,22 +48,11 @@
         </div>
 
         <!-- User Item -->
-        <div class="user-item">
-            <input type="checkbox" class="user-item-checkbox">
-            <div class="user-item-avatar"></div> 
-            <div class="user-item-name-container">
-                <div class="user-item-name-label">
-                    Anshlynn Aminoff
-                </div>
-                <div class="user-item-id-label">
-                    1737657
-                </div>
-            </div>
-            <div class="user-item-locate-container"></div>
-            <div class="user-item-phone-label"></div>
-            <div class="user-item-status-label">Good</div>
-            <div class="user-item-camp-label">A</div>
-            <div class="user-item-timeago-label">17 hours ago</div>
+        <div class="user-item-container"></div>
+        
+        <div class="user-item-loader-btn loading">
+            <div class="user-item-loader-icon"></div>
+            <div class="user-item-loader-label">Load more</div>
         </div>
     </div>
 </div>
@@ -74,10 +63,153 @@
 
     <script>
         (function() {
+            let STATUS_DISPLAY = {
+                '0': 'Not Registered',
+                '1': 'Good',
+                '2': 'Quarantined',
+                '3': 'Positive',
+                '4': 'Isolated',
+                '5': 'Suspected',
+                '-1': 'Terminated',
+                '-2': 'On Leave'
+            }, PAGE_SIZE = 10; // chunk size of users
+
+            let _db = firebase.firestore();
+            var _lastUserSnapShot
+                _loadingUsers = false;
+
+
+            // init
+            initHandlers();
+            displayUsers(function() {
+                $('.user-item-loader-btn').removeClass('loading');
+            });
+
+
+            function initHandlers() {
+                $('.user-item-loader-btn').click(function() {
+                    let _this = $(this);
+                    _this.addClass('loading');
+                    displayUsers(function () {
+                        _this.removeClass('loading');
+                    });
+                });
+            }
+
+            function displayUsers(callback) {
+                callback = callback || _.noop;
+                if (!_loadingUsers) {
+                    _loadingUsers = true;
+                    loadUsers(_lastUserSnapShot, function(users, lastSnapShot) {
+                        // TODO: check last snapshot is equal?
+                        _lastUserSnapShot = lastSnapShot;
+
+                        // render users.
+                        let container = $('.user-item-container');
+                        $.each(users, function(index, user) {
+                            let userItem = UserItem(user);
+                            container.append(userItem.render());
+                        });
+
+                        _loadingUsers = false;
+                        callback();
+                    });
+                } else {
+                    console.debug("Already loading users.");
+                    callback();
+                }
+            }
+
+            function loadUsers(startAt, callback) {
+                // TODO: filter
+
+                var query;
+                if (!!startAt) {
+                    // Paging
+                    query = _db.collection('users')
+                        .startAfter(startAt)
+                        .limit(PAGE_SIZE)
+                } else {
+                    // Query first time.
+                    query = _db.collection('users')
+                        .limit(PAGE_SIZE);
+                }
+
+                // do query
+                query.get().then(function(snapshots) {
+                    var users = [],
+                        lastSnapShot;
+                    if (!!!snapshots.empty) {
+                        lastSnapShot = snapshots.docs[snapshots.docs.length - 1];
+                        snapshots.forEach(function(doc) {
+                            users.push(doc.data());
+                        });
+                    } else {
+                        // no more users.
+                    }
+
+                    callback(users, lastSnapShot);
+                }).catch(function(error) {
+                    console.warn('Failed to load users from server.', error);
+                    callback();
+                });
+            }
+
             function UserItem(model) {
-                let _model = model;
+                var _model = model,
+                    _views = {};
 
+                function render() {
+                    let container = $('<div class="user-item">');
+                    let checkbox = $('<input type="checkbox" class="user-item-checkbox">');
+                    let profile = $('<div class="user-item-avatar">'),
+                        nameCotainer = $('<div class="user-item-name-container">'),
+                        nameLabel = $('<div class="user-item-name-label">')
+                        idLabel = $('<div class="user-item-id-label">');
+                    let locateContainer = $('<div class="user-item-locate-container">'),
+                        phoneLabel = $('<div class="user-item-phone-label">'),
+                        statusLabel = $('<div class="user-item-status-label">'),
+                        campLabel = $('<div class="user-item-camp-label">'),
+                        timeagoLabel = $('<div class="user-item-timeago-label">');
+                    
+                    container.append(checkbox, profile, nameCotainer, locateContainer, phoneLabel, statusLabel,
+                        campLabel, timeagoLabel);
+                    nameCotainer.append(nameLabel, idLabel);
 
+                    // Store views.
+                    _views = {
+                        container: container,
+                        checkbox: checkbox,
+                        profile: profile,
+                        nameLabel: nameLabel,
+                        idLabel: idLabel,
+                        locationLabel: locateContainer,
+                        phoneLabel: phoneLabel,
+                        statusLabel: statusLabel,
+                        campLabel: campLabel,
+                        timeagoLabel: timeagoLabel
+                    }
+
+                    update(_model);
+
+                    return container;
+                }
+
+                function update(model) {
+                    _model = model;
+
+                    _views.nameLabel.text(model.fullname || '-');
+                    _views.idLabel.text('');
+                    _views.locationLabel.text(model.pv_area || '-');
+                    _views.phoneLabel.text(model.phone_number || '-');
+                    _views.statusLabel.text(STATUS_DISPLAY[model.status] || '-');
+                    _views.campLabel.text(model.camp || '-');
+                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
+                }
+
+                return {
+                    render: render
+                }
             }
         })();
     </script>

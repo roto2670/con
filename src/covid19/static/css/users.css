@@ -81,22 +81,47 @@
     height: 3.4em;
     margin-bottom: 0.6em;
     margin-top: 2em;
-    padding: 0 1em;
+    padding: 0 0.4em;
     box-sizing: border-box;
     display: flex;
     flex-wrap: nowrap;
-    justify-content: space-between;
     align-items: center;
     background-color: #EDEDED;
     color: #848484;
     border-bottom: 1px solid #E8E8E8;
 }
-.user-item-header-container:nth-child(1) {
-    padding-left: 8em;
-}
+
 
 .user-item-header-label {
     display: inline-flex;
+    justify-content: center;
+}
+.user-item-header-label:nth-child(1) {
+    width: 16em;
+    margin-left: 1.2em;
+}
+.user-item-header-label:nth-child(2) {
+    width: 6em;
+    margin: auto;
+}
+.user-item-header-label:nth-child(3) {
+    width: 7em;
+    margin: auto;
+}
+.user-item-header-label:nth-child(4) {
+    width: 5em;
+    margin: auto;
+}
+.user-item-header-label:nth-child(5) {
+    width: 6em;
+    margin: auto;
+}
+.user-item-header-label:nth-child(6) {
+    margin-left: auto;
+}
+
+.user-item-container {
+    width: 100%;
 }
 
 .user-item {
@@ -131,6 +156,7 @@
 .user-item-name-label {
     text-overflow: ellipsis;
     white-space: nowrap;
+    overflow: hidden;
 }
 
 .user-item-id-label {
@@ -139,21 +165,58 @@
 }
 
 .user-item-locate-container {
-    width: 8em;
+    width: 6em;
+    margin: auto;
+    text-align: center;
 }
 
 .user-item-phone-label {
     margin: auto;
+    width: 7em;
+    text-align: center;
 }
 
 .user-item-status-label {
+    width: 5em;
     margin: auto;
+    word-break: break-word;
+    text-align: center;
 }
 
 .user-item-camp-label {
     margin: auto;
+    width: 6em;
+    text-align: center;
 }
 
 .user-item-timeago-label {
     margin-left: auto;
+}
+
+
+.user-item-loader-btn {
+    display: flex;
+    justify-content: center;
+    margin: 1.4em 0;
+    cursor: pointer;
+}
+
+.user-item-loader-icon {
+    width: 1.5em;
+    height: 1.5em;
+    background-image: url(../img/icn_reload.svg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.loading .user-item-loader-icon {
+    display: none;
+}
+
+.user-item-loader-label {
+    color: #EF8009;
+    margin-left: 0.6em;
+}
+
+.loading .user-item-loader-label {
+    display: none;
 }
