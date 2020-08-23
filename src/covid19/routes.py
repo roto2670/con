@@ -15,9 +15,6 @@ import logging
 
 from flask import render_template, redirect, request  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
-import firebase_admin as fbase
-from firebase_admin import firestore
-from firebase_admin import credentials
 
 import base
 import util

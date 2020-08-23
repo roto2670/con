@@ -19,6 +19,7 @@
 }
 
 .status-widget {
+    width: 25%;
     min-width: 18em;
     height: 10em;
     display: inline-flex;
@@ -29,7 +30,7 @@
     box-shadow: #929292 0.2em 0.2em 0.2em;
     transition: background-color 500ms ease-in-out;
     flex-grow: 1;
-    margin: 0 0.2em;
+    margin: 0 0.4em;
 }
 .status-widget.small {
     height: 8em;
@@ -48,6 +49,7 @@
 }
 
 .status-title-widget {
+    width: 50%;
     min-width: 18em;
     height: 10em;
     display: inline-flex;
@@ -93,11 +95,13 @@
 }
 
 .status-title-widget-title-label {
+    color: #EDEDED;
     font-size: 3em;
     margin-left: auto;
 }
 
 .status-title-widget-value-label {
+    color: #EDEDED;
     font-size: 3.4em;
     margin-left: 0.2em;
 }
@@ -157,12 +161,12 @@
 
 .status-w-value-label {
     display: inline-flex;
-    font-size: 2.4em;
+    font-size: 3.2em;
     font-weight: 400;
     padding-right: 0.2em;
 }
-.big .status-w-value-label {
-    font-size: 3em;
+.small .status-w-value-label {
+    font-size: 2.8em;
 }
 
 .status-w-pct-container {
@@ -191,12 +195,14 @@
 
 .status-w-title-label {
     color: #EDEDED;
-    font-size: 1.6em;
+    font-size: 2.2em;
     font-weight: 400;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
-.big .status-w-title-label {
-    font-size: 1.8em;
-    text-align: right;
+.small .status-w-title-label {
+    font-size: 2em
 }
 
 .a-item {
