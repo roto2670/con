@@ -23,71 +23,16 @@
     <!-- Status widget -->
     <div class="content-container status-widgets">
         <div class="w-upper-container">
-            <div class="status-widget big">
-                <div class="status-w-left-container">
-                    <div class="status-widget-icon actptv"></div>
-                </div>
-                <div class="status-w-right-container">
-                    <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">{{ stats['active_positives'] }}</div>
-                        <div class="status-w-pct-container">
-                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
-                            <div class="status-w-pct-label">-25%</div>
-                        </div>
-                    </div>
-                    <div class="status-w-right-lower-container status-w-title-label">
-                        Active/Positive
-                    </div>
-                </div>
-            </div>
-
-            <div class="status-widget big warn">
-                <div class="status-w-left-container">
-                    <div class="status-widget-icon suspected"></div>
-                </div>
-                <div class="status-w-right-container">
-                    <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">{{ stats['suspected'] }}</div>
-                        <div class="status-w-pct-container">
-                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
-                            <div class="status-w-pct-label">-25%</div>
-                        </div>
-                    </div>
-                    <div class="status-w-right-lower-container status-w-title-label">
-                        Suspected Cases
-                    </div>
-                </div>
-            </div>
-
-            <div class="status-widget big">
-                <div class="status-w-left-container">
-                    <div class="status-widget-icon quarantined"></div>
-                </div>
-                <div class="status-w-right-container">
-                    <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">{{ stats['quarantined'] }}</div>
-                        <div class="status-w-pct-container">
-                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
-                            <div class="status-w-pct-label">-25%</div>
-                        </div>
-                    </div>
-                    <div class="status-w-right-lower-container status-w-title-label">
-                        Quarantined
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="w-lower-container">
-            <div class="status-widget">
+            <div class="status-widget confirmed">
                 <div class="status-w-left-container">
                     <div class="status-widget-icon confirmed"></div>
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">{{ stats['confirmed'] }}</div>
+                        <div class="status-w-value-label">-</div>
                         <div class="status-w-pct-container">
-                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
-                            <div class="status-w-pct-label">-25%</div>
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
                         </div>
                     </div>
                     <div class="status-w-right-lower-container status-w-title-label">
@@ -96,16 +41,34 @@
                 </div>
             </div>
 
-            <div class="status-widget">
+            <div class="status-widget deaths">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon death"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Deaths
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget recovered">
                 <div class="status-w-left-container">
                     <div class="status-widget-icon recovered"></div>
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">{{ stats['recovered'] }}</div>
+                        <div class="status-w-value-label">-</div>
                         <div class="status-w-pct-container">
-                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
-                            <div class="status-w-pct-label">-25%</div>
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
                         </div>
                     </div>
                     <div class="status-w-right-lower-container status-w-title-label">
@@ -113,17 +76,129 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="status-widget alert">
+        <div class="w-middle-container">
+            <div class="status-widget actptv small">
                 <div class="status-w-left-container">
-                    <div class="status-widget-icon death"></div>
+                    <div class="status-widget-icon actptv"></div>
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">{{ stats['deaths'] }}</div>
+                        <div class="status-w-value-label">-</div>
                         <div class="status-w-pct-container">
-                            <i class="fa fa-caret-up status-w-pct-icon ngtv"></i>
-                            <div class="status-w-pct-label">-25%</div>
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Active/Positive
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget quarantined small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon quarantined"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Quarantined
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget isolated small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon isolated"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Isolated
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget suspected small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon suspected"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Suspected Cases
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-lower-container">
+            <div class="status-widget alertphase wide">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon alertphase"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Alert Phase
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget cconfirmed">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon uae"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Confirmed
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget cdeaths">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon uae"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
                         </div>
                     </div>
                     <div class="status-w-right-lower-container status-w-title-label">
@@ -138,39 +213,7 @@
     <div class="sub-title-container">
         Alerts 
     </div>
-    <div class="content-container alerts">
-        <!-- Alert item -->
-        {%for n in range(10) %}
-            <div class="a-item">
-                <div class="a-item-left-container">
-                    <div class="a-item-avatar"></div>
-                </div>
-                <div class="a-item-name-container">
-                    <div class="a-item-id-label">
-                        30285
-                    </div>
-                    <div class="a-item-name-label">
-                        Makenna Dorwart
-                    </div>
-                    <div class="a-item-locate-container">
-
-                    </div>
-                </div>
-                <div class="a-item-text-container">
-                    <div class="a-item-title-label">
-                        Self-assessment indicates suspected infection
-                    </div>
-                    <div class="a-item-desc-label">
-                        blah blah blahblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah  
-                    </div>
-                </div>
-                <div class="a-item-right-container">
-                    <div class="a-item-close-btn"></div>
-                    <div class="a-item-timeago-label">10 hours ago</div>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
+    <div class="content-container alerts"></div>
 </div>
 
 {% endblock content %}
@@ -180,10 +223,135 @@
 
     <script>
         (function() {
-            // TODO: item?
-            $.get("./stats", function(data) {
-                console.error(data);
-            });
+            let STAT_DISPLAY_NAME = {
+                'active_positives': "Active/Positive",
+                'confirmed': "Confirmed",
+                'country_total_cases': "Country Total Cases",
+                'country_total_deaths': "Country Total Deaths",
+                'deaths': "Deaths",
+                'quarantined': "Quarantined",
+                'recovered': "Recovered",
+                'suspected': "Suspected",
+                'ts': "Last Time"
+            },
+            STAT_LAYOUT = {
+                upper: ['active_positives', 'suspected', 'quarantined'],
+                lower: ['confirmed', 'recovered', 'deaths']
+            };
+
+            let _db = firebase.firestore();
+        
+
+            // Init
+            display();
+
+
+            function display() {
+                // TODO: render Stat item?
+                loadStats(function(stats) {
+                    updateStats(stats);
+                });
+
+                // Render Alerts.
+                let alertContainer = $('.content-container.alerts')
+                for (var i = 0; i < 15; i++) {
+                    alertContainer.append(AlertItem().render());
+                }
+            }
+
+            function updateStats(stats) {
+                $('.status-widget.confirmed .status-w-value-label').text(stats.confirmed || '0');
+                $('.status-widget.deaths .status-w-value-label').text(stats.deaths || '0');
+                $('.status-widget.recovered .status-w-value-label').text(stats.recovered || '0');
+
+                $('.status-widget.actptv .status-w-value-label').text(stats.active_positives || '0');
+                $('.status-widget.quarantined .status-w-value-label').text(stats.quarantined || '0');
+                $('.status-widget.isolated .status-w-value-label').text(stats.isolated || '0');
+                $('.status-widget.suspected .status-w-value-label').text(stats.suspected || '0');
+
+                $('.status-widget.alertphase .status-w-value-label').text(stats.alert_phase || '0');
+                $('.status-widget.cconfirmed .status-w-value-label').text(stats.country_new_cases || '0');
+                $('.status-widget.cdeaths .status-w-value-label').text(stats.country_new_deaths || '0');
+            }
+
+            function loadStats(callback) {
+                _db.collection('covid19_stats')
+                    .orderBy('ts', 'desc')
+                    .limit(1).get().then((snapShots) => {
+                        var data = {};
+                        if (!snapShots.empty) {
+                            data = snapShots.docs[0].data();
+                        }
+                        callback(data); 
+                    });
+            }
+
+            function StatItem(value, displayName) {
+                function render () {
+                    return ;
+                }
+
+                return {
+                    render: render
+                }
+            }
+
+            function AlertItem(model) {
+                let _model = model,
+                    _views = {};
+
+                function render() {
+                    let container = $('<div class="a-item">')
+                    let leftContainer = $('<div class="a-item-left-container">')
+                            .append('<div class="a-item-avatar">');
+                    let nameContainer = $('<div class="a-item-name-container">'),
+                        idLabel = $('<div class="a-item-id-label">'),
+                        nameLabel = $('<div class="a-item-name-label">'),
+                        locateContainer = $('<div class="a-item-locate-container">');
+                    let textContainer = $('<div class="a-item-text-container">'),
+                        titleLabel = $('<div class="a-item-title-label">'),
+                        descLabel = $('<div class="a-item-desc-label">');
+                    let rightContainer = $('<div class="a-item-right-container">')
+                        closeButton = $('<div class="a-item-close-btn">'),
+                        timeagoLabel = $('<div class="a-item-timeago-label">');
+
+                    container.append(leftContainer, nameContainer, textContainer, rightContainer);
+                    nameContainer.append(idLabel, nameLabel, locateContainer);
+                    textContainer.append(titleLabel, descLabel);
+                    rightContainer.append(closeButton, timeagoLabel);
+
+                    // init handlers
+                    closeButton.click(function() {
+                        container.detach().remove();
+                    });
+
+                    // Stores view
+                    _views.container = container;
+                    _views.idLabel = idLabel;
+                    _views.nameLabel = nameLabel;
+                    _views.titleLabel = titleLabel;
+                    _views.descLabel = descLabel;
+                    _views.timeagoLabel = timeagoLabel;
+
+                    update(_model);
+
+                    return container;
+                }
+
+                function update(model) {
+                    _model = model;
+
+                    _views.idLabel.text('239294');
+                    _views.nameLabel.text('Makenna Dorwart');
+                    _views.titleLabel.text('Self-assessment indicates suspected infection');
+                    _views.descLabel.text('blah blah blahblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah')
+                    _views.timeagoLabel.text('10 hours ago');
+                }
+
+                return {
+                    render: render
+                }
+            }
         })();
     </script>
 {% endblock javascripts %}

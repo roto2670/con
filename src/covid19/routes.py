@@ -39,16 +39,16 @@ def route_default():
   # TODO: update daily
   fbase_store = firestore.client()
   global stats
-  if not stats:
+  # if not stats:
     # query to firebase.
-    stat_ref = fbase_store.collection(u'covid19_stats')
-    query = stat_ref.order_by(u'ts', direction=firestore.Query.DESCENDING).limit(1)
-    results = query.stream()
-    try:
-      doc = next(results)
-      stats = doc.to_dict()
-    except StopIteration:
-      pass
+    # stat_ref = fbase_store.collection(u'covid19_stats')
+    # query = stat_ref.order_by(u'ts', direction=firestore.Query.DESCENDING).limit(1)
+    # results = query.stream()
+    # try:
+    #   doc = next(results)
+    #   stats = doc.to_dict()
+    # except StopIteration:
+    #   pass
 
   return render_template("dashboard.html", stats=stats)
 
@@ -88,3 +88,8 @@ def default_users():
 @util.require_login
 def route_notifications():
   return render_template("notifications.html")
+
+@blueprint.route('/managedata')
+@util.require_login
+def route_manage_data():
+  return render_template("manage_data.html")
