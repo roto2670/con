@@ -155,8 +155,10 @@
 
 .user-item-name-label {
     text-overflow: ellipsis;
-    white-space: nowrap;
     overflow: hidden;
+    -webkit-line-clamp: 2;
+    display: -webkit-inline-box;
+    -webkit-box-orient: vertical;
 }
 
 .user-item-id-label {

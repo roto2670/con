@@ -1,9 +1,50 @@
 .top-container {
+    display: flex;
+    flex-wrap: nowrap;
+    background-color: #F3F3F3;
+    margin-bottom: 0.8em;
+}
 
+.top-button {
+    width: 8em;
+    height: 6em;
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: column;
+    background-color: #F8F8F8;
+    margin-right: 1.2em;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 0 #e2e2e2;
+}
+.top-button.selected {
+    background-color: white;
+}
+.top-button-icon {
+    width: 3.2em;
+    height: 3.2em;
+}
+.top-button-icon > svg {
+    width: 100%;
+    height: 100%;
+}
+.top-button-icon > svg > path {
+    fill: #808080;
+}
+.selected .top-button-icon > svg > path {
+    fill: #EF8009;
+}
+
+.top-button-label {
+    font-weight: 500;
+    color: #808080;
+}
+.selected .top-button-label {
+    color: #EF8009;
 }
 
 .content-container {
-
+    width: 100%;
 }
 
 .noty-item {
@@ -16,6 +57,7 @@
     background-color: #F5F5F5;
     align-items: center;
     flex-wrap: nowrap;
+    margin-bottom: 0.8em;
 }
 
 .noty-item-avatar {
@@ -81,4 +123,31 @@
     background-repeat: no-repeat;
     margin-bottom: auto;
     margin-left: 1em;
+}
+
+.noty-item-loader-btn {
+    display: flex;
+    justify-content: center;
+    margin: 1.4em 0;
+    cursor: pointer;
+}
+
+.noty-item-loader-icon {
+    width: 1.5em;
+    height: 1.5em;
+    background-image: url(../img/icn_reload.svg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.loading .noty-item-loader-icon {
+    display: none;
+}
+
+.noty-item-loader-label {
+    color: #EF8009;
+    margin-left: 0.6em;
+}
+
+.loading .noty-item-loader-label {
+    display: none;
 }
