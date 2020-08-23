@@ -145,7 +145,8 @@ html , body{
 }
 .left_col {
     /*background: #2A3F54*/
-    background: #1fa6fc
+    background: #1fa6fc;
+    transition: background-color 500ms ease-in-out 300ms;
 }
 .nav-sm .container.body .col-md-3.left_col {
     min-height: 100%;
@@ -4518,6 +4519,7 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     background: #1b8dd7;
     width: 70px;
     height: 100%;
+    transition: background-color 500ms ease-in-out 300ms;
 }
 
 .logo_img_div {

@@ -171,9 +171,9 @@
                 // create a query.
                 var query;
                 if (MESSAGE_TYPE.ADMIN === type) {
-                    query = ref.where('from_user', '==', 1);
+                    query = ref.where('to_user', '==', 1);
                 } else if (MESSAGE_TYPE.MEDICAL === type) {
-                    query = ref.where('from_user', '==', 2);
+                    query = ref.where('to_user', '==', 2);
                 } else if (MESSAGE_TYPE.SENT === type) {
                     query = ref.where('from_user', '>=', 1);
                     query = ref.where('from_user', '<=', 2);

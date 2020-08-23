@@ -1,3 +1,12 @@
+<style type="text/css">
+  .sk-main {
+    background-color: #E0002A;
+  }
+  .sk-sub {
+    background-color: #EF8009;
+  }
+</style>
+
 <div class="left_col scroll-view">
   {% if current_user.level != 0 and current_user.level != 6 %}
   <script>
@@ -59,6 +68,10 @@
 <script>
   (function() {
     let TOKEN_KEY = '__fb_auth_tk__';
+
+    // init style
+    $('.top_sidebar_menu').addClass('sk-main');
+    $('.left_col').addClass('sk-sub');
 
     // Initialize firebase
     var fbaseConfig = {
