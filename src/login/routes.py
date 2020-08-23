@@ -54,10 +54,8 @@ def login():
 def sign_in_progress():
   email = request.form.get('email')
   password = request.form.get('password')
-  user = in_apis.get_user("LAVnwZHGixRXp1N5NCzKYo4dy453")
-  if user:
-  # user = in_apis.get_user_by_email(email, constants.ORG_ID)
-  # if user and user.password and checkpw(password.encode('utf-8'), user.password):
+  user = in_apis.get_user_by_email(email, constants.ORG_ID)
+  if user and user.password and checkpw(password.encode('utf-8'), user.password):
     in_apis.update_user_by_ip(user.id, util.get_ip_addr())
     login_user(user, remember=False)
     if user.level == models.MOI:

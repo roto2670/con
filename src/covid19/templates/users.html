@@ -101,8 +101,9 @@
                 if (!_loadingUsers) {
                     _loadingUsers = true;
                     loadUsers(_lastUserSnapShot, function(users, lastSnapShot) {
-                        // TODO: check last snapshot is equal?
-                        _lastUserSnapShot = lastSnapShot;
+                        if (!!lastSnapShot) {
+                            _lastUserSnapShot = lastSnapShot;
+                        }
 
                         // render users.
                         let container = $('.user-item-container');

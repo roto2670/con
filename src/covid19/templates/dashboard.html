@@ -153,21 +153,14 @@
         </div>
 
         <div class="w-lower-container">
-            <div class="status-widget alertphase wide">
-                <div class="status-w-left-container">
-                    <div class="status-widget-icon alertphase"></div>
+            <div class="status-title-widget alertphase wide">
+                <div class="status-title-widget-upper-container">
+                    Alert Phase
                 </div>
-                <div class="status-w-right-container">
-                    <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">-</div>
-                        <div class="status-w-pct-container">
-                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
-                            <div class="status-w-pct-label">-</div>
-                        </div>
-                    </div>
-                    <div class="status-w-right-lower-container status-w-title-label">
-                        Alert Phase
-                    </div>
+                <div class="status-title-widget-lower-container">
+                    <div class="status-title-widget-icon"></div>
+                    <div class="status-title-widget-title-label">Level</div>
+                    <div class="status-title-widget-value-label">-</div>
                 </div>
             </div>
 
@@ -214,6 +207,10 @@
         Alerts 
     </div>
     <div class="content-container alerts"></div>
+    <div class="alert-item-loader-btn loading">
+        <div class="alert-item-loader-icon"></div>
+        <div class="alert-item-loader-label">Load more</div>
+    </div>
 </div>
 
 {% endblock content %}
@@ -223,7 +220,7 @@
 
     <script>
         (function() {
-            let STAT_DISPLAY_NAME = {
+            const STAT_DISPLAY_NAME = {
                 'active_positives': "Active/Positive",
                 'confirmed': "Confirmed",
                 'country_total_cases': "Country Total Cases",
@@ -237,14 +234,28 @@
             STAT_LAYOUT = {
                 upper: ['active_positives', 'suspected', 'quarantined'],
                 lower: ['confirmed', 'recovered', 'deaths']
-            };
+            },
+            ALERT_PAGE_SIZE = 5;
 
-            let _db = firebase.firestore();
+            let _db = firebase.firestore(),
+                _loadingAlerts = false,
+                _lastAlertSnapshot;
         
 
             // Init
+            initHandlers();
             display();
 
+
+            function initHandlers() {
+                $('.alert-item-loader-btn').click(function() {
+                    let _this = $(this);
+                    _this.addClass('loading');
+                    displayAlerts(function () {
+                        _this.removeClass('loading');
+                    });
+                });
+            }
 
             function display() {
                 // TODO: render Stat item?
@@ -252,11 +263,10 @@
                     updateStats(stats);
                 });
 
-                // Render Alerts.
-                let alertContainer = $('.content-container.alerts')
-                for (var i = 0; i < 15; i++) {
-                    alertContainer.append(AlertItem().render());
-                }
+                // Load alerts
+                displayAlerts(function() {
+                    $('.alert-item-loader-btn').removeClass('loading');
+                });
             }
 
             function updateStats(stats) {
@@ -269,7 +279,7 @@
                 $('.status-widget.isolated .status-w-value-label').text(stats.isolated || '0');
                 $('.status-widget.suspected .status-w-value-label').text(stats.suspected || '0');
 
-                $('.status-widget.alertphase .status-w-value-label').text(stats.alert_phase || '0');
+                $('.status-title-widget.alertphase .status-title-widget-value-label').text(stats.alert_phase || '0');
                 $('.status-widget.cconfirmed .status-w-value-label').text(stats.country_new_cases || '0');
                 $('.status-widget.cdeaths .status-w-value-label').text(stats.country_new_deaths || '0');
             }
@@ -284,6 +294,68 @@
                         }
                         callback(data); 
                     });
+            }
+
+            function displayAlerts(callback) {
+                callback = callback || _.noop;
+                if (!_loadingAlerts) {
+                    _loadingAlerts = true;
+                    loadAlerts(_lastAlertSnapshot, function(users, lastSnapshot) {
+                        if (!!lastSnapshot) {
+                            _lastAlertSnapshot = lastSnapshot;
+                        }
+
+                        // render alert items.
+                        let container = $('.content-container.alerts');
+                        $.each(users, function(index, user) {
+                            let viewItem = AlertItem(user);
+                            container.append(viewItem.render());
+                        });
+
+                        _loadingAlerts = false;
+                        callback();
+                    });
+                } else {
+                    console.debug("Already loading users.");
+                    callback();
+                }
+            }
+
+            function loadAlerts(startAt, callback) {
+                var ref,
+                    query;
+                if (!!startAt) {
+                    // Paging
+                    ref = _db.collection('messages')
+                        .startAfter(startAt)
+                        .limit(ALERT_PAGE_SIZE)
+                } else {
+                    // Query first time.
+                    ref = _db.collection('messages')
+                        .limit(ALERT_PAGE_SIZE);
+                }
+
+                // make a query
+                query = ref.where('type', '==', 1);
+
+                // do query
+                query.get().then(function(snapshots) {
+                    var alerts = [],
+                        lastSnapShot;
+                    if (!!!snapshots.empty) {
+                        lastSnapShot = snapshots.docs[snapshots.docs.length - 1];
+                        snapshots.forEach(function(doc) {
+                            alerts.push(doc.data());
+                        });
+                    } else {
+                        // no more alerts.
+                    }
+
+                    callback(alerts, lastSnapShot);
+                }).catch(function(error) {
+                    console.warn('Failed to load alerts from server.', error);
+                    callback();
+                });
             }
 
             function StatItem(value, displayName) {
@@ -341,11 +413,11 @@
                 function update(model) {
                     _model = model;
 
-                    _views.idLabel.text('239294');
-                    _views.nameLabel.text('Makenna Dorwart');
-                    _views.titleLabel.text('Self-assessment indicates suspected infection');
-                    _views.descLabel.text('blah blah blahblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah')
-                    _views.timeagoLabel.text('10 hours ago');
+                    _views.idLabel.text('');
+                    _views.nameLabel.text('');
+                    _views.titleLabel.text(model.title || '-');
+                    _views.descLabel.text(model.message || '-');
+                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
                 }
 
                 return {

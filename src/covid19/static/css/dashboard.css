@@ -47,6 +47,61 @@
     background-color: #FF4A4A;
 }
 
+.status-title-widget {
+    min-width: 18em;
+    height: 10em;
+    display: inline-flex;
+    box-sizing: border-box;
+    padding: 1em 1.6em;
+    background-color: #3FB744;
+    color: white;
+    box-shadow: #929292 0.2em 0.2em 0.2em;
+    transition: background-color 500ms ease-in-out;
+    flex-grow: 2;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 0.2em;
+}
+.status-title-widget.good {
+    background-color: #3FB744;
+}
+.status-title-widget.warn {
+    background-color: #E3B616;
+}
+.status-title-widget.alert {
+    background-color: #FF4A4A;
+}
+
+.status-title-widget-upper-container {
+    font-size: 1.6em;
+}
+
+.status-title-widget-lower-container {
+    margin-top: 1em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+}
+
+.status-title-widget-icon {
+    width: 4em;
+    height: 4em;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-image: url(../img/icn_alert.svg);
+}
+
+.status-title-widget-title-label {
+    font-size: 3em;
+    margin-left: auto;
+}
+
+.status-title-widget-value-label {
+    font-size: 3.4em;
+    margin-left: 0.2em;
+}
+
 .status-w-left-container {
     width: 4.8em;
     height: 100%;
@@ -174,7 +229,7 @@
 
 .a-item-name-container {
     overflow: hidden;
-    width: 20em;
+    width: 1em; /* TODO: original 20em; */
     box-sizing: border-box;
     margin: 0 0.6em;
 }
@@ -237,4 +292,31 @@
     color: #848484;
     font-size: 0.8em;
     font-weight: 400;
+}
+
+.alert-item-loader-btn {
+    display: flex;
+    justify-content: center;
+    margin: 1.4em 0;
+    cursor: pointer;
+}
+
+.alert-item-loader-icon {
+    width: 1.5em;
+    height: 1.5em;
+    background-image: url(../img/icn_reload.svg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.loading .alert-item-loader-icon {
+    display: none;
+}
+
+.alert-item-loader-label {
+    color: #EF8009;
+    margin-left: 0.6em;
+}
+
+.loading .alert-item-loader-label {
+    display: none;
 }
