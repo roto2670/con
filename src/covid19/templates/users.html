@@ -28,22 +28,32 @@
             <div class="user-filter-btn" id="isolated">Isolated</div>
             <div class="user-filter-btn" id="suspected">Suspected</div>
             <div class="user-filter-btn" id="terminated">Terminated</div>
-            <div class="user-filter-btn" id="notregistered">Not Registered</div>
         </div>
         <div class="user-new-btn">
             <div class="user-new-btn-icn"></div>
             <div class="user-new-btn-label">New</div>
+        </div>
+        <div class="discover-hotspot-btn">
+            <div class="discover-hotspot-btn-icn"></div>
+            <div class="discover-hotspot-btn-label">Discover Hotspot</div>
         </div>
     </div>
     <div class="content-container">
         <!-- filter item -->
         <div class="user-item-header-container">
             <div class="user-item-header-label">Name</div>
-            <div class="user-item-header-label">Location</div>
-            <div class="user-item-header-label">Phone Number</div>
             <div class="user-item-header-label">Status</div>
+            <div class="user-item-header-label">Gender</div>
+            <div class="user-item-header-label">Nationality</div>
+            <div class="user-item-header-label">Employer</div>
             <div class="user-item-header-label">Camp</div>
-            <div class="user-item-header-label">Last Updated</div>
+            <div class="user-item-header-label">Room</div>
+            <div class="user-item-header-label">Phone Number</div>
+            <div class="user-item-header-label">Department</div>
+            <div class="user-item-header-label">Location</div>
+            <div class="user-item-header-label">Job</div>
+            <div class="user-item-header-label">Language</div>
+            <div class="user-item-header-label">RX</div>
         </div>
 
         <!-- User Item -->
@@ -104,6 +114,9 @@
                         _this.removeClass('loading');
                     });
                 });
+                $('.discover-hotspot-btn').click(function() {
+                    window.alert('Not ready yet!');
+                })
 
                 $('.user-serach-box').keypress(function(event) {
                     let keycode = (event.keyCode ? event.keyCode : event.which);
@@ -232,15 +245,27 @@
                         nameCotainer = $('<div class="user-item-name-container">'),
                         nameLabel = $('<div class="user-item-name-label">')
                         idLabel = $('<div class="user-item-id-label">');
-                    let locateContainer = $('<div class="user-item-locate-container">'),
-                        phoneLabel = $('<div class="user-item-phone-label">'),
-                        statusLabel = $('<div class="user-item-status-label">'),
-                        campLabel = $('<div class="user-item-camp-label">'),
-                        timeagoLabel = $('<div class="user-item-timeago-label">');
+                    let statusLabel = $('<div class="user-item-label status">'),
+                        genderLabel = $('<div class="user-item-label gender">'),
+                        nationalLabel = $('<div class="user-item-label national">'),
+                        employerLabel = $('<div class="user-item-label employer">'),
+                        campLabel = $('<div class="user-item-label camp">'),
+                        roomLabel = $('<div class="user-item-label room">'),
+                        phoneLabel = $('<div class="user-item-label phone">'),
+                        departmentLabel = $('<div class="user-item-label department">'),
+                        jobContainer = $('<div class="user-item-job-container">'),
+                        jobCat1Label = $('<div class="user-item-label jobcat1">'),
+                        jobCat2Label = $('<div class="user-item-label jobcat2">'),
+                        locateContainer = $('<div class="user-item-locate-container">'),
+                        langLabel = $('<div class="user-item-label lang">'),
+                        rxLabel = $('<div class="user-item-label rx">'),
+                        timeagoLabel = $('<div class="user-item-label timeago">');
                     
-                    container.append(checkbox, profile, nameCotainer, locateContainer, phoneLabel, statusLabel,
-                        campLabel, timeagoLabel);
+                    container.append(checkbox, profile, nameCotainer, statusLabel, genderLabel, nationalLabel,
+                        employerLabel, campLabel, roomLabel, phoneLabel, departmentLabel, locateContainer,
+                        jobContainer, langLabel, rxLabel);
                     nameCotainer.append(nameLabel, idLabel);
+                    jobContainer.append(jobCat1Label, jobCat2Label);
 
                     // Store views.
                     _views = {
@@ -249,10 +274,19 @@
                         profile: profile,
                         nameLabel: nameLabel,
                         idLabel: idLabel,
-                        locationLabel: locateContainer,
-                        phoneLabel: phoneLabel,
                         statusLabel: statusLabel,
+                        genderLabel: genderLabel,
+                        nationalLabel: nationalLabel,
+                        employerLabel: employerLabel,
                         campLabel: campLabel,
+                        roomLabel: roomLabel,
+                        phoneLabel: phoneLabel,
+                        departmentLabel: departmentLabel,
+                        locationLabel: locateContainer,
+                        jobCat1Label: jobCat1Label,
+                        jobCat2Label: jobCat2Label,
+                        langLabel: langLabel,
+                        rxLabel: rxLabel,
                         timeagoLabel: timeagoLabel
                     }
 
@@ -266,10 +300,19 @@
 
                     _views.nameLabel.text(model.fullname || '-');
                     _views.idLabel.text('');
-                    _views.locationLabel.text(model.pv_area || '-');
-                    _views.phoneLabel.text(model.phone_number || '-');
                     _views.statusLabel.text(STATUS_DISPLAY[model.status] || '-');
+                    _views.genderLabel.text(model.gender || '');
+                    _views.nationalLabel.text(model.nationality || '');
+                    _views.employerLabel.text(model.employer || '-');
                     _views.campLabel.text(model.camp || '-');
+                    _views.roomLabel.text(model.room || '-');
+                    _views.phoneLabel.text(model.phone_number || '-');
+                    _views.departmentLabel.text(model.department || '-');
+                    _views.locationLabel.text(model.pv_area || '-');
+                    _views.jobCat1Label.text(model.job_cat1 || '-');
+                    _views.jobCat2Label.text(model.job_cat2 || '-');
+                    _views.langLabel.text(model.lang || '-');
+                    _views.rxLabel.text(model.rx || '-');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
                 }
 

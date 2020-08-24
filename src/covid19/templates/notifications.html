@@ -56,15 +56,14 @@
 
     <script>
         (function() {
-            const PAGE_SIZE = 10, // chunk size
+            const PAGE_SIZE = 7, // chunk size
                 MESSAGE_TYPE = {
                     ADMIN: 'admin',
                     MEDICAL: 'medical',
                     SENT: 'sent'
                 };
 
-            let _db = firebase.firestore(),
-                _messaging = firebase.messaging();
+            let _db = firebase.firestore();
             var _lastQuerySnapShots = {},
                 _loadingMessages = false
                 _notyItemContainers = {}
@@ -73,7 +72,9 @@
             // init
             initHandlers();
             render();
-            switchMessages(MESSAGE_TYPE.ADMIN);
+            switchMessages(MESSAGE_TYPE.ADMIN, function() {
+                initSnapshotHandler();
+            });
 
             function initHandlers() {
                 // init top buttons.
@@ -90,22 +91,54 @@
                 $('.noty-item-loader-btn').click(function() {
                     let _this = $(this);
                     _this.addClass('loading');
-                    displayMessages(_currentMessageType, function () {
+                    displayMessages(_currentMessageType, true, function () {
                         _this.removeClass('loading');
                     });
                 });
+            }
 
-                // Handle cloud message for add message item.
-                _messaging.onMessage((payload) => {
-                    if (!!payload) {
-                        console.debug('Received cloud message, try draw it.', payload);
+            function initSnapshotHandler() {
+                // Add message item in real time.
+                // TODO: fix where,
+                _db.collection('messages')
+                    // .orderBy('ts', 'desc')
+                    //.limit(1)
+                    .onSnapshot(function(snapshot) {
+                        snapshot.docChanges().forEach(function(change) {
+                            if (change.type === 'added') {
+                                let container,
+                                    model;
 
-                        let container = _notyItemContainers[_currentMessageType];
-                        container.prepend(MessageItem(payload).render());
-                    } else {
-                        console.warn('Received cloud message, but there is no payload.', payload);
-                    }
-                });
+                                model = change.doc.data();
+                                if (model) {
+                                    // don't check type of type.
+                                    // check type
+                                    if (model.to_user == 1) {
+                                        // admin
+                                        container = _notyItemContainers[MESSAGE_TYPE.ADMIN];
+                                    } else if (model.to_user == 2) {
+                                        // medical team
+                                        container = _notyItemContainers[MESSAGE_TYPE.MEDICAL];
+                                    } else if (model.from_user == 1 || model.from_user == 2) {
+                                        // sent
+                                        container = _notyItemContainers[MESSAGE_TYPE.SENT];
+                                    }
+
+                                    if (!!container) {
+                                        let item = MessageItem(model);
+
+                                        // do animation
+                                        _.delay(function() {
+                                            container.prepend(item.render(model));
+                                            item.blink();
+                                        });
+                                    } else {
+                                        // this message will be appered when switched view.
+                                    }
+                                }
+                            }
+                        });
+                    });
             }
 
             function render() {
@@ -114,7 +147,9 @@
                 })
             }
 
-            function switchMessages(type) {
+            function switchMessages(type, callback) {
+                let _callback = callback || _.noop;
+
                 $('.noty-item-loader-btn').addClass('loading');
                 if (_currentMessageType !== type) {
                     let currentContainer = _notyItemContainers[type];
@@ -124,23 +159,26 @@
                     _.each(_notyItemContainers, function(container) {
                         container.detach();
                     })
-                    _notyItemContainers[type].appendTo($('.content-container'));
+                    currentContainer.appendTo($('.content-container'));
                     if (!!currentContainer && currentContainer.children().length <= 0) {
                         // Load init messages
-                        displayMessages(type, function() {
+                        displayMessages(type, false, function() {
                             $('.noty-item-loader-btn').removeClass('loading');
+                            _callback();
                         });
                     } else {
                         $('.noty-item-loader-btn').removeClass('loading');
+                        _callback();
                     }
                     _currentMessageType = type;
                 } else {
                     // nothing.
                     $('.noty-item-loader-btn').removeClass('loading');
+                    _callback();
                 }
             }
 
-            function displayMessages(type, callback) {
+            function displayMessages(type, animation, callback) {
                 var _callback = callback || _.noop;
                 if (!_loadingMessages) {
                     _loadingMessages = true;
@@ -157,6 +195,9 @@
                         $.each(messages, function(index, message) {
                             let item = MessageItem(message);
                             container.append(item.render(message));
+                            if (animation) {
+                                item.blink();
+                            }
                         });
 
                         _loadingMessages = false;
@@ -169,17 +210,12 @@
             }
 
             function loadMessages(startAt, type, callback) {
-                var ref;
+                var ref = _db.collection('messages');
                 if (!!startAt) {
                     // Paging
-                    ref = _db.collection('messages')
-                        .startAfter(startAt)
-                        .limit(PAGE_SIZE)
-                } else {
-                    // Query first time.
-                    ref = _db.collection('messages')
-                        .limit(PAGE_SIZE);
+                    ref = ref.startAfter(startAt);
                 }
+                ref = ref.limit(PAGE_SIZE);
 
                 // create a query.
                 var query;
@@ -188,8 +224,7 @@
                 } else if (MESSAGE_TYPE.MEDICAL === type) {
                     query = ref.where('to_user', '==', 2);
                 } else if (MESSAGE_TYPE.SENT === type) {
-                    query = ref.where('from_user', '>=', 1);
-                    query = ref.where('from_user', '<=', 2);
+                    query = ref.where('from_user', '>=', 1).where('from_user', '<=', 2);
                 }
 
                 if (!!query) {
@@ -222,6 +257,7 @@
                     _views = {};
 
                 function render(model) {
+
                     let container = $('<div class="noty-item">');
                     let profile = $('<div class="noty-item-avatar">');
                     let contentContainer = $('<div class="noty-item-content-container">'),
@@ -264,9 +300,20 @@
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-')
                 }
 
+                function blink() {
+                    let container = _views.container;
+                    if (!!container) {
+                        container.addClass('new');
+                        _.delay(function() {
+                            container.removeClass('new');
+                        });
+                    }
+                }
+
                 return {
                     render: render,
-                    upate: update
+                    upate: update,
+                    blink: blink
                 }
             }
         })();

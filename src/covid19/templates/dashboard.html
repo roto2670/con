@@ -255,21 +255,29 @@
                         _this.removeClass('loading');
                     });
                 });
+            }
 
+            function initSnapshots() {
                 // listening new stats.
-                _db.collection('covid19_stats').onSnapshot(function(snapshots) {
-                    var data;
-                    if (!!!snapshots.empty) {
-                        // get last item
-                        data = snapshots.docs[snapshots.docs.length - 1].data();
-                    }
+                _db.collection('covid19_stats')
+                    .orderBy('ts', 'desc')
+                    .limit(1)
+                    .onSnapshot(function(snapshot) {
+                        snapshot.docChanges().forEach(function(change) {
+                            if (change.type === 'added' || change.type === 'modified')
+                            var data;
+                            if (!!!snapshot.empty) {
+                                // get last item
+                                data = snapshot.docs[snapshot.docs.length - 1].data();
+                            }
 
-                    // update view
-                    if (!!data) {
-                        updateStats(data);
-                    } else {
-                        console.warn('Received new stats data, but cannot parse data from shapshot.');
-                    }
+                            // update view
+                            if (!!data) {
+                                updateStats(data);
+                            } else {
+                                console.warn('Received new stats data, but cannot parse data from shapshot.');
+                            }
+                        });
                 }, function(error) {
                     console.warn("Received new stats data, but there was an error.", error);
                 })
@@ -278,6 +286,7 @@
             function display() {
                 loadStats(function(stats) {
                     updateStats(stats);
+                    initSnapshots(); // init handlers
                 });
 
                 // Load alerts
@@ -354,6 +363,7 @@
 
                 // make a query
                 query = ref.where('type', '==', 1);
+                query = ref.where('to_user', '==', 1);
 
                 // do query
                 query.get().then(function(snapshots) {
