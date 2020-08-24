@@ -44,17 +44,17 @@
           </a>
         </li>
         <li>
-          <a href="/covid19/managedata">
+          <a href="/covid19/managedata" class="notsupported">
             <i class="fa fa-database"></i>Manage Data
           </a>
         </li>
         <li>
-          <a href="#">
+          <a href="#" class="notsupported">
             <i class="fa fa-newspaper-o"></i>News
           </a>
         </li>
         <li>
-          <a href="#">
+          <a href="#" class="notsupported">
             <i class="fa fa-cogs"></i>Settings
           </a>
         </li>
@@ -88,6 +88,11 @@
     // Initialzie Firebase
     firebase.initializeApp(fbaseConfig);
     
+    // init Handlers
+    $('.notsupported').click(function() {
+      window.alert('Not ready yet!');
+    });
+
     // Auth
     // Check local storage first.
     let token = localStorage.getItem(TOKEN_KEY);

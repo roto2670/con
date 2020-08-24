@@ -107,6 +107,7 @@
 .noty-item-msg-btn {
     width: 4em;
     height: 4em;
+    display: none;
     cursor: pointer;
     margin-left: auto;
     background-image: url(../img/icn_quickmsg.svg);
@@ -122,7 +123,7 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
     margin-bottom: auto;
-    margin-left: 1em;
+    margin-left: auto;
 }
 
 .noty-item-loader-btn {

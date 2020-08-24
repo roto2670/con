@@ -18,18 +18,17 @@
 <div id="scroll-style-hidden" class="right_col base" role="main">
     <div class="top-container">
         <div class="user-searchbox-container">
-            <input type="text" class="hidden-textfield">
+            <input type="text" class="user-serach-box hidden-textfield">
             <div class="searchbox-icon"></div>
         </div>
         <div class="user-filter-container">
-            <div class="user-filter-btn">Good</div>
-            <div class="user-filter-btn">Quarantined</div>
-            <div class="user-filter-btn">Recovered</div>
-            <div class="user-filter-btn">Active/Positive</div>
-            <div class="user-filter-btn">Hospitalized</div>
-            <div class="user-filter-btn">Terminated</div>
-            <div class="user-filter-btn">Not Reported</div>
-            <div class="user-filter-btn">Being Tested</div>
+            <div class="user-filter-btn" id="good">Good</div>
+            <div class="user-filter-btn" id="quarantined">Quarantined</div>
+            <div class="user-filter-btn" id="positive">Positive</div>
+            <div class="user-filter-btn" id="isolated">Isolated</div>
+            <div class="user-filter-btn" id="suspected">Suspected</div>
+            <div class="user-filter-btn" id="terminated">Terminated</div>
+            <div class="user-filter-btn" id="notregistered">Not Registered</div>
         </div>
         <div class="user-new-btn">
             <div class="user-new-btn-icn"></div>
@@ -72,41 +71,97 @@
                 '5': 'Suspected',
                 '-1': 'Terminated',
                 '-2': 'On Leave'
-            }, PAGE_SIZE = 10; // chunk size of users
+            }, 
+            STATUS_VALUE = {
+                'notregistered': 0,
+                'good': 1,
+                'quarantined': 2,
+                'positive': 3,
+                'isolated': 4,
+                'suspected': 5,
+                'terminated': -1,
+                'onleave': -2
+            },
+            PAGE_SIZE = 10; // chunk size of users
 
             let _db = firebase.firestore();
             var _lastUserSnapShot
-                _loadingUsers = false;
+                _loadingUsers = false,
+                _selectedFilter = null;
 
 
             // init
             initHandlers();
-            displayUsers(function() {
+            displayUsers(_selectedFilter, null, false, function() {
                 $('.user-item-loader-btn').removeClass('loading');
             });
-
 
             function initHandlers() {
                 $('.user-item-loader-btn').click(function() {
                     let _this = $(this);
                     _this.addClass('loading');
-                    displayUsers(function () {
+                    displayUsers(_selectedFilter, null, false, function () {
                         _this.removeClass('loading');
                     });
                 });
+
+                $('.user-serach-box').keypress(function(event) {
+                    let keycode = (event.keyCode ? event.keyCode : event.which);
+                    if(keycode == '13'){
+                        alert('Not ready yet!');  
+                    }
+                });
+                $('.searchbox-icon').click(function() {
+                    alert('Not ready yet!');  
+                });
+
+                // init filter buttons.
+                $('.user-filter-btn').click(function() {
+                    _selectedFilter = null;
+                    _lastUserSnapShot = null; // reset paging
+
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected');
+
+                        // display default user list.
+                        displayUsers(null, null, true, function() {
+                            $('.user-item-loader-btn').removeClass('loading');
+                        })
+                    } else {
+                        $('.user-filter-btn').removeClass('selected');
+                        $(this).addClass('selected');
+
+                        let filter = STATUS_VALUE[$(this).attr('id')];
+                        if (_.isNumber(filter)) {
+                            _selectedFilter = filter;
+
+                            // do query.
+                            displayUsers(filter, null, true, function() {
+                                $('.user-item-loader-btn').removeClass('loading');
+                            })
+                        } else {
+                            console.warn('Seems to selected filter, but unknown filter.');
+                        }
+                    }
+                });
             }
 
-            function displayUsers(callback) {
+            function displayUsers(filter, userName, clean, callback) {
                 callback = callback || _.noop;
+
+                let container = $('.user-item-container');
+                if (!!clean) {
+                    container.children().detach().remove();
+                }
+
                 if (!_loadingUsers) {
                     _loadingUsers = true;
-                    loadUsers(_lastUserSnapShot, function(users, lastSnapShot) {
+                    loadUsers(_lastUserSnapShot, filter, userName, function(users, lastSnapShot) {
                         if (!!lastSnapShot) {
                             _lastUserSnapShot = lastSnapShot;
                         }
 
                         // render users.
-                        let container = $('.user-item-container');
                         $.each(users, function(index, user) {
                             let userItem = UserItem(user);
                             container.append(userItem.render());
@@ -121,19 +176,29 @@
                 }
             }
 
-            function loadUsers(startAt, callback) {
+            function loadUsers(startAt, filter, userName, callback) {
                 // TODO: filter
 
-                var query;
+                var ref,
+                    query;
                 if (!!startAt) {
                     // Paging
-                    query = _db.collection('users')
+                    ref = _db.collection('users')
                         .startAfter(startAt)
                         .limit(PAGE_SIZE)
                 } else {
                     // Query first time.
-                    query = _db.collection('users')
+                    ref = _db.collection('users')
                         .limit(PAGE_SIZE);
+                }
+                query = ref;
+
+                // Adds filter if has
+                if (!!filter || filter === 0) {
+                    query = ref.where('status', '==', filter);
+                }
+                if (!!userName) {
+                    query = ref.where('fullname', 'array-contains', userName);
                 }
 
                 // do query

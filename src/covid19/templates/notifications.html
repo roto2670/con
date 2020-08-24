@@ -63,7 +63,8 @@
                     SENT: 'sent'
                 };
 
-            let _db = firebase.firestore();
+            let _db = firebase.firestore(),
+                _messaging = firebase.messaging();
             var _lastQuerySnapShots = {},
                 _loadingMessages = false
                 _notyItemContainers = {}
@@ -92,6 +93,18 @@
                     displayMessages(_currentMessageType, function () {
                         _this.removeClass('loading');
                     });
+                });
+
+                // Handle cloud message for add message item.
+                _messaging.onMessage((payload) => {
+                    if (!!payload) {
+                        console.debug('Received cloud message, try draw it.', payload);
+
+                        let container = _notyItemContainers[_currentMessageType];
+                        container.prepend(MessageItem(payload).render());
+                    } else {
+                        console.warn('Received cloud message, but there is no payload.', payload);
+                    }
                 });
             }
 

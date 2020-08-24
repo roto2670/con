@@ -8,7 +8,7 @@
 
 .user-searchbox-container {
     height: 3em;
-    display: flex;
+    display: none; /* original flex */
     border: 1px solid #EF8009;
     padding: 0.2em 0.4em;
     border-radius: 0.3em;
@@ -34,8 +34,8 @@
 .user-filter-btn {
     display: inline-flex;
     cursor: pointer;
-    background-color: #EF8009;
-    color: white;
+    color: #EF8009;
+    border: 1px solid #EF8009;
     padding: 0.4em 0.8em;
     margin: 0 0.2em;
     box-shadow: 1px 1px #c1c1c1;
@@ -48,6 +48,10 @@
     line-height: 1.2em;
     justify-content: center;
 }
+.user-filter-btn.selected {
+    background-color: #EF8009;
+    color: white;
+}
 
 .user-new-btn {
     align-items: center;
@@ -55,7 +59,7 @@
     background-color: #EF8009;
     height: 3em;
     justify-content: center;
-    display: inline-flex;
+    display: none;
     color: white;
     padding: 0 0.6em;
 }

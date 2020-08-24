@@ -255,10 +255,27 @@
                         _this.removeClass('loading');
                     });
                 });
+
+                // listening new stats.
+                _db.collection('covid19_stats').onSnapshot(function(snapshots) {
+                    var data;
+                    if (!!!snapshots.empty) {
+                        // get last item
+                        data = snapshots.docs[snapshots.docs.length - 1].data();
+                    }
+
+                    // update view
+                    if (!!data) {
+                        updateStats(data);
+                    } else {
+                        console.warn('Received new stats data, but cannot parse data from shapshot.');
+                    }
+                }, function(error) {
+                    console.warn("Received new stats data, but there was an error.", error);
+                })
             }
 
             function display() {
-                // TODO: render Stat item?
                 loadStats(function(stats) {
                     updateStats(stats);
                 });
