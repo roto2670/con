@@ -1,0 +1,130 @@
+<style type="text/css">
+  .sk-main {
+    background-color: #E0002A;
+  }
+  .sk-sub {
+    background-color: #EF8009;
+  }
+</style>
+
+<div class="left_col scroll-view">
+  {% if current_user.level != 0 and current_user.level != 6 %}
+  <script>
+    window.location.href = "/";
+  </script>
+  {% endif %}
+  <!-- sidebar menu -->
+  <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+    
+    <div class="nav_title nav_sm_hidden sub_side_top_tile">
+      <div style="display: inline-block">
+        <i class="fa fa-medkit"></i>
+      </div>
+      <div style="display: inline-block">
+        COVID-19
+      </div>
+    </div>
+    <br><br><br>
+    
+    <div class="menu_section">
+      <ul class="nav side-menu nav_sm_hidden">
+        <li>
+          <a href="/covid19">
+            <i class="fa fa-columns"></i>Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="/covid19/users">
+            <i class="fa fa-users"></i>User
+          </a>
+        </li>
+        <li>
+          <a href="/covid19/notifications">
+            <i class="fa fa-bell"></i>Notification
+          </a>
+        </li>
+        <li>
+          <a href="/covid19/managedata" class="notsupported">
+            <i class="fa fa-database"></i>Manage Data
+          </a>
+        </li>
+        <li>
+          <a href="#" class="notsupported">
+            <i class="fa fa-newspaper-o"></i>News
+          </a>
+        </li>
+        <li>
+          <a href="#" class="notsupported">
+            <i class="fa fa-cogs"></i>Settings
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+  </div>
+</div>
+
+{% block javascripts %}
+<script>
+  (function() {
+    let TOKEN_KEY = '__fb_auth_tk__';
+
+    // init style
+    $('.top_sidebar_menu').addClass('sk-main');
+    $('.left_col').addClass('sk-sub');
+
+    // Initialize firebase
+    var fbaseConfig = {
+      apiKey: "AIzaSyAF1L8Ckq9O_7Atrdn0eZDTBHoyxeSS5JI",
+      authDomain: "skec-fujairah-3a656.firebaseapp.com",
+      databaseURL: "https://skec-fujairah-3a656.firebaseio.com",
+      projectId: "skec-fujairah-3a656",
+      storageBucket: "skec-fujairah-3a656.appspot.com",
+      messagingSenderId: "892956044896",
+      appId: "1:892956044896:web:2a2c4945497c1d547e1d05",
+      measurementId: "G-FN21V51YZQ"
+    };
+    
+    // Initialzie Firebase
+    firebase.initializeApp(fbaseConfig);
+    
+    // init Handlers
+    $('.notsupported').click(function() {
+      window.alert('Not ready yet!');
+    });
+
+    // Auth
+    // Check local storage first.
+    let token = localStorage.getItem(TOKEN_KEY);
+    if (!!token) {
+      console.debug('Try firebase login by token from storage');
+      firebase.auth().signInWithCustomToken(token).catch(function(error) {
+        console.warn('Failed login to firebase from cache token, try refresh token.', error.code, error.message);
+        authToFirebase();
+      });
+    } else {
+      console.debug('There is no auth token in storage, try to issue.');
+      authToFirebase();
+    }
+
+    function authToFirebase() {
+      let functions = firebase.app().functions('asia-east2'),
+        auth = functions.httpsCallable('auth');
+      auth({
+        'emirates_id': '999-0000-0000000-3',
+        'code': 'web!-adMIN-P2rm',
+        'device_id': 'web'
+      }).then(function(result) {
+        firebase.auth().signInWithCustomToken(result.data.token).catch(function(error) {
+          console.error('Firebase login was fail.', error.code, error.message);
+        });
+
+        // TODO: move in auth success
+        // Set in local storage
+        localStorage.setItem(TOKEN_KEY, result.data.token);
+      });
+    }
+
+  })();
+</script>
+{% endblock javascripts %}

@@ -1,0 +1,30 @@
+.base {
+    color: #2e2e2e;
+}
+
+.btn {
+    background-color: #EF8009;
+    cursor: pointer;
+    padding: 0.2em 0.4em;
+    color: white;
+    font-weight: 300;
+}
+
+.hidden-textfield {
+    border: 0px none;
+}
+
+.sub-title-container {
+    width: 100%;
+    font-weight: 500;
+    font-size: 1.8em;
+    border-bottom: 1px solid #E9C7A2;
+    padding: 0.3em 0;
+    box-sizing: border-box;
+    margin-bottom: 0.6em;
+}
+
+.content-container {
+    width: 100%;
+    margin-bottom: 2.4em;
+}

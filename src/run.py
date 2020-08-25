@@ -71,6 +71,7 @@ def register_blueprints(app):
       'pa',
       'internal',
       'login',
+      'covid19',
       'work'
   ]
   for blueprint in blueprints:

@@ -1,0 +1,321 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/notifications.css">
+{% endblock stylesheets %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="top-container">
+        <div class="top-button admin">
+            <div class="top-button-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.67458 1.4059L3.33333 3.08256L1.99208 1.4059C1.93791 1.33893 1.86435 1.29036 1.78149 1.26684C1.69863 1.24332 1.61052 1.24601 1.52925 1.27453C1.44797 1.30305 1.37751 1.35601 1.32752 1.42615C1.27752 1.49629 1.25045 1.58018 1.25 1.66631V7.91631C1.25 8.37589 1.62375 8.74964 2.08333 8.74964H7.91667C8.37625 8.74964 8.75 8.37589 8.75 7.91631V1.66631C8.74955 1.58018 8.72248 1.49629 8.67248 1.42615C8.62249 1.35601 8.55203 1.30305 8.47075 1.27453C8.38948 1.24601 8.30137 1.24332 8.21851 1.26684C8.13565 1.29036 8.06209 1.33893 8.00792 1.4059L6.66667 3.08256L5.32542 1.4059C5.16667 1.2084 4.83333 1.2084 4.67458 1.4059ZM2.08333 7.91631V7.08298H7.91708V7.91631H2.08333ZM6.34125 4.01006C6.5 4.20798 6.83375 4.20798 6.9925 4.01006L7.91667 2.85423L7.91708 6.24964H2.08333V2.85423L3.00792 4.01006C3.16667 4.20798 3.50042 4.20798 3.65917 4.01006L5 2.3334L6.34125 4.01006Z" fill="white"/>
+                </svg>
+            </div>
+            <div class="top-button-label">Admin</div>
+        </div>
+        <div class="top-button medical">
+            <div class="top-button-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.63687 1.875L2.54875 2.02187C2.54875 2.02187 1.5625 3.64125 1.5625 6.25V6.5625H3.46687C3.44645 6.66539 3.43661 6.7701 3.4375 6.875C3.4375 7.73438 4.14062 8.4375 5 8.4375C5.85938 8.4375 6.5625 7.73438 6.5625 6.875C6.5625 6.7675 6.55406 6.66406 6.53312 6.5625H8.4375V6.25C8.4375 4.80938 8.195 3.75313 7.94906 3.05625C7.70344 2.36 7.44125 2.00188 7.44125 2.00188L7.34375 1.875H2.63656H2.63687ZM3.0175 2.5H6.9925C7.03781 2.565 7.17156 2.72875 7.36312 3.27188C7.56625 3.84688 7.74813 4.75 7.78312 5.9375H6.25C5.96406 5.55938 5.5075 5.3125 5 5.3125C4.4925 5.3125 4.03594 5.55938 3.75 5.9375H2.21687C2.28812 3.85938 2.91438 2.67813 3.0175 2.5ZM4.6875 3.125V3.75H4.0625V4.375H4.6875V5H5.3125V4.375H5.9375V3.75H5.3125V3.125H4.6875ZM5 5.9375C5.52187 5.9375 5.9375 6.35313 5.9375 6.875C5.9375 7.39688 5.52187 7.8125 5 7.8125C4.47813 7.8125 4.0625 7.39688 4.0625 6.875C4.0625 6.35313 4.47813 5.9375 5 5.9375ZM5 6.5625C4.91712 6.5625 4.83763 6.59542 4.77903 6.65403C4.72042 6.71263 4.6875 6.79212 4.6875 6.875C4.6875 6.95788 4.72042 7.03737 4.77903 7.09597C4.83763 7.15458 4.91712 7.1875 5 7.1875C5.08288 7.1875 5.16237 7.15458 5.22097 7.09597C5.27958 7.03737 5.3125 6.95788 5.3125 6.875C5.3125 6.79212 5.27958 6.71263 5.22097 6.65403C5.16237 6.59542 5.08288 6.5625 5 6.5625Z" fill="white"/>
+                </svg>
+            </div>
+            <div class="top-button-label">Medical Team</div>
+        </div>
+        <div class="top-button sent">
+            <div class="top-button-icon">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.5 8.5H8.5V7L11 9.25L8.5 11.5V10H6.5V8.5ZM10 2H2C1.73478 2 1.48043 2.10536 1.29289 2.29289C1.10536 2.48043 1 2.73478 1 3V9C1 9.26522 1.10536 9.51957 1.29289 9.70711C1.48043 9.89464 1.73478 10 2 10H5.5V9H2V4L6 6.5L10 4V7H11V3C11 2.73478 10.8946 2.48043 10.7071 2.29289C10.5196 2.10536 10.2652 2 10 2ZM6 5.5L2 3H10L6 5.5Z" fill="#EF8009"/>
+                </svg>
+            </div>
+            <div class="top-button-label">Sent</div>
+        </div>
+    </div>
+    <div class="content-container"></div>
+
+    <div class="noty-item-loader-btn loading">
+        <div class="noty-item-loader-icon"></div>
+        <div class="noty-item-loader-label">Load more</div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+
+    <script>
+        (function() {
+            const PAGE_SIZE = 7, // chunk size
+                MESSAGE_TYPE = {
+                    ADMIN: 'admin',
+                    MEDICAL: 'medical',
+                    SENT: 'sent'
+                };
+
+            let _db = firebase.firestore();
+            var _lastQuerySnapShots = {},
+                _loadingMessages = false
+                _notyItemContainers = {}
+                _currentMessageType = '';
+            
+            // init
+            initHandlers();
+            render();
+            switchMessages(MESSAGE_TYPE.ADMIN, function() {
+                initSnapshotHandler();
+            });
+
+            function initHandlers() {
+                // init top buttons.
+                $('.top-button.admin').click(function() {
+                    switchMessages(MESSAGE_TYPE.ADMIN);
+                });
+                $('.top-button.medical').click(function() {
+                    switchMessages(MESSAGE_TYPE.MEDICAL);
+                });
+                $('.top-button.sent').click(function() {
+                    switchMessages(MESSAGE_TYPE.SENT);
+                });
+
+                $('.noty-item-loader-btn').click(function() {
+                    let _this = $(this);
+                    _this.addClass('loading');
+                    displayMessages(_currentMessageType, true, function () {
+                        _this.removeClass('loading');
+                    });
+                });
+            }
+
+            function initSnapshotHandler() {
+                // Add message item in real time.
+                // TODO: fix where,
+                _db.collection('messages')
+                    // .orderBy('ts', 'desc')
+                    //.limit(1)
+                    .onSnapshot(function(snapshot) {
+                        snapshot.docChanges().forEach(function(change) {
+                            if (change.type === 'added') {
+                                let container,
+                                    model;
+
+                                model = change.doc.data();
+                                if (model) {
+                                    // don't check type of type.
+                                    // check type
+                                    if (model.to_user == 1) {
+                                        // admin
+                                        container = _notyItemContainers[MESSAGE_TYPE.ADMIN];
+                                    } else if (model.to_user == 2) {
+                                        // medical team
+                                        container = _notyItemContainers[MESSAGE_TYPE.MEDICAL];
+                                    } else if (model.from_user == 1 || model.from_user == 2) {
+                                        // sent
+                                        container = _notyItemContainers[MESSAGE_TYPE.SENT];
+                                    }
+
+                                    if (!!container) {
+                                        let item = MessageItem(model);
+
+                                        // do animation
+                                        _.delay(function() {
+                                            container.prepend(item.render(model));
+                                            item.blink();
+                                        });
+                                    } else {
+                                        // this message will be appered when switched view.
+                                    }
+                                }
+                            }
+                        });
+                    });
+            }
+
+            function render() {
+                _.each(MESSAGE_TYPE, function(type) {
+                    _notyItemContainers[type] = $('<div class="noty-item-container ' + type + '">');
+                })
+            }
+
+            function switchMessages(type, callback) {
+                let _callback = callback || _.noop;
+
+                $('.noty-item-loader-btn').addClass('loading');
+                if (_currentMessageType !== type) {
+                    let currentContainer = _notyItemContainers[type];
+
+                    $('.top-button').removeClass('selected');
+                    $('.top-button.' + type).addClass('selected');
+                    _.each(_notyItemContainers, function(container) {
+                        container.detach();
+                    })
+                    currentContainer.appendTo($('.content-container'));
+                    if (!!currentContainer && currentContainer.children().length <= 0) {
+                        // Load init messages
+                        displayMessages(type, false, function() {
+                            $('.noty-item-loader-btn').removeClass('loading');
+                            _callback();
+                        });
+                    } else {
+                        $('.noty-item-loader-btn').removeClass('loading');
+                        _callback();
+                    }
+                    _currentMessageType = type;
+                } else {
+                    // nothing.
+                    $('.noty-item-loader-btn').removeClass('loading');
+                    _callback();
+                }
+            }
+
+            function displayMessages(type, animation, callback) {
+                var _callback = callback || _.noop;
+                if (!_loadingMessages) {
+                    _loadingMessages = true;
+                    loadMessages(_lastQuerySnapShots[type], type, function(messages, lastSnapShot) {
+                        // TODO: check last snapshot is equal?
+                        if (!!lastSnapShot) {
+                            _lastQuerySnapShots[type] = lastSnapShot;
+                        } else {
+                            // TODO no more items.
+                        }
+
+                        // render messages.
+                        let container = _notyItemContainers[type];
+                        $.each(messages, function(index, message) {
+                            let item = MessageItem(message);
+                            container.append(item.render(message));
+                            if (animation) {
+                                item.blink();
+                            }
+                        });
+
+                        _loadingMessages = false;
+                        _callback();
+                    });
+                } else {
+                    console.debug("Already loading messages.");
+                    _callback();
+                }
+            }
+
+            function loadMessages(startAt, type, callback) {
+                var ref = _db.collection('messages');
+                if (!!startAt) {
+                    // Paging
+                    ref = ref.startAfter(startAt);
+                }
+                ref = ref.limit(PAGE_SIZE);
+
+                // create a query.
+                var query;
+                if (MESSAGE_TYPE.ADMIN === type) {
+                    query = ref.where('to_user', '==', 1);
+                } else if (MESSAGE_TYPE.MEDICAL === type) {
+                    query = ref.where('to_user', '==', 2);
+                } else if (MESSAGE_TYPE.SENT === type) {
+                    query = ref.where('from_user', '>=', 1).where('from_user', '<=', 2);
+                }
+
+                if (!!query) {
+                    // do query
+                    query.get().then(function(snapshots) {
+                        var messages = [],
+                            lastSnapShot;
+                        if (!!!snapshots.empty) {
+                            lastSnapShot = snapshots.docs[snapshots.docs.length - 1];
+                            snapshots.forEach(function(doc) {
+                                messages.push(doc.data());
+                            });
+                        } else {
+                            // no more messages.
+                        }
+
+                        callback(messages, lastSnapShot);
+                    }).catch(function(error) {
+                        console.warn('Failed to load messages from server.', error);
+                        callback();
+                    });
+                } else {
+                    console.warn('Cannot request get messages, wrong type.', type);
+                    callback();
+                }
+            }
+
+            function MessageItem(model) {
+                var _model = model,
+                    _views = {};
+
+                function render(model) {
+
+                    let container = $('<div class="noty-item">');
+                    let profile = $('<div class="noty-item-avatar">');
+                    let contentContainer = $('<div class="noty-item-content-container">'),
+                        nameLabel = $('<div class="noty-item-name-label">'),
+                        descLabel = $('<div class="noty-item-desc-label">');
+                    let locateContainer = $('<div class="noty-item-locate-container">'),
+                        timeagoLabel = $('<div class="noty-item-timeago-label">');
+                    let messageButton = $('<div class="noty-item-msg-btn">')
+                    let closeButton = $('<div class="noty-item-close-btn">')
+
+                    container.append(profile, contentContainer, messageButton, closeButton);
+                    contentContainer.append(nameLabel, descLabel, locateContainer);
+                    locateContainer.append(timeagoLabel);
+
+                    // init handlers
+                    closeButton.click(function() {
+                        container.detach().remove();
+                        // TODO: call api?
+                    })
+
+                    // store views
+                    _views.container = container;
+                    _views.profile = profile;
+                    _views.nameLabel = nameLabel;
+                    _views.descLabel = descLabel;
+                    _views.timeagoLabel = timeagoLabel;
+                    _views.messageButton = messageButton;
+                    _views.closeButton = closeButton;
+
+                    update(model);
+
+                    return container;
+                }
+
+                function update(model) {
+                    _model = model;
+
+                    _views.nameLabel.text(model.title || '-');
+                    _views.descLabel.text(model.message || '-');
+                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-')
+                }
+
+                function blink() {
+                    let container = _views.container;
+                    if (!!container) {
+                        container.addClass('new');
+                        _.delay(function() {
+                            container.removeClass('new');
+                        });
+                    }
+                }
+
+                return {
+                    render: render,
+                    upate: update,
+                    blink: blink
+                }
+            }
+        })();
+    </script>
+{% endblock javascripts %}

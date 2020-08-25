@@ -35,6 +35,18 @@
       {% else %}
         <link href="{{ url_for('static', filename='build/css/custom.css') }}" rel="stylesheet">
       {% endif %}
+
+      <!-- load early scripts -->
+      <!-- jQuery -->
+      <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js') }}"></script>
+      <!-- Bootstrap -->
+      <script src="{{ url_for('static', filename='vendors/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+
+      <!-- for firebase -->
+      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-app.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-auth.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-functions.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-firestore.js"></script>
     {% endblock head %}
   </head>
 
@@ -116,10 +128,6 @@
       </div>
 
       {% block javascripts %}
-        <!-- jQuery -->
-        <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js') }}"></script>
-        <!-- Bootstrap -->
-        <script src="{{ url_for('static', filename='vendors/bootstrap/dist/js/bootstrap.min.js') }}"></script>
         <!-- FastClick -->
         <script src="{{ url_for('static', filename='vendors/fastclick/lib/fastclick.js') }}"></script>
         <!-- NProgress
@@ -146,6 +154,12 @@
         <script src="{{ url_for('static', filename='vendors/pnotify/dist/pnotify.js') }}"></script>
         <script src="{{ url_for('static', filename='vendors/pnotify/dist/pnotify.buttons.js') }}"></script>
         <script src="{{ url_for('static', filename='vendors/pnotify/dist/pnotify.nonblock.js') }}"></script>
+
+        <!-- Underscore -->
+        <script src="{{ url_for('static', filename='vendors/underscore/underscore.js') }}"></script>
+
+        <!-- Timeago -->
+        <script src="{{ url_for('static', filename='vendors/timeago/jquery.timeago.js') }}"></script>
 
         <!-- Custom function(jslee) -->
         <script>

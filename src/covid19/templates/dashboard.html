@@ -1,0 +1,456 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/dashboard.css">
+{% endblock stylesheets %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="sub-title-container">
+        Overview
+    </div>
+
+    <!-- Status widget -->
+    <div class="content-container status-widgets">
+        <div class="w-upper-container">
+            <div class="status-widget confirmed">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon confirmed"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Confirmed
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget deaths">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon death"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Deaths
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget recovered">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon recovered"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Recovered
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-middle-container">
+            <div class="status-widget actptv small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon actptv"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Active/Positive
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget quarantined small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon quarantined"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Quarantined
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget isolated small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon isolated"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Isolated
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget suspected small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon suspected"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Suspected Cases
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-lower-container">
+            <div class="status-title-widget alertphase wide">
+                <div class="status-title-widget-upper-container">
+                    Alert Phase
+                </div>
+                <div class="status-title-widget-lower-container">
+                    <div class="status-title-widget-icon"></div>
+                    <div class="status-title-widget-title-label">Level</div>
+                    <div class="status-title-widget-value-label">-</div>
+                </div>
+            </div>
+
+            <div class="status-widget cconfirmed">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon uae"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Confirmed
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget cdeaths">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon uae"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Deaths
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts message items -->
+    <div class="sub-title-container">
+        Alerts 
+    </div>
+    <div class="content-container alerts"></div>
+    <div class="alert-item-loader-btn loading">
+        <div class="alert-item-loader-icon"></div>
+        <div class="alert-item-loader-label">Load more</div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+
+    <script>
+        (function() {
+            const STAT_DISPLAY_NAME = {
+                'active_positives': "Active/Positive",
+                'confirmed': "Confirmed",
+                'country_total_cases': "Country Total Cases",
+                'country_total_deaths': "Country Total Deaths",
+                'deaths': "Deaths",
+                'quarantined': "Quarantined",
+                'recovered': "Recovered",
+                'suspected': "Suspected",
+                'ts': "Last Time"
+            },
+            STAT_LAYOUT = {
+                upper: ['active_positives', 'suspected', 'quarantined'],
+                lower: ['confirmed', 'recovered', 'deaths']
+            },
+            ALERT_PAGE_SIZE = 5;
+
+            let _db = firebase.firestore(),
+                _loadingAlerts = false,
+                _lastAlertSnapshot;
+        
+
+            // Init
+            initHandlers();
+            display();
+
+
+            function initHandlers() {
+                $('.alert-item-loader-btn').click(function() {
+                    let _this = $(this);
+                    _this.addClass('loading');
+                    displayAlerts(function () {
+                        _this.removeClass('loading');
+                    });
+                });
+            }
+
+            function initSnapshots() {
+                // listening new stats.
+                _db.collection('covid19_stats')
+                    .orderBy('ts', 'desc')
+                    .limit(1)
+                    .onSnapshot(function(snapshot) {
+                        snapshot.docChanges().forEach(function(change) {
+                            if (change.type === 'added' || change.type === 'modified')
+                            var data;
+                            if (!!!snapshot.empty) {
+                                // get last item
+                                data = snapshot.docs[snapshot.docs.length - 1].data();
+                            }
+
+                            // update view
+                            if (!!data) {
+                                updateStats(data);
+                            } else {
+                                console.warn('Received new stats data, but cannot parse data from shapshot.');
+                            }
+                        });
+                }, function(error) {
+                    console.warn("Received new stats data, but there was an error.", error);
+                })
+            }
+
+            function display() {
+                loadStats(function(stats) {
+                    updateStats(stats);
+                    initSnapshots(); // init handlers
+                });
+
+                // Load alerts
+                displayAlerts(function() {
+                    $('.alert-item-loader-btn').removeClass('loading');
+                });
+            }
+
+            function updateStats(stats) {
+                $('.status-widget.confirmed .status-w-value-label').text(stats.confirmed || '0');
+                $('.status-widget.deaths .status-w-value-label').text(stats.deaths || '0');
+                $('.status-widget.recovered .status-w-value-label').text(stats.recovered || '0');
+
+                $('.status-widget.actptv .status-w-value-label').text(stats.active_positives || '0');
+                $('.status-widget.quarantined .status-w-value-label').text(stats.quarantined || '0');
+                $('.status-widget.isolated .status-w-value-label').text(stats.isolated || '0');
+                $('.status-widget.suspected .status-w-value-label').text(stats.suspected || '0');
+
+                $('.status-title-widget.alertphase .status-title-widget-value-label').text(stats.alert_phase || '0');
+                $('.status-widget.cconfirmed .status-w-value-label').text(stats.country_new_cases || '0');
+                $('.status-widget.cdeaths .status-w-value-label').text(stats.country_new_deaths || '0');
+            }
+
+            function loadStats(callback) {
+                _db.collection('covid19_stats')
+                    .orderBy('ts', 'desc')
+                    .limit(1).get().then((snapShots) => {
+                        var data = {};
+                        if (!snapShots.empty) {
+                            data = snapShots.docs[0].data();
+                        }
+                        callback(data); 
+                    });
+            }
+
+            function displayAlerts(callback) {
+                callback = callback || _.noop;
+                if (!_loadingAlerts) {
+                    _loadingAlerts = true;
+                    loadAlerts(_lastAlertSnapshot, function(users, lastSnapshot) {
+                        if (!!lastSnapshot) {
+                            _lastAlertSnapshot = lastSnapshot;
+                        }
+
+                        // render alert items.
+                        let container = $('.content-container.alerts');
+                        $.each(users, function(index, user) {
+                            let viewItem = AlertItem(user);
+                            container.append(viewItem.render());
+                        });
+
+                        _loadingAlerts = false;
+                        callback();
+                    });
+                } else {
+                    console.debug("Already loading users.");
+                    callback();
+                }
+            }
+
+            function loadAlerts(startAt, callback) {
+                var ref,
+                    query;
+                if (!!startAt) {
+                    // Paging
+                    ref = _db.collection('messages')
+                        .startAfter(startAt)
+                        .limit(ALERT_PAGE_SIZE)
+                } else {
+                    // Query first time.
+                    ref = _db.collection('messages')
+                        .limit(ALERT_PAGE_SIZE);
+                }
+
+                // make a query
+                query = ref.where('type', '==', 1);
+                query = ref.where('to_user', '==', 1);
+
+                // do query
+                query.get().then(function(snapshots) {
+                    var alerts = [],
+                        lastSnapShot;
+                    if (!!!snapshots.empty) {
+                        lastSnapShot = snapshots.docs[snapshots.docs.length - 1];
+                        snapshots.forEach(function(doc) {
+                            alerts.push(doc.data());
+                        });
+                    } else {
+                        // no more alerts.
+                    }
+
+                    callback(alerts, lastSnapShot);
+                }).catch(function(error) {
+                    console.warn('Failed to load alerts from server.', error);
+                    callback();
+                });
+            }
+
+            function StatItem(value, displayName) {
+                function render () {
+                    return ;
+                }
+
+                return {
+                    render: render
+                }
+            }
+
+            function AlertItem(model) {
+                let _model = model,
+                    _views = {};
+
+                function render() {
+                    let container = $('<div class="a-item">')
+                    let leftContainer = $('<div class="a-item-left-container">')
+                            .append('<div class="a-item-avatar">');
+                    let nameContainer = $('<div class="a-item-name-container">'),
+                        idLabel = $('<div class="a-item-id-label">'),
+                        nameLabel = $('<div class="a-item-name-label">'),
+                        locateContainer = $('<div class="a-item-locate-container">');
+                    let textContainer = $('<div class="a-item-text-container">'),
+                        titleLabel = $('<div class="a-item-title-label">'),
+                        descLabel = $('<div class="a-item-desc-label">');
+                    let rightContainer = $('<div class="a-item-right-container">')
+                        closeButton = $('<div class="a-item-close-btn">'),
+                        timeagoLabel = $('<div class="a-item-timeago-label">');
+
+                    container.append(leftContainer, nameContainer, textContainer, rightContainer);
+                    nameContainer.append(idLabel, nameLabel, locateContainer);
+                    textContainer.append(titleLabel, descLabel);
+                    rightContainer.append(closeButton, timeagoLabel);
+
+                    // init handlers
+                    closeButton.click(function() {
+                        container.detach().remove();
+                    });
+
+                    // Stores view
+                    _views.container = container;
+                    _views.idLabel = idLabel;
+                    _views.nameLabel = nameLabel;
+                    _views.titleLabel = titleLabel;
+                    _views.descLabel = descLabel;
+                    _views.timeagoLabel = timeagoLabel;
+
+                    update(_model);
+
+                    return container;
+                }
+
+                function update(model) {
+                    _model = model;
+
+                    _views.idLabel.text('');
+                    _views.nameLabel.text('');
+                    _views.titleLabel.text(model.title || '-');
+                    _views.descLabel.text(model.message || '-');
+                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
+                }
+
+                return {
+                    render: render
+                }
+            }
+        })();
+    </script>
+{% endblock javascripts %}

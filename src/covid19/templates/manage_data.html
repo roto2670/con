@@ -1,0 +1,58 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/managedata.css">
+{% endblock stylesheets %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="content-container tests">
+        <!-- Upload box -->
+        <div class="title-container">
+            <div class="title-icon tests"></div>
+            <div class="title-label">Tests</div>
+        </div>
+        <div class="upload-container">
+            <div class="upload-icon"></div>
+            <div class="desc-label">Drag & Drop a file containing data to upload</div>
+            <div class="or-label">or</div>
+            <div class="browse-button btn">Browse (.csv)</div>
+        </div>
+        <div class="submit-button btn">Submit</div>
+    </div>
+    <div class="content-container users">
+        <!-- Upload box -->
+        <div class="title-container">
+            <div class="title-icon users"></div>
+            <div class="title-label">Users</div>
+        </div>
+        <div class="upload-container">
+            <div class="upload-icon"></div>
+            <div class="desc-label">Drag & Drop a file containing data to upload</div>
+            <div class="or-label">or</div>
+            <div class="browse-button btn">Browse (.csv)</div>
+        </div>
+        <div class="submit-button btn">Submit</div>
+
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+    <script>
+        (function() {
+            // TODO: 
+        })();
+    </script>
+{% endblock javascripts %}
