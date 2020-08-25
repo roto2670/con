@@ -29,7 +29,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-value-label">N/A</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-</div>
@@ -47,7 +47,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-value-label">N/A</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-</div>
@@ -65,7 +65,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-value-label">N/A</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-</div>
@@ -85,7 +85,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-value-label">N/A</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-</div>
@@ -103,7 +103,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-value-label">N/A</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-</div>
@@ -121,7 +121,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-value-label">N/A</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-</div>
@@ -139,14 +139,14 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-value-label">N/A</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-</div>
                         </div>
                     </div>
                     <div class="status-w-right-lower-container status-w-title-label">
-                        Suspected Cases
+                        Suspected
                     </div>
                 </div>
             </div>
@@ -160,7 +160,7 @@
                 <div class="status-title-widget-lower-container">
                     <div class="status-title-widget-icon"></div>
                     <div class="status-title-widget-title-label">Level</div>
-                    <div class="status-title-widget-value-label">-</div>
+                    <div class="status-title-widget-value-label">N/A</div>
                 </div>
             </div>
 
@@ -170,7 +170,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-value-label">N/A</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-</div>
@@ -188,7 +188,7 @@
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
-                        <div class="status-w-value-label">-</div>
+                        <div class="status-w-value-label">N/A</div>
                         <div class="status-w-pct-container">
                             <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
                             <div class="status-w-pct-label">-</div>
@@ -231,9 +231,17 @@
                 'suspected': "Suspected",
                 'ts': "Last Time"
             },
-            STAT_LAYOUT = {
-                upper: ['active_positives', 'suspected', 'quarantined'],
-                lower: ['confirmed', 'recovered', 'deaths']
+            STAT_TYPE_KEY = {
+                'active_positives': "actptv",
+                'confirmed': "confirmed",
+                'country_total_cases': "cconfirmed",
+                'country_total_deaths': "cdeaths",
+                'deaths': "deaths",
+                'quarantined': "quarantined",
+                'recovered': "recovered",
+                'suspected': "suspected",
+                'isolated': "isolated",
+                'alert_phase': "alertphase"
             },
             ALERT_PAGE_SIZE = 5;
 
@@ -267,11 +275,10 @@
                             if (change.type === 'added' || change.type === 'modified')
                             var data;
                             if (!!!snapshot.empty) {
-                                // get last item
                                 data = snapshot.docs[snapshot.docs.length - 1].data();
                             }
 
-                            // update view
+                            // update stat value view
                             if (!!data) {
                                 updateStats(data);
                             } else {
@@ -284,8 +291,15 @@
             }
 
             function display() {
-                loadStats(function(stats) {
-                    updateStats(stats);
+                loadStats(function(today, yesterday) {
+
+                    updateStats(today);
+
+                    // update compare view
+                    if (!!yesterday) {
+                        updateCompareStats(yesterday, today);
+                    }
+
                     initSnapshots(); // init handlers
                 });
 
@@ -296,29 +310,92 @@
             }
 
             function updateStats(stats) {
-                $('.status-widget.confirmed .status-w-value-label').text(stats.confirmed || '0');
-                $('.status-widget.deaths .status-w-value-label').text(stats.deaths || '0');
-                $('.status-widget.recovered .status-w-value-label').text(stats.recovered || '0');
+                // Display stats
+                $('.status-widget.confirmed .status-w-value-label').text(getStatDisplayName(stats.confirmed));
+                $('.status-widget.deaths .status-w-value-label').text(getStatDisplayName(stats.deaths));
+                $('.status-widget.recovered .status-w-value-label').text(getStatDisplayName(stats.recovered));
 
-                $('.status-widget.actptv .status-w-value-label').text(stats.active_positives || '0');
-                $('.status-widget.quarantined .status-w-value-label').text(stats.quarantined || '0');
-                $('.status-widget.isolated .status-w-value-label').text(stats.isolated || '0');
-                $('.status-widget.suspected .status-w-value-label').text(stats.suspected || '0');
+                $('.status-widget.actptv .status-w-value-label').text(getStatDisplayName(stats.active_positives));
+                $('.status-widget.quarantined .status-w-value-label').text(getStatDisplayName(stats.quarantined));
+                $('.status-widget.isolated .status-w-value-label').text(getStatDisplayName(stats.isolated));
+                $('.status-widget.suspected .status-w-value-label').text(getStatDisplayName(stats.suspected));
 
-                $('.status-title-widget.alertphase .status-title-widget-value-label').text(stats.alert_phase || '0');
-                $('.status-widget.cconfirmed .status-w-value-label').text(stats.country_new_cases || '0');
-                $('.status-widget.cdeaths .status-w-value-label').text(stats.country_new_deaths || '0');
+                // handle alert phase
+                if (stats.alert_phase == 0) {
+                    $('.status-title-widget.alertphase .status-title-widget-title-label').text('');
+                    $('.status-title-widget.alertphase .status-title-widget-value-label').text('Normal');
+                } else {
+                    $('.status-title-widget.alertphase .status-title-widget-title-label').text('Level');
+                    $('.status-title-widget.alertphase .status-title-widget-value-label').text(
+                        getStatDisplayName(stats.alert_phase));
+                }
+                $('.status-widget.cconfirmed .status-w-value-label').text(getStatDisplayName(stats.country_total_cases));
+                $('.status-widget.cdeaths .status-w-value-label').text(getStatDisplayName(stats.country_total_deaths));
+            }
+
+            function updateCompareStats(source, target) {
+                if (!!source && !!target) {
+                    let targetTypes = _.keys(_.omit(target, 'avg_new_cases', 'avg_new_deaths', 'country_avg_new_cases',
+                        'country_avg_new_deaths', 'headcount', 'ts', 'recovered'));
+                    _.each(targetTypes, function(type) {
+                        updateCompareStat(type, source[type], target[type]);
+                    });
+
+                    // good for the increase
+                    targetTypes = ['recovered'];
+                    _.each(targetTypes, function(type) {
+                        updateCompareStat(type, source[type], target[type], true);
+                    });
+                } else {
+                    console.warn('Cannot update compare stats, by given args is null.', source, target)
+                }
+            }
+
+            function updateCompareStat(type, source, target, reverse, valueLabel, arrowWidget) {
+                if (_.isNumber(source) || _.isNumber(target)) {
+                    let label = valueLabel || $('.status-widget.' + STAT_TYPE_KEY[type] + ' .status-w-pct-label'),
+                        arrow = arrowWidget || $('.status-widget.' + STAT_TYPE_KEY[type] + ' .status-w-pct-icon'),
+                        different = (target || 0) - (source || 0);
+
+                        arrow.removeClass('fa-caret-down fa-caret-up pstv ngtv');
+                        if (!!!reverse) {
+                            if (different > 0) {
+                                arrow.addClass('fa-caret-up ngtv');
+                            } else {
+                                arrow.addClass('fa-caret-down pstv');
+                            }
+                        } else {
+                            if (different > 0) {
+                                arrow.addClass('fa-caret-up pstv');
+                            } else {
+                                arrow.addClass('fa-caret-down ngtv');
+                            }
+                        }
+
+
+                        label.text(different);
+                } else {
+                    console.warn('Cannot update compare stat, by given source or target are not numbers.', source,
+                        target);
+                }
             }
 
             function loadStats(callback) {
                 _db.collection('covid19_stats')
                     .orderBy('ts', 'desc')
-                    .limit(1).get().then((snapShots) => {
-                        var data = {};
-                        if (!snapShots.empty) {
-                            data = snapShots.docs[0].data();
+                    .limit(2).get().then((snapshots) => {
+                        var today = {},
+                            yesterday;
+
+                        if (!snapshots.empty) {
+                            today = snapshots.docs[snapshots.docs.length - 1].data();
                         }
-                        callback(data); 
+                        if (snapshots.docs.length > 1) {
+                            // has yesterday
+                            yesterday = today;
+                            today = snapshots.docs[snapshots.docs.length - 2].data();
+                        }
+                        callback(today, yesterday); 
                     });
             }
 
@@ -353,17 +430,19 @@
                 if (!!startAt) {
                     // Paging
                     ref = _db.collection('messages')
+                        .orderBy('ts', 'desc')
                         .startAfter(startAt)
                         .limit(ALERT_PAGE_SIZE)
                 } else {
                     // Query first time.
                     ref = _db.collection('messages')
+                        .orderBy('ts', 'desc')
                         .limit(ALERT_PAGE_SIZE);
                 }
 
                 // make a query
                 query = ref.where('type', '==', 1);
-                query = ref.where('to_user', '==', 1);
+                query = ref.where('to_user', '==', '1');
 
                 // do query
                 query.get().then(function(snapshots) {
@@ -383,6 +462,13 @@
                     console.warn('Failed to load alerts from server.', error);
                     callback();
                 });
+            }
+
+            function getStatDisplayName(value) {
+                if (_.isNumber(value)) {
+                    return value;
+                }
+                return 'N/A';
             }
 
             function StatItem(value, displayName) {

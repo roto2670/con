@@ -75,15 +75,15 @@
 }
 
 .status-title-widget-upper-container {
-    font-size: 1.6em;
+    font-size: 2em;
 }
 
 .status-title-widget-lower-container {
-    margin-top: 1em;
+    margin-top: 0.2em;
     display: flex;
     flex-direction: row;
     align-items: center;
-
+    line-height: normal;
 }
 
 .status-title-widget-icon {
@@ -96,13 +96,13 @@
 
 .status-title-widget-title-label {
     color: #EDEDED;
-    font-size: 3em;
+    font-size: 4.6em;
     margin-left: auto;
 }
 
 .status-title-widget-value-label {
     color: #EDEDED;
-    font-size: 3.4em;
+    font-size: 5em;
     margin-left: 0.2em;
 }
 
@@ -163,7 +163,7 @@
     display: inline-flex;
     font-size: 3.2em;
     font-weight: 400;
-    padding-right: 0.2em;
+    padding-right: 0.3em;
 }
 .small .status-w-value-label {
     font-size: 2.8em;
@@ -190,6 +190,7 @@
 }
 
 .status-w-pct-label {
+    font-size: 1.6em;
     color: #EAEAEA;
 }
 
