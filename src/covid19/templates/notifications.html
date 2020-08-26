@@ -185,7 +185,7 @@
                                     // don't check type of type.
                                     container = _notyItemContainers[MESSAGE_TYPE.COMPLIANCE];
                                     if (!!container) {
-                                        let item = MessageItem(model);
+                                        let item = ComplianceMessageItem(model);
 
                                         // do animation
                                         _.delay(function() {
@@ -253,7 +253,12 @@
                         // render messages.
                         let container = _notyItemContainers[type];
                         $.each(messages, function(index, message) {
-                            let item = MessageItem(message);
+                            let item;
+                            if (MESSAGE_TYPE.COMPLIANCE != type) {
+                                item = MessageItem(message);
+                            } else {
+                                item = ComplianceMessageItem(message);
+                            }
                             container.append(item.render(message));
                             if (animation) {
                                 item.blink();
@@ -364,6 +369,85 @@
                     _views.titleLabel.text(model.title || '-');
                     _views.descLabel.text(model.message || '-');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-')
+                }
+
+                function blink() {
+                    let container = _views.container;
+                    if (!!container) {
+                        container.addClass('new');
+                        _.delay(function() {
+                            container.removeClass('new');
+                        });
+                    }
+                }
+
+                return {
+                    render: render,
+                    upate: update,
+                    blink: blink
+                }
+            }
+
+            function ComplianceMessageItem(model) {
+                var _model = model,
+                    _views = {};
+
+                function render(model) {
+
+                    let container = $('<div class="noty-item">');
+                    let profile = $('<div class="noty-item-avatar">');
+                    let contentContainer = $('<div class="noty-item-content-container">'),
+                        titleLabel = $('<div class="noty-item-title-label">'),
+                        descLabel = $('<div class="noty-item-desc-label">');
+                    let locateContainer = $('<div class="noty-item-locate-container">'),
+                        nameLabel = $('<div class="noty-item-name-label">'),
+                        timeagoLabel = $('<div class="noty-item-timeago-label">');
+                    let messageButton = $('<div class="noty-item-msg-btn">')
+                    let closeButton = $('<div class="noty-item-close-btn">')
+
+                    container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
+                    contentContainer.append(titleLabel, descLabel, locateContainer);
+                    locateContainer.append(timeagoLabel);
+
+                    // init handlers
+                    closeButton.click(function() {
+                        container.detach().remove();
+                        // TODO: call api?
+                    })
+
+                    // store views
+                    _views.container = container;
+                    _views.profile = profile;
+                    _views.titleLabel = titleLabel;
+                    _views.descLabel = descLabel;
+                    _views.nameLabel = nameLabel;
+                    _views.messageButton = messageButton;
+                    _views.closeButton = closeButton;
+                    _views.timeagoLabel = timeagoLabel;
+
+                    update(model);
+
+                    return container;
+                }
+
+                function update(model) {
+                    _model = model;
+
+                    _views.descLabel.text(model.message || '-');
+                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-')
+
+                    let title = 'Hygiene practices';
+                    if (model.category === 2) {
+                        title = 'Social distancing';
+                    } else if (model.category === 3) {
+                        title = 'Restroom';
+                    } else if (model.category === 4) {
+                        title = 'Office hygiene';
+                    } else if (model.category === 5) {
+                        title = 'Meeting rooms';
+                    }
+
+                    _views.titleLabel.text(title);
                 }
 
                 function blink() {
