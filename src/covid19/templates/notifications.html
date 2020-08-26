@@ -85,6 +85,7 @@
                 _notyItemContainers = {}
                 _currentMessageType = ''
                 _initializedSnapshotHandler = false;
+                _initializedComplianceSnapshotHandler = false;
             
             // init
             initHandlers();
@@ -148,6 +149,41 @@
                                         container = _notyItemContainers[MESSAGE_TYPE.SENT];
                                     }
 
+                                    if (!!container) {
+                                        let item = MessageItem(model);
+
+                                        // do animation
+                                        _.delay(function() {
+                                            container.prepend(item.render(model));
+                                            item.blink();
+                                        });
+                                    } else {
+                                        // this message will be appered when switched view.
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                _db.collection('compliance_reports')
+                    .orderBy('ts', 'desc')
+                    .limit(1)
+                    .onSnapshot(function(snapshot) {
+                        snapshot.docChanges().forEach(function(change) {
+                            if (!_initializedComplianceSnapshotHandler) {
+                                // FIXME: OnSnapshot first loads all the documents that match the query.
+                                _initializedComplianceSnapshotHandler = true;
+                                return;
+                            }
+
+                            if (change.type === 'added') {
+                                let container,
+                                    model;
+
+                                model = change.doc.data();
+                                if (model) {
+                                    // don't check type of type.
+                                    container = _notyItemContainers[MESSAGE_TYPE.COMPLIANCE];
                                     if (!!container) {
                                         let item = MessageItem(model);
 
@@ -245,7 +281,7 @@
                 } else if (MESSAGE_TYPE.SENT === type) {
                     query = ref.where('from_user', '>=', 1).where('from_user', '<=', 2).orderBy('from_user'); 
                 } else if (MESSAGE_TYPE.COMPLIANCE === type) {
-                    query = ref.where('type', '==', 5);
+                    query = _db.collection('compliance_reports')
                 }
                 query = query.orderBy('ts', 'desc');
 
