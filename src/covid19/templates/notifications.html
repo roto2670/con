@@ -77,7 +77,8 @@
                     MEDICAL: 'medical',
                     SENT: 'sent',
                     COMPLIANCE: 'compliance'
-                };
+                },
+                USER_MENU_URL_PREFIX='users';
 
             let _db = firebase.firestore();
             var _lastQuerySnapShots = {},
@@ -112,8 +113,11 @@
                 $('.noty-item-loader-btn').click(function() {
                     let _this = $(this);
                     _this.addClass('loading');
-                    displayMessages(_currentMessageType, true, function () {
+                    displayMessages(_currentMessageType, true, function (empty) {
                         _this.removeClass('loading');
+                        if (empty) {
+                            _this.addClass('hide');
+                        }
                     });
                 });
             }
@@ -150,7 +154,11 @@
                                     }
 
                                     if (!!container) {
-                                        let item = MessageItem(model);
+                                        let item = MessageItem(model, {
+                                            goToUser: function(userId) {
+                                                goToUserMenu(userId);
+                                            }
+                                        });
 
                                         // do animation
                                         _.delay(function() {
@@ -207,10 +215,16 @@
                 })
             }
 
+            function goToUserMenu(id) {
+                if (!!id) {
+                    window.location = USER_MENU_URL_PREFIX + '?id=' + encodeURIComponent(id);
+                }
+            }
+
             function switchMessages(type, callback) {
                 let _callback = callback || _.noop;
 
-                $('.noty-item-loader-btn').addClass('loading');
+                $('.noty-item-loader-btn').addClass('loading').removeClass('hide');
                 if (_currentMessageType !== type) {
                     let currentContainer = _notyItemContainers[type];
 
@@ -222,8 +236,11 @@
                     currentContainer.appendTo($('.content-container'));
                     if (!!currentContainer && currentContainer.children().length <= 0) {
                         // Load init messages
-                        displayMessages(type, false, function() {
+                        displayMessages(type, false, function(empty) {
                             $('.noty-item-loader-btn').removeClass('loading');
+                            if (empty) {
+                                $('.noty-item-loader-btn').addClass('hide');
+                            }
                             _callback();
                         });
                     } else {
@@ -255,7 +272,11 @@
                         $.each(messages, function(index, message) {
                             let item;
                             if (MESSAGE_TYPE.COMPLIANCE != type) {
-                                item = MessageItem(message);
+                                item = MessageItem(message, {
+                                    goToUser: function(userId) {
+                                        goToUserMenu(userId);
+                                    }
+                                });
                             } else {
                                 item = ComplianceMessageItem(message);
                             }
@@ -266,7 +287,7 @@
                         });
 
                         _loadingMessages = false;
-                        _callback();
+                        _callback(!!!lastSnapShot || (messages && messages.length < PAGE_SIZE));
                     });
                 } else {
                     console.debug("Already loading messages.");
@@ -321,12 +342,14 @@
                 }
             }
 
-            function MessageItem(model) {
+            function MessageItem(model, callbacks) {
                 var _model = model,
+                    _callbacks = callbacks || {
+                        goToUser: _.noop
+                    },
                     _views = {};
 
                 function render(model) {
-
                     let container = $('<div class="noty-item">');
                     let profile = $('<div class="noty-item-avatar">');
                     let contentContainer = $('<div class="noty-item-content-container">'),
@@ -340,13 +363,27 @@
 
                     container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
                     contentContainer.append(titleLabel, descLabel, locateContainer);
-                    locateContainer.append(timeagoLabel);
+                    locateContainer.append(nameLabel);
 
                     // init handlers
                     closeButton.click(function() {
                         container.detach().remove();
                         // TODO: call api?
                     })
+                    profile.click(function() {
+                        let userId = model.from_user;
+                        if (model.from_user == '1' || model.from_user == '2') {
+                            userId = model.to_user;
+                        }
+                        _callbacks.goToUser(userId);
+                    });
+                    nameLabel.click(function() {
+                        let userId = model.from_user;
+                        if (model.from_user == '1' || model.from_user == '2') {
+                            userId = model.to_user;
+                        }
+                        _callbacks.goToUser(userId);
+                    });
 
                     // store views
                     _views.container = container;
@@ -369,6 +406,12 @@
                     _views.titleLabel.text(model.title || '-');
                     _views.descLabel.text(model.message || '-');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-')
+
+                    if (model.from_user == '1' || model.from_user == '2') {
+                        _views.nameLabel.text(model.to_name || '');
+                    } else {
+                        _views.nameLabel.text(model.from_name || '');
+                    }
                 }
 
                 function blink() {
@@ -388,12 +431,15 @@
                 }
             }
 
-            function ComplianceMessageItem(model) {
+            function ComplianceMessageItem(model, callbacks) {
                 var _model = model,
+                    _callbacks = callback = {
+                        goToUser: _.noop
+                    },
+                    _user,
                     _views = {};
 
                 function render(model) {
-
                     let container = $('<div class="noty-item">');
                     let profile = $('<div class="noty-item-avatar">');
                     let contentContainer = $('<div class="noty-item-content-container">'),
@@ -407,12 +453,26 @@
 
                     container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
                     contentContainer.append(titleLabel, descLabel, locateContainer);
-                    locateContainer.append(timeagoLabel);
+                    locateContainer.append(nameLabel);
 
                     // init handlers
                     closeButton.click(function() {
                         container.detach().remove();
                         // TODO: call api?
+                    })
+                    profile.click(function() {
+                        if (!!_user) {
+                            _callbacks.goToUser();
+                        } else {
+                            console.warn('Cannot move to user menu, unknown user.');
+                        }
+                    });
+                    nameLabel.click(function() {
+                        if (!!_user) {
+                            _callbacks.goToUser();
+                        } else {
+                            console.warn('Cannot move to user menu, unknown user.');
+                        }
                     })
 
                     // store views
@@ -427,14 +487,22 @@
 
                     update(model);
 
+                    // TODO: move in function?
+                    if (model.from_user) {
+                        model.from_user.get().then(function(doc) {
+                            if (!!doc) {
+                                // Store user.
+                                _user = user = doc.data();
+                                updateName(doc.fullname);
+                            }
+                        });
+                    }
+
                     return container;
                 }
 
                 function update(model) {
                     _model = model;
-
-                    _views.descLabel.text(model.message || '-');
-                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-')
 
                     let title = 'Hygiene practices';
                     if (model.category === 2) {
@@ -446,8 +514,14 @@
                     } else if (model.category === 5) {
                         title = 'Meeting rooms';
                     }
-
                     _views.titleLabel.text(title);
+
+                    _views.descLabel.text(model.message || '-');
+                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
+                }
+
+                function updateName(fullname) {
+                    _views.nameLabel.text(user.fullname || '-');
                 }
 
                 function blink() {

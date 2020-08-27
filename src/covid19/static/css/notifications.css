@@ -73,6 +73,7 @@
     background-repeat: no-repeat;
     padding: 0 3em;
     box-sizing: border-box;
+    cursor: pointer;
 }
 
 .noty-item-content-container {
@@ -100,6 +101,16 @@
     display: -webkit-inline-box;
 }
 
+.noty-item-name-label {
+    max-width: 15em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #8A8A8A;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
 .noty-item-locate-container {
 
 }
@@ -107,6 +118,9 @@
 .noty-item-timeago-label {
     font-size: 0.8em;
     color: #C6C6C8;
+    margin-left: auto;
+    margin-top: auto;
+    padding-right: 1em;
 }
 
 .noty-item-msg-btn {
@@ -121,6 +135,7 @@
 }
 
 .noty-item-close-btn {
+    display: none;
     width: 1.6em;
     height: 1.6em;
     cursor: pointer;
@@ -128,7 +143,6 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
     margin-bottom: auto;
-    margin-left: auto;
 }
 
 .noty-item-loader-btn {

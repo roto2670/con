@@ -33,6 +33,10 @@
             <div class="user-new-btn-icn"></div>
             <div class="user-new-btn-label">New</div>
         </div>
+        <div class="cmessage-btn">
+            <div class="cmessage-btn-icn"></div>
+            <div class="cmessage-btn-label">Create a Message</div>
+        </div>
         <div class="discover-hotspot-btn">
             <div class="discover-hotspot-btn-icn"></div>
             <div class="discover-hotspot-btn-label">Discover Hotspot</div>
@@ -100,17 +104,35 @@
                 _selectedFilter = null;
 
 
-            // init
-            initHandlers();
-            displayUsers(_selectedFilter, null, false, function() {
-                $('.user-item-loader-btn').removeClass('loading');
-            });
+            start();
+
+
+            function start() {
+                initHandlers();
+                let userId = getUrlParameter('id');
+                if (!!!userId) {
+                    displayUsers({
+                        userId: getUrlParameter('id'),
+                        status: _selectedFilter
+                    }, false, function() {
+                        $('.user-item-loader-btn').removeClass('loading');
+                    });
+                } else {
+                    displayUser(userId);
+                }
+            }
+
+            function stop() {
+
+            }
 
             function initHandlers() {
                 $('.user-item-loader-btn').click(function() {
                     let _this = $(this);
                     _this.addClass('loading');
-                    displayUsers(_selectedFilter, null, false, function () {
+                    displayUsers({
+                        status: _selectedFilter
+                        }, false, function () {
                         _this.removeClass('loading');
                     });
                 });
@@ -137,7 +159,7 @@
                         $(this).removeClass('selected');
 
                         // display default user list.
-                        displayUsers(null, null, true, function() {
+                        displayUsers(null, true, function() {
                             $('.user-item-loader-btn').removeClass('loading');
                         })
                     } else {
@@ -149,7 +171,9 @@
                             _selectedFilter = filter;
 
                             // do query.
-                            displayUsers(filter, null, true, function() {
+                            displayUsers({
+                                status: filter
+                            }, true, function() {
                                 $('.user-item-loader-btn').removeClass('loading');
                             })
                         } else {
@@ -157,9 +181,107 @@
                         }
                     }
                 });
+
+                // init create message button
+                $('.cmessage-btn').click(function() {
+                    let userIds = getSelectedUsers();
+                    if (!!userIds && userIds.length > 0) {
+                        createMessageWithDialog(userIds);
+                    } else {
+
+                    }
+                });
             }
 
-            function displayUsers(filter, userName, clean, callback) {
+            function createMessageWithDialog(userIds) {
+                let dialog = CreateMessageDialog();
+                dialog.show($('.right_col'), function(texts) {
+                    dialog.hide();
+                    // Do query
+                    createMesages(userIds, texts.title, texts.message);
+                });
+            }
+
+            function getSelectedUsers() {
+                let userIds = [];
+                // TODO: use modeling
+                $('.user-item>input:checked').each(function() {
+                    let userId = $(this).attr('uid'),
+                        name = $(this).parent('.user-item').find('.user-item-name-label').first().text();
+                    if (!!userId && !!name) {
+                        userIds.push({
+                            id: userId,
+                            name: name
+                        });
+                    }
+                }) 
+
+                return userIds;
+            }
+
+            function createMesage(userId, title, message) {
+                if (!!userId && !!message) {
+                    doCreateMessage([userId], '1', title, message)
+                } else {
+                    console.warn('Failed to send message, given params cannot be null.');
+                }
+            }
+
+            function createMesages(userIds, title, message) {
+                if (!!userIds && !!message) {
+                    doCreateMessage(userIds, '1', title, message)
+                } else {
+                    console.warn('Failed to send messages, given params cannot be null.');
+                }
+            }
+
+            function doCreateMessage(userIds, fromId, title, message) {
+                let data = userIds.shift();
+                if (!!data) {
+                    _db.collection('messages').doc().set({
+                        from_user: fromId,
+                        to_user: data.id,
+                        to_name: data.name,
+                        action: 4,
+                        title: title,
+                        message: message,
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(function() {
+                        doCreateMessage(userIds, fromId, title, message);
+                    }).catch(function() {
+                        doCreateMessage(userIds, fromId, title, message);
+                    });
+                }
+            }
+
+            function displayUser(userId, callback) {
+                callback = callback || _.noop;
+
+                if (!!userId) {
+                    let container = $('.user-item-container');
+                    container.children().detach().remove();
+
+                    if (!_loadingUsers) {
+                        _loadingUsers = true;
+                        
+                        loadUser(userId, function(user) {
+                            // render user.
+                            let userItem = UserItem(user);
+                            container.append(userItem.render());
+
+                            _loadingUsers = false;
+                            callback();
+                        });
+                    } else {
+                        console.debug("Already loading users.");
+                        callback();
+                    }
+                } else {
+                    callback();
+                }
+            }
+
+            function displayUsers(filter, clean, callback) {
                 callback = callback || _.noop;
 
                 let container = $('.user-item-container');
@@ -169,7 +291,7 @@
 
                 if (!_loadingUsers) {
                     _loadingUsers = true;
-                    loadUsers(_lastUserSnapShot, filter, userName, function(users, lastSnapShot) {
+                    loadUsers(_lastUserSnapShot, filter, function(users, lastSnapShot) {
                         if (!!lastSnapShot) {
                             _lastUserSnapShot = lastSnapShot;
                         }
@@ -189,7 +311,21 @@
                 }
             }
 
-            function loadUsers(startAt, filter, userName, callback) {
+            function loadUser(userId, callback) {
+                let _callback = callback || _.noop;
+
+                _db.collection('users').doc(userId).get().then(function(snapshot) {
+                    if (!!snapshot) {
+                        let user = snapshot.data();
+                        user.id = snapshot.id;
+                        callback(user);
+                    } else {
+                        callback();
+                    }
+                });
+            }
+
+            function loadUsers(startAt, filter, callback) {
                 // TODO: filter
 
                 var ref,
@@ -207,11 +343,14 @@
                 query = ref;
 
                 // Adds filter if has
-                if (!!filter || filter === 0) {
-                    query = ref.where('status', '==', filter);
-                }
-                if (!!userName) {
-                    query = ref.where('fullname', 'array-contains', userName);
+                if (!!filter) {
+                    if (!!filter.status || filter.status === 0) {
+                        query = ref.where('status', '==', filter.status);
+                    }
+
+                    if (filter.userName) {
+                        query = ref.where('fullname', 'array-contains', filter.userName);
+                    }
                 }
 
                 // do query
@@ -221,7 +360,9 @@
                     if (!!!snapshots.empty) {
                         lastSnapShot = snapshots.docs[snapshots.docs.length - 1];
                         snapshots.forEach(function(doc) {
-                            users.push(doc.data());
+                            let user = doc.data();
+                            user.id = doc.id;
+                            users.push(user);
                         });
                     } else {
                         // no more users.
@@ -233,6 +374,21 @@
                     callback();
                 });
             }
+
+            function getUrlParameter(sParam) {
+                var sPageURL = window.location.search.substring(1),
+                    sURLVariables = sPageURL.split('&'),
+                    sParameterName,
+                    i;
+            
+                for (i = 0; i < sURLVariables.length; i++) {
+                    sParameterName = sURLVariables[i].split('=');
+            
+                    if (sParameterName[0] === sParam) {
+                        return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                    }
+                }
+            };
 
             function UserItem(model) {
                 var _model = model,
@@ -266,6 +422,9 @@
                         jobContainer, langLabel, rxLabel);
                     nameCotainer.append(nameLabel, idLabel);
                     jobContainer.append(jobCat1Label, jobCat2Label);
+
+                    // Store id.
+                    checkbox.attr('uid', model.id);
 
                     // Store views.
                     _views = {
@@ -318,6 +477,75 @@
 
                 return {
                     render: render
+                }
+            }
+
+            function CreateMessageDialog() {
+                let _views
+                    _callback = _.noop;
+
+                function render() {
+                    let container = $('<div class="cmessage-dialog">'),
+                        contentContainer = $('<div class="cmessage-dialog-content">'),
+                        closeButton = $('<div class="cmessage-dialog-close-btn">'),
+                        titleTextbox = $('<input type="text" class="cmessage-dialog-title-textbox" placeholder="Stay Home">');
+                        messageTextarea = $('<textarea class="cmessage-dialog-message-textarea" placeholder="Please do not come to work today.\nOne of our medical staff will be in contact soon.">');
+                    let sendButton = $('<div class="cmessage-dialog-send-btn">'),
+                        sendButtonLabel = $('<div class="cmessage-dialog-send-btn-label">Send</div>'),
+                        sendButtonIcon = $('<div class="cmessage-dialog-send-btn-icon">');
+
+                    // init handlers
+                    container.click(function() {
+                        // hide();
+                    });
+                    closeButton.click(function() {
+                        hide();
+                    })
+
+                    sendButton.click(function() {
+                        let title = titleTextbox.val(),
+                            message = messageTextarea.val();
+
+                        if (title.trim().length > 0) {
+                            _callback({
+                                title: title,
+                                message: message
+                            });
+                        } else {
+                            window.alert('Please enter title.');
+                        }
+                    });
+                    titleTextbox.change(function() {
+                        if ($(this).val().trim().length <= 0) {
+                            // TODO:
+                        }
+                    });
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, titleTextbox, messageTextarea, sendButton);
+                    sendButton.append(sendButtonLabel, sendButtonIcon);
+
+                    // Store views
+                    _views = {};
+                    _views.container = container;
+                }
+
+                function show(parent, callback) {
+                    _callback = callback || _.noop;
+                    render();
+
+                    parent.append(_views.container);
+                }
+
+                function hide() {
+                    _views.container.remove();
+                    _views = null;
+                    _callback = _.noop;
+                }
+
+                return {
+                    show: show,
+                    hide: hide
                 }
             }
         })();
