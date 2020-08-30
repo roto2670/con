@@ -68,12 +68,14 @@
 .noty-item-avatar {
     width: 4em;
     height: 4em;
+    border-radius: 999em;
     background-image: url(../img/icn_default_profile.svg);
-    background-size: 100% 100%;
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
-    padding: 0 3em;
     box-sizing: border-box;
     cursor: pointer;
+    margin: 0 1em;
 }
 
 .noty-item-content-container {

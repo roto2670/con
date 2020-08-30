@@ -96,10 +96,12 @@
                 'terminated': -1,
                 'onleave': -2
             },
-            PAGE_SIZE = 10; // chunk size of users
+            USER_PAGE_SIZE = 10,
+            TEST_RESULT_PAGE_SIZE = 10;
 
             let _db = firebase.firestore();
-            var _lastUserSnapShot
+            var _lastUserSnapShot,
+                _lastTestResultDoc,
                 _loadingUsers = false,
                 _selectedFilter = null;
 
@@ -186,20 +188,96 @@
                 $('.cmessage-btn').click(function() {
                     let userIds = getSelectedUsers();
                     if (!!userIds && userIds.length > 0) {
-                        createMessageWithDialog(userIds);
+                        showMessageWithDialog(userIds);
                     } else {
-
+                        console.warn('Failed to show message dialog by cannot find selected users.');
                     }
                 });
             }
 
-            function createMessageWithDialog(userIds) {
+            function showMessageWithDialog(userIds) {
                 let dialog = CreateMessageDialog();
                 dialog.show($('.right_col'), function(texts) {
                     dialog.hide();
                     // Do query
                     createMesages(userIds, texts.title, texts.message);
                 });
+            }
+
+            function showHistoryDialog(userId) {
+                _lastTestResultDoc = null; // refresh for paging
+
+                if (!!userId) {
+                    // TODO: show loading for request
+                    loadTestResults(userId, _lastTestResultDoc, function(testList, lastDoc) {
+                        if (!!lastDoc) {
+                            _lastTestResultDoc = lastDoc;
+                        }
+
+                        if (!_.isEmpty(testList)) {
+                            let dialog = TestHistoryDialog();
+                            dialog.show($('.right_col'), testList, {
+                                selectedLoadMore: function() {
+                                    dialog.doLoading(true);
+                                    loadTestResults(userId, _lastTestResultDoc, function(testList, lastDoc) {
+                                        if (!!lastDoc) {
+                                            _lastTestResultDoc = lastDoc;
+                                        }
+
+                                        dialog.addHistories(testList);
+                                        dialog.doLoading(_.size(testList) <= 0);
+                                    });
+                                }
+                            });
+                            dialog.doLoading(_.size(testList) <= 0);
+                        } else {
+                            // TODO: ui?
+                            window.alert('No test results reported.');
+                        }
+                    });
+                } else {
+                    console.warn('Failed to display history dialog by given user id cannot be null.');
+                }
+            }
+
+            function loadTestResults(userId, startAt, callback) {
+                let _callback = callback || _.noop,
+                    endUserId = userId;
+
+                // Make user id for end codition.
+                let endNumber = _.last(userId);
+                if (_.isNumber(++endNumber)) {
+                    endUserId = userId.slice(0, userId.length -1) + endNumber;
+                } else {
+                    // It's not a possibility, but handling it just in case.
+                    endUserId = userId + '--999';
+                }
+
+                // Do request
+                let query = _db.collection('test_results')
+                    .where(firebase.firestore.FieldPath.documentId(), '>=', userId)
+                    .where(firebase.firestore.FieldPath.documentId(), '<', endUserId);
+                
+                if (!!startAt) {
+                    query = query.startAfter(startAt);
+                }
+                query.limit(TEST_RESULT_PAGE_SIZE)
+                    .get().then(function(snapshot) {
+                        let testList = [],
+                            lastDoc;
+                        if (!!!snapshot.empty) {
+                            lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                            snapshot.forEach(function(doc) {
+                                let history = doc.data();
+                                testList.push(history);
+                            });
+                        } else {
+                            // no items
+                        }
+
+                        _callback(testList, lastDoc);
+                    });
+                    // TODO: if error
             }
 
             function getSelectedUsers() {
@@ -266,11 +344,19 @@
                         
                         loadUser(userId, function(user) {
                             // render user.
-                            let userItem = UserItem(user);
-                            container.append(userItem.render());
+                            if (_.isObject(user) && !_.isEmpty(user)) {
+                                let userItem = UserItem(user, {
+                                    selectedHistory: function(user) {
+                                        showHistoryDialog(user.documentId);
+                                    }
+                                });
+                                container.append(userItem.render());
 
-                            _loadingUsers = false;
-                            callback();
+                                _loadingUsers = false;
+                                callback();
+                            } else {
+                                console.warn('Failed to display user for ' + userId);
+                            }
                         });
                     } else {
                         console.debug("Already loading users.");
@@ -298,7 +384,11 @@
 
                         // render users.
                         $.each(users, function(index, user) {
-                            let userItem = UserItem(user);
+                            let userItem = UserItem(user, {
+                                selectedHistory: function(user) {
+                                    showHistoryDialog(user.documentId);
+                                }
+                            });
                             container.append(userItem.render());
                         });
 
@@ -317,7 +407,7 @@
                 _db.collection('users').doc(userId).get().then(function(snapshot) {
                     if (!!snapshot) {
                         let user = snapshot.data();
-                        user.id = snapshot.id;
+                        user.documentId = userId;
                         callback(user);
                     } else {
                         callback();
@@ -334,11 +424,11 @@
                     // Paging
                     ref = _db.collection('users')
                         .startAfter(startAt)
-                        .limit(PAGE_SIZE)
+                        .limit(USER_PAGE_SIZE)
                 } else {
                     // Query first time.
                     ref = _db.collection('users')
-                        .limit(PAGE_SIZE);
+                        .limit(USER_PAGE_SIZE);
                 }
                 query = ref;
 
@@ -361,7 +451,7 @@
                         lastSnapShot = snapshots.docs[snapshots.docs.length - 1];
                         snapshots.forEach(function(doc) {
                             let user = doc.data();
-                            user.id = doc.id;
+                            user.documentId = doc.id;
                             users.push(user);
                         });
                     } else {
@@ -390,18 +480,25 @@
                 }
             };
 
-            function UserItem(model) {
+
+            function UserItem(model, callbacks) {
                 var _model = model,
-                    _views = {};
+                    _views = {},
+                    _callbacks = callbacks || {
+                        selectedHistory: _.noop
+                    };
 
                 function render() {
                     let container = $('<div class="user-item">');
                     let checkbox = $('<input type="checkbox" class="user-item-checkbox">');
-                    let profile = $('<div class="user-item-avatar">'),
-                        nameCotainer = $('<div class="user-item-name-container">'),
+                    let profileCell = $('<div class="user-item-cell avatar">'),
+                        profile = $('<div class="user-item-avatar">');
+                    let nameCell = $('<div class="user-item-cell name">'),
                         nameLabel = $('<div class="user-item-name-label">')
                         idLabel = $('<div class="user-item-id-label">');
-                    let statusLabel = $('<div class="user-item-label status">'),
+                    let statusCell = $('<div class="user-item-cell status">'),
+                        statusLabel = $('<div class="user-item-label status">'),
+                        historyButton = $('<div class="user-item-btn history">'),
                         genderLabel = $('<div class="user-item-label gender">'),
                         nationalLabel = $('<div class="user-item-label national">'),
                         employerLabel = $('<div class="user-item-label employer">'),
@@ -417,14 +514,21 @@
                         rxLabel = $('<div class="user-item-label rx">'),
                         timeagoLabel = $('<div class="user-item-label timeago">');
                     
-                    container.append(checkbox, profile, nameCotainer, statusLabel, genderLabel, nationalLabel,
-                        employerLabel, campLabel, roomLabel, phoneLabel, departmentLabel, locateContainer,
-                        jobContainer, langLabel, rxLabel);
-                    nameCotainer.append(nameLabel, idLabel);
+                    container.append(checkbox, profileCell, nameCell, statusCell, genderLabel, nationalLabel,
+                        employerLabel, campLabel, roomLabel, phoneLabel, departmentLabel, locateContainer, jobContainer,
+                        langLabel, rxLabel);
+                    profileCell.append(profile);
+                    statusCell.append(statusLabel, historyButton);
+                    nameCell.append(nameLabel, idLabel);
                     jobContainer.append(jobCat1Label, jobCat2Label);
 
                     // Store id.
                     checkbox.attr('uid', model.id);
+
+                    // init handlers
+                    historyButton.click(function() {
+                        _callbacks.selectedHistory(model);
+                    });
 
                     // Store views.
                     _views = {
@@ -457,6 +561,14 @@
                 function update(model) {
                     _model = model;
 
+                    // load profile image
+                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + model.documentId + '-pf.png';
+                    $('<img/>')
+                        .load(function() {
+                            _views.profile.css('background-image', 'url(' + profileUrl + ')');
+                        })
+                        .attr('src', profileUrl);
+
                     _views.nameLabel.text(model.fullname || '-');
                     _views.idLabel.text('');
                     _views.statusLabel.text(STATUS_DISPLAY[model.status] || '-');
@@ -488,7 +600,7 @@
                     let container = $('<div class="cmessage-dialog">'),
                         contentContainer = $('<div class="cmessage-dialog-content">'),
                         closeButton = $('<div class="cmessage-dialog-close-btn">'),
-                        titleTextbox = $('<input type="text" class="cmessage-dialog-title-textbox" placeholder="Stay Home">');
+                        titleTextbox = $('<input type="text" class="cmessage-dialog-title-textbox" placeholder="Stay Home">'),
                         messageTextarea = $('<textarea class="cmessage-dialog-message-textarea" placeholder="Please do not come to work today.\nOne of our medical staff will be in contact soon.">');
                     let sendButton = $('<div class="cmessage-dialog-send-btn">'),
                         sendButtonLabel = $('<div class="cmessage-dialog-send-btn-label">Send</div>'),
@@ -548,6 +660,154 @@
                     hide: hide
                 }
             }
+
+            function TestHistoryDialog() {
+                let _views = {}
+                    _histories = [],
+                    _callbacks = {
+                        selectedLoadMore: _.noop
+                    };
+
+                function show(parent, histories, callbacks) {
+                    _histories = histories || [];
+                    _callbacks = callbacks || {
+                        selectedLoadMore: _.noop
+                    };
+
+                    let container = $('<div class="history-dialog c-modal-dialog">'),
+                        closeButton = $('<div class="history-dialog-close-btn c-modal-dialog-close-btn">'),
+                        contentContainer = $('<div class="hd-content-container c-modal-dialog-content">'),
+                        historyContainer = $('<div class="hd-history-container">');
+                    let loadMoreButton = $('<div class="hd-dialog-loader-btn">')
+                        .append($('<div class="hd-dialog-loader-icon">'))
+                        .append($('<div class="hd-dialog-loader-label">Load more</div>'));
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, historyContainer, loadMoreButton);
+
+                    parent.append(container);
+
+                    // init handler
+                    // TODO: modal click
+                    closeButton.click(function() {
+                        hide();
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                   });
+                   loadMoreButton.click(function() {
+                       _callbacks.selectedLoadMore();
+                   });
+
+                    _views.container = container;
+                    _views.contentContainer = contentContainer;
+                    _views.historyContainer = historyContainer;
+                    _views.closeButton = closeButton;
+                    _views.loadMoreButton = loadMoreButton;
+
+                    addHistoryItems(_histories);
+                }
+
+                function hide() {
+                    _views.container.detach().remove();
+                }
+
+                function doLoading(loading) {
+                    if (loading) {
+                        _views.loadMoreButton.addClass('loading');
+                    } else {
+                        _views.loadMoreButton.removeClass('loading');
+                    }
+                }
+
+                function addHistoryItems(histories) {
+                    let container = _views.historyContainer;
+                    _.each(histories, function(history) {
+                        let viewItem = HistoryItem(history);
+                        container.append(viewItem.render());
+                    });
+                }
+
+                function HistoryItem(model) {
+                    let _views = {}
+                        _model = model;
+
+                    function render() {
+                        let container = $('<div class="status-history-item">'),
+                            testDateTitleLabel = $('<div class="shi-title-label test-date">Test Date:</div>'),
+                            testDateValueLabel = $('<div class="shi-value-label test-date">'),
+                            resultDateTitleLabel = $('<div class="shi-title-label result-date">Result Date:</div>'),
+                            resultDateValueLabel = $('<div class="shi-value-label result-date">'),
+                            symptomsTitleLabel = $('<div class="shi-title-label symptoms">Symptoms:</div>'),
+                            symptomsValueLabel = $('<div class="shi-value-label symptoms">'),
+                            resultTitleLabel = $('<div class="shi-title-label result">Result:</div>'),
+                            resultValueLabel = $('<div class="shi-value-label result">');
+                        
+                        container.append(testDateTitleLabel, testDateValueLabel, resultDateTitleLabel,
+                            resultDateValueLabel, symptomsTitleLabel, symptomsValueLabel, resultTitleLabel,
+                            resultValueLabel);
+                            
+                        // Store views
+                        _views.testDateTitleLabel = testDateTitleLabel;
+                        _views.testDateValueLabel = testDateValueLabel;
+                        _views.resultDateTitleLabel = resultDateTitleLabel;
+                        _views.resultDateValueLabel = resultDateValueLabel;
+                        _views.symptomsTitleLabel = symptomsTitleLabel;
+                        _views.symptomsValueLabel = symptomsValueLabel;
+                        _views.resultTitleLabel = resultTitleLabel;
+                        _views.resultValueLabel = resultValueLabel;
+                        // TODO: attachment
+
+                        update(_model);
+
+                        return container;
+                    }
+
+                    function update(model) {
+                        _model = model;
+
+                        let testDateLabel = 'N/A',
+                            resultDateLabel = 'N/A';
+                        if (!!model.test_date) {
+                            testDateLabel = $.timeago(model.test_date.seconds * 1000);
+                        }
+                        if (!!model.result_date) {
+                            resultDateLabel = $.timeago(model.result_date.seconds * 1000);
+                        }
+                        _views.testDateValueLabel.text(testDateLabel);
+                        _views.resultDateValueLabel.text(resultDateLabel);
+                        _views.symptomsValueLabel.text(model.symptoms ? 'Yes' : 'No');
+                        _views.resultValueLabel.text(getResultDisplayName(model.result));
+                    }
+
+                    function getResultDisplayName(result) {
+                        if (result == 1) {
+                            return 'Positive';
+                        } else if (result == 0) {
+                            return 'No result yet';
+                        } else if (result == -1) {
+                            return 'Negative';
+                        }
+
+                        return 'N/A';
+                    } 
+
+                    return {
+                        render: render,
+                        update: update
+                    }
+                }
+
+                return {
+                    show: show,
+                    hide: hide,
+                    doLoading: doLoading,
+                    addHistories: addHistoryItems
+                }
+            }
+
         })();
     </script>
 {% endblock javascripts %}

@@ -1,0 +1,420 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/news.css">
+{% endblock stylesheets %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="top-container">
+        <div class="add-news-menu-container">
+            <div class="add-news-btn"></div>
+            <div class="add-news-menu hide">
+                <div class="add-news-menu-item file">
+                    <div class="ads-mi-icn">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve" width="512px" height="512px" class="">
+                            <path d="M459.36,100.64l-96-96C360.341,1.645,356.253-0.024,352,0H96c-26.51,0-48,21.49-48,48v416c0,26.51,21.49,48,48,48h320     c26.51,0,48-21.49,48-48V112C464.025,107.747,462.355,103.66,459.36,100.64z M432,464c0,8.837-7.163,16-16,16H96     c-8.837,0-16-7.163-16-16V48c0-8.837,7.163-16,16-16h240v64c0,17.673,14.327,32,32,32h64V464z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                            <rect x="368" y="384" width="32" height="32" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                            <rect x="112" y="224" width="288" height="32" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                            <rect x="112" y="304" width="288" height="32" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                            <rect x="112" y="384" width="224" height="32" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                        </svg>
+                    </div>
+                    <div class="ads-mi-label">File</div>
+                </div>
+                <div class="add-news-menu-item youtube">
+                    <div class="ads-mi-icn">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve" width="512px" height="512px">
+                            <path d="M258.53,71.003l-0.724-0.002c-0.01,0-0.018,0-0.028,0c-5.51,0-9.985,4.459-10,9.973c0,0.008,0,0.016,0,0.024    c-0.002,5.512,4.458,9.988,9.973,10.003l0.725,0.002c0.009,0,0.018,0,0.027,0c5.51,0,9.985-4.459,10-9.973    c0-0.008,0-0.016,0-0.024C268.505,75.494,264.045,71.018,258.53,71.003z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                            <path d="M501.391,133.108c-6.566-24.965-25.935-44.626-50.542-51.31c-25.375-6.911-96.12-9.456-151-10.373    c-5.49-0.075-10.074,4.31-10.166,9.832c-0.092,5.522,4.31,10.074,9.832,10.166c75.96,1.27,127.838,4.705,146.085,9.674    c17.73,4.816,31.697,19.031,36.45,37.104c9.83,37.283,9.95,116.997,9.95,117.797c0,0.801-0.12,80.515-9.951,117.804    c-4.752,18.067-18.719,32.282-36.455,37.1c-36.648,9.98-188.069,10.097-189.594,10.097c-1.525,0-152.946-0.118-189.6-10.099    c-17.73-4.816-31.697-19.031-36.45-37.104C20.12,336.513,20,256.799,20,255.999c0-0.801,0.12-80.515,9.951-117.803    c4.752-18.067,18.719-32.282,36.455-37.1c18.647-5.078,72.059-8.537,150.399-9.742c5.522-0.084,9.929-4.63,9.845-10.152    c-0.085-5.522-4.645-9.893-10.153-9.845c-56.569,0.869-129.439,3.387-155.34,10.44c-24.613,6.685-43.982,26.347-50.546,51.306    C0.121,172.891,0,252.624,0,255.999s0.121,83.108,10.609,122.89c6.566,24.965,25.935,44.626,50.542,51.31    c39.208,10.677,188.513,10.8,194.849,10.8s155.641-0.123,194.843-10.798c24.613-6.685,43.982-26.347,50.546-51.306    C511.879,339.107,512,259.374,512,255.999S511.879,172.891,501.391,133.108z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                            <path d="M58,229.521c-5.523,0-10,4.477-10,10v81.5c0,5.523,4.477,10,10,10s10-4.477,10-10v-81.5    C68,233.998,63.523,229.521,58,229.521z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                            <path d="M58,184.021c-5.523,0-10,4.477-10,10v0.118c0,5.523,4.477,10,10,10s10-4.477,10-10v-0.118    C68,188.498,63.523,184.021,58,184.021z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                            <path d="M337.106,248.873l-124-72c-3.094-1.797-6.911-1.804-10.011-0.019c-3.1,1.785-5.011,5.09-5.011,8.667v144    c0,3.578,1.911,6.882,5.011,8.667c1.544,0.889,3.266,1.333,4.989,1.333c1.735,0,3.47-0.45,5.022-1.352l124-72    c3.083-1.79,4.979-5.084,4.979-8.648C342.085,253.957,340.188,250.663,337.106,248.873z M218.084,312.151v-109.26l94.085,54.63    L218.084,312.151z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                        </svg>
+                    </div>
+                    <div class="ads-mi-label">Youtube</div>
+                </div>
+                <div class="add-news-menu-item image">
+                    <div class="ads-mi-icn">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve" width="512px" height="512px">
+                            <path d="M0,61v390h512V61H0z M482,421H51.213L155,317.213l61,61l180-180l86,86V421z M482,241.787l-86-86l-180,180l-61-61l-125,125    V91h452V241.787z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                            <path d="M155,121c-33.084,0-60,26.916-60,60s26.916,60,60,60s60-26.916,60-60S188.084,121,155,121z M155,211    c-16.542,0-30-13.458-30-30s13.458-30,30-30s30,13.458,30,30S171.542,211,155,211z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#E3E9ED"/>
+                        </svg>
+                    </div>
+                    <div class="ads-mi-label">Image</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content-container">
+    </div>
+
+    <div class="news-item-loader-btn loading">
+        <div class="news-item-loader-icon"></div>
+        <div class="news-item-loader-label">Load more</div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+    <script>
+        (function() {
+            const PAGE_SIZE = 10;
+
+            let _db = firebase.firestore(),
+                _loadingNews = false,
+                _initializedSnapshotHandler = false,
+                _lastSnapshot = null;
+
+            // init
+            initHandlers();
+            displayNews(function() {
+                $('.news-item-loader-btn').removeClass('loading');
+            })
+
+            function initHandlers() {
+                $('.add-news-btn').click(function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    showAddMenu();
+                });
+                $(document).click(function() {
+                    hideAddMenu();
+                });
+
+                $('.news-item-loader-btn').click(function() {
+                    let _this = $(this);
+                    displayNews();
+                });
+
+                // init add menus
+                $('.add-news-menu-item.file').click(function() {
+                    window.alert('Not ready yet!');
+                });
+                $('.add-news-menu-item.youtube').click(function() {
+                    showAddYoutubeDialog();
+                });
+                $('.add-news-menu-item.image').click(function() {
+                    window.alert('Not ready yet!');
+                });
+            }
+
+            function initSnapshotHandler() {
+                // listen new news item.
+                _db.collection('bulletin_items')
+                    .orderBy('ts', 'desc')
+                    .limit(1)
+                    .onSnapshot(function(snapshot) {
+                        if (!_initializedSnapshotHandler) {
+                            // FIXME: OnSnapshot first loads all the documents that match the query.
+                            _initializedSnapshotHandler = true;
+                            return;
+                        }
+                        if (!snapshot.metadata.hasPendingWrites) {
+                            snapshot.docChanges().forEach(function(change) {
+                                if (change.type === 'added') {
+                                    let model = change.doc.data();
+                                    model.documentId = change.doc.id;
+                                    addNewsItem(model, true);
+                                }
+                            });
+                        }
+                    });
+            }
+
+            function showAddYoutubeDialog() {
+                let dialog = AddYoutubeDialog();
+                dialog.show($('.right_col'), function(title, body, link) {
+                    if (!!title && !!link) {
+                        let model = {
+                            title: title,
+                            content: body || '',
+                            type: 'youtube',
+                            order: 1000,
+                            media_url: link,
+                            ts: new Date()
+                        }
+                        dialog.hide();
+                        addNews(model);
+                        addNewsItem(model);
+                    }
+                });
+            }
+
+            function showAddMenu() {
+                $('.add-news-menu').removeClass('hide');
+            }
+
+            function hideAddMenu() {
+                $('.add-news-menu').addClass('hide');
+            }
+
+            function displayNews(callback) {
+                let _callback = callback || _.noop;
+                let loader = $('.news-item-loader-btn');
+
+                loader.addClass('loading').removeClass('hide');
+                if (!!!_loadingNews) {
+                    _loadingNews = true;
+
+                    loadNews(_lastSnapshot, function(newsList, lastSnapshot) {
+                        if (!!lastSnapshot) {
+                            _lastSnapshot = lastSnapshot;
+                        } else {
+                            // no more items.
+                            loader.addClass('hide');
+                        }
+
+                        // Add news item
+                        _.each(newsList, function(news) {
+                            addNewsItem(news);
+                        });
+
+                        if (_.size(newsList) < PAGE_SIZE) {
+                            // no more items.
+                            loader.addClass('hide');
+                        }
+
+                        _loadingNews = false;
+                        loader.removeClass('loading');
+                        _callback();
+                    });
+                } else {
+                    console.warn('Already fetching news from server.');
+                    loader.removeClass('loading');
+                    _callback();
+                }
+            }
+
+            function addNewsItem(news, prepend) {
+                // TODO: by order?
+                if (!!news) {
+                    let container = $('.content-container'),
+                        viewItem,
+                        newsItem = NewsItem(news, {
+                            selectedRemove: function(documentId) {
+                                if (window.confirm('Are you sure?')) {
+                                    viewItem.detach().remove();
+
+                                    // do query.
+                                    if (documentId) {
+                                        _db.collection('bulletin_items').doc(documentId).delete();
+                                    }
+                                }
+                            }
+                        });
+                    
+                    viewItem = newsItem.render();
+                    if (prepend) {
+                        container.prepend(viewItem);
+                    } else {
+                        container.append(viewItem);
+                    }
+                } else {
+                    console.warn('Failed to draw new item by given model cannot be null.');
+                }
+            }
+
+            function addNews(data) {
+                if (_.isObject(data) && !_.isEmpty(data)) {
+                    _db.collection('bulletin_items').doc().set({
+                        title: data.title,
+                        content: data.content,
+                        order: data.order,
+                        type: data.type,
+                        media_url: data.media_url,
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    console.warn('Failed to add new to server, given data is wrong.', data);
+                }
+            }
+
+            function loadNews(startAt, callback) {
+                let _callback = callback || _.noop;
+
+                let ref = _db.collection('bulletin_items'),
+                    query;
+
+                query = ref.limit(PAGE_SIZE)
+                            .orderBy('order', 'desc');
+
+                if (!!startAt) {
+                    query = query.startAfter(startAt);
+                }
+                
+                query.get().then(function(snapshot) {
+                    let newsList = [],
+                        lastSnapshot;
+                    if (!!!snapshot.empty) {
+                        lastSnapshot = snapshot.docs[snapshot.docs.length - 1];
+                        snapshot.forEach(function(doc) {
+                            let news = doc.data();
+                            news.documentId = doc.id;
+                            newsList.push(news);
+                        });
+                    } else {
+                        // no more news?
+                    }
+
+                    callback(newsList, lastSnapshot);
+                });
+            }
+
+            function NewsItem(model, callbacks) {
+                let _views = {},
+                    _callbacks = callbacks || {
+                        selectedRemove: _.noop
+                    };
+                    _model = model;
+
+                function render() {
+                    let container = $('<div class="news-item">'),
+                        grabButton = $('<div class="ni-grap-btn">'),
+                        thumbnail = $('<div class="ni-thumbnail">');
+                    let contentContainer = $('<div class="ni-content-container">'),
+                        titleLabel = $('<div class="ni-title-label">'),
+                        messageLabel = $('<div class="ni-message-label">');
+                    let timeagoLabel = $('<div class="ni-timeago-label">');
+                    let rightContainer = $('<div class="ni-right-container">'),
+                        removeButton = $('<div class="ni-remove-btn">'),
+                        pinButton = $('<div class="ni-pin-btn">');
+
+                    container.append(grabButton, thumbnail, contentContainer, timeagoLabel, rightContainer);
+                    contentContainer.append(titleLabel, messageLabel);
+                    rightContainer.append(removeButton, pinButton);
+
+                    // Init handlers
+                    thumbnail.click(function() {
+                        window.open(model.media_url);
+                    });
+                    removeButton.click(function() {
+                        _callbacks.selectedRemove(model.documentId);
+                    });
+
+                    _views.container = container;
+                    _views.grabButton = grabButton;
+                    _views.thumbnail = thumbnail;
+                    _views.titleLabel = titleLabel;
+                    _views.messageLabel = messageLabel;
+                    _views.timeagoLabel = timeagoLabel;
+                    _views.removeButton = removeButton;
+                    _views.pinButton = pinButton;
+
+                    update(_model);
+
+                    return container;
+                }
+
+                function update(model) {
+                    _model = model
+
+                    if (model.type === "image") {
+                        _views.thumbnail.css('background-image', 'url("' + model.media_url + '")')
+                    } else if (model.type === 'youtube') {
+                        let parsed = null;
+                        try { parsed = getVideoId(model.media_url);
+                        } catch(error) {
+                            // nothing.
+                        }
+
+                        if (_.size(parsed) > 1) {
+                            let thumbUrl = 'https://img.youtube.com/vi/' + parsed[1] + '/0.jpg';
+                            _views.thumbnail.css('background-image', 'url("' + thumbUrl + '")')
+                        } else {
+                            // display default thumbnail.
+                        }
+                    }
+
+                    _views.titleLabel.text(model.title || '-');
+                    _views.messageLabel.text(model.content || '');
+                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
+                }
+
+                function getVideoId(url) {
+                    return url.match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/);
+                }
+
+                return {
+                    render: render
+                }
+            }
+
+            function AddYoutubeDialog() {
+                let _views = {};
+
+                function show(parent, callback) {
+                    let _callback = callback || _.noop;
+
+                    let container = $('<div class="add-news-dialog youtube c-modal-dialog">'),
+                        contentContainer = $('<div class="and-content-container c-modal-dialog-content">'),
+                        closeButton = $('<div class="and-close-btn c-modal-dialog-close-btn">');
+                    let titleLabel = $('<div class="and-title-label">YouTube</div>'),
+                        descLabel = $('<div class="and-desc-label">It\'s a Youtube type of news. Please enter the YouTube URL.</div>'),
+                        inputTitleTextbox = $('<input type="text" class="and-input-title-textbox dialog-textbox" placeholder="News title">'),
+                        messageTextarea = $('<textarea class="and-message-textarea dialog-message-textarea" placeholder="Will be displayed with the YouTube link.">');
+                        linkTextbox = $('<input type="text" class="and-textbox dialog-textbox" placeholder="Please enter YouTube link.">'),
+                        addButton = $('<div class="and-add-btn dialog-btn">ADD</div>');
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, titleLabel, descLabel, inputTitleTextbox, messageTextarea,
+                        linkTextbox, addButton);
+
+                    // init handlers
+                    closeButton.click(function() {
+                        hide();
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
+                    addButton.click(function() {
+                        let title = inputTitleTextbox.val().trim(),
+                            message = messageTextarea.val().trim(),
+                            link = linkTextbox.val().trim();
+
+                        if (_.isEmpty(title)) {
+                            window.alert('Please enter title.');
+                            return;
+                        }
+
+                        if (_.isEmpty(link)) {
+                            // TODO: valid url.
+                            window.alert('Please enter YouTube link.');
+                            return;
+                        }
+
+                        _callback(title, message, link);
+                    });
+
+                    // store views.
+                    _views.container = container;
+
+                    parent.append(container);
+                }
+
+                function hide() {
+                    _views.container.detach().remove();
+                }
+
+                return {
+                    show: show,
+                    hide: hide
+                }
+            }
+        })();
+    </script>
+{% endblock javascripts %}

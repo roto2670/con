@@ -206,99 +206,103 @@
     font-size: 2em
 }
 
-.a-item {
+.alert-item {
     width: 100%;
-    height: 6.4em;
+    height: 7em;
     position: relative;
-    margin-bottom: 0.4em;
     display: flex;
-    flex-wrap: nowrap;
+    padding: 0.8em 0.4em;
+    box-sizing: border-box;
+    background-color: #F5F5F5;
     align-items: center;
-    box-shadow: 0.1em 0.1em 0.2em 0px #00000042;
-    box-sizing: border-box;
-    padding: 0.4em 0.8em;
+    flex-wrap: nowrap;
+    margin-bottom: 0.8em;
+    transition: background-color 1500ms ease-in-out;
+}
+.alert-item.new {
+    background-color: #EF8009;
 }
 
-.a-item-left-container {
-    justify-content: center;
-    display: inline-flex;
-    padding: 0 0.3em;
-    box-sizing: border-box;
-}
-
-.a-item-avatar {
-    width: 3em;
-    height: 3em;
+.alert-item-avatar {
+    width: 4em;
+    height: 4em;
+    border-radius: 999em;
     background-image: url(../img/icn_default_profile.svg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    cursor: pointer;
+    margin: 0 1em;
+}
+
+.alert-item-content-container {
+    position: absolute;
+    left: 6em;
+    right: 8em;
+    padding: 0.6em 0 0.6em 1em;
+    box-sizing: border-box;
+    margin-right: auto;
+    overflow: hidden;
+}
+
+.alert-item-title-label {
+    color: #3E3E3E;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+.alert-item-desc-label {
+    color: #3E3E3E;
+    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    display: -webkit-inline-box;
+}
+
+.alert-item-name-label {
+    max-width: 15em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #8A8A8A;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.alert-item-locate-container {
+
+}
+
+.alert-item-timeago-label {
+    font-size: 0.8em;
+    color: #C6C6C8;
+    margin-left: auto;
+    margin-top: auto;
+    padding-right: 1em;
+}
+
+.alert-item-msg-btn {
+    width: 4em;
+    height: 4em;
+    display: none;
+    cursor: pointer;
+    margin-left: auto;
+    background-image: url(../img/icn_quickmsg.svg);
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
 
-.a-item-name-container {
-    overflow: hidden;
-    width: 1em; /* TODO: original 20em; */
-    box-sizing: border-box;
-    margin: 0 0.6em;
-}
-
-.a-item-id-label {
-    font-size: 0.85em;
-    color: #D1D1D1;
-    margin-bottom: -0.4em;    
-}
-
-.a-item-name-label {
-    font-size: 1.3em;
-    font-weight: 400;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: #3E3E3E;
-}
-
-.a-item-locate-contaienr {
-
-}
-
-.a-item-text-contaienr {
-
-}
-
-.a-item-title-container {
-}
-
-.a-item-title-label {
-    font-size: 1.2em;
-    font-weight: 500;
-    color: #2E2E2E;
-}
-
-.a-item-desc-label {
-    color: #AEAEAE;
-}
-
-.a-item-right-container {
-    margin-left: auto;
-    width: 13em;
-    height: 100%;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.a-item-close-btn {
+.alert-item-close-btn {
+    display: none;
     width: 1.6em;
     height: 1.6em;
     cursor: pointer;
     background-image: url(../img/icn_close_s.svg);
     background-size: 100% 100%;
     background-repeat: no-repeat;
-}
-
-.a-item-timeago-label {
-    margin-top: auto;
-    color: #848484;
-    font-size: 0.8em;
-    font-weight: 400;
+    margin-bottom: auto;
 }
 
 .alert-item-loader-btn {

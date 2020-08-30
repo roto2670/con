@@ -1,0 +1,61 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/settings.css">
+{% endblock stylesheets %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="setting-panel">
+        <div class="setting-title-container">
+            <div class="setting-title-icn"></div>
+            <div class="setting-title-label">General</div>
+        </div>
+        <div class="setting-content-container">
+            <div class="setting-item">
+                <div class="si-title-label userid">ID</div>
+                <div class="si-content-container">
+                    <div class="si-desc-label">Administrator ID must be entered for use.</div>
+                    <div class="si-field-container">
+                        <input type="text" class="si-textbox userid">
+                        <div class="si-btn userid">Set</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+
+    <script>
+        (function() {
+            // init
+            initHandlers();
+            
+            loadUserId(); 
+
+            function initHandlers() {
+                $('.si-btn.userid').click(function() {
+                    window.alert('Not ready yet!');
+                });
+            }
+
+            function loadUserId() {
+                $('.si-textbox.userid').val('');
+            }
+        })();
+    </script>
+{% endblock javascripts %}
