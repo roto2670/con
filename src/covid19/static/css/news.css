@@ -1,0 +1,226 @@
+.content-container {
+    width: 100%;
+}
+
+.top-container {
+    margin-bottom: 1.4em;
+}
+
+.add-news-menu-container {
+    position: relative;
+    margin-left: auto;
+}
+
+.add-news-btn {
+    width: 2em;
+    height: 2em;
+    margin-left: auto;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url(../img/icn_add.svg);
+    cursor: pointer;
+}
+
+.add-news-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1;
+    margin-top: 0.6em;
+    background-color: white;
+    box-shadow: 1px 1px rgb(190, 190, 190);
+    border: 1px solid #EF8009;
+}
+
+.add-news-menu .hide {
+    display: none;
+}
+.add-news-menu:nth-last-child() {
+    border-bottom: none;
+}
+.add-news-menu-item {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.8em 0.6em;
+    border-bottom: 1px solid #EF8009;
+}
+.add-news-menu-item:hover {
+    background-color: #ef800959;
+}
+.add-news-menu-item:nth-last-child(1) {
+    border-bottom: none;
+}
+.ads-mi-icn {
+    width: 2em;
+    height: 2em;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.ads-mi-icn > svg {
+    width: 2em;
+    height: 2em;
+}
+.ads-mi-icn > svg > rect {
+    fill: #595959;
+}
+.ads-mi-icn > svg > path {
+    fill: #595959;
+}
+.ads-mi-label {
+    margin-left: 1em;
+    font-weight: 500;
+    font-size: 1.4em;
+}
+
+.news-item {
+    height: 7em;
+    background-color: #FCFCFC;
+    padding: 0.8em 1.2em;
+    box-sizing: border-box;
+    box-shadow: 0.2em 0.2em #d8d8d8;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    position: relative;
+    margin-bottom: 0.8em;
+}
+
+.ni-grap-btn {
+    width: 1.8em;
+    height: 1.8em;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-image: url(../img/icn_grab.svg);
+    cursor: grab;
+    margin-right: 1em;  
+}
+
+.ni-thumbnail {
+    position: absolute;
+    width: 9em;
+    top: 0;
+    bottom: 0;
+    left: 4em;
+    cursor: pointer;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url(../img/icn_image.svg);
+}
+
+.ni-content-container {
+    padding-left: 0.8em;
+    box-sizing: border-box;
+    position: absolute;
+    left: 14em;
+    right: 8em;
+}
+
+.ni-title-label {
+    font-size: 1.2em;
+    font-weight: 500;
+    color: #2E2E2E;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.ni-message-label {
+    color: #3E3E3E;
+    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    display: -webkit-inline-box;
+    margin-top: 0.4em;
+}
+
+.ni-timeago-label {
+    font-size: 0.8em;
+    color: #C6C6C8;
+    margin-left: auto;
+    margin-top: auto;
+}
+
+.ni-right-container {
+    position: absolute;
+    right: 1em;
+    top: 1em;
+}
+
+.ni-remove-btn {
+    width: 1.6em;
+    height: 1.6em;
+    cursor: pointer;
+    background-image: url(../img/icn_close_s.svg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    margin-bottom: auto;
+    margin-left: auto;
+}
+
+.ni-pin-btn {
+    display: none;
+}
+
+.news-item-loader-btn {
+    display: flex;
+    justify-content: center;
+    margin: 1.4em 0;
+    cursor: pointer;
+}
+
+.news-item-loader-icon {
+    width: 1.5em;
+    height: 1.5em;
+    background-image: url(../img/icn_reload.svg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.loading .news-item-loader-icon {
+    display: none;
+}
+
+.news-item-loader-label {
+    color: #EF8009;
+    margin-left: 0.6em;
+}
+
+.loading .news-item-loader-label {
+    display: none;
+}
+
+.and-content-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.and-title-label {
+    font-weight: 500;
+    font-size: 1.2em;
+    margin-top: 1em;
+}
+.and-desc-label {
+    color: #6d6d6d;
+}
+
+.and-input-title-textbox {
+    width: 100%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 0.6em 0.4em;
+    border: 0 none;
+    background-color: #F6F6F6;
+}
+.and-message-textarea {
+    width: 100%;
+    height: 15em;
+    margin-bottom: 1em;
+    background-color: #F6F6F6;
+    border: 0 none;
+}

@@ -243,6 +243,7 @@
                 'isolated': "isolated",
                 'alert_phase': "alertphase"
             },
+            USER_MENU_URL_PREFIX = 'users',
             ALERT_PAGE_SIZE = 5;
 
             let _db = firebase.firestore(),
@@ -411,7 +412,11 @@
                         // render alert items.
                         let container = $('.content-container.alerts');
                         $.each(users, function(index, user) {
-                            let viewItem = AlertItem(user);
+                            let viewItem = AlertItem(user, {
+                                goToUser: function(userId) {
+                                    goToUserMenu(userId);
+                                }
+                            });
                             container.append(viewItem.render());
                         });
 
@@ -470,6 +475,12 @@
                 }
                 return 'N/A';
             }
+            
+            function goToUserMenu(id) {
+                if (!!id) {
+                    window.location = USER_MENU_URL_PREFIX + '?id=' + encodeURIComponent(id);
+                }
+            }
 
             function StatItem(value, displayName) {
                 function render () {
@@ -481,41 +492,45 @@
                 }
             }
 
-            function AlertItem(model) {
+            function AlertItem(model, callbacks) {
                 let _model = model,
+                    _callbacks = callbacks || {
+                        goToUser: _.noop
+                    },
                     _views = {};
 
                 function render() {
-                    let container = $('<div class="a-item">')
-                    let leftContainer = $('<div class="a-item-left-container">')
-                            .append('<div class="a-item-avatar">');
-                    let nameContainer = $('<div class="a-item-name-container">'),
-                        idLabel = $('<div class="a-item-id-label">'),
-                        nameLabel = $('<div class="a-item-name-label">'),
-                        locateContainer = $('<div class="a-item-locate-container">');
-                    let textContainer = $('<div class="a-item-text-container">'),
-                        titleLabel = $('<div class="a-item-title-label">'),
-                        descLabel = $('<div class="a-item-desc-label">');
-                    let rightContainer = $('<div class="a-item-right-container">')
-                        closeButton = $('<div class="a-item-close-btn">'),
-                        timeagoLabel = $('<div class="a-item-timeago-label">');
+                    let container = $('<div class="alert-item">');
+                    let profile = $('<div class="alert-item-avatar">');
+                    let contentContainer = $('<div class="alert-item-content-container">'),
+                        titleLabel = $('<div class="alert-item-title-label">'),
+                        descLabel = $('<div class="alert-item-desc-label">');
+                    let locateContainer = $('<div class="alert-item-locate-container">'),
+                        nameLabel = $('<div class="alert-item-name-label">'),
+                        timeagoLabel = $('<div class="alert-item-timeago-label">');
+                    let messageButton = $('<div class="alert-item-msg-btn">')
+                    let closeButton = $('<div class="alert-item-close-btn">')
 
-                    container.append(leftContainer, nameContainer, textContainer, rightContainer);
-                    nameContainer.append(idLabel, nameLabel, locateContainer);
-                    textContainer.append(titleLabel, descLabel);
-                    rightContainer.append(closeButton, timeagoLabel);
+                    container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
+                    contentContainer.append(titleLabel, descLabel, locateContainer);
+                    locateContainer.append(nameLabel);
 
                     // init handlers
-                    closeButton.click(function() {
-                        container.detach().remove();
+                    profile.click(function() {
+                        _callbacks.goToUser(model.from_user);
+                    });
+                    nameLabel.click(function() {
+                        _callbacks.goToUser(model.from_user);
                     });
 
-                    // Stores view
+                    // store views
                     _views.container = container;
-                    _views.idLabel = idLabel;
-                    _views.nameLabel = nameLabel;
+                    _views.profile = profile;
                     _views.titleLabel = titleLabel;
                     _views.descLabel = descLabel;
+                    _views.nameLabel = nameLabel;
+                    _views.messageButton = messageButton;
+                    _views.closeButton = closeButton;
                     _views.timeagoLabel = timeagoLabel;
 
                     update(_model);
@@ -526,15 +541,24 @@
                 function update(model) {
                     _model = model;
 
-                    _views.idLabel.text('');
-                    _views.nameLabel.text('');
                     _views.titleLabel.text(model.title || '-');
                     _views.descLabel.text(model.message || '-');
-                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
+                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-')
+                    _views.nameLabel.text(model.from_name || '');
+
+                    // load profile image
+                    console.log('name :', model.from_name, 'id : ', model.from_user);
+                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + model.from_user + '-pf.png';
+                    $('<img/>')
+                        .load(function() {
+                            _views.profile.css('background-image', 'url(' + profileUrl + ')');
+                        })
+                        .attr('src', profileUrl);
                 }
 
                 return {
-                    render: render
+                    render: render,
+                    update: update
                 }
             }
         })();

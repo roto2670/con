@@ -45,3 +45,13 @@ def route_notifications():
 @util.require_login
 def route_manage_data():
   return render_template("manage_data.html")
+
+@blueprint.route('/news')
+@util.require_login
+def route_news():
+  return render_template("news.html")
+
+@blueprint.route('/settings')
+@util.require_login
+def route_settings():
+  return render_template("csettings.html")

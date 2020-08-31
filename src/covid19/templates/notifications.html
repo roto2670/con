@@ -139,6 +139,7 @@
                                     model;
 
                                 model = change.doc.data();
+                                model.documentId = change.doc.id;
                                 if (model) {
                                     // don't check type of type.
                                     // check type
@@ -162,7 +163,7 @@
 
                                         // do animation
                                         _.delay(function() {
-                                            container.prepend(item.render(model));
+                                            container.prepend(item.render());
                                             item.blink();
                                         });
                                     } else {
@@ -189,15 +190,21 @@
                                     model;
 
                                 model = change.doc.data();
+                                model.documentId = change.doc.id;
+                                model.fromUserId = change.from_user.id;
                                 if (model) {
                                     // don't check type of type.
                                     container = _notyItemContainers[MESSAGE_TYPE.COMPLIANCE];
                                     if (!!container) {
-                                        let item = ComplianceMessageItem(model);
+                                        let item = ComplianceMessageItem(model, {
+                                            goToUser: function(userId) {
+                                                goToUserMenu(userId);
+                                            }
+                                        });
 
                                         // do animation
                                         _.delay(function() {
-                                            container.prepend(item.render(model));
+                                            container.prepend(item.render());
                                             item.blink();
                                         });
                                     } else {
@@ -278,9 +285,14 @@
                                     }
                                 });
                             } else {
-                                item = ComplianceMessageItem(message);
+                                message.fromUserId = message.from_user.id;
+                                item = ComplianceMessageItem(message, {
+                                    goToUser: function(userId) {
+                                        goToUserMenu(userId);
+                                    }
+                                });
                             }
-                            container.append(item.render(message));
+                            container.append(item.render());
                             if (animation) {
                                 item.blink();
                             }
@@ -305,7 +317,7 @@
                 } else if (MESSAGE_TYPE.MEDICAL === type) {
                     query = ref.where('to_user', '==', '2');
                 } else if (MESSAGE_TYPE.SENT === type) {
-                    query = ref.where('from_user', '>=', 1).where('from_user', '<=', 2).orderBy('from_user'); 
+                    query = ref.where('from_user', '>=', '1').where('from_user', '<=', '2').orderBy('from_user'); 
                 } else if (MESSAGE_TYPE.COMPLIANCE === type) {
                     query = _db.collection('compliance_reports')
                 }
@@ -325,7 +337,9 @@
                         if (!!!snapshots.empty) {
                             lastSnapShot = snapshots.docs[snapshots.docs.length - 1];
                             snapshots.forEach(function(doc) {
-                                messages.push(doc.data());
+                                let model = doc.data();
+                                model.documentId = doc.id;
+                                messages.push(model);
                             });
                         } else {
                             // no more messages.
@@ -349,7 +363,7 @@
                     },
                     _views = {};
 
-                function render(model) {
+                function render() {
                     let container = $('<div class="noty-item">');
                     let profile = $('<div class="noty-item-avatar">');
                     let contentContainer = $('<div class="noty-item-content-container">'),
@@ -371,16 +385,16 @@
                         // TODO: call api?
                     })
                     profile.click(function() {
-                        let userId = model.from_user;
-                        if (model.from_user == '1' || model.from_user == '2') {
-                            userId = model.to_user;
+                        let userId = _model.from_user;
+                        if (_model.from_user == '1' || _model.from_user == '2') {
+                            userId = _model.to_user;
                         }
                         _callbacks.goToUser(userId);
                     });
                     nameLabel.click(function() {
-                        let userId = model.from_user;
-                        if (model.from_user == '1' || model.from_user == '2') {
-                            userId = model.to_user;
+                        let userId = _model.from_user;
+                        if (_model.from_user == '1' || _model.from_user == '2') {
+                            userId = _model.to_user;
                         }
                         _callbacks.goToUser(userId);
                     });
@@ -395,7 +409,7 @@
                     _views.closeButton = closeButton;
                     _views.timeagoLabel = timeagoLabel;
 
-                    update(model);
+                    update(_model);
 
                     return container;
                 }
@@ -407,11 +421,21 @@
                     _views.descLabel.text(model.message || '-');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-')
 
+                    let profileUserId = model.from_user;
                     if (model.from_user == '1' || model.from_user == '2') {
                         _views.nameLabel.text(model.to_name || '');
+                        profileUserId = model.to_user;
                     } else {
                         _views.nameLabel.text(model.from_name || '');
                     }
+
+                    // load profile image
+                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + profileUserId + '-pf.png';
+                    $('<img/>')
+                        .load(function() {
+                            _views.profile.css('background-image', 'url(' + profileUrl + ')');
+                        })
+                        .attr('src', profileUrl);
                 }
 
                 function blink() {
@@ -433,13 +457,13 @@
 
             function ComplianceMessageItem(model, callbacks) {
                 var _model = model,
-                    _callbacks = callback = {
+                    _callbacks = callbacks || {
                         goToUser: _.noop
                     },
-                    _user,
+                    _fromUser,
                     _views = {};
 
-                function render(model) {
+                function render() {
                     let container = $('<div class="noty-item">');
                     let profile = $('<div class="noty-item-avatar">');
                     let contentContainer = $('<div class="noty-item-content-container">'),
@@ -461,15 +485,15 @@
                         // TODO: call api?
                     })
                     profile.click(function() {
-                        if (!!_user) {
-                            _callbacks.goToUser();
+                        if (!!_model) {
+                            _callbacks.goToUser(_model.fromUserId);
                         } else {
                             console.warn('Cannot move to user menu, unknown user.');
                         }
                     });
                     nameLabel.click(function() {
-                        if (!!_user) {
-                            _callbacks.goToUser();
+                        if (!!_model) {
+                            _callbacks.goToUser(_model.fromUserId);
                         } else {
                             console.warn('Cannot move to user menu, unknown user.');
                         }
@@ -485,18 +509,7 @@
                     _views.closeButton = closeButton;
                     _views.timeagoLabel = timeagoLabel;
 
-                    update(model);
-
-                    // TODO: move in function?
-                    if (model.from_user) {
-                        model.from_user.get().then(function(doc) {
-                            if (!!doc) {
-                                // Store user.
-                                _user = user = doc.data();
-                                updateName(doc.fullname);
-                            }
-                        });
-                    }
+                    update(_model);
 
                     return container;
                 }
@@ -516,12 +529,32 @@
                     }
                     _views.titleLabel.text(title);
 
+                    // TODO: move in load api.
+                    if (_model.from_user) {
+                        _model.from_user.get().then(function(doc) {
+                            if (!!doc) {
+                                // Store user.
+                                _fromUser = doc.data();
+                                _fromUser.documentId = doc.id;
+                                updateName(_fromUser.fullname);
+
+                                // load profile image
+                                let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + _fromUser.documentId + '-pf.png';
+                                $('<img/>')
+                                    .load(function() {
+                                        _views.profile.css('background-image', 'url(' + profileUrl + ')');
+                                    })
+                                    .attr('src', profileUrl);
+                            }
+                        });
+                    }
+
                     _views.descLabel.text(model.message || '-');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
                 }
 
                 function updateName(fullname) {
-                    _views.nameLabel.text(user.fullname || '-');
+                    _views.nameLabel.text(fullname || '-');
                 }
 
                 function blink() {
