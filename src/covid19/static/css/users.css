@@ -103,6 +103,7 @@
 }
 
 .discover-hotspot-btn {
+    display: none !important;
     align-items: center;
     background-color: #E0002A;
     height: 3em;

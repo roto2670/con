@@ -154,6 +154,22 @@
     cursor: pointer;
 }
 
+.noty-item-attchmentContainer {
+    margin-top: 0.6em;
+}
+
+.noty-item-attachment {
+    width: 1.1em;
+    height: 1.1em;
+    display: inline-flex;
+    margin-right: 0.6em;
+    cursor: pointer;
+    background-image: url(../img/icn_attachment.svg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 .noty-item-loader-icon {
     width: 1.5em;
     height: 1.5em;
