@@ -1313,11 +1313,11 @@ CSV_INDEX = {
     301: 2,
     302: 3,
     303: 4,
-    304: 5,
-    305: 6,
-    306: 7,
-    307: 8,
-    308: 9,
+    304: 9,
+    305: 5,
+    306: 6,
+    307: 7,
+    308: 8,
     309: 10,
     310: 11,
 }
@@ -1637,7 +1637,7 @@ def download_work_log():
              "RB_Drilling,RB_Injection,GT_Drilling,GT_Injection,GT_Curing,"\
              "GT_Check Hole,CD_Core Drilling,Idle,TBM,Interference,Evacuation,"\
              "Equipment B/D,Preperation,Resource not available,Shift Change,"\
-             "Explosive Delivery,No Work,Others\n"
+             "Explosive Delivery,No Work,Others,None\n"
   ret_csv_str = csv_str_formatting(csv_str, work_log_list, tunnel_id)
   return _get_download_csv_response(ret_csv_str, filename)
 
@@ -1654,7 +1654,7 @@ def csv_str_formatting(csv_str, work_log_list, tunnel_id):
     blast_info = _blast.blast_info_list[0]
     main_work_times = ["0" for index in range(16)]
     support_times = ["0" for index in range(10)]
-    idle_times = ["0" for index in range(11)]
+    idle_times = ["0" for index in range(12)]
     log_data_list = []
     total_data_list = []
     main_total_times = 0
