@@ -222,6 +222,7 @@ def _convert_dict_by_operator(data):
 def _convert_dict_by_work_equipment(data):
   return {
     "id": data.id,
+    "category": data.category,
     "equipment_id": data.equipment_id,
     "operator_id": data.operator_id,
     "accum_time": data.accum_time,

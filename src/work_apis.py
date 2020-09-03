@@ -700,7 +700,8 @@ def get_all_operator():
 
 def create_work_equipment(data):
   cur_time = get_servertime()
-  data = WorkEquipment(equipment_id=data['equipment_id'],
+  data = WorkEquipment(category=data['category'],
+                       equipment_id=data['equipment_id'],
                        operator_id=data['operator_id'],
                        accum_time=data['accum_time'],
                        p_accum_time=data['p_accum_time'],

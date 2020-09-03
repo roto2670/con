@@ -204,6 +204,7 @@ class _WorkEquipment(db.Model):
   __bind_key__ = 'smart_work'
 
   id = Column(Integer, primary_key=True)
+  category = Column(String(75))
   equipment_id = Column(String(75))
   operator_id = Column(String(75))
   accum_time = Column(Integer)
