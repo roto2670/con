@@ -24,6 +24,20 @@
           <i class="fa fa-cogs"></i>
         </a>
       </li>
+    </ul>
+  {% elif current_user.level == 7 or current_user.level == 8 %}
+    <div class="logo_img_div">
+      <a href="/covid19">
+        <img class="logo_img_middle" src="/static/images/logo-main_page.png">
+      </a>
+    </div>
+    <ul class="nav side-menu">
+      <li>
+        <a href="/covid19" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="COVID-19 Dashboard">
+          <i class="fa fa-medkit"></i>
+        </a>
+      </li>
+    </ul>
   {% else %}  <!-- OTHER -->
     <div class="logo_img_div">
       <a href="/">

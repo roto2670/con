@@ -393,7 +393,7 @@ def update_organization_by_logo(organization_id, logo_path):
 # {{{ User
 
 
-def create_user(email, username, password, department, level):
+def create_user(email, username, password, department, level, emirates_id):
   cur_time = get_datetime()
   org_id = constants.ORG_ID
   user_id = uuid.uuid4().hex
@@ -408,6 +408,7 @@ def create_user(email, username, password, department, level):
               ip_address=util.get_ip_addr(),
               level=int(level),
               password=password,
+              emirates_id=emirates_id,
               organization_id=org_id)
   db.session.add(user)
   db.session.commit()

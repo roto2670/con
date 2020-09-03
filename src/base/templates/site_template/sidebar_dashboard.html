@@ -1,4 +1,9 @@
 <div class="left_col scroll-view">
+  {% if current_user.level in [7, 8] %}
+  <script>
+    window.location.href = "/covid19";
+  </script>
+  {% endif %}
 
   <!-- sidebar menu -->
   <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
