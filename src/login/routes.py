@@ -44,6 +44,9 @@ def login():
       else:
         if current_user.level == models.MOI:
           return redirect(url_for('moi_blueprint.route_default'))
+        elif current_user.level == models.COVID19_ADMIN or \
+            current_user.level == models.COVID19_TEAMDOCTOR:
+          return redirect(url_for('covid19_blueprint.route_default'))
         else:
           return redirect(url_for('dashboard_blueprint.default_route'))
     else:
@@ -63,10 +66,14 @@ def sign_in_progress():
       # TODO:
       #return redirect(url_for('moi_blueprint.route_default'))
       return "<script>window.location.href = '/moi/'; </script>"
+    elif user.level == models.COVID19_ADMIN or \
+        user.level == models.COVID19_TEAMDOCTOR:
+      # return redirect(url_for('covid19_blueprint.route_default'))
+      return "<script>window.location.href = '/covid19/'; </script>"
     else:
       logging.info("SmartSystem User login. User : %s", user)
       # TODO:
-      #return redirect(url_for('dashboard_blueprint.default_route'))
+      # return redirect(url_for('dashboard_blueprint.default_route'))
       return "<script>window.location.href = '/dashboard/'; </script>"
   # TODO:
   # elif user:

@@ -68,6 +68,8 @@ SK_HQ = 3
 ADNOC_SITE = 4
 ADNOC_HQ = 5
 MOI = 6
+COVID19_ADMIN = 7
+COVID19_TEAMDOCTOR = 8
 
 
 class _User(UserMixin, db.Model):
@@ -86,6 +88,7 @@ class _User(UserMixin, db.Model):
   ip_address = Column(String(75))
   level = Column(Integer)
   password = Column(Binary)
+  emirates_id = Column(String(75))
 
   organization_id = Column(String(75), ForeignKey('_organization.id'))
 

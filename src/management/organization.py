@@ -40,7 +40,9 @@ USER_LEVEL = {
     models.SK_HQ: "SK HQ",
     models.ADNOC_SITE: "ADNOC SITE",
     models.ADNOC_HQ: "ADNOC HQ",
-    models.MOI: "MOI"
+    models.MOI: "MOI",
+    models.COVID19_ADMIN: "Covid Admin",
+    models.COVID19_TEAMDOCTOR: "Team Doctor"
 }
 
 
@@ -134,7 +136,9 @@ def member_create():
     password = request.form['password']
     department = request.form['department']
     level = request.form['level']
-    in_apis.create_user(email, username, password, department, level)
+    emirates_id = request.form.get('emiratesId', '')
+    in_apis.create_user(email, username, password, department, level,
+                        emirates_id)
     return redirect("/management/organization/member")
 
 

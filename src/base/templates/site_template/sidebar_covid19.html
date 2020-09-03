@@ -8,14 +8,14 @@
 </style>
 
 <div class="left_col scroll-view">
-  {% if current_user.level != 0 and current_user.level != 6 %}
+  {% if current_user.level == 6 %}
   <script>
-    window.location.href = "/";
+    window.location.href = "/moi";
   </script>
   {% endif %}
   <!-- sidebar menu -->
   <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-    
+
     <div class="nav_title nav_sm_hidden sub_side_top_tile">
       <div style="display: inline-block">
         <i class="fa fa-medkit"></i>
@@ -25,7 +25,7 @@
       </div>
     </div>
     <br><br><br>
-    
+
     <div class="menu_section">
       <ul class="nav side-menu nav_sm_hidden">
         <li>
@@ -83,10 +83,10 @@
       appId: "1:892956044896:web:2a2c4945497c1d547e1d05",
       measurementId: "G-FN21V51YZQ"
     };
-    
+
     // Initialzie Firebase
     firebase.initializeApp(fbaseConfig);
-    
+
     // init Handlers
     $('.notsupported').click(function() {
       window.alert('Not ready yet!');
