@@ -57,6 +57,8 @@
         </div>
     </div>
     <div class="content-container">
+        <div class="news-items-container pin"></div>
+        <div class="news-items-container unpin"></div>
     </div>
 
     <div class="news-item-loader-btn loading">
@@ -68,20 +70,35 @@
 
 {% block javascripts %}
     {{ super() }}
+      <script src="static/js/vendor/sortable/sortable.min.js"></script>
+      <script src="static/js/vendor/sortable/jquery-sortable.js"></script>
     <script>
         (function() {
-            const PAGE_SIZE = 10;
+            const PAGE_SIZE = 10,
+                UPLOAD_COUNT_LIMIT = 3,
+                UPLOAD_SIZE_LIMIT = 5; // 5mb
+            const UPLOAD_URL_BUILDER = _.template('https://skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>'),
+                DOWNLOAD_URL_BUILDER = _.template('https://skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>');
+            const MAX_PIN_ORDER = 100,  
+                PIN_ORDER_INCREMENT = 1;
+                UNPIN_ORDER_INCREMENT = 1000;
 
             let _db = firebase.firestore(),
+                _newsItems = {},
                 _loadingNews = false,
                 _initializedSnapshotHandler = false,
                 _lastSnapshot = null;
 
             // init
+            // remove hard-coded to change the order of news items by drag.
+            $('body').removeAttr('ondragstart');
+
             initHandlers();
+            initSortableNewsItems();
             displayNews(function() {
                 $('.news-item-loader-btn').removeClass('loading');
             })
+            initSnapshotHandler();
 
             function initHandlers() {
                 $('.add-news-btn').click(function(event) {
@@ -107,7 +124,38 @@
                     showAddYoutubeDialog();
                 });
                 $('.add-news-menu-item.image').click(function() {
-                    window.alert('Not ready yet!');
+                    showAddImageDialog();
+                });
+            }
+
+            function initSortableNewsItems() {
+                // init sortable items.
+                $('.news-items-container.unpin').sortable({
+                    animation: 150,
+                    handle: '.ni-grab-btn',
+                    ghostClass: 'ni-news-item-ghost',
+                    onSort: function(event) {
+                        let currentViewItem = $(event.item),
+                            prevViewItem = currentViewItem.prev(),
+                            nextViewItem = currentViewItem.next();
+
+                        let currentOrder = currentViewItem.data('order'),
+                            prevOrder = currentViewItem.prev().data('order') || 0,
+                            nextOrder = currentViewItem.next().data('order');
+
+                        if (_.isNumber(currentOrder)) {
+                            let newOrder = (prevOrder + nextOrder) / 2;
+                            if (!nextOrder) {
+                                // there is no next order
+                                newOrder = getNextUnpinOrder();
+                                nextOrder = newOrder + UNPIN_ORDER_INCREMENT;
+                            }
+
+                            if (prevOrder < newOrder && nextOrder > newOrder ) {
+                                updateOrder(currentViewItem.data('documentId'), newOrder);
+                            }
+                        }
+                    }
                 });
             }
 
@@ -122,35 +170,223 @@
                             _initializedSnapshotHandler = true;
                             return;
                         }
-                        if (!snapshot.metadata.hasPendingWrites) {
-                            snapshot.docChanges().forEach(function(change) {
-                                if (change.type === 'added') {
-                                    let model = change.doc.data();
-                                    model.documentId = change.doc.id;
-                                    addNewsItem(model, true);
+                        snapshot.docChanges().forEach(function(change) {
+                            if (change.type === 'added') {
+                                let model = change.doc.data();
+                                    newsObj = _newsItems[change.doc.id];
+
+                                model.documentId = change.doc.id;
+                                if (snapshot.metadata.hasPendingWrites) {
+                                    // This has not yet been recorded on the server, so must manually set the time field.
+                                    model.ts = {
+                                        seconds: new Date().getTime() / 1000
+                                    };
                                 }
-                            });
-                        }
+                                if (!_.has(_newsItems, change.doc.id)) {
+                                    addNewsItem(model);
+                                } else {
+                                    updateNewsItem(model);
+                                }
+                            }
+                        });
                     });
             }
 
-            function showAddYoutubeDialog() {
-                let dialog = AddYoutubeDialog();
-                dialog.show($('.right_col'), function(title, body, link) {
-                    if (!!title && !!link) {
-                        let model = {
-                            title: title,
-                            content: body || '',
-                            type: 'youtube',
-                            order: 1000,
-                            media_url: link,
-                            ts: new Date()
+            function showAddYoutubeDialog(model) {
+                let dialog = AddYoutubeDialog(),
+                    uploading = false,
+                    filesQueue = null;
+
+                dialog.show($('.right_col'), model, {
+                    selectedAdd: function(title, body, lang, link, files) {
+                        if (!uploading) {
+                            uploading = true;
+    
+                            filesQueue = makeFileUrls(files, false);
+                            // Upload attachments.
+                            uploadFiles(0, filesQueue, dialog, function(files) {
+                                // Write to firestore.
+                                let queryData = {
+                                        title: title,
+                                        content: body || '',
+                                        order: getNextUnpinOrder(),
+                                        type: 'youtube',
+                                        media_url: link,
+                                        lang: lang,
+                                        ts: {
+                                            seconds: new Date().getTime() / 1000
+                                        }
+                                    };
+    
+                                if (!_.isEmpty(filesQueue)) {
+                                    let files = [];
+                                    _.each(filesQueue, function(file) {
+                                        files.push(_.pick(file, 'download_url', 'filename'));
+                                    });
+                                    queryData.files = files;
+                                }
+    
+                                addNews(queryData);
+                                dialog.hide();    
+                            });
+                        } else {
+                            // Already uploading.
                         }
+                    },
+                    selectedEdit: function(title, body, lang, link) {
+                        // Update to firestore.
+                        let queryData = {
+                                title: title,
+                                content: body || '',
+                                order: model.order,
+                                type: 'youtube',
+                                media_url: link,
+                                lang: lang,
+                                ts: {
+                                    seconds: new Date().getTime() / 1000
+                                }
+                            };
+
+                        updateNews(model.documentId, queryData);
+                        updateNewsItem(_.extend(model, queryData));
                         dialog.hide();
-                        addNews(model);
-                        addNewsItem(model);
                     }
                 });
+            }
+
+            function showAddImageDialog(model) {
+                let dialog = AddImageDialog(),
+                    uploading = false,
+                    imageQueue = null,
+                    filesQueue = null;
+
+                dialog.show($('.right_col'), model, {
+                    selectedAdd: function(title, message, lang, image, files) {
+                        if (!uploading) {
+                            uploading = true;
+
+                            imageQueue = makeFileUrls([image], true);
+                            filesQueue = makeFileUrls(files, false);
+                            // Upload image first.
+                            uploadFiles(0, imageQueue, dialog, function(imageUrls) {
+                                // Upload attachments.
+                                uploadFiles(0, filesQueue, dialog, function(files) {
+                                    // Write to firestore.
+                                    let queryData = {
+                                            title: title,
+                                            content: message,
+                                            order: 1000,
+                                            type: 'image',
+                                            media_url: _.first(imageQueue).download_url,
+                                            lang: lang,
+                                            ts: {
+                                                seconds: new Date().getTime() / 1000
+                                            }
+                                        };
+
+                                    if (!_.isEmpty(filesQueue)) {
+                                        let files = [];
+                                        _.each(filesQueue, function(file) {
+                                            files.push(_.pick(file, 'download_url', 'filename'));
+                                        });
+                                        queryData.files = files;
+                                    }
+
+                                    addNews(queryData);
+                                    dialog.hide();    
+                                });
+                            });
+                        } else {
+                            // Already uploading.
+                        }
+                    },
+                    selectedEdit: function(title, message, lang) {
+                        // Updates to firestore.
+                        let queryData = {
+                                title: title,
+                                content: message || '',
+                                order: 1000,
+                                type: 'image',
+                                lang: lang,
+                                ts: {
+                                    seconds: new Date().getTime() / 1000
+                                }
+                            };
+
+                        updateNews(model.documentId, queryData);
+                        updateNewsItem(_.extend(model, queryData));
+                        dialog.hide();    
+                    }
+                });
+            }
+
+            function makeFileUrls(files, image) {
+                let queue = [];
+                _.each(files, function(file) {
+                    let fileId = makeUUID();
+                    queue.push({
+                        filename: file.name || 'unnamed',
+                        upload_url: makeUploadUrl(image, fileId),
+                        download_url: makeDownloadUrl(image, fileId),
+                        file: file
+                    })
+                });
+
+                return queue;
+            }
+
+            function uploadFiles(currentIndex, files, dialog, callback) {
+                let _file = null,
+                    _callback = callback || _.noop;
+                if (currentIndex < _.size(files)) {
+                    _file = files[currentIndex];
+                    
+                    dialog.setFileName(_file.filename);
+                    dialog.setFileCount(currentIndex + 1, _.size(files));
+                    uploadFile(_file, {
+                        progress: function(progress) {
+                            dialog.setProgress(progress);
+                        },
+                        success: function() {
+                            dialog.setProgress(100);
+                            uploadFiles(++currentIndex, files, dialog, _callback);
+                        }
+                    });
+                } else {
+                    _callback();
+                }
+            }
+
+            function uploadFile(file, callbacks) {
+                let _callbacks = callbacks || {
+                    progress: _.noop,
+                    success: _.noop
+                };
+                if (file) {
+                    let formData = new FormData();
+                    formData.append('file', file.file, file.filename); 
+
+                    $.ajax({
+                        url: file.upload_url,
+                        data: formData,
+                        type: 'post',
+                        contentType: false,
+                        processData: false,
+                        xhr: function() {
+                            let xhr = $.ajaxSettings.xhr();
+                            xhr.upload.onprogress = function(event) {
+                                _callbacks.progress(event.loaded * 100 / event.total);
+                            }
+
+                            return xhr;
+                        },
+                        success: function() {
+                            _callbacks.success();
+                        },
+                    });
+                } else {
+                    _callback();
+                }
             }
 
             function showAddMenu() {
@@ -201,7 +437,7 @@
             function addNewsItem(news, prepend) {
                 // TODO: by order?
                 if (!!news) {
-                    let container = $('.content-container'),
+                    let container = $('.news-items-container.unpin'),
                         viewItem,
                         newsItem = NewsItem(news, {
                             selectedRemove: function(documentId) {
@@ -213,8 +449,32 @@
                                         _db.collection('bulletin_items').doc(documentId).delete();
                                     }
                                 }
+                            },
+                            selectedEdit: function(selectedModel) {
+                                if (selectedModel.type === 'youtube') {
+                                    showAddYoutubeDialog(selectedModel);
+                                } else if (selectedModel.type === 'image') {
+                                    showAddImageDialog(selectedModel);
+                                }
+                            },
+                            selectedPin: function(pinned) {
+                                let _pinned = !pinned;
+                                    _order = getNextPinOrder();
+                                
+                                if (!_pinned) {
+                                    _order = getNextUnpinOrder();
+                                }
+
+                                updateNews(news.documentId, {
+                                    order: _order
+                                });
+                                rearrangeNewsItem(news.documentId, _order);
                             }
                         });
+                    
+                    if (isPinNews(news)) {
+                        container = $('.news-items-container.pin');
+                    }
                     
                     viewItem = newsItem.render();
                     if (prepend) {
@@ -222,21 +482,93 @@
                     } else {
                         container.append(viewItem);
                     }
+
+                    // store in cache
+                    _newsItems[news.documentId] = {
+                        model: news,
+                        view: newsItem
+                    }
                 } else {
                     console.warn('Failed to draw new item by given model cannot be null.');
                 }
             }
 
+            function updateOrder(documentId, newOrder) {
+                let _newsObj = _newsItems[documentId];
+                if (_newsObj && _.isNumber(newOrder)) {
+                    _newsObj.model.order = newOrder; 
+                    _newsObj.view.setOrder(newOrder);
+
+                    // Updates the db
+                    updateNews(documentId, {
+                        order: newOrder
+                    });
+                }
+            }
+
+            function updateNewsItem(news) {
+                let viewObj = _newsItems[news.documentId];
+                if (viewObj) {
+                    viewObj.view.update(news);
+                    viewObj.model = news;
+                } else {
+                    console.warn('Failed to update news view item, cannot find view item by given model.', news);
+                }
+            }
+
+            function rearrangeNewsItem(documentId, newOrder){
+                let viewObj = _newsItems[documentId];
+
+                if (viewObj) {
+                    _view = viewObj.view,
+                    _container = $('.news-items-container.pin');
+
+                    let oldPinned = isPinNews(viewObj.model),
+                        newPinned = isPinNews(null, newOrder);
+                    _view.setOrder(newOrder);
+
+                    if (oldPinned != newPinned) {
+                        let viewItem = _view.getView();
+                        viewItem.detach();
+
+                        if (!newPinned) {
+                            _container = $('.news-items-container.unpin');
+                        } else {
+                            _container.append(viewItem);
+                        }
+                    }
+
+                    // update model
+                    viewObj.model.order = newOrder;
+                }
+            }
+
             function addNews(data) {
                 if (_.isObject(data) && !_.isEmpty(data)) {
-                    _db.collection('bulletin_items').doc().set({
+                    let _data = {
                         title: data.title,
-                        content: data.content,
+                        content: data.content || '',
                         order: data.order,
                         type: data.type,
                         media_url: data.media_url,
+                        lang: data.lang,
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    if (data.files) {
+                        _data.files = data.files;
+                    }
+                    _db.collection('bulletin_items').doc().set(_data);
+                } else {
+                    console.warn('Failed to add new to server, given data is wrong.', data);
+                }
+            }
+
+            function updateNews(documentId, data) {
+                if (documentId && _.isObject(data) && !_.isEmpty(data)) {
+                    let _data = _.extend(data, {
                         ts: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                    _db.collection('bulletin_items').doc(documentId).update(_data);
                 } else {
                     console.warn('Failed to add new to server, given data is wrong.', data);
                 }
@@ -249,7 +581,7 @@
                     query;
 
                 query = ref.limit(PAGE_SIZE)
-                            .orderBy('order', 'desc');
+                            .orderBy('order');
 
                 if (!!startAt) {
                     query = query.startAfter(startAt);
@@ -273,16 +605,71 @@
                 });
             }
 
+            function isPinNews(news, order) {
+                return MAX_PIN_ORDER >= (order || news.order);
+            }
+
+            function getNextPinOrder() {
+                let max = 0,
+                    current = 0;
+                _.each(_newsItems, function(newsObj) {
+                    current = newsObj.model.order + PIN_ORDER_INCREMENT;
+                    if (max < current && current <= MAX_PIN_ORDER)  {
+                        max = current;
+                    }
+                });
+
+                return max || 1;
+            }
+
+            function getNextUnpinOrder() {
+                let max = 0,
+                    current = 0;
+                _.each(_newsItems, function(newsObj) {
+                    current = newsObj.model.order;
+                    if (max < current)  {
+                        max = current;
+                    }
+                });
+
+                return max + UNPIN_ORDER_INCREMENT;
+            }
+
+            function makeUploadUrl(image, fileId) {
+                return UPLOAD_URL_BUILDER({
+                    type: image ? 'image' : 'file',
+                    id: fileId || makeUUID()
+                });
+            }
+
+            function makeDownloadUrl(image, fileId) {
+                return DOWNLOAD_URL_BUILDER({
+                    type: image ? 'image' : 'file',
+                    id: fileId || makeUUID()
+                });
+            }
+
+            function makeUUID() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                  });
+            }
+
             function NewsItem(model, callbacks) {
                 let _views = {},
                     _callbacks = callbacks || {
-                        selectedRemove: _.noop
-                    };
+                        selectedRemove: _.noop,
+                        selectedEdit: _.noop
+                    },
+                    _pinned = false,
                     _model = model;
 
                 function render() {
                     let container = $('<div class="news-item">'),
-                        grabButton = $('<div class="ni-grap-btn">'),
+                        upperContainer = $('<div class="ni-upper-container">'),
+                        lowerContainer = $('<div class="ni-lower-container">');
+                    let grabButton = $('<div class="ni-grab-btn">'),
                         thumbnail = $('<div class="ni-thumbnail">');
                     let contentContainer = $('<div class="ni-content-container">'),
                         titleLabel = $('<div class="ni-title-label">'),
@@ -292,7 +679,8 @@
                         removeButton = $('<div class="ni-remove-btn">'),
                         pinButton = $('<div class="ni-pin-btn">');
 
-                    container.append(grabButton, thumbnail, contentContainer, timeagoLabel, rightContainer);
+                    container.append(upperContainer, lowerContainer);
+                    upperContainer.append(grabButton, thumbnail, contentContainer, timeagoLabel, rightContainer);
                     contentContainer.append(titleLabel, messageLabel);
                     rightContainer.append(removeButton, pinButton);
 
@@ -303,8 +691,15 @@
                     removeButton.click(function() {
                         _callbacks.selectedRemove(model.documentId);
                     });
+                    titleLabel.click(function() {
+                        _callbacks.selectedEdit(_model);
+                    });
+                    pinButton.click(function() {
+                        _callbacks.selectedPin(_pinned);
+                    });
 
                     _views.container = container;
+                    _views.lowerContainer = lowerContainer;
                     _views.grabButton = grabButton;
                     _views.thumbnail = thumbnail;
                     _views.titleLabel = titleLabel;
@@ -320,6 +715,9 @@
 
                 function update(model) {
                     _model = model
+
+                    // set id and order using by jquery
+                    _views.container.data('documentId', model.documentId);
 
                     if (model.type === "image") {
                         _views.thumbnail.css('background-image', 'url("' + model.media_url + '")')
@@ -341,6 +739,42 @@
                     _views.titleLabel.text(model.title || '-');
                     _views.messageLabel.text(model.content || '');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
+
+                    // draw attachments if has
+                    _views.lowerContainer.empty();
+                    _.each(model.files, function(file) {
+                        let item = $('<div class="ni-attach-item">'),
+                            icon = $('<div class="ni-attach-icn">');
+                            nameLabel = $('<div class="ni-attach-name-label">');
+                        
+                        item.append(icon, nameLabel);
+                        nameLabel.text(file.filename);
+                        _views.lowerContainer.append(item);
+
+                        item.click(function() {
+                            // TODO: fix
+                            window.open(file.download_url);
+                        });
+                    });
+
+                    setOrder(model.order);
+                }
+
+                function setOrder(order) {
+                    _pinned = order <= MAX_PIN_ORDER;
+                    _views.container.data('order', order);
+                    _views.container.attr('order', order);
+
+                    // check pinned
+                    if (_pinned) {
+                        _views.pinButton.addClass('pin');
+                    } else {
+                        _views.pinButton.removeClass('pin');
+                    }
+                }
+
+                function getView() {
+                    return _views.container;
                 }
 
                 function getVideoId(url) {
@@ -348,15 +782,23 @@
                 }
 
                 return {
-                    render: render
+                    render: render,
+                    update: update,
+                    setOrder: setOrder,
+                    getView: getView
                 }
             }
 
             function AddYoutubeDialog() {
-                let _views = {};
+                let _views = {},
+                    _model;
 
-                function show(parent, callback) {
-                    let _callback = callback || _.noop;
+                function show(parent, model, callbacks) {
+                    let _callbacks = callbacks || {
+                        selectedAdd: _.noop,
+                        selectedEdit: _.noop
+                    };
+                    _model = model;
 
                     let container = $('<div class="add-news-dialog youtube c-modal-dialog">'),
                         contentContainer = $('<div class="and-content-container c-modal-dialog-content">'),
@@ -364,13 +806,38 @@
                     let titleLabel = $('<div class="and-title-label">YouTube</div>'),
                         descLabel = $('<div class="and-desc-label">It\'s a Youtube type of news. Please enter the YouTube URL.</div>'),
                         inputTitleTextbox = $('<input type="text" class="and-input-title-textbox dialog-textbox" placeholder="News title">'),
-                        messageTextarea = $('<textarea class="and-message-textarea dialog-message-textarea" placeholder="Will be displayed with the YouTube link.">');
-                        linkTextbox = $('<input type="text" class="and-textbox dialog-textbox" placeholder="Please enter YouTube link.">'),
+                        messageTextarea = $('<textarea class="and-message-textarea dialog-message-textarea" placeholder="Will be displayed with the YouTube link.">'),
+                        linkTextbox = $('<input type="text" class="and-textbox dialog-textbox" placeholder="Please enter YouTube link.">');
+                    let langSelector = $('<select name="lang" class="and-lang-selector">');
+                    let imageUploaderContainer = $('<div class="and-image-container">'),
+                        imageTitleLabel = $('<div class="and-subtitle-label">Image</div>'),
+                        selectImageButton = $('<input type="file" class="and-upload-btn" accept="image/*">');
+                    let filesTitleLabel = $('<div class="and-subtitle-label">Attachments</div>'),
+                        filesUploaderContainer = $('<div class="and-files-container">'),
+                        uploadDescLabel = $('<div class="and-desc-label">Up to 5 files and up to 5 mb per file.</div>'),
+                        selectFilesButton = $('<input type="file" class="and-upload-btn" multiple>');
+                    let bottomContainer = $('<div class="and-bottom-container">'),
+                        fileNameContainer = $('<div class="and-filename-container">'),
+                        fileNameLabel = $('<div class="and-desc-label filename">'),
+                        countLabel = $('<div class="and-desc-label filecount">'),
+                        progress = $('<div class="and-progress">'),
                         addButton = $('<div class="and-add-btn dialog-btn">ADD</div>');
 
                     container.append(contentContainer);
                     contentContainer.append(closeButton, titleLabel, descLabel, inputTitleTextbox, messageTextarea,
-                        linkTextbox, addButton);
+                        linkTextbox, langSelector, imageUploaderContainer, filesUploaderContainer, bottomContainer);
+                    imageUploaderContainer.append(imageTitleLabel, selectImageButton).hide();
+                    filesUploaderContainer.append(filesTitleLabel, uploadDescLabel, selectFilesButton);
+
+                    bottomContainer.append(fileNameContainer, progress, addButton);
+                    fileNameContainer.append(fileNameLabel, countLabel);
+
+                    langSelector.append($('<option value="en" selected="selected">English</option>'))
+                        .append($('<option value="ko">한국어</option>'))
+                        .append($('<option value="zh">中文</option>'))
+                        .append($('<option value="ar">العربية</option>'))
+                        .append($('<option value="hi">हिन्दी</option>'))
+                        .append($('<option value="ur">اردو</option>'));
 
                     // init handlers
                     closeButton.click(function() {
@@ -384,7 +851,10 @@
                     addButton.click(function() {
                         let title = inputTitleTextbox.val().trim(),
                             message = messageTextarea.val().trim(),
-                            link = linkTextbox.val().trim();
+                            link = linkTextbox.val().trim(),
+                            images = selectImageButton.prop('files'),
+                            files = selectFilesButton.prop('files'),
+                            image = null; 
 
                         if (_.isEmpty(title)) {
                             window.alert('Please enter title.');
@@ -397,11 +867,46 @@
                             return;
                         }
 
-                        _callback(title, message, link);
+                        // check attachment
+                        if (!_.isEmpty(files)) {
+                            if (UPLOAD_SIZE_LIMIT < files.length) {
+                                window.alert('You can only upload a maximum of ' + UPLOAD_SIZE_LIMIT + 'files.');
+                                event.preventDefault();
+                                return;
+                            }
+
+                            if (_.find(files, function(file) {
+                                return  UPLOAD_SIZE_LIMIT < (file.size / 1024 / 1024).toFixed(4);
+                            })) {
+                                window.alert('You can\'t upload files that are over 5mb.');
+                                event.preventDefault();
+                                return;
+                            }
+                        }
+
+                        if (model) {
+                            _callbacks.selectedEdit(title, message, langSelector.val(), link);
+                        } else {
+                            _callbacks.selectedAdd(title, message, langSelector.val(), link, files);
+                        }
                     });
 
                     // store views.
                     _views.container = container;
+                    _views.fileNameLabel = fileNameLabel;
+                    _views.countLabel = countLabel;
+                    _views.progress = progress;
+                    _views.addButton = addButton;
+                    _views.titleTextbox = inputTitleTextbox;
+                    _views.messageTextarea = messageTextarea;
+                    _views.langSelector = langSelector;
+                    _views.linkTextbox = linkTextbox;
+                    _views.imageUploadButton = selectImageButton;
+                    _views.imageUploader = imageUploaderContainer;
+                    _views.filesUploadButton = selectFilesButton;
+                    _views.filesUploader = filesUploaderContainer;
+
+                    update(model);
 
                     parent.append(container);
                 }
@@ -410,9 +915,213 @@
                     _views.container.detach().remove();
                 }
 
+                function update(model) {
+                    _model = model;
+                    if (_.isObject(model)) {
+                        _views.titleTextbox.val(model.title);
+                        _views.messageTextarea.val(model.content);
+                        _views.langSelector.val(model.lang);
+                        _views.linkTextbox.val(model.media_url);
+
+                        // hide uploaders
+                        _views.imageUploader.hide();
+                        _views.filesUploader.hide();
+
+                        _views.addButton.text('UPDATE');
+                    }
+                }
+
+                function setProgress(progress) {
+                    if (_.isNumber(progress)) {
+                        _views.progress.css('width', progress + '%');
+                    }
+                }
+
+                function setFileName(name) {
+                    _views.fileNameLabel.text(name);
+                }
+
+                function setFileCount(current, max) {
+                    _views.countLabel.text('(' + current + '/' + max + ')');
+                }
+
                 return {
                     show: show,
-                    hide: hide
+                    hide: hide,
+                    setProgress: setProgress,
+                    setFileName: setFileName,
+                    setFileCount: setFileCount
+                }
+            }
+
+            function AddImageDialog() {
+                let _views = {},
+                    _mode;;
+
+                function show(parent, model, callbacks) {
+                    let _callbacks = callbacks || {
+                        selectedAdd: _.noop,
+                        selectedEdit: _.noop
+                    };
+                    _model = model;
+
+                    let container = $('<div class="add-news-dialog image c-modal-dialog">'),
+                        contentContainer = $('<div class="and-content-container c-modal-dialog-content">'),
+                        closeButton = $('<div class="and-close-btn c-modal-dialog-close-btn">');
+                    let titleLabel = $('<div class="and-title-label">Image</div>'),
+                        descLabel = $('<div class="and-desc-label">Message will be displayed with image.</div>'),
+                        inputTitleTextbox = $('<input type="text" class="and-input-title-textbox dialog-textbox" placeholder="News title">'),
+                        messageTextarea = $('<textarea class="and-message-textarea dialog-message-textarea" placeholder="Will be displayed with the YouTube link.">');
+                    let langSelector = $('<select name="lang" class="and-lang-selector">');
+                    let imageUploaderContainer = $('<div class="and-image-container">'),
+                        imageTitleLabel = $('<div class="and-subtitle-label">Image</div>'),
+                        selectImageButton = $('<input type="file" class="and-upload-btn" accept="image/*">');
+                    let filesTitleLabel = $('<div class="and-subtitle-label">Attachments</div>'),
+                        filesUploaderContainer = $('<div class="and-files-container">'),
+                        uploadDescLabel = $('<div class="and-desc-label">Up to 5 files and up to 5 mb per file.</div>'),
+                        selectFilesButton = $('<input type="file" class="and-upload-btn" multiple>');
+                    let bottomContainer = $('<div class="and-bottom-container">'),
+                        fileNameContainer = $('<div class="and-filename-container">'),
+                        fileNameLabel = $('<div class="and-desc-label filename">'),
+                        countLabel = $('<div class="and-desc-label filecount">'),
+                        progress = $('<div class="and-progress">'),
+                        addButton = $('<div class="and-add-btn dialog-btn">ADD</div>');
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, titleLabel, descLabel, inputTitleTextbox, messageTextarea,
+                        langSelector, imageUploaderContainer, filesUploaderContainer, bottomContainer);
+                    imageUploaderContainer.append(imageTitleLabel, selectImageButton);
+                    filesUploaderContainer.append(filesTitleLabel, uploadDescLabel, selectFilesButton);
+
+                    bottomContainer.append(fileNameContainer, progress, addButton);
+                    fileNameContainer.append(fileNameLabel, countLabel);
+
+                    langSelector.append($('<option value="en" selected="selected">English</option>'))
+                        .append($('<option value="ko">한국어</option>'))
+                        .append($('<option value="zh">中文</option>'))
+                        .append($('<option value="ar">العربية</option>'))
+                        .append($('<option value="hi">हिन्दी</option>'))
+                        .append($('<option value="ur">اردو</option>'));
+
+                    // init handlers
+                    closeButton.click(function() {
+                        hide();
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
+                    addButton.click(function(event) {
+                        let title = inputTitleTextbox.val().trim(),
+                            message = messageTextarea.val().trim(),
+                            images = selectImageButton.prop('files'),
+                            files = selectFilesButton.prop('files'),
+                            image = null; 
+                        if (_.isEmpty(title)) {
+                            window.alert('Please enter title.');
+                            event.preventDefault();
+                            return;
+                        }
+
+                        // check image
+                        if (!model) {
+                            if (_.isEmpty(images)) {
+                                window.alert('Please select image to upload.');
+                                event.preventDefault();
+                                return;
+                            } else {
+                                image = images[0];
+                                if (UPLOAD_SIZE_LIMIT < (image.size / 1024 / 1024).toFixed(4)) {
+                                    window.alert('You can\'t upload image that over 5mb.');
+                                    event.preventDefault();
+                                    return;
+                                }
+                            }
+                        }
+
+                        // check attachment
+                        if (!_.isEmpty(files)) {
+                            if (UPLOAD_SIZE_LIMIT < files.length) {
+                                window.alert('You can only upload a maximum of ' + UPLOAD_SIZE_LIMIT + 'files.');
+                                event.preventDefault();
+                                return;
+                            }
+
+                            if (_.find(files, function(file) {
+                                return  UPLOAD_SIZE_LIMIT < (file.size / 1024 / 1024).toFixed(4);
+                            })) {
+                                window.alert('You can\'t upload files that are over 5mb.');
+                                event.preventDefault();
+                                return;
+                            }
+                        }
+
+                        if (model) {
+                            _callbacks.selectedEdit(title, message, langSelector.val(), image, files);
+                        } else {
+                            _callbacks.selectedAdd(title, message, langSelector.val(), image, files);
+                        }
+                    });
+
+                    // store views.
+                    _views.container = container;
+                    _views.fileNameLabel = fileNameLabel;
+                    _views.countLabel = countLabel;
+                    _views.progress = progress;
+                    _views.addButton = addButton;
+                    _views.titleTextbox = inputTitleTextbox;
+                    _views.messageTextarea = messageTextarea;
+                    _views.langSelector = langSelector;
+                    _views.imageUploadButton = selectImageButton;
+                    _views.imageUploader = imageUploaderContainer;
+                    _views.filesUploadButton = selectFilesButton;
+                    _views.filesUploader = filesUploaderContainer;
+
+                    update(model);
+                
+                    parent.append(container);
+                }
+
+                function hide() {
+                    _views.container.detach().remove();
+                }
+
+                function update(model) {
+                    _model = model;
+                    if (_.isObject(model)) {
+                        _views.titleTextbox.val(model.title);
+                        _views.messageTextarea.val(model.content);
+                        _views.langSelector.val(model.lang);
+
+                        // hide uploaders
+                        _views.imageUploader.hide();
+                        _views.filesUploader.hide();
+
+                        _views.addButton.text('UPDATE');
+                    }
+                }
+
+                function setProgress(progress) {
+                    if (_.isNumber(progress)) {
+                        _views.progress.css('width', progress + '%');
+                    }
+                }
+
+                function setFileName(name) {
+                    _views.fileNameLabel.text(name);
+                }
+
+                function setFileCount(current, max) {
+                    _views.countLabel.text('(' + current + '/' + max + ')');
+                }
+
+                return {
+                    show: show,
+                    hide: hide,
+                    setProgress: setProgress,
+                    setFileName: setFileName,
+                    setFileCount: setFileCount
                 }
             }
         })();

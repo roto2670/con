@@ -79,6 +79,7 @@
                     COMPLIANCE: 'compliance'
                 },
                 USER_MENU_URL_PREFIX='users';
+            const DOWNLOAD_URL_BUILDER = _.template('https://skec-fujairah.loc8.dev:10443/api/download/file/<%= id %>');
 
             let _db = firebase.firestore();
             var _lastQuerySnapShots = {},
@@ -430,7 +431,7 @@
                     }
 
                     // load profile image
-                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + profileUserId + '-pf.png';
+                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + profileUserId;
                     $('<img/>')
                         .load(function() {
                             _views.profile.css('background-image', 'url(' + profileUrl + ')');
@@ -471,13 +472,14 @@
                         descLabel = $('<div class="noty-item-desc-label">');
                     let locateContainer = $('<div class="noty-item-locate-container">'),
                         nameLabel = $('<div class="noty-item-name-label">'),
-                        timeagoLabel = $('<div class="noty-item-timeago-label">');
+                        timeagoLabel = $('<div class="noty-item-timeago-label">'),
+                        attachmentContainer = $('<div class="noty-item-attchmentContainer">');
                     let messageButton = $('<div class="noty-item-msg-btn">')
                     let closeButton = $('<div class="noty-item-close-btn">')
 
                     container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
                     contentContainer.append(titleLabel, descLabel, locateContainer);
-                    locateContainer.append(nameLabel);
+                    locateContainer.append(nameLabel, attachmentContainer);
 
                     // init handlers
                     closeButton.click(function() {
@@ -508,6 +510,7 @@
                     _views.messageButton = messageButton;
                     _views.closeButton = closeButton;
                     _views.timeagoLabel = timeagoLabel;
+                    _views.attachmentContainer = attachmentContainer;
 
                     update(_model);
 
@@ -548,6 +551,18 @@
                             }
                         });
                     }
+
+                    // render attachements
+                    _.each(model.attachments, function(attachmentId) {
+                        let viewItem = $('<div class="noty-item-attachment">');
+                        viewItem.click(function() {
+                            window.open(DOWNLOAD_URL_BUILDER({
+                                id: attachmentId
+                            }));
+                        });
+
+                        _views.attachmentContainer.append(viewItem);
+                    });
 
                     _views.descLabel.text(model.message || '-');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');

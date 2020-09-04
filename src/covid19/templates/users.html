@@ -562,7 +562,7 @@
                     _model = model;
 
                     // load profile image
-                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + model.documentId + '-pf.png';
+                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + model.documentId;
                     $('<img/>')
                         .load(function() {
                             _views.profile.css('background-image', 'url(' + profileUrl + ')');
