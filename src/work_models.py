@@ -46,7 +46,8 @@ class _Tunnel(db.Model):
   tunnel_id = Column(String(75))
   b_accum_length = Column(Float)
   initial_b_time = Column(DateTime)
-  x_loc = Column(Float)
+  left_x_loc = Column(Float)
+  right_x_loc = Column(Float)
   y_loc = Column(Float)
   width = Column(Float)
   height = Column(Float)
@@ -64,7 +65,8 @@ class _Blast(db.Model):
   __bind_key__ = 'smart_work'
 
   id = Column(String(75), primary_key=True)
-  x_loc = Column(Float)
+  left_x_loc = Column(Float)
+  right_x_loc = Column(Float)
   y_loc = Column(Float)
   width = Column(Float)
   height = Column(Float)

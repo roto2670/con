@@ -87,7 +87,8 @@ def _convert_dict_by_tunnel(data):
       "tunnel_id": data.tunnel_id,
       "b_accum_length": data.b_accum_length,
       "initial_b_time": str(data.initial_b_time).replace(' ', 'T'),
-      "x_loc": data.x_loc,
+      "left_x_loc": data.left_x_loc,
+      "right_x_loc": data.right_x_loc,
       "y_loc": data.y_loc,
       "width": data.width,
       "height": data.height,
@@ -103,7 +104,8 @@ def _convert_dict_by_tunnel(data):
 def _convert_dict_by_blast(data):
   ret = {
       "id": data.id,
-      "x_loc": data.x_loc,
+      "left_x_loc": data.left_x_loc,
+      "right_x_loc": data.right_x_loc,
       "y_loc": data.y_loc,
       "width": data.width,
       "height": data.height,
