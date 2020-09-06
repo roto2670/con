@@ -201,23 +201,13 @@
                     </div>
 
                     <label class="control-label col-md-1">
-                      Direction
+                      Activity
                     </label>
                     <div class="col-md-3">
-                      <select id="direction" name="direction" class="form-control">
-                        {% if data.direction == "0"%}
-                          <option id="10000" value="10000">ALL</option>
-                          <option id="0" value="0" selected>EAST</option>
-                          <option id="1" value="1">WEST</option>
-                        {% elif data.direction == "1" %}
-                          <option id="10000" value="10000">ALL</option>
-                          <option id="0" value="0">EAST</option>
-                          <option id="1" value="1" selected>WEST</option>
-                        {% else %}
-                          <option id="10000" value="10000" selected>ALL</option>
-                          <option id="0" value="0">EAST</option>
-                          <option id="1" value="1">WEST</option>
-                        {% endif %}
+                      <select id="activity" name="activity" class="form-control">
+                        {% for key, value in activity_list.items() %}
+                            <option id="{{ key }}" value="{{ key }}" {% if key == data.activity %} selected="selected"{% endif %}>{{ value }}</option>
+                        {% endfor %}
                       </select>
                     </div>
                   </div>

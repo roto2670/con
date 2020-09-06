@@ -1346,11 +1346,13 @@ def route_default():
 def get_work_search_page():
 
   if request.method == "GET":
-    return render_template("search_work_prepare.html")
+    activity_list = ACTIVITY_NAME
+    activity_list[10000] = "ALL"
+    return render_template("search_work_prepare.html", activity_list=ACTIVITY_NAME)
   else:
     tunnel_id = request.form.get('tunnelId')
     tunnel = request.form.get('tunnel')
-    direction = request.form.get('direction')
+    activity = request.form.get('activity')
     raw_datetime_list = request.form.get('datetime')
     datetime_list = json.loads(raw_datetime_list)
 
@@ -1363,13 +1365,13 @@ def get_work_search_page():
     elif page == "2":
       page_num = next_num
 
-    logging.info("## tid : %s, t : %s, d : %s", tunnel_id, tunnel, direction)
-    work_list = work_apis.search(tunnel_id, int(tunnel), int(direction),
+    logging.info("## tid : %s, t : %s, d : %s", tunnel_id, tunnel, activity)
+    work_list = work_apis.search(tunnel_id, int(tunnel), int(activity),
                                  datetime_list,
                                  page_num)
     data = {
       "tunnel_id": tunnel_id, "tunnel": tunnel,
-      "direction": direction, "datetime": raw_datetime_list,
+      "activity": activity, "datetime": raw_datetime_list,
       "tunnel_category": TUNNEL_CATEGORY, "tunnel_direction":TUNNEL_DIRECTION ,
       "activity_name": ACTIVITY_NAME
     }
@@ -1380,7 +1382,7 @@ def get_work_search_page():
     start = "{} {}".format(start_date, start_time)
     end = "{} {}".format(end_date, end_time)
     return render_template("search_work.html", data=data,
-                           work_list=work_list,
+                           work_list=work_list, activity_list=ACTIVITY_NAME,
                            start_date=start, end_date=end)
 
 

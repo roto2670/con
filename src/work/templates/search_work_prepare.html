@@ -152,13 +152,13 @@
                     </div>
 
                     <label class="control-label col-md-1">
-                      Direction
+                      Activity
                     </label>
                     <div class="col-md-3">
-                      <select id="direction" name="direction" class="form-control">
-                        <option id="10000" value="10000">ALL</option>
-                        <option id="0" value="0">EAST</option>
-                        <option id="1" value="1">WEST</option>
+                      <select id="activity" name="activity" class="form-control">
+                        {% for key, value in activity_list.items() %}
+                            <option id="{{ key }}" value="{{ key }}" {% if key == 10000 %} selected="selected"{% endif %}>{{ value }}</option>
+                        {% endfor %}
                       </select>
                     </div>
 

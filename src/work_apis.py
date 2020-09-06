@@ -740,7 +740,7 @@ def get_all_work_equipment():
   return data_list
 
 
-def search(tunnel_id, tunnel, direction, datetime_list, next_num=None):
+def search(tunnel_id, tunnel, activity, datetime_list, next_num=None):
   st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
   end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
   filter_list = []
@@ -756,8 +756,8 @@ def search(tunnel_id, tunnel, direction, datetime_list, next_num=None):
   #   filter_list.append(EnterenceWorkerLog.worker_name.like("%" + worker_name + "%"))
   if tunnel != 10000:
     filter_list.append(Tunnel.category == tunnel)
-  if direction != 10000:
-    filter_list.append(Tunnel.direction == direction)
+  if activity != 10000:
+    t_filter_list.append(WorkHistory.typ == activity)
   try:
     work_list = db.session.query(WorkHistory).filter(*t_filter_list).\
         join(Work).join(Blast).join(Tunnel).filter(*filter_list).\
