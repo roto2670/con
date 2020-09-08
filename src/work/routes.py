@@ -87,7 +87,8 @@ def _convert_dict_by_tunnel(data):
       "tunnel_id": data.tunnel_id,
       "b_accum_length": data.b_accum_length,
       "initial_b_time": str(data.initial_b_time).replace(' ', 'T'),
-      "x_loc": data.x_loc,
+      "left_x_loc": data.left_x_loc,
+      "right_x_loc": data.right_x_loc,
       "y_loc": data.y_loc,
       "width": data.width,
       "height": data.height,
@@ -103,7 +104,8 @@ def _convert_dict_by_tunnel(data):
 def _convert_dict_by_blast(data):
   ret = {
       "id": data.id,
-      "x_loc": data.x_loc,
+      "left_x_loc": data.left_x_loc,
+      "right_x_loc": data.right_x_loc,
       "y_loc": data.y_loc,
       "width": data.width,
       "height": data.height,
@@ -222,6 +224,7 @@ def _convert_dict_by_operator(data):
 def _convert_dict_by_work_equipment(data):
   return {
     "id": data.id,
+    "category": data.category,
     "equipment_id": data.equipment_id,
     "operator_id": data.operator_id,
     "accum_time": data.accum_time,
@@ -1313,11 +1316,11 @@ CSV_INDEX = {
     301: 2,
     302: 3,
     303: 4,
-    304: 5,
-    305: 6,
-    306: 7,
-    307: 8,
-    308: 9,
+    304: 9,
+    305: 5,
+    306: 6,
+    307: 7,
+    308: 8,
     309: 10,
     310: 11,
 }
@@ -1343,11 +1346,13 @@ def route_default():
 def get_work_search_page():
 
   if request.method == "GET":
-    return render_template("search_work_prepare.html")
+    activity_list = ACTIVITY_NAME
+    activity_list[10000] = "ALL"
+    return render_template("search_work_prepare.html", activity_list=ACTIVITY_NAME)
   else:
     tunnel_id = request.form.get('tunnelId')
     tunnel = request.form.get('tunnel')
-    direction = request.form.get('direction')
+    activity = request.form.get('activity')
     raw_datetime_list = request.form.get('datetime')
     datetime_list = json.loads(raw_datetime_list)
 
@@ -1360,13 +1365,13 @@ def get_work_search_page():
     elif page == "2":
       page_num = next_num
 
-    logging.info("## tid : %s, t : %s, d : %s", tunnel_id, tunnel, direction)
-    work_list = work_apis.search(tunnel_id, int(tunnel), int(direction),
+    logging.info("## tid : %s, t : %s, d : %s", tunnel_id, tunnel, activity)
+    work_list = work_apis.search(tunnel_id, int(tunnel), int(activity),
                                  datetime_list,
                                  page_num)
     data = {
       "tunnel_id": tunnel_id, "tunnel": tunnel,
-      "direction": direction, "datetime": raw_datetime_list,
+      "activity": activity, "datetime": raw_datetime_list,
       "tunnel_category": TUNNEL_CATEGORY, "tunnel_direction":TUNNEL_DIRECTION ,
       "activity_name": ACTIVITY_NAME
     }
@@ -1377,7 +1382,7 @@ def get_work_search_page():
     start = "{} {}".format(start_date, start_time)
     end = "{} {}".format(end_date, end_time)
     return render_template("search_work.html", data=data,
-                           work_list=work_list,
+                           work_list=work_list, activity_list=ACTIVITY_NAME,
                            start_date=start, end_date=end)
 
 
@@ -1637,7 +1642,7 @@ def download_work_log():
              "RB_Drilling,RB_Injection,GT_Drilling,GT_Injection,GT_Curing,"\
              "GT_Check Hole,CD_Core Drilling,Idle,TBM,Interference,Evacuation,"\
              "Equipment B/D,Preperation,Resource not available,Shift Change,"\
-             "Explosive Delivery,No Work,Others\n"
+             "Explosive Delivery,No Work,Others,None\n"
   ret_csv_str = csv_str_formatting(csv_str, work_log_list, tunnel_id)
   return _get_download_csv_response(ret_csv_str, filename)
 
@@ -1654,7 +1659,7 @@ def csv_str_formatting(csv_str, work_log_list, tunnel_id):
     blast_info = _blast.blast_info_list[0]
     main_work_times = ["0" for index in range(16)]
     support_times = ["0" for index in range(10)]
-    idle_times = ["0" for index in range(11)]
+    idle_times = ["0" for index in range(12)]
     log_data_list = []
     total_data_list = []
     main_total_times = 0

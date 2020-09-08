@@ -97,7 +97,8 @@ def create_tunnel(data):
                 tunnel_id=data['tunnel_id'],
                 b_accum_length=data['b_accum_length'],
                 initial_b_time=data['initial_b_time'],
-                x_loc=data['x_loc'],
+                left_x_loc=data['left_x_loc'],
+                right_x_loc=data['right_x_loc'],
                 y_loc=data['y_loc'],
                 width=data['width'],
                 height=data['height'],
@@ -121,7 +122,8 @@ def update_tunnel(data):
   _data.direction = data['tunnelDirection']
   _data.length = data['tunnelLength']
   _data.tunnel_id = data['tunnelId']
-  _data.x_loc = data['x_loc']
+  _data.left_x_loc = data['left_x_loc']
+  _data.right_x_loc = data['right_x_loc']
   _data.y_loc = data['y_loc']
   _data.width = data['width']
   _data.height = data['height']
@@ -193,7 +195,8 @@ def get_blast_list_for_csv(tunnel_id):
 def create_blast(data):
   cur_time = get_servertime()
   data = Blast(id=data['id'],
-               x_loc=data['x_loc'],
+               left_x_loc=data['left_x_loc'],
+               right_x_loc=data['right_x_loc'],
                y_loc=data['y_loc'],
                width=data['width'],
                height=data['height'],
@@ -215,7 +218,8 @@ def update_blast(data):
   _id = data['id']
   cur_time = get_servertime()
   _data = get_blast(_id)
-  _data.x_loc = data['x_loc']
+  _data.left_x_loc = data['left_x_loc']
+  _data.right_x_loc = data['right_x_loc']
   _data.y_loc = data['y_loc']
   _data.width = data['width']
   _data.height = data['height']
@@ -700,7 +704,8 @@ def get_all_operator():
 
 def create_work_equipment(data):
   cur_time = get_servertime()
-  data = WorkEquipment(equipment_id=data['equipment_id'],
+  data = WorkEquipment(category=data['category'],
+                       equipment_id=data['equipment_id'],
                        operator_id=data['operator_id'],
                        accum_time=data['accum_time'],
                        p_accum_time=data['p_accum_time'],
@@ -735,7 +740,7 @@ def get_all_work_equipment():
   return data_list
 
 
-def search(tunnel_id, tunnel, direction, datetime_list, next_num=None):
+def search(tunnel_id, tunnel, activity, datetime_list, next_num=None):
   st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
   end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
   filter_list = []
@@ -751,8 +756,8 @@ def search(tunnel_id, tunnel, direction, datetime_list, next_num=None):
   #   filter_list.append(EnterenceWorkerLog.worker_name.like("%" + worker_name + "%"))
   if tunnel != 10000:
     filter_list.append(Tunnel.category == tunnel)
-  if direction != 10000:
-    filter_list.append(Tunnel.direction == direction)
+  if activity != 10000:
+    t_filter_list.append(WorkHistory.typ == activity)
   try:
     work_list = db.session.query(WorkHistory).filter(*t_filter_list).\
         join(Work).join(Blast).join(Tunnel).filter(*filter_list).\
