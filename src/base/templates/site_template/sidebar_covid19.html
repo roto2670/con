@@ -44,20 +44,24 @@
           </a>
         </li>
         <li>
-          <a href="/covid19/managedata" class="notsupported">
+        {% if current_user.level == 7 %}
+          <a href="/covid19/managedata">
             <i class="fa fa-database"></i>Manage Data
           </a>
         </li>
+        {% endif %}
         <li>
           <a href="/covid19/news">
             <i class="fa fa-newspaper-o"></i>News
           </a>
         </li>
+        {% if current_user.level == 7 %}
         <li>
           <a href="/covid19/settings">
             <i class="fa fa-cogs"></i>Settings
           </a>
         </li>
+        {% endif %}
       </ul>
     </div>
   </div>
