@@ -21,7 +21,30 @@
             <div class="setting-title-icn"></div>
             <div class="setting-title-label">General</div>
         </div>
+
         <div class="setting-content-container">
+            <div class="setting-item">
+                <div class="si-title-label code">CODE</div>
+                <div class="si-content-container">
+                    <div class="si-desc-label">Issue codes. The user needs code to use the system.</div>
+                    <div class="si-field-container codes">
+                        <div class="code-items-upper-container">
+                            <input type="text" class="ci-generate-textbox si-textbox">
+                            <div class="ci-generate-btn si-btn">Register</div>
+                        </div>
+                        <div class="code-items-container"></div>
+                        <div class="code-items-lower-container">
+                            <div class="ci-loader-btn loading">
+                                <div class="ci-loader-icon"></div>
+                                <div class="ci-loader-label">Load more</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="setting-content-container hide">
             <div class="setting-item">
                 <div class="si-title-label userid">ID</div>
                 <div class="si-content-container">
@@ -42,19 +65,275 @@
 
     <script>
         (function() {
+            const PROFILE_URL_BUILDER = _.template('https://skec-fujairah.loc8.dev:10443/api/download/image/<%= id %>'),
+                CODE_PAGE_SIZE = 10;
+
+            let _db = firebase.firestore(),
+                _currentUserRef;
+            let _loadingCodes = false,
+                _lastCodeDocument = null,
+                _initializedCodeSnapshotHandler = false,
+                _codeItems = {};
+
             // init
             initHandlers();
-            
             loadUserId(); 
+            displayCodes(function(end) {
+                $('.ci-loader-btn').removeClass('loading');
+                if (end) {
+                    $('.ci-loader-btn').addClass('hide');
+                }
+                initCodesSnapshotHandler();
+            });
+
 
             function initHandlers() {
+                // for reg codes
+                $('.ci-loader-btn').click(function() {
+                    let _this = $(this);
+                    _this.addClass('loading');
+                    displayCodes(function(end) {
+                        _this.removeClass('loading');
+                        if (end) {
+                            _this.addClass('hide');
+                        }
+                    });
+                });
+                $('.ci-generate-btn').click(function() {
+                    let code = $('.ci-generate-textbox').val().trim();
+                    if (code) {
+                        addNewCode(code);
+                    } else {
+                        window.alert('Please enter the codes.');
+                    }
+                });
+
                 $('.si-btn.userid').click(function() {
                     window.alert('Not ready yet!');
                 });
             }
 
+            function initCodesSnapshotHandler() {
+                _db.collection('reg_codes')
+                    .orderBy('ts', 'desc')
+                    .limit(1)
+                    .onSnapshot(function(snapshot) {
+                        if (!_initializedCodeSnapshotHandler) {
+                            // FIXME: OnSnapshot first loads all the documents that match the query.
+                            _initializedCodeSnapshotHandler = true;
+                            return;
+                        }
+                        snapshot.docChanges().forEach(function(change) {
+                            if (change.type === 'added') {
+                                let model = change.doc.data(),
+                                    codeData = _codeItems[change.doc.id];
+
+                                    model.documentId = change.doc.id;
+                                if (snapshot.metadata.hasPendingWrites) {
+                                    // This has not yet been recorded on the server, so must manually set the time field.
+                                    model.ts = {
+                                        seconds: new Date().getTime() / 1000
+                                    };
+                                }
+
+                                if (codeData) {
+                                    codeData.model = model;
+                                    codeData.viewItem.update(model);
+                                } else {
+                                    addCodeItem(model, null, true);
+                                }
+                            }
+                        });
+                    });
+            }
+
             function loadUserId() {
-                $('.si-textbox.userid').val('');
+                $('.si-textbox.userid').val('reg_codes');
+            }
+
+            function displayCodes(callback) {
+                let _callback = callback || _.noop;
+
+                if (!_loadingCodes) {
+                    _loadingCodes = true;
+                    loadCodes(_lastCodeDocument, function(codes, lastDocument) {
+                        if (lastDocument) {
+                            _lastCodeDocument = lastDocument;
+                        }
+
+                        let _container = $('.code-items-container');
+                        _.each(codes, function(code) {
+                            addCodeItem(code, _container);
+                        });
+
+                        _loadingCodes = false;
+                        _callback(!lastDocument || _.size(codes) < CODE_PAGE_SIZE);
+                    });
+                } else {
+                    // already loading
+                    _callback();
+                }
+            }
+
+            function addCodeItem(model, container, prepend) {
+                let _container = container || $('.code-items-container'),
+                    _viewItem = CodeItem(model, {
+                        selectedRemove: function(deleteModel) {
+                            if (window.confirm('Are you sure?')) {
+                                removeCode(model.documentId);
+                                removeCodeItem(model.documentId);
+                            }
+                        }
+                    });
+                
+                if (prepend) {
+                    _container.prepend(_viewItem.render());
+                } else {
+                    _container.append(_viewItem.render());
+                }
+
+                _codeItems[model.documentId] = {
+                    model: model,
+                    viewItem: _viewItem
+                }
+            }
+
+            function removeCodeItem(documentId) {
+                let data = _codeItems[documentId];
+                if (data) {
+                    data.viewItem.destroy();
+                    delete _codeItems[documentId];
+                }
+            }
+
+            function addNewCode(code) {
+                if (code) {
+                    if (!_currentUserRef) {
+                        _currentUserRef = _db.collection('users').doc(firebase.auth().currentUser.uid);
+                    }
+                    let _data = {
+                        issuer: _currentUserRef,
+                        value: code,
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    }
+
+                    _db.collection('reg_codes').doc().set(_data);
+                }
+            }
+
+            function removeCode(documentId) {
+                if (documentId) {
+                    _db.collection('reg_codes').doc(documentId).delete();
+                }
+            }
+
+            function loadCodes(startAt, callback) {
+                let _callback = callback || _.noop,
+                    query;
+                query = _db.collection('reg_codes').orderBy('ts', 'desc');
+
+                if (startAt) {
+                    query = query.startAfter(startAt);
+                }
+                query = query.limit(CODE_PAGE_SIZE)
+
+                query.get().then(function(snapshot) {
+                    let codes = [],
+                        lastSnapshot
+                    if (!!!snapshot.empty) {
+                        lastSnapshot = _.last(snapshot.docs);
+                        snapshot.forEach(function(doc) {
+                            let code = doc.data();
+                            code.documentId = doc.id;
+                            codes.push(code);
+                        });
+                    } else {
+                        // no more codes.
+                    }
+
+                    _callback(codes, lastSnapshot);
+                }).catch(function(error) {
+                    _callback();
+                });
+            }
+
+
+            function CodeItem(model, callbacks) {
+                let _model = model,
+                    _views = {},
+                    _callbacks = callbacks || {
+                        selectedRemove: _.noop
+                    };
+
+
+                function render() {
+                    let container = $('<div class="code-item">'),
+                        codeLabel = $('<div class="ci-value-label code">'),
+                        profile = $('<div class="ci-profile">'),
+                        nameLabel = $('<div class="ci-value-label name">'),
+                        timeLabel = $('<div class="ci-value-label time">'),
+                        removeButton = $('<div class="ci-remove-btn">');
+                    
+                    container.append(codeLabel, profile, nameLabel, timeLabel, removeButton);
+
+                    // init handlers
+                    removeButton.click(function() {
+                        _callbacks.selectedRemove(model);
+                    });
+
+                    // Store views
+                    _views.container = container;
+                    _views.codeLabel = codeLabel;
+                    _views.profile = profile;
+                    _views.nameLabel = nameLabel;
+                    _views.timeLabel = timeLabel;
+
+                    update(_model);
+
+                    return container;
+                }
+
+                function update(model) {
+                    _model = model;
+
+                    _views.codeLabel.text(model.value || '');
+
+                    // updates issuer info
+                    if (model.issuer) {
+                        // load user
+                        _model.issuer.get().then(function(snapshot) {
+                            let user = snapshot.data(),
+                                profileUrl = PROFILE_URL_BUILDER({
+                                    id: snapshot.id
+                                });
+
+                            // Updates profile
+                            $('<img/>')
+                                .load(function() {
+                                    _views.profile.css('background-image', 'url(' + profileUrl + ')');
+                                })
+                                .attr('src', profileUrl);
+
+                            // Updates name
+                            _views.nameLabel.text(user.fullname);
+                        });
+                    }
+
+                    _views.timeLabel.text($.timeago(model.ts.seconds * 1000));
+                }
+
+                function destroy() {
+                    _views.container.detach().remove();
+                    _model = null;
+                    _views = null;
+                    _callbacks = null;
+                }
+
+                return {
+                    render: render,
+                    update: update,
+                    destroy: destroy
+                }
             }
         })();
     </script>

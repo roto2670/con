@@ -1,5 +1,15 @@
 .content-container {
     width: 100%;
+    background-color: #efefef8a;
+    border-radius: 0.3em;
+    box-shadow: 0.1em 0.1em #e2e2e2;
+    padding: 1em 1.4em;
+    box-sizing: border-box;
+}
+
+.content-container.tests {
+    display: none;
+    width: 100%;
     padding: 0.2em 1em;
     box-sizing: border-box;
     margin-bottom: 4em;
@@ -10,13 +20,18 @@
     flex-wrap: nowrap;
     align-items: center;
     margin-bottom: 0.4em;
+    border-bottom: 1px solid #b3b3b3;
+    padding-bottom: 0.8em;
 }
 
 .title-icon {
-    width: 1.8em;
-    height: 1.8em;
+    width: 1.4em;
+    height: 1.4em;
     background-size: 100% 100%;
     background-repeat: no-repeat;
+}
+.title-icon.stats {
+    background-image: url(../img/icn_stats.svg);
 }
 .title-icon.tests {
     background-image: url(../img/icn_tests.svg);
@@ -26,9 +41,69 @@
 }
 
 .title-label {
-    font-weight: 600;
-    font-size: 1.8em;
     margin-left: 0.6em;
+    font-weight: 500;
+    font-size: 1.4em;
+}
+
+.sub-title-label {
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+.items-container {
+    border-radius: 0.2em;
+    border: 1px solid #BBBBBB;
+    padding: 0.8em;
+    box-sizing: border-box;
+    margin-top: 0.4em;
+}
+
+.stat-items-container {
+    width: 100%;
+    padding-top: 0.8em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.stat-item {
+    display: inline-flex;
+    width: 33%;
+    margin-top: 0.8em;
+}
+.stat-item:nth-child(3n+2) {
+    justify-content: center;
+}
+.stat-item:nth-child(3n) {
+    justify-content: flex-end;
+}
+.si-title-label {
+    width: 8em;
+    margin-right: 0.8em;
+}
+.si-value-textbox {
+    width: 9em;
+    padding: 0.2em 0.4em;
+    border: 1px solid #EF8009;
+    border-radius: 0.2em;
+}
+.si-bottom-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 1.6em;
+}
+.si-update-label {
+    margin-right: 1em;
+    color: #737373;
+}
+.si-update-btn {
+    padding: 0.4em 1em;
+}
+
+.items-desc-label {
+    color: #636363;
 }
 
 .upload-container {

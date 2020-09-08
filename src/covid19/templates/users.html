@@ -299,7 +299,7 @@
 
             function createMesage(userId, title, message) {
                 if (!!userId && !!message) {
-                    doCreateMessage([userId], '1', title, message)
+                    doCreateMessage([userId], firebase.auth().currentUser.uid, title, message);
                 } else {
                     console.warn('Failed to send message, given params cannot be null.');
                 }
@@ -307,7 +307,7 @@
 
             function createMesages(userIds, title, message) {
                 if (!!userIds && !!message) {
-                    doCreateMessage(userIds, '1', title, message)
+                    doCreateMessage(userIds, firebase.auth().currentUser.uid, title, message);
                 } else {
                     console.warn('Failed to send messages, given params cannot be null.');
                 }

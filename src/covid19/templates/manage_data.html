@@ -16,6 +16,23 @@
 
 {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="title-container">
+        <div class="title-icon stats"></div>
+        <div class="title-label">Stats</div>
+    </div>
+    <div class="content-container stats">
+        <div class="sub-title-label">Manual</div>
+        <div class="items-container stats">
+            <div class="items-desc-label">
+                Update the stats displayed on the dashboard to be manual.
+            </div>
+            <div class="stat-items-container"></div>
+            <div class="si-bottom-container">
+                <div class="si-update-label"></div>
+                <div class="si-update-btn btn">Update</div>
+            </div>
+        </div>
+    </div>
     <div class="content-container tests">
         <!-- Upload box -->
         <div class="title-container">
@@ -30,21 +47,6 @@
         </div>
         <div class="submit-button btn">Submit</div>
     </div>
-    <div class="content-container users">
-        <!-- Upload box -->
-        <div class="title-container">
-            <div class="title-icon users"></div>
-            <div class="title-label">Users</div>
-        </div>
-        <div class="upload-container">
-            <div class="upload-icon"></div>
-            <div class="desc-label">Drag & Drop a file containing data to upload</div>
-            <div class="or-label">or</div>
-            <div class="browse-button btn">Browse (.csv)</div>
-        </div>
-        <div class="submit-button btn">Submit</div>
-
-    </div>
 </div>
 {% endblock content %}
 
@@ -52,7 +54,149 @@
     {{ super() }}
     <script>
         (function() {
-            // TODO: 
+            const MANUAL_STATS_KEY_LIST = ["confirmed", "deaths", "recovered", "suspected", "active_positives",
+                "quarantined", "isolated", "country_total_cases", "country_total_deaths", "stringency_index", 
+                "headcount", "alert_phase"],
+                MANUAL_STATS_DISPLAY = {
+                    'confirmed': 'Confirmed',
+                    'deaths': 'Deaths',
+                    'recovered': 'Recovered',
+                    'suspected': 'Suspected',
+                    'active_positives': "Active/Positive",
+                    'quarantined': 'Quarantined',
+                    'isolated': 'Isolated',
+                    'country_total_cases': 'UAE Total cases',
+                    'country_total_deaths': 'UAE Total deaths',
+                    'stringency_index': 'Stringency Index',
+                    'headcount': 'Headcount',
+                    'alert_phase': 'Alert Phase'
+                };
+
+            let _db = firebase.firestore(),
+                _stats;
+            let _statViewItems = {};
+
+
+            // init
+            initHandlers();
+            // load stats
+            loadStats(function(stats) {
+                _stats = stats;
+                buildStatsItems(stats);
+            });
+
+
+            function buildStatsItems(stats) {
+                if (stats) {
+                    let _container = $('.stat-items-container');
+                    _.each(MANUAL_STATS_KEY_LIST, function(key) {
+                        let _viewItem = StatItem(MANUAL_STATS_DISPLAY[key], stats[key]);
+                        _container.append(_viewItem.render());    
+                    
+                        _statViewItems[key] = _viewItem;
+                    });
+                }
+            }
+
+            function loadStats(callback) {
+                let _callback = callback || _.noop;
+
+                _db.collection('covid19_stats')
+                    .orderBy('ts', 'desc')
+                    .limit(1).get().then((snapshot) => {
+                        var today = {};
+                        if (!snapshot.empty) {
+                            let doc = _.last(snapshot.docs);
+                            today = doc.data();
+                            today.documentId = doc.id;
+                        }
+
+                        _callback(today); 
+                    });
+            }
+
+            function updateStats(documentId, newStats) {
+                $('.si-update-label').text('');
+                if (documentId && newStats) {
+                    let _data = _.extend(newStats, {
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    _db.collection('covid19_stats').doc(documentId).update(_data).then(function() {
+                        $('.si-update-label').text('Manual stats updated successfully.');
+                    }).catch(function() {
+                        $('.si-update-label').text('Failed to manual update stats.');
+                    });
+                }
+            }
+
+            function initHandlers() {
+                $('.si-update-btn').click(function() {
+                    let _newStats = {};
+                    _.each(_statViewItems, function(statsItem, key) {
+                        if (statsItem.isChanged()) {
+                            let _value = statsItem.getValue();
+                            if (_.isNumber(_value)) {
+                                _newStats[key] = _value;
+                            }
+                        }
+                    });
+
+                    if (!_.isEmpty(_newStats)) {
+                        updateStats(_stats.documentId, _newStats);
+                        // TODO: if success
+                        _.each(_newStats, function(value, key) {
+                            let _viewItem = _statViewItems[key];
+                            if (_viewItem) {
+                                _viewItem.update(value);
+                            }
+                        });
+                    }
+                });
+            }
+
+            function StatItem(title, value) {
+                let _views = {},
+                    _title = title,
+                    _value = value;
+
+                function render() {
+                    let container = $('<div class="stat-item">'),
+                        titleLabel = $('<div class="si-title-label">'),
+                        valueTextbox = $('<input type="text" class="si-value-textbox">');
+
+                    container.append(titleLabel, valueTextbox);
+                    titleLabel.text(_title);
+
+                    // Store views
+                    _views.container = container;
+                    _views.valueTextbox = valueTextbox;
+                    _views.valueTextbox = valueTextbox;
+
+                    update(_value);
+
+                    return container;
+                }
+
+                function update(value) {
+                    _value = value;
+                    _views.valueTextbox.val(value);
+                }
+
+                function getValue() {
+                    return parseInt(_views.valueTextbox.val());
+                }
+
+                function isChanged() {
+                    return _views.valueTextbox.val() != _value;
+                }
+
+                return {
+                    render: render,
+                    update: update,
+                    getValue: getValue,
+                    isChanged: isChanged
+                }
+            }
         })();
     </script>
 {% endblock javascripts %}
