@@ -206,7 +206,7 @@
                     <div class="col-md-3">
                       <select id="activity" name="activity" class="form-control">
                         {% for key, value in activity_list.items() %}
-                            <option id="{{ key }}" value="{{ key }}" {% if key == data.activity %} selected="selected"{% endif %}>{{ value }}</option>
+                            <option id="{{ key }}" value="{{ key }}" {% if key == data.activity|int %} selected="selected"{% endif %}>{{ value }}</option>
                         {% endfor %}
                       </select>
                     </div>
