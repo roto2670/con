@@ -1627,10 +1627,10 @@ def route_reg_message_create():
 def download_work_log():
   tunnel_id = request.form.get('tunnel_id')
   tunnel = request.form.get('tunnel')
-  direction = request.form.get('direction')
+  activity = request.form.get('activity')
   raw_datetime_list = request.form.get('datetime')
   datetime_list = json.loads(raw_datetime_list)
-  work_log_list = work_apis.csv_work_log(tunnel_id, int(tunnel), int(direction),
+  work_log_list = work_apis.csv_work_log(tunnel_id, int(tunnel), int(activity),
                                          datetime_list)
 
   filename = "Work Search_{}".format(str(in_config_apis.get_servertime()))

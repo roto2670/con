@@ -23,11 +23,11 @@
       window.location.href = "/work/search/work";
     }
 
-    function exportCsv(tunnel_id, tunnel, direction, datetime ) {
+    function exportCsv(tunnel_id, tunnel, activity, datetime) {
       const params = {}
       params.tunnel_id = tunnel_id;
       params.tunnel = tunnel;
-      params.direction = direction;
+      params.activity = activity;
       params.datetime = datetime
       method = "post";
       var form = document.createElement("form");
@@ -258,7 +258,7 @@
                   <th></th>
                   <th>
                     <button type="button" class="btn btn-default btn-xs"
-                        onclick="exportCsv('{{ data.tunnel_id }}', '{{data.tunnel}}', '{{data.direction}}', '{{ data.datetime }}' )"
+                        onclick="exportCsv('{{ data.tunnel_id }}', '{{data.tunnel}}', '{{data.activity}}', '{{ data.datetime }}' )"
                         style="margin-bottom: 0;">
                       CSV Download
                     </button>
