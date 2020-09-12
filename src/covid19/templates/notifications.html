@@ -17,6 +17,7 @@
 {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
     <div class="top-container">
+        {% if current_user.level in [0, 7] %}
         <div class="top-button admin">
             <div class="top-button-icon">
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -25,13 +26,14 @@
             </div>
             <div class="top-button-label">Admin</div>
         </div>
+        {% endif %}
         <div class="top-button medical">
             <div class="top-button-icon">
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M2.63687 1.875L2.54875 2.02187C2.54875 2.02187 1.5625 3.64125 1.5625 6.25V6.5625H3.46687C3.44645 6.66539 3.43661 6.7701 3.4375 6.875C3.4375 7.73438 4.14062 8.4375 5 8.4375C5.85938 8.4375 6.5625 7.73438 6.5625 6.875C6.5625 6.7675 6.55406 6.66406 6.53312 6.5625H8.4375V6.25C8.4375 4.80938 8.195 3.75313 7.94906 3.05625C7.70344 2.36 7.44125 2.00188 7.44125 2.00188L7.34375 1.875H2.63656H2.63687ZM3.0175 2.5H6.9925C7.03781 2.565 7.17156 2.72875 7.36312 3.27188C7.56625 3.84688 7.74813 4.75 7.78312 5.9375H6.25C5.96406 5.55938 5.5075 5.3125 5 5.3125C4.4925 5.3125 4.03594 5.55938 3.75 5.9375H2.21687C2.28812 3.85938 2.91438 2.67813 3.0175 2.5ZM4.6875 3.125V3.75H4.0625V4.375H4.6875V5H5.3125V4.375H5.9375V3.75H5.3125V3.125H4.6875ZM5 5.9375C5.52187 5.9375 5.9375 6.35313 5.9375 6.875C5.9375 7.39688 5.52187 7.8125 5 7.8125C4.47813 7.8125 4.0625 7.39688 4.0625 6.875C4.0625 6.35313 4.47813 5.9375 5 5.9375ZM5 6.5625C4.91712 6.5625 4.83763 6.59542 4.77903 6.65403C4.72042 6.71263 4.6875 6.79212 4.6875 6.875C4.6875 6.95788 4.72042 7.03737 4.77903 7.09597C4.83763 7.15458 4.91712 7.1875 5 7.1875C5.08288 7.1875 5.16237 7.15458 5.22097 7.09597C5.27958 7.03737 5.3125 6.95788 5.3125 6.875C5.3125 6.79212 5.27958 6.71263 5.22097 6.65403C5.16237 6.59542 5.08288 6.5625 5 6.5625Z" fill="white"/>
                 </svg>
             </div>
-            <div class="top-button-label">Medical Team</div>
+            <div class="top-button-label">Clinic</div>
         </div>
         <div class="top-button sent">
             <div class="top-button-icon">
@@ -41,6 +43,8 @@
             </div>
             <div class="top-button-label">Sent</div>
         </div>
+
+        {% if current_user.level in [0, 7] %}
         <div class="top-button compliance">
             <div class="top-button-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" height="512px" viewBox="0 0 24 24" width="512px">
@@ -54,8 +58,9 @@
                     <path d="m20.5 20h-7c-.276 0-.5-.224-.5-.5s.224-.5.5-.5h7c.276 0 .5.224.5.5s-.224.5-.5.5z" data-original="#000000" class="active-path" data-old_color="#000000" fill="#FFFFFF"/>
                 </svg>
             </div>
-            <div class="top-button-label">Compliance</div>
+            <div class="top-button-label">Observations</div>
         </div>
+        {% endif %}
     </div>
     <div class="content-container"></div>
 
@@ -286,7 +291,6 @@
                                     }
                                 });
                             } else {
-                                message.fromUserId = message.from_user.id;
                                 item = ComplianceMessageItem(message, {
                                     goToUser: function(userId) {
                                         goToUserMenu(userId);
@@ -461,7 +465,7 @@
                     _callbacks = callbacks || {
                         goToUser: _.noop
                     },
-                    _fromUser,
+                    _reporter,
                     _views = {};
 
                 function render() {
@@ -488,14 +492,14 @@
                     })
                     profile.click(function() {
                         if (!!_model) {
-                            _callbacks.goToUser(_model.fromUserId);
+                            _callbacks.goToUser(_reporter.documentId);
                         } else {
                             console.warn('Cannot move to user menu, unknown user.');
                         }
                     });
                     nameLabel.click(function() {
                         if (!!_model) {
-                            _callbacks.goToUser(_model.fromUserId);
+                            _callbacks.goToUser(_reporter.documentId);
                         } else {
                             console.warn('Cannot move to user menu, unknown user.');
                         }
@@ -520,29 +524,34 @@
                 function update(model) {
                     _model = model;
 
-                    let title = 'Hygiene practices';
-                    if (model.category === 2) {
-                        title = 'Social distancing';
+                    let title = 'Social Distancing';
+                    if (model.category === 1) {
+                        title = 'PPE';
+                    } else if (model.category === 2) {
+                        title = 'Disinfection';
                     } else if (model.category === 3) {
-                        title = 'Restroom';
+                        title = 'Sanitizer';
                     } else if (model.category === 4) {
-                        title = 'Office hygiene';
+                        title = 'House Keeping';
                     } else if (model.category === 5) {
-                        title = 'Meeting rooms';
+                        title = 'Others';
                     }
                     _views.titleLabel.text(title);
 
                     // TODO: move in load api.
-                    if (_model.from_user) {
-                        _model.from_user.get().then(function(doc) {
+                    if (_model.from_user && !_model.reporter) {
+                        _model.reporter = _model.from_user;
+                    }
+                    if (_model.reporter) {
+                        _model.reporter.get().then(function(doc) {
                             if (!!doc) {
                                 // Store user.
-                                _fromUser = doc.data();
-                                _fromUser.documentId = doc.id;
-                                updateName(_fromUser.fullname);
+                                _reporter = doc.data();
+                                _reporter.documentId = doc.id;
+                                updateName(_reporter.fullname);
 
                                 // load profile image
-                                let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + _fromUser.documentId + '-pf.png';
+                                let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + _reporter.documentId;
                                 $('<img/>')
                                     .load(function() {
                                         _views.profile.css('background-image', 'url(' + profileUrl + ')');
