@@ -28,22 +28,62 @@
 
 .user-filter-container {
     display: inline-flex;
+    flex-wrap: wrap;
+    flex-flow: column;
+    margin-right: 1.2em;
+}
+.user-filter-container.command {
+    margin-right: 0;
+    margin-left: auto;
+}
+.user-filter-top-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.4em;
+}
+.user-filter-bottom-container {
+    display: flex;
     flex-wrap: nowrap;
+}
+.user-filter-title-icn {
+    width: 1.2em;
+    height: 1.2em;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    box-sizing: border-box;
+    margin-right: 0.4em;
+}
+.user .user-filter-title-icn {
+    background-image: url(../img/icn_user_filter.svg);
+}
+.clinic .user-filter-title-icn {
+    background-image: url(../img/icn_clinic_filter.svg);
+}
+.op .user-filter-title-icn {
+    background-image: url(../img/icn_op_filter.svg);
+}
+.command .user-filter-title-icn {
+    background-image: url(../img/icn_command_filter.svg);
+}
+.user-filter-title-label {
+    color: #6B6B6B;
 }
 
 .user-filter-btn {
     display: inline-flex;
     cursor: pointer;
+    font-size: 0.8em;
     color: #EF8009;
     border: 1px solid #EF8009;
-    padding: 0.4em 0.8em;
-    margin: 0 0.2em;
+    padding: 0.4em 0.6em;
+    margin: 0 0.1em;
     box-shadow: 1px 1px #c1c1c1;
     align-items: center;
     text-overflow: ellipsis;
     overflow: hidden;
     text-align: center;
-    width: 7em;
+    width: 6.4em;
     height: 3em;
     line-height: 1.2em;
     justify-content: center;
@@ -74,30 +114,33 @@
 .user-new-btn-label {
 }
 
-.cmessage-btn {
-    align-items: center;
-    margin-left: auto;
-    background-color: #EF8009;
+.command-btn {
     height: 3em;
+    font-size: 0.8em;
+    align-items: center;
+    background-color: #EF8009;
     justify-content: center;
     display: inline-flex;
     color: white;
-    padding: 0 0.6em;
+    padding: 0.4em 0.6em;
+    margin: 0 0.2em;
     box-shadow: 1px 1px #c1c1c1;
     cursor: pointer;
-    margin-right: 0.8em;
 }
-.cmessage-btn-icn {
+.command-btn-icn {
     width: 1.4em;
     height: 1.4em;
-    background-image: url(../img/icn_create_msg.svg);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     margin-right: 0.4em;
 }
-.cmessage-btn-label {
+.message .command-btn-icn {
+    background-image: url(../img/icn_create_msg.svg);
 }
-.cmessage-btn.disabled {
+.command-btn-label {
+    text-align: center;
+}
+.command-btn.disabled {
     cursor: none;
     background-color: #949494;
 }
@@ -145,6 +188,7 @@
 
 
 .user-item-header-label {
+    font-size: 0.9em;
     display: inline-flex;
     justify-content: center;
     margin: auto;
@@ -152,9 +196,8 @@
     text-align: center;
 }
 .user-item-header-label:nth-child(1) {
-    width: 13em;
-    margin-left: 2em;
-    margin-right: 0;
+    width: 15em;
+    margin-left: 0;
 }
 .user-item-header-label:nth-child(2) {
     /* status */
@@ -176,6 +219,9 @@
 .user-item-header-label:nth-child(12) {
     /* lang */
 }
+.user-item-header-label:nth-last-child(1) {
+    margin-right: 0;
+}
 
 .user-item-container {
     width: 100%;
@@ -195,9 +241,13 @@
 .user-item-checkbox {
 }
 
+.user-item-checkbox {
+    margin: 0 !important;
+}
 .user-item-avatar {
-    width: 3em;
-    height: 3em;
+    width: 2.5em;
+    height: 2.5em;
+    margin-left: 1em;
     background-image: url(../img/icn_default_profile.svg);
     background-size: cover;
     background-repeat: no-repeat;
@@ -212,6 +262,8 @@
     -webkit-line-clamp: 2;
     display: -webkit-inline-box;
     -webkit-box-orient: vertical;
+    margin-left: 1em;
+    width: 10em;
 }
 
 .user-item-id-label {
@@ -225,12 +277,11 @@
     display: inline-flex;
     align-items: center;
 }
-.user-item-cell.avatar {
-    width: 4em;
-    justify-content: center;
+.user-item-cell:nth-child(1) {
+    margin-left: 0;
 }
 .user-item-cell.name {
-    width: 9em;
+    width: 15em;
 }
 .user-item-cell.status {
     width: 8em;
@@ -241,6 +292,9 @@
     margin: auto;
     word-break: break-word;
     text-align: center;
+}
+.user-item-label:nth-last-child(1) {
+    margin-right: 0;
 }
 .user-item-label.status {
     margin: 0;
@@ -283,7 +337,7 @@
     text-align: center;
 }
 
-.user-item-job-container {
+.user-item-cell.job {
     width: 6em;
     margin: auto;
     text-align: center;
@@ -316,7 +370,7 @@
     display: none;
 }
 
-.cmessage-dialog {
+.command-dialog {
     position: absolute;
     display: flex;
     z-index: 10;
@@ -329,14 +383,14 @@
     align-items: center;
 }
 
-.cmessage-dialog-content {
+.command-dialog-content {
     width: 25em;
     background-color: white;
     padding: 1em;
     box-sizing: border-box;
 }
 
-.cmessage-dialog-close-btn {
+.command-dialog-close-btn {
     width: 1.6em;
     height: 1.6em;
     cursor: pointer;
@@ -347,7 +401,7 @@
     margin-left: auto;
 }
 
-.cmessage-dialog-title-textbox {
+.command-dialog-title-textbox {
     width: 100%;
     margin-top: 1em;
     margin-bottom: 1em;
@@ -356,20 +410,20 @@
     background-color: #F6F6F6;
 }
 
-.cmessage-dialog-message-textarea {
+.command-dialog-message-textarea {
     width: 100%;
     height: 15em;
     margin-bottom: 1em;
     background-color: #F6F6F6;
     border: 0 none;
 }
-.cmessage-dialog-message-textarea:focus {
+.command-dialog-message-textarea:focus {
     border: 0 none !important;
     outline: none !important;
 }
 
 
-.cmessage-dialog-send-btn {
+.command-dialog-send-btn {
     background-color: #EF8009;
     cursor: pointer;
     padding: 0.6em 0.6em;
@@ -381,12 +435,12 @@
     align-items: center; 
 }
 
-.cmessage-dialog-send-btn-label {
+.command-dialog-send-btn-label {
     color: white;
     font-size: 1.2em;
 }
 
-.cmessage-dialog-send-btn-icon {
+.command-dialog-send-btn-icon {
     width: 1.2em;
     height: 1.2em;
     background-image: url(../img/icn_create_msg.svg);
@@ -396,10 +450,20 @@
 }
 
 .hd-content-container {
-    width: 55em;
+    width: 65%;
+    min-width: 110em;
 }
-
-.hd-history-container {
+.hd-history-title-container {
+    width: 100%;
+    font-size: 0.9em;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    background-color: #EDEDED;
+    padding: 0.4em 0;
+    margin-top: 1.2em;
+}
+.hd-history-items-container {
     width: 100%;
     max-height: 40em;
     overflow: auto;
@@ -407,25 +471,89 @@
     margin-top: 1.6em;
 }
 .status-history-item {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
+    width: 100%;
+    font-size: 0.9em;
     margin-bottom: 0.4em;
     border-bottom: 1px solid #e8e8e8;
     padding: 1em 0;
 }
+.shi-upper-container {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+.shi-lower-container {
+    width: 100%;
+    display: flex;
+}
 .shi-title-label {
     font-weight: 500;
-    color: #191919;
-    margin-right: 0.6em;
+    width: 7em;
+    margin: auto;
+    text-align: center;
+    color: #848484;
+}
+.shi-title-label.schedule-date {
+    width: 10em;
+}
+.shi-title-label.test-date {
+    width: 10em;
+}
+.shi-title-label.result-date {
+    width: 10em;
+}
+.shi-title-label.expiry-date {
+    width: 10em;
+}
+.shi-title-label.owner-name {
+    width: 12em;
+}
+.shi-title-label.reporter-name {
+    width: 12em;
+}
+.shi-title-label.attachment {
+    margin-top: auto;
+    margin: auto;
 }
 .shi-value-label {
     width: 7em;
-    margin-right: 0.6em;
+    margin: 1em;
+    text-align: center;
+    word-break: break-word;
 }
-.shi-value-label.symptoms {
-    width: 3em;
+.shi-value-label.schedule-date {
+    width: 10em;
+}
+.shi-value-label.test-date {
+    width: 10em;
+}
+.shi-value-label.result-date {
+    width: 10em;
+}
+.shi-value-label.expiry-date {
+    width: 10em;
+}
+.shi-value-label.owner-name {
+    width: 12em;
+}
+.shi-value-label.reporter-name {
+    width: 12em;
+}
+.shi-attachment-container {
+    width: 7em;
+    text-align: center;
+}
+.shi-attachment {
+    width: 1.1em;
+    height: 1.1em;
+    display: inline-flex;
+    margin-right: 0.6em;
+    cursor: pointer;
+    background-image: url(../img/icn_attachment.svg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .hd-dialog-loader-btn {

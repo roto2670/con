@@ -73,7 +73,7 @@
     background-color: #F6F6F6;
     border: 0 none;
 }
-.dialog-message-textarea:focus {
+.dialog-textarea:focus {
     border: 0 none !important;
     outline: none !important;
 }

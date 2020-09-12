@@ -547,8 +547,7 @@
                     _views.nameLabel.text(model.from_name || '');
 
                     // load profile image
-                    console.log('name :', model.from_name, 'id : ', model.from_user);
-                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + model.from_user + '-pf.png';
+                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + model.from_user;
                     $('<img/>')
                         .load(function() {
                             _views.profile.css('background-image', 'url(' + profileUrl + ')');

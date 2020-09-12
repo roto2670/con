@@ -41,8 +41,8 @@ USER_LEVEL = {
     models.ADNOC_SITE: "ADNOC SITE",
     models.ADNOC_HQ: "ADNOC HQ",
     models.MOI: "MOI",
-    models.COVID19_ADMIN: "Covid Admin",
-    models.COVID19_TEAMDOCTOR: "Team Doctor"
+    models.COVID19_ADMIN: "COVID19 OP",
+    models.COVID19_TEAMDOCTOR: "COVID19 Clinic"
 }
 
 
