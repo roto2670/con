@@ -262,11 +262,12 @@
                         let userIds = getSelectedUsers();
                         if (!_.isEmpty(userIds)) {
                             if (window.confirm('Have you confirmed the selected persons are in QUARANTINE?')) {
-                                doUpdateStatus(userIds, STATUS_TYPE.OP, OP_STATUS_VALUE['quarantine-confirmed'], function() {
+                                doUpdateStatus(userIds, STATUS_TYPE.COMMAND, OP_STATUS_VALUE['quarantine-confirmed'], function() {
                                     new PNotify({
                                         type: 'success',
                                         text: 'Successfully changed status.'
                                     });
+                                    refreshUserList();
                                 });
                             }
                         } else {
@@ -289,6 +290,7 @@
                                         type: 'success',
                                         text: 'Successfully changed status.'
                                     });
+                                    refreshUserList();
                                 });
                             }
                         } else {
@@ -311,6 +313,7 @@
                                         type: 'success',
                                         text: 'Successfully refer test.'
                                     });
+                                    refreshUserList();
                                 });
                             }
                         } else {
@@ -333,6 +336,7 @@
                                         type: 'success',
                                         text: 'Successfully release.'
                                     });
+                                    refreshUserList();
                                 });
                             }
                         } else {
@@ -355,6 +359,7 @@
                                         type: 'success',
                                         text: 'Successfully release.'
                                     });
+                                    refreshUserList();
                                 });
                             }
                         } else {
@@ -377,6 +382,7 @@
                                         type: 'success',
                                         text: 'Successfully release.'
                                     });
+                                    refreshUserList();
                                 });
                             }
                         } else {
@@ -399,6 +405,7 @@
                                         type: 'success',
                                         text: 'Successfully release.'
                                     });
+                                    refreshUserList();
                                 });
                             }
                         } else {
@@ -543,25 +550,15 @@
 
             function loadTestResults(userId, startAt, callback) {
                 let _callback = callback || _.noop,
-                    endUserId = userId;
-
-                // Make user id for end codition.
-                let endNumber = _.last(userId);
-                if (_.isNumber(++endNumber)) {
-                    endUserId = userId.slice(0, userId.length -1) + endNumber;
-                } else {
-                    // It's not a possibility, but handling it just in case.
-                    endUserId = userId + '--999';
-                }
+                    _userRef = _db.collection('users').doc(userId);
 
                 // Do request
-                let query = _db.collection('test_results')
-                    .where(firebase.firestore.FieldPath.documentId(), '>=', userId)
-                    .where(firebase.firestore.FieldPath.documentId(), '<', endUserId);
+                let query = _db.collection('test_results').where('owner', '==', _userRef);
                 
                 if (!!startAt) {
                     query = query.startAfter(startAt);
                 }
+                query = query.orderBy('result_data', 'desc');
                 query.limit(TEST_RESULT_PAGE_SIZE)
                     .get().then(function(snapshot) {
                         let testList = [],
@@ -671,7 +668,10 @@
                     } else if (type === STATUS_TYPE.COMMAND) {
                         if (status === COMMAND_STATUS_VALUE.REFER_TEST) {
                             _data.test_referred = true;
-                            _data.clinic_stats = CLINIC_STATUS_VALUE['quarantine-required'];
+                            _data.clinic_status = CLINIC_STATUS_VALUE['quarantine-required'];
+                        } else if (status == OP_STATUS_VALUE['quarantine-confirmed']) {
+                            _data.op_status = status;
+                            _data.clinic_status = CLINIC_STATUS_VALUE['none'];
                         }
                     } else {
                         _pass = true;
@@ -850,6 +850,19 @@
                 return _filters;
             }
 
+            function refreshUserList() {
+                _lastUserSnapShot = null;
+                displayUsers(_selectedFilters, true, function() {
+                    $('.user-item-loader-btn').removeClass('loading');
+                });
+            }
+
+            function removeUserItems(userIds) {
+                _.each(userIds, function(id) {
+                   $('.user-item[uid="' + id + '"]').detach().remove();
+                });
+            }
+
             function getUrlParameter(sParam) {
                 var sPageURL = window.location.search.substring(1),
                     sURLVariables = sPageURL.split('&'),
@@ -906,6 +919,7 @@
                     jobContainer.append(jobCat1Label, jobCat2Label);
 
                     // Store id.
+                    container.attr('uid', model.documentId);
                     checkbox.attr('uid', model.documentId);
 
                     // init handlers
