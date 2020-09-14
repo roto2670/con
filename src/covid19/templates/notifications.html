@@ -86,13 +86,15 @@
                 USER_MENU_URL_PREFIX='users';
             const DOWNLOAD_URL_BUILDER = _.template('https://skec-fujairah.loc8.dev:10443/api/download/file/<%= id %>');
 
-            let _db = firebase.firestore();
-            var _lastQuerySnapShots = {},
+            let _db = firebase.firestore(),
+                _currentUser = null;
+            let _lastQuerySnapShots = {},
                 _loadingMessages = false
                 _notyItemContainers = {}
                 _currentMessageType = ''
                 _initializedSnapshotHandler = false;
                 _initializedComplianceSnapshotHandler = false;
+
             
             // init
             initHandlers();
@@ -164,6 +166,9 @@
                                         let item = MessageItem(model, {
                                             goToUser: function(userId) {
                                                 goToUserMenu(userId);
+                                            },
+                                            selectedMessage: function(message) {
+                                                showMessageDialog(message);
                                             }
                                         });
 
@@ -205,6 +210,9 @@
                                         let item = ComplianceMessageItem(model, {
                                             goToUser: function(userId) {
                                                 goToUserMenu(userId);
+                                            },
+                                            selectedMessage: function(message) {
+                                                showMessageDialog(message, 5);
                                             }
                                         });
 
@@ -288,12 +296,18 @@
                                 item = MessageItem(message, {
                                     goToUser: function(userId) {
                                         goToUserMenu(userId);
+                                    },
+                                    selectedMessage: function(message) {
+                                        showMessageDialog(message);
                                     }
                                 });
                             } else {
                                 item = ComplianceMessageItem(message, {
                                     goToUser: function(userId) {
                                         goToUserMenu(userId);
+                                    },
+                                    selectedMessage: function(message) {
+                                        showMessageDialog(message, 5);
                                     }
                                 });
                             }
@@ -361,10 +375,93 @@
                 }
             }
 
+            function showMessageDialog(message, type) {
+                let dialog = CreateMessageDialog();
+                dialog.show($('.right_col'), function(texts) {
+                    if (texts) {
+                        let _threadId = message.thread_id || _db.collection('messages').doc(message.documentId),
+                            _type = _.isNumber(type) ? type : 2;
+                        
+                        if (message.to_user == '2') {
+                            _type  = 4;
+                        } else if (message.from_user == '1' || message.from_user == '2') {
+                            _type  = 3;
+                        }
+
+                        if (message.reporter) {
+                            message.reporter.get().then(function(doc) {
+                                if (doc) {
+                                    let reporter = doc.data();
+                                    reporter.documentId = doc.id;
+
+                                    replyMessage(_threadId, reporter.documentId, reporter.fullname, texts.title,
+                                        texts.message, _type);
+                                }
+                            });
+                        } else if (_type == 3) {
+                            // compliance
+                            replyMessage(_threadId, message.to_user, message.to_name, texts.title, texts.message,   
+                                _type);
+                        } else {
+                            replyMessage(_threadId, message.from_user, message.from_name, texts.title, texts.message,   
+                                _type);
+                        }
+                    }
+
+                    dialog.hide();
+                });
+            }
+
+            function replyMessage(threadId, toId, toName, title, message, type, callback) {
+                let _callback = callback || _.noop,
+                    _newData = {
+                        to_user: toId,
+                        to_name: toName,
+                        action: 3,
+                        title: title,
+                        message: message,
+                        type: type,
+                        thread_id: threadId,
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+
+                loadCurrentUser(function(currentUser) {
+                    if (currentUser.role == 1) {
+                        _newData.from_id = '1';
+                    } else if (currentUser.role == 2) {
+                        _newData.from_id = '1';
+                    } else {
+                        _newData.from_id = currentUser.documentId;
+                    }
+                    _newData.from_name = currentUser.fullname;
+
+                    _db.collection('messages').doc().set(_newData).then(function() {
+                        _callback();
+                    });
+                });
+            }
+
+            function loadCurrentUser(callback) {
+                let _callback = callback || _.noop;
+                if (!_currentUser) {
+                    _db.collection('users').doc(firebase.auth().currentUser.uid).get().then(function(doc) {
+                        if (doc) {
+                            _currentUser = doc.data();
+                            _currentUser.documentId = doc.id;
+                        }
+
+                        _callback(_currentUser);
+                    });
+                } else {
+                    _callback(_currentUser);
+                }
+            }
+
             function MessageItem(model, callbacks) {
                 var _model = model,
                     _callbacks = callbacks || {
-                        goToUser: _.noop
+                        goToUser: _.noop,
+                        selectedMessage: _.noop
                     },
                     _views = {};
 
@@ -385,6 +482,9 @@
                     locateContainer.append(nameLabel);
 
                     // init handlers
+                    messageButton.click(function() {
+                        _callbacks.selectedMessage(model);
+                    });
                     closeButton.click(function() {
                         container.detach().remove();
                         // TODO: call api?
@@ -465,6 +565,10 @@
                     _callbacks = callbacks || {
                         goToUser: _.noop
                     },
+                    _callbacks = callbacks || {
+                        goToUser: _.noop,
+                        selectedMessage: _.noop
+                    },
                     _reporter,
                     _views = {};
 
@@ -486,6 +590,9 @@
                     locateContainer.append(nameLabel, attachmentContainer);
 
                     // init handlers
+                    messageButton.click(function() {
+                        _callbacks.selectedMessage(model);
+                    });
                     closeButton.click(function() {
                         container.detach().remove();
                         // TODO: call api?
@@ -595,6 +702,75 @@
                     render: render,
                     upate: update,
                     blink: blink
+                }
+            }
+
+            function CreateMessageDialog() {
+                let _views
+                    _callback = _.noop;
+
+                function render() {
+                    let container = $('<div class="c-modal-dialog cmessage-dialog">'),
+                        contentContainer = $('<div class="c-modal-dialog-content cmessage-dialog-content">'),
+                        closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">'),
+                        titleTextbox = $('<input type="text" class="dialog-textbox cmessage-dialog-title-textbox" placeholder="Reply Title">'),
+                        messageTextarea = $('<textarea class="dialog-textarea cmessage-dialog-message-textarea" placeholder="Enter messages.">');
+                    let sendButton = $('<div class="dialog-btn cmessage-dialog-send-btn">'),
+                        sendButtonLabel = $('<div class="cmessage-dialog-send-btn-label">Send</div>'),
+                        sendButtonIcon = $('<div class="cmessage-dialog-send-btn-icon">');
+
+                    // init handlers
+                    container.click(function() {
+                        // hide();
+                    });
+                    closeButton.click(function() {
+                        hide();
+                    })
+
+                    sendButton.click(function() {
+                        let title = titleTextbox.val(),
+                            message = messageTextarea.val();
+
+                        if (title.trim().length > 0) {
+                            _callback({
+                                title: title,
+                                message: message
+                            });
+                        } else {
+                            window.alert('Please enter title.');
+                        }
+                    });
+                    titleTextbox.change(function() {
+                        if ($(this).val().trim().length <= 0) {
+                            // TODO:
+                        }
+                    });
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, titleTextbox, messageTextarea, sendButton);
+                    sendButton.append(sendButtonLabel, sendButtonIcon);
+
+                    // Store views
+                    _views = {};
+                    _views.container = container;
+                }
+
+                function show(parent, callback) {
+                    _callback = callback || _.noop;
+                    render();
+
+                    parent.append(_views.container);
+                }
+
+                function hide() {
+                    _views.container.remove();
+                    _views = null;
+                    _callback = _.noop;
+                }
+
+                return {
+                    show: show,
+                    hide: hide
                 }
             }
         })();
