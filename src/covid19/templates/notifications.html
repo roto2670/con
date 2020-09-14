@@ -212,7 +212,7 @@
                                                 goToUserMenu(userId);
                                             },
                                             selectedMessage: function(message) {
-                                                showMessageDialog(message, 5);
+                                                showComplianceMessageDialog(message, 5);
                                             }
                                         });
 
@@ -307,7 +307,7 @@
                                         goToUserMenu(userId);
                                     },
                                     selectedMessage: function(message) {
-                                        showMessageDialog(message, 5);
+                                        showComplianceMessageDialog(message, 5);
                                     }
                                 });
                             }
@@ -377,10 +377,9 @@
 
             function showMessageDialog(message, type) {
                 let dialog = CreateMessageDialog();
-                dialog.show($('.right_col'), function(texts) {
+                dialog.show($('.right_col'), message, function(texts) {
                     if (texts) {
-                        let _threadId = message.thread_id || _db.collection('messages').doc(message.documentId),
-                            _type = _.isNumber(type) ? type : 2;
+                        let _type = _.isNumber(type) ? type : 2;
                         
                         if (message.to_user == '2') {
                             _type  = 4;
@@ -394,17 +393,17 @@
                                     let reporter = doc.data();
                                     reporter.documentId = doc.id;
 
-                                    replyMessage(_threadId, reporter.documentId, reporter.fullname, texts.title,
+                                    replyMessage(message.documentId, reporter.documentId, reporter.fullname, texts.title,
                                         texts.message, _type);
                                 }
                             });
                         } else if (_type == 3) {
                             // compliance
-                            replyMessage(_threadId, message.to_user, message.to_name, texts.title, texts.message,   
-                                _type);
+                            replyMessage(message.documentId, message.to_user, message.to_name, texts.title,
+                                texts.message, _type);
                         } else {
-                            replyMessage(_threadId, message.from_user, message.from_name, texts.title, texts.message,   
-                                _type);
+                            replyMessage(message.documentId, message.from_user, message.from_name, texts.title,
+                                texts.message, _type);
                         }
                     }
 
@@ -412,7 +411,18 @@
                 });
             }
 
-            function replyMessage(threadId, toId, toName, title, message, type, callback) {
+            function showComplianceMessageDialog(message) {
+                let dialog = CreateComplianceMessageDialog();
+                dialog.show($('.right_col'), function(texts) {
+                    if (texts) {
+                        replyCompliance(message.documentId, firebase.auth().currentUser.uid,
+                            texts.message, texts.type);
+                        dialog.hide();
+                    }
+                });
+            }
+
+            function replyMessage(replyId, toId, toName, title, message, type, callback) {
                 let _callback = callback || _.noop,
                     _newData = {
                         to_user: toId,
@@ -421,7 +431,6 @@
                         title: title,
                         message: message,
                         type: type,
-                        thread_id: threadId,
                         ts: firebase.firestore.FieldValue.serverTimestamp()
                     };
 
@@ -435,10 +444,31 @@
                     }
                     _newData.from_name = currentUser.fullname;
 
-                    _db.collection('messages').doc().set(_newData).then(function() {
-                        _callback();
+                    let docRef = _db.collection('messages').doc();
+                    docRef.set(_newData).then(function() {
+                        _db.collection('messages').doc(replyId).update({
+                            reply: docRef
+                        }).then(function() {
+                            _callback();
+                        });
                     });
                 });
+            }
+
+            function replyCompliance(messageId, toId, message, type, callback) {
+                let _callback = callback || _.noop,
+                    _resolverRef = _db.collection('users').doc(toId);
+                    _newData = {
+                        resolution_type: type,
+                        resolution_note: message,
+                        resolver: _resolverRef,
+                        resolution_ts: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+
+                    _db.collection('compliance_reports').doc(messageId).update(_newData)
+                        .then(function() {
+                            _callback();
+                        });
             }
 
             function loadCurrentUser(callback) {
@@ -473,13 +503,15 @@
                         descLabel = $('<div class="noty-item-desc-label">');
                     let locateContainer = $('<div class="noty-item-locate-container">'),
                         nameLabel = $('<div class="noty-item-name-label">'),
+                        replyNameLabel = $('<div class="noty-item-replyname-label">> REPLY</div>'),
                         timeagoLabel = $('<div class="noty-item-timeago-label">');
                     let messageButton = $('<div class="noty-item-msg-btn">')
                     let closeButton = $('<div class="noty-item-close-btn">')
 
                     container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
                     contentContainer.append(titleLabel, descLabel, locateContainer);
-                    locateContainer.append(nameLabel);
+                    locateContainer.append(nameLabel, replyNameLabel);
+                    replyNameLabel.hide(); // TODO
 
                     // init handlers
                     messageButton.click(function() {
@@ -503,6 +535,15 @@
                         }
                         _callbacks.goToUser(userId);
                     });
+                    replyNameLabel.click(function() {
+                        // TODO!
+                        _model.reply.get().then(function(doc) {
+                            let reply = doc.data();
+                            reply.documentId = doc.id;
+                            let dialog = MessageDialog();
+                            dialog.show($('.right_col'), reply);
+                        });
+                    });
 
                     // store views
                     _views.container = container;
@@ -510,6 +551,7 @@
                     _views.titleLabel = titleLabel;
                     _views.descLabel = descLabel;
                     _views.nameLabel = nameLabel;
+                    _views.replyNameLabel = replyNameLabel;
                     _views.messageButton = messageButton;
                     _views.closeButton = closeButton;
                     _views.timeagoLabel = timeagoLabel;
@@ -532,6 +574,18 @@
                         profileUserId = model.to_user;
                     } else {
                         _views.nameLabel.text(model.from_name || '');
+                    }
+
+                    // Only show message button for clinic
+                    if (model.to_user == 2) {
+                        _views.messageButton.show();
+                    } else {
+                        _views.messageButton.hide();
+                    }
+
+                    // TODO
+                    if (model.reply) {
+                        _views.replyNameLabel.show();
                     }
 
                     // load profile image
@@ -706,6 +760,8 @@
             }
 
             function CreateMessageDialog() {
+                const TITLE_DISPLAY_BUILDER = _.template('Reply: <%= name %>(<%= id %>)');
+
                 let _views
                     _callback = _.noop;
 
@@ -753,11 +809,138 @@
                     // Store views
                     _views = {};
                     _views.container = container;
+                    _views.titleTextbox = titleTextbox;
+                }
+
+                function show(parent, message, callback) {
+                    _callback = callback || _.noop;
+                    render();
+ 
+                    if (message) {
+                        _views.titleTextbox.val(TITLE_DISPLAY_BUILDER({
+                            name: message.from_name,
+                            id: message.from_user
+                        }));
+                    }
+
+                    parent.append(_views.container);
+                }
+
+                function hide() {
+                    _views.container.remove();
+                    _views = null;
+                    _callback = _.noop;
+                }
+
+                return {
+                    show: show,
+                    hide: hide
+                }
+            }
+
+            function CreateComplianceMessageDialog() {
+                let _views
+                    _callback = _.noop;
+
+                function render() {
+                    let container = $('<div class="c-modal-dialog cmessage-dialog">'),
+                        contentContainer = $('<div class="c-modal-dialog-content cmessage-dialog-content">'),
+                        closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">'),
+                        typeSelector = $('<select name="resolve_type" class="dialog-selector cmessage-dialog-selector">'),
+                        messageTextarea = $('<textarea class="dialog-textarea cmessage-dialog-message-textarea" placeholder="Enter messages.">');
+                    let sendButton = $('<div class="dialog-btn cmessage-dialog-send-btn">'),
+                        sendButtonLabel = $('<div class="cmessage-dialog-send-btn-label">Send</div>'),
+                        sendButtonIcon = $('<div class="cmessage-dialog-send-btn-icon">');
+
+                    // init handlers
+                    container.click(function() {
+                        // hide();
+                    });
+                    closeButton.click(function() {
+                        hide();
+                    })
+
+                    sendButton.click(function() {
+                        let message = messageTextarea.val();
+
+                        _callback({
+                            type: parseInt(typeSelector.val()),
+                            message: message
+                        });
+                    });
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, typeSelector, messageTextarea, sendButton);
+                    sendButton.append(sendButtonLabel, sendButtonIcon);
+                    typeSelector.append('<option value="1">Open</option>')
+                        .append('<option value="2">Closed</option>')
+                        .append('<option value="3">Postponed</option>')
+                        .append('<option value="4">Declined</option>');
+
+                    // Store views
+                    _views = {};
+                    _views.container = container;
                 }
 
                 function show(parent, callback) {
                     _callback = callback || _.noop;
                     render();
+
+                    parent.append(_views.container);
+                }
+
+                function hide() {
+                    _views.container.remove();
+                    _views = null;
+                    _callback = _.noop;
+                }
+
+                return {
+                    show: show,
+                    hide: hide
+                }
+            }
+
+            function MessageDialog() {
+                let _views
+                    _callback = _.noop;
+
+                function render() {
+                    let container = $('<div class="c-modal-dialog cmessage-dialog">'),
+                        contentContainer = $('<div class="c-modal-dialog-content cmessage-dialog-content">'),
+                        closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">'),
+                        fromNameLabel = $('<div class="c-model-label">'),
+                        fromTitleLabel = $('<div class="c-model-label">'),
+                        messageLabel = $('<div class="c-model-label">');
+
+                    // init handlers
+                    container.click(function() {
+                        // hide();
+                    });
+                    closeButton.click(function() {
+                        hide();
+                    })
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, fromNameLabel, fromTitleLabel, messageLabel);
+
+                    // Store views
+                    _views = {};
+                    _views.container = container;
+                    _views.fromNameLabel = fromNameLabel;
+                    _views.fromTitleLabel = fromTitleLabel;
+                    _views.messageLabel = messageLabel;
+                }
+
+                function show(parent, reply, callback) {
+                    _callback = callback || _.noop;
+                    render();
+
+                    if (reply) {
+                        _views.fromNameLabel.text(reply.from_name);
+                        _views.fromTitleLabel.text(reply.title);
+                        _views.messageLabel.text(reply.message);
+                    }
 
                     parent.append(_views.container);
                 }

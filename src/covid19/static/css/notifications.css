@@ -112,6 +112,11 @@
     font-size: 0.9em;
     cursor: pointer;
 }
+.noty-item-replyname-label {
+    color: #EF8009;
+    font-size: 0.9em;
+    cursor: pointer;
+}
 
 .noty-item-locate-container {
 
