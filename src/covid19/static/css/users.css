@@ -1,9 +1,12 @@
-.top-container {
+.top-upper-container {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
     padding: 0.2em 0.4em;
     box-sizing: border-box;
+}
+.top-lower-container {
+    margin-top: 1em;
 }
 
 .user-searchbox-container {
@@ -46,8 +49,8 @@
     flex-wrap: nowrap;
 }
 .user-filter-title-icn {
-    width: 1.2em;
-    height: 1.2em;
+    width: 1.3em;
+    height: 1.3em;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -62,6 +65,9 @@
 }
 .op .user-filter-title-icn {
     background-image: url(../img/icn_op_filter.svg);
+}
+.staff .user-filter-title-icn {
+    background-image: url(../img/icn_staff_filter.svg);
 }
 .command .user-filter-title-icn {
     background-image: url(../img/icn_command_filter.svg);

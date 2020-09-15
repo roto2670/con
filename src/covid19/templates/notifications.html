@@ -615,10 +615,15 @@
             }
 
             function ComplianceMessageItem(model, callbacks) {
-                var _model = model,
-                    _callbacks = callbacks || {
-                        goToUser: _.noop
-                    },
+                const LOCATION_DISPLAY = {
+                    0: 'Camp',
+                    1: 'Work site',
+                    2: 'Transportation',
+                    3: 'Others' 
+                },
+                LOCATION_DISPLAY_BUILDER = _.template('[<%= place %>]');
+
+                let _model = model,
                     _callbacks = callbacks || {
                         goToUser: _.noop,
                         selectedMessage: _.noop
@@ -630,6 +635,8 @@
                     let container = $('<div class="noty-item">');
                     let profile = $('<div class="noty-item-avatar">');
                     let contentContainer = $('<div class="noty-item-content-container">'),
+                        titleContainer = $('<div class="noty-item-title-container">'),
+                        locationLabel = $('<div class="noty-item-location-label">'),
                         titleLabel = $('<div class="noty-item-title-label">'),
                         descLabel = $('<div class="noty-item-desc-label">');
                     let locateContainer = $('<div class="noty-item-locate-container">'),
@@ -640,7 +647,8 @@
                     let closeButton = $('<div class="noty-item-close-btn">')
 
                     container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
-                    contentContainer.append(titleLabel, descLabel, locateContainer);
+                    contentContainer.append(titleContainer, descLabel, locateContainer);
+                    titleContainer.append(locationLabel, titleLabel);
                     locateContainer.append(nameLabel, attachmentContainer);
 
                     // init handlers
@@ -669,6 +677,7 @@
                     // store views
                     _views.container = container;
                     _views.profile = profile;
+                    _views.locationLabel = locationLabel;
                     _views.titleLabel = titleLabel;
                     _views.descLabel = descLabel;
                     _views.nameLabel = nameLabel;
@@ -698,6 +707,13 @@
                         title = 'Others';
                     }
                     _views.titleLabel.text(title);
+
+                    // Display location
+                    if (_.isNumber(_model.location)) {
+                        _views.locationLabel.text(LOCATION_DISPLAY_BUILDER({
+                            place: LOCATION_DISPLAY[model.location]
+                        }));
+                    }
 
                     // TODO: move in load api.
                     if (_model.from_user && !_model.reporter) {
@@ -762,7 +778,7 @@
             function CreateMessageDialog() {
                 const TITLE_DISPLAY_BUILDER = _.template('Reply: <%= name %>(<%= id %>)');
 
-                let _views
+                let _views,
                     _callback = _.noop;
 
                 function render() {

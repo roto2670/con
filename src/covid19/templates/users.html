@@ -16,7 +16,7 @@
 
 {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
-    <div class="top-container">
+    <div class="top-upper-container">
         <div class="user-searchbox-container">
             <input type="text" class="user-serach-box hidden-textfield">
             <div class="searchbox-icon"></div>
@@ -40,7 +40,7 @@
             </div>
             <div class="user-filter-bottom-container">
                 <div class="user-filter-btn" id="close-contact">Close Contact</div>
-                <div class="user-filter-btn" id="symptom-suspected">Symptom Suspected</div>
+                <div class="user-filter-btn" id="symptom-suspected">Suspected Symptom</div>
                 <div class="user-filter-btn" id="quarantine-required">Quarantine Required</div>
                 <div class="user-filter-btn" id="isolation-required">Isolated Required</div>
                 <div class="user-filter-btn" id="test-referred">Test Referred</div>
@@ -56,6 +56,26 @@
                 <div class="user-filter-btn" id="isolation-confirmed">Isolation Confirmed</div>
             </div>
         </div>
+        <div class="user-filter-container staff">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-icn"></div>
+                <div class="user-filter-title-label">Staff</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-filter-btn" id="admin">Admin</div>
+                <div class="user-filter-btn" id="clinic">Clinic</div>
+            </div>
+        </div>
+        <div class="user-new-btn">
+            <div class="user-new-btn-icn"></div>
+            <div class="user-new-btn-label">New</div>
+        </div>
+        <div class="discover-hotspot-btn">
+            <div class="discover-hotspot-btn-icn"></div>
+            <div class="discover-hotspot-btn-label">Discover Hotspot</div>
+        </div>
+    </div>
+    <div class="top-lower-container">
         <div class="user-filter-container command">
             <div class="user-filter-top-container">
                 <div class="user-filter-title-icn"></div>
@@ -99,14 +119,6 @@
                     <div class="command-btn-label">Create a Message</div>
                 </div>
             </div>
-        </div>
-        <div class="user-new-btn">
-            <div class="user-new-btn-icn"></div>
-            <div class="user-new-btn-label">New</div>
-        </div>
-        <div class="discover-hotspot-btn">
-            <div class="discover-hotspot-btn-icn"></div>
-            <div class="discover-hotspot-btn-label">Discover Hotspot</div>
         </div>
     </div>
     <div class="content-container">
@@ -183,6 +195,10 @@
                 'none': 1,
                 'quarantine-confirmed': 2,
                 'isolation-confirmed': 3
+            },
+            STAFF_STATUS_VALUE = {
+                admin: '_adm_',
+                clinic: '_cln_'
             },
             COMMAND_STATUS_VALUE = {
                 REFER_TEST: '_rft_',
@@ -801,6 +817,11 @@
                     if (_.isNumber(filters.op)) {
                         query = query.where('op_status', '==', filters.op);
                     }
+                    if (filters.staff === STAFF_STATUS_VALUE['admin']) {
+                        query = query.where('role', '==', 1);
+                    } else if (filters.staff === STAFF_STATUS_VALUE['clinic']) {
+                        query = query.where('role', '==', 2);
+                    }
                     if (filters.userName) {
                         query = query.where('fullname', 'array-contains', filter.userName);
                     }
@@ -832,7 +853,8 @@
                 let _filters = {},
                     _userStatus = STATUS_VALUE[$('.user .user-filter-btn.selected').attr('id')],
                     _clinicStatus = CLINIC_STATUS_VALUE[$('.clinic .user-filter-btn.selected').attr('id')],
-                    _opStatus = OP_STATUS_VALUE[$('.op .user-filter-btn.selected').attr('id')];
+                    _opStatus = OP_STATUS_VALUE[$('.op .user-filter-btn.selected').attr('id')],
+                    _staffStatus = STAFF_STATUS_VALUE[$('.staff .user-filter-btn.selected').attr('id')];
 
                 if (_.isNumber(_userStatus)) {
                     _filters.user = _userStatus;
@@ -845,6 +867,9 @@
                 }
                 if (_.isNumber(_opStatus)) {
                     _filters.op = _opStatus;
+                }
+                if (_staffStatus) {
+                    _filters.staff = _staffStatus;
                 }
 
                 return _filters;

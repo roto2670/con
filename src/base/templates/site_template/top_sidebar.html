@@ -1,5 +1,6 @@
 <script>
     function logout() {
+      firebase.auth().signOut();
       window.location.href = "/auth/sign-out";
     }
 </script>

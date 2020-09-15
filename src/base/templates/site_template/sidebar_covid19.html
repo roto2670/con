@@ -35,7 +35,7 @@
         </li>
         <li>
           <a href="/covid19/users">
-            <i class="fa fa-users"></i>Users
+            <i class="fa fa-users"></i>Staff List
           </a>
         </li>
         <li>
@@ -94,8 +94,18 @@
       window.alert('Not ready yet!');
     });
 
-    // Auth
-    // Check local storage first.
+    // Firebase Auth
+    // Try get logged user first.
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.debug('Logged user, skip custom login');
+      } else {
+        console.log('There is no logged user, try custom login without cache.');
+        authTOFirebase();
+      }
+    });
+
+{# 
     let token = localStorage.getItem(TOKEN_KEY);
     if (!!token) {
       console.debug('Try firebase login by token from storage');
@@ -107,6 +117,7 @@
       console.debug('There is no auth token in storage, try to issue.');
       authToFirebase();
     }
+ #}
 
     function authToFirebase() {
       let functions = firebase.app().functions('asia-east2'),
