@@ -35,10 +35,6 @@
     flex-flow: column;
     margin-right: 1.2em;
 }
-.user-filter-container.command {
-    margin-right: 0;
-    margin-left: auto;
-}
 .user-filter-top-container {
     display: flex;
     align-items: center;
@@ -68,6 +64,12 @@
 }
 .staff .user-filter-title-icn {
     background-image: url(../img/icn_staff_filter.svg);
+}
+.clinic-command .user-filter-title-icn {
+    background-image: url(../img/icn_clinic_filter.svg);
+}
+.admin-command .user-filter-title-icn {
+    background-image: url(../img/icn_op_filter.svg);
 }
 .command .user-filter-title-icn {
     background-image: url(../img/icn_command_filter.svg);
@@ -211,22 +213,27 @@
 }
 .user-item-header-label:nth-child(3) {
     /* gender */
+    width: 4em;
 }
 .user-item-header-label:nth-child(4) {
 }
 .user-item-header-label:nth-child(5) {
 }
 .user-item-header-label:nth-child(6) {
+    /* camp */
+}
+.user-item-header-label:nth-child(7) {
     /* room */
+    width: 3em;
 }
 .user-item-header-label:nth-child(8) {
     /* phone */
+    width: 7em;
 }
 .user-item-header-label:nth-child(12) {
     /* lang */
 }
 .user-item-header-label:nth-last-child(1) {
-    margin-right: 0;
 }
 
 .user-item-container {
@@ -300,7 +307,6 @@
     text-align: center;
 }
 .user-item-label:nth-last-child(1) {
-    margin-right: 0;
 }
 .user-item-label.status {
     margin: 0;
@@ -347,6 +353,7 @@
     width: 6em;
     margin: auto;
     text-align: center;
+    flex-wrap: wrap;
 }
 
 .user-item-loader-btn {

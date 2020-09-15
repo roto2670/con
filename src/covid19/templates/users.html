@@ -76,32 +76,17 @@
         </div>
     </div>
     <div class="top-lower-container">
-        <div class="user-filter-container command">
+        {% if current_user.level in [0, 7, 8] %}
+        <div class="user-filter-container clinic-command">
             <div class="user-filter-top-container">
                 <div class="user-filter-title-icn"></div>
-                <div class="user-filter-title-label">Commands</div>
+                <div class="user-filter-title-label">Clinic Commands</div>
             </div>
             <div class="user-filter-bottom-container">
-                {% if current_user.level in [0, 7] %}
-                <div class="command-btn confirm-quarantine disabled">
-                    <div class="command-btn-icn hide"></div>
-                    <div class="command-btn-label">Confirm Quarantine</div>
-                </div>
-                <div class="command-btn confirm-isolation disabled">
-                    <div class="command-btn-icn hide"></div>
-                    <div class="command-btn-label">Confirm Isolation</div>
-                </div>
-                <div class="command-btn release-op disabled">
-                    <div class="command-btn-icn hide"></div>
-                    <div class="command-btn-label">Release</div>
-                </div>
-                {% endif %}
-                {% if current_user.level in [0, 8] %}
                 <div class="command-btn release-clinic">
                     <div class="command-btn-icn hide"></div>
                     <div class="command-btn-label">Release</div>
                 </div>
-                {% endif %}
                 <div class="command-btn quarantine">
                     <div class="command-btn-icn hide"></div>
                     <div class="command-btn-label">Quarantine</div>
@@ -114,6 +99,37 @@
                     <div class="command-btn-icn hide"></div>
                     <div class="command-btn-label">Refer Test</div>
                 </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if current_user.level in [0, 7] %}
+        <div class="user-filter-container admin-command">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-icn"></div>
+                <div class="user-filter-title-label">Admin Commands</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="command-btn confirm-quarantine disabled">
+                    <div class="command-btn-icn hide"></div>
+                    <div class="command-btn-label">Confirm Quarantine</div>
+                </div>
+                <div class="command-btn confirm-isolation disabled">
+                    <div class="command-btn-icn hide"></div>
+                    <div class="command-btn-label">Confirm Isolation</div>
+                </div>
+                <div class="command-btn release-op disabled">
+                    <div class="command-btn-icn hide"></div>
+                    <div class="command-btn-label">Release</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="user-filter-container command">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-icn"></div>
+                <div class="user-filter-title-label">Commands</div>
+            </div>
+            <div class="user-filter-bottom-container">
                 <div class="command-btn message">
                     <div class="command-btn-icn hide"></div>
                     <div class="command-btn-label">Create a Message</div>
@@ -135,8 +151,7 @@
             <div class="user-item-header-label">Department</div>
             <div class="user-item-header-label">Location</div>
             <div class="user-item-header-label">Job</div>
-            <div class="user-item-header-label">Language</div>
-            <div class="user-item-header-label">RX</div>
+            <div class="user-item-header-label">App Installed</div>
         </div>
 
         <!-- User Item -->
@@ -931,14 +946,13 @@
                         jobContainer = $('<div class="user-item-cell job">'),
                         jobCat1Label = $('<div class="user-item-label jobcat1">'),
                         jobCat2Label = $('<div class="user-item-label jobcat2">'),
-                        locateContainer = $('<div class="user-item-cell locate">'),
-                        langLabel = $('<div class="user-item-label lang">'),
-                        rxLabel = $('<div class="user-item-label rx">'),
+                        locateLabel = $('<div class="user-item-label locate">'),
                         timeagoLabel = $('<div class="user-item-label timeago">');
+                        appInstalledLabel = $('<div class="user-item-label app-installed">');
                     
                     container.append(nameCell, statusCell, genderLabel, nationalLabel,
-                        employerLabel, campLabel, roomLabel, phoneLabel, departmentLabel, locateContainer, jobContainer,
-                        langLabel, rxLabel);
+                        employerLabel, campLabel, roomLabel, phoneLabel, departmentLabel, locateLabel, jobContainer,
+                        appInstalledLabel);
                     nameCell.append(checkbox, profile, nameLabel, idLabel);
                     statusCell.append(statusLabel, historyButton);
                     jobContainer.append(jobCat1Label, jobCat2Label);
@@ -967,12 +981,11 @@
                         roomLabel: roomLabel,
                         phoneLabel: phoneLabel,
                         departmentLabel: departmentLabel,
-                        locationLabel: locateContainer,
+                        locationLabel: locateLabel,
                         jobCat1Label: jobCat1Label,
                         jobCat2Label: jobCat2Label,
-                        langLabel: langLabel,
-                        rxLabel: rxLabel,
-                        timeagoLabel: timeagoLabel
+                        timeagoLabel: timeagoLabel,
+                        appInstalledLabel: appInstalledLabel
                     }
 
                     update(_model);
@@ -1004,9 +1017,8 @@
                     _views.locationLabel.text(model.pv_area || '-');
                     _views.jobCat1Label.text(model.job_cat1 || '-');
                     _views.jobCat2Label.text(model.job_cat2 || '-');
-                    _views.langLabel.text(model.lang || '-');
-                    _views.rxLabel.text(model.rx || '-');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
+                    _views.appInstalledLabel.text(_.isEmpty(model.device_id) ? 'No' : 'Yes');
                 }
 
                 return {

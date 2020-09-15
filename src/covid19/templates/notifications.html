@@ -94,6 +94,7 @@
                 _currentMessageType = ''
                 _initializedSnapshotHandler = false;
                 _initializedComplianceSnapshotHandler = false;
+            let _complianceItems = {};
 
             
             // init
@@ -213,6 +214,9 @@
                                             },
                                             selectedMessage: function(message) {
                                                 showComplianceMessageDialog(message, 5);
+                                            },
+                                            selectedResolve: function(message) {
+                                                showComplianceResolveDialog(message);
                                             }
                                         });
 
@@ -221,11 +225,34 @@
                                             container.prepend(item.render());
                                             item.blink();
                                         });
+
+                                        // Store in cache
+                                        _complianceItems[model.documentId] = {
+                                            model: model,
+                                            viewItem: item
+                                        }
                                     } else {
                                         // this message will be appered when switched view.
                                     }
                                 }
                             }
+                             {# else if (change.type === 'modified') {
+                                let model = change.doc.data();
+                                model.documentId = change.doc.id;
+
+                                if (snapshot.metadata.hasPendingWrites) {
+                                    // This has not yet been recorded on the server, so must manually set the time field.
+                                    model.ts = {
+                                        seconds: new Date().getTime() / 1000
+                                    };
+                                }
+
+                                let data = _complianceItems[model.documentId];
+                                if (data) {
+                                    data.model = model;
+                                    data.viewItem.update(model);
+                                }
+                            } #}
                         });
                     });
             }
@@ -242,11 +269,11 @@
                 }
             }
 
-            function switchMessages(type, callback) {
+            function switchMessages(type, callback, force) {
                 let _callback = callback || _.noop;
 
                 $('.noty-item-loader-btn').addClass('loading').removeClass('hide');
-                if (_currentMessageType !== type) {
+                if (_currentMessageType !== type || force) {
                     let currentContainer = _notyItemContainers[type];
 
                     $('.top-button').removeClass('selected');
@@ -255,6 +282,10 @@
                         container.detach();
                     })
                     currentContainer.appendTo($('.content-container'));
+                    if (force) {
+                        currentContainer.empty();
+                        _lastQuerySnapShots[type] = null;
+                    }
                     if (!!currentContainer && currentContainer.children().length <= 0) {
                         // Load init messages
                         displayMessages(type, false, function(empty) {
@@ -308,8 +339,17 @@
                                     },
                                     selectedMessage: function(message) {
                                         showComplianceMessageDialog(message, 5);
+                                    },
+                                    selectedResolve: function(message) {
+                                        showComplianceResolveDialog(message);
                                     }
                                 });
+
+                                // Store in cache
+                                _complianceItems[message.documentId] = {
+                                    model: message,
+                                    viewItem: item
+                                }
                             }
                             container.append(item.render());
                             if (animation) {
@@ -416,10 +456,17 @@
                 dialog.show($('.right_col'), function(texts) {
                     if (texts) {
                         replyCompliance(message.documentId, firebase.auth().currentUser.uid,
-                            texts.message, texts.type);
+                            texts.message, texts.type, function() {
+                                refreshList();
+                            });
                         dialog.hide();
                     }
                 });
+            }
+
+            function showComplianceResolveDialog(message) {
+                let dialog = ComplianceResolveDialog(); 
+                dialog.show($('.right_col'), message);
             }
 
             function replyMessage(replyId, toId, toName, title, message, type, callback) {
@@ -487,6 +534,10 @@
                 }
             }
 
+            function refreshList() {
+                switchMessages(_currentMessageType, null, true);
+            }
+
             function MessageItem(model, callbacks) {
                 var _model = model,
                     _callbacks = callbacks || {
@@ -505,8 +556,8 @@
                         nameLabel = $('<div class="noty-item-name-label">'),
                         replyNameLabel = $('<div class="noty-item-replyname-label">> REPLY</div>'),
                         timeagoLabel = $('<div class="noty-item-timeago-label">');
-                    let messageButton = $('<div class="noty-item-msg-btn">')
-                    let closeButton = $('<div class="noty-item-close-btn">')
+                    let messageButton = $('<div class="noty-item-msg-btn">');
+                    let closeButton = $('<div class="noty-item-close-btn">');
 
                     container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
                     contentContainer.append(titleLabel, descLabel, locateContainer);
@@ -626,7 +677,8 @@
                 let _model = model,
                     _callbacks = callbacks || {
                         goToUser: _.noop,
-                        selectedMessage: _.noop
+                        selectedMessage: _.noop,
+                        selectedResolve: _.noop
                     },
                     _reporter,
                     _views = {};
@@ -643,10 +695,12 @@
                         nameLabel = $('<div class="noty-item-name-label">'),
                         timeagoLabel = $('<div class="noty-item-timeago-label">'),
                         attachmentContainer = $('<div class="noty-item-attchmentContainer">');
-                    let messageButton = $('<div class="noty-item-msg-btn">')
-                    let closeButton = $('<div class="noty-item-close-btn">')
+                    let messageButton = $('<div class="noty-item-msg-btn">'),
+                        resolveButton = $('<div class="noty-item-resolve-btn">');
+                    let closeButton = $('<div class="noty-item-close-btn">');
 
-                    container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
+                    container.append(profile, contentContainer, messageButton, resolveButton,
+                        timeagoLabel, closeButton);
                     contentContainer.append(titleContainer, descLabel, locateContainer);
                     titleContainer.append(locationLabel, titleLabel);
                     locateContainer.append(nameLabel, attachmentContainer);
@@ -654,6 +708,9 @@
                     // init handlers
                     messageButton.click(function() {
                         _callbacks.selectedMessage(model);
+                    });
+                    resolveButton.click(function() {
+                        _callbacks.selectedResolve(model);
                     });
                     closeButton.click(function() {
                         container.detach().remove();
@@ -682,6 +739,7 @@
                     _views.descLabel = descLabel;
                     _views.nameLabel = nameLabel;
                     _views.messageButton = messageButton;
+                    _views.resolveButton = resolveButton;
                     _views.closeButton = closeButton;
                     _views.timeagoLabel = timeagoLabel;
                     _views.attachmentContainer = attachmentContainer;
@@ -713,6 +771,15 @@
                         _views.locationLabel.text(LOCATION_DISPLAY_BUILDER({
                             place: LOCATION_DISPLAY[model.location]
                         }));
+                    }
+
+                    // Handle resolved
+                    if (_.isNumber(_model.resolution_type)) {
+                        _views.resolveButton.show();
+                        _views.messageButton.hide();
+                    } else {
+                        _views.resolveButton.hide();
+                        _views.messageButton.show();
                     }
 
                     // TODO: move in load api.
@@ -855,7 +922,7 @@
             }
 
             function CreateComplianceMessageDialog() {
-                let _views
+                let _views,
                     _callback = _.noop;
 
                 function render() {
@@ -918,16 +985,19 @@
             }
 
             function MessageDialog() {
-                let _views
+                let _views,
                     _callback = _.noop;
 
                 function render() {
                     let container = $('<div class="c-modal-dialog cmessage-dialog">'),
                         contentContainer = $('<div class="c-modal-dialog-content cmessage-dialog-content">'),
                         closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">'),
-                        fromNameLabel = $('<div class="c-model-label">'),
-                        fromTitleLabel = $('<div class="c-model-label">'),
-                        messageLabel = $('<div class="c-model-label">');
+                        fromNameTitleLabel = $('<div class="dialog-title-label">From</div>'),
+                        fromNameValueLabel = $('<div class="dialog-value-label">'),
+                        fromTitleTitleLabel = $('<div class="dialog-title-label">Title</div>'),
+                        fromTitleValueLabel = $('<div class="dialog-value-label">'),
+                        messageTitleLabel = $('<div class="dialog-title-label">Message</div>'),
+                        messageValueLabel = $('<div class="dialog-value-label">');
 
                     // init handlers
                     container.click(function() {
@@ -938,14 +1008,15 @@
                     })
 
                     container.append(contentContainer);
-                    contentContainer.append(closeButton, fromNameLabel, fromTitleLabel, messageLabel);
+                    contentContainer.append(closeButton, fromNameTitleLabel, fromNameValueLabel, fromTitleTitleLabel,
+                        fromTitleValueLabel, messageTitleLabel, messageValueLabel);
 
                     // Store views
                     _views = {};
                     _views.container = container;
-                    _views.fromNameLabel = fromNameLabel;
-                    _views.fromTitleLabel = fromTitleLabel;
-                    _views.messageLabel = messageLabel;
+                    _views.fromNameValueLabel = fromNameValueLabel;
+                    _views.fromTitleValueLabel = fromTitleValueLabel;
+                    _views.messageValueLabel = messageValueLabel;
                 }
 
                 function show(parent, reply, callback) {
@@ -953,9 +1024,86 @@
                     render();
 
                     if (reply) {
-                        _views.fromNameLabel.text(reply.from_name);
-                        _views.fromTitleLabel.text(reply.title);
-                        _views.messageLabel.text(reply.message);
+                        _views.fromNameValueLabel.text(reply.from_name);
+                        _views.fromTitleValueLabel.text(reply.title);
+                        _views.messageValueLabel.text(reply.message);
+                    }
+
+                    parent.append(_views.container);
+                }
+
+                function hide() {
+                    _views.container.remove();
+                    _views = null;
+                    _callback = _.noop;
+                }
+
+                return {
+                    show: show,
+                    hide: hide
+                }
+            }
+
+            function ComplianceResolveDialog() {
+                const TYPE_DISPLAY = {
+                    1: 'Open',
+                    2: 'Closed',
+                    3: 'Postponed',
+                    4: 'Others'
+                };
+
+                let _views,
+                    _callback = _.noop;
+
+
+                function render() {
+                    let container = $('<div class="c-modal-dialog c-resolve-dialog">'),
+                        contentContainer = $('<div class="c-modal-dialog-content">'),
+                        closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">'),
+                        resolverTitleLabel = $('<div class="dialog-title-label">Resolver</div>'),
+                        resolverValueLabel = $('<div class="dialog-value-label">'),
+                        typeTitleLabel = $('<div class="dialog-title-label">Type</div>'),
+                        typeValueLabel = $('<div class="dialog-value-label">'),
+                        timeTitleLabel = $('<div class="dialog-title-label">Date</div>'),
+                        timeValueLabel = $('<div class="dialog-value-label">'),
+                        noteTitleLabel = $('<div class="dialog-title-label">Note</div>'),
+                        noteValueLabel = $('<div class="dialog-value-label">');
+
+                    // init handlers
+                    container.click(function() {
+                        // hide();
+                    });
+                    closeButton.click(function() {
+                        hide();
+                    })
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, resolverTitleLabel, resolverValueLabel, typeTitleLabel,
+                        typeValueLabel, timeTitleLabel, timeValueLabel, noteTitleLabel, noteValueLabel);
+
+                    // Store views
+                    _views = {};
+                    _views.container = container;
+                    _views.resolverValueLabel = resolverValueLabel;
+                    _views.typeValueLabel = typeValueLabel;
+                    _views.timeValueLabel = timeValueLabel;
+                    _views.noteValueLabel = noteValueLabel;
+                }
+
+                function show(parent, message) {
+                    render();
+
+
+                    // Updates the views.
+                    if (message) {
+                        if (message.resolver) {
+                            message.resolver.get().then(function(doc) {
+                                _views.resolverValueLabel.text(doc.data().fullname);
+                            });
+                        }
+                        _views.typeValueLabel.text(TYPE_DISPLAY[message.resolution_type]);
+                        _views.timeValueLabel.text($.timeago(message.resolution_ts.seconds * 1000));
+                        _views.noteValueLabel.text(message.resolution_note);
                     }
 
                     parent.append(_views.container);

@@ -153,6 +153,18 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
+.noty-item-resolve-btn {
+    width: 3.4em;
+    height: 3.4em;
+    position: absolute;
+    right: 2em;
+    top: 1em;
+    cursor: pointer;
+    margin-left: auto;
+    background-image: url(../img/icn_done.svg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
 
 .noty-item-close-btn {
     display: none;
@@ -206,4 +218,8 @@
 
 .loading .noty-item-loader-label {
     display: none;
+}
+
+.c-resolve-dialog .c-modal-dialog-content {
+    width: 25em;
 }

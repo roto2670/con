@@ -1,6 +1,10 @@
 <script>
     function logout() {
-      firebase.auth().signOut();
+      try {
+        firebase.auth().signOut();
+      } catch(error) {
+        // nothing.
+      }
       window.location.href = "/auth/sign-out";
     }
 </script>
