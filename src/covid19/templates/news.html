@@ -144,7 +144,7 @@
                             nextOrder = currentViewItem.next().data('order');
 
                         if (_.isNumber(currentOrder)) {
-                            let newOrder = (prevOrder + nextOrder) / 2;
+                            let newOrder = Math.round((prevOrder + nextOrder) / 2);
                             if (!nextOrder) {
                                 // there is no next order
                                 newOrder = getNextUnpinOrder();

@@ -466,10 +466,10 @@
                     }
                 });
                 // init Noty
-                PNotify.prototype.options.delay = 3500;
+                PNotify.prototype.options.delay = 5000;
                 PNotify.prototype.options.styling = 'bootstrap3';
-                PNotify.prototype.options.stack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
-                PNotify.prototype.options.addclass = 'stack-bottomright';
+                // PNotify.prototype.options.stack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
+                // PNotify.prototype.options.addclass = 'stack-bottomright';
             }
 
             // TODO: setSelectedFilter
@@ -589,7 +589,7 @@
                 if (!!startAt) {
                     query = query.startAfter(startAt);
                 }
-                query = query.orderBy('result_data', 'desc');
+                query = query.orderBy('result_date', 'desc');
                 query.limit(TEST_RESULT_PAGE_SIZE)
                     .get().then(function(snapshot) {
                         let testList = [],
@@ -1018,7 +1018,7 @@
                     _views.jobCat1Label.text(model.job_cat1 || '-');
                     _views.jobCat2Label.text(model.job_cat2 || '-');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
-                    _views.appInstalledLabel.text(_.isEmpty(model.device_id) ? 'No' : 'Yes');
+                    _views.appInstalledLabel.text(_.isEmpty(model.f_token) ? 'No' : 'Yes');
                 }
 
                 return {

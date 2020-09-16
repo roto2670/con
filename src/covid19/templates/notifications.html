@@ -83,6 +83,14 @@
                     SENT: 'sent',
                     COMPLIANCE: 'compliance'
                 },
+                MESSAGE_ACTION = {
+                    SELF_ASSESSMENT: 1,
+                    REPORT_TEST_RESULTS: 2,
+                    REPLY: 3,
+                    REPLY_IN_USERS: 4,
+                    CLINIC: 5,
+                    NONE: 0
+                },
                 USER_MENU_URL_PREFIX='users';
             const DOWNLOAD_URL_BUILDER = _.template('https://skec-fujairah.loc8.dev:10443/api/download/file/<%= id %>');
 
@@ -94,7 +102,8 @@
                 _currentMessageType = ''
                 _initializedSnapshotHandler = false;
                 _initializedComplianceSnapshotHandler = false;
-            let _complianceItems = {};
+            let _messageItems = {},
+                _complianceItems = {};
 
             
             // init
@@ -149,7 +158,7 @@
 
                                 model = change.doc.data();
                                 model.documentId = change.doc.id;
-                                if (model) {
+                                if (model && model.action != MESSAGE_ACTION.REPLY && model.action != MESSAGE_ACTION.REPLY_IN_USERS) {
                                     // don't check type of type.
                                     // check type
                                     if (model.to_user == 1) {
@@ -178,11 +187,29 @@
                                             container.prepend(item.render());
                                             item.blink();
                                         });
+
+                                        // Store
+                                        _messageItems[model.documentId] = {
+                                            model: model,
+                                            viewItem: item
+                                        };
                                     } else {
                                         // this message will be appered when switched view.
                                     }
                                 }
-                            }
+                            } 
+                            {# else if (change.type === 'modified') {
+                                let _model,
+                                    _data = _messageItems[change.doc.id];
+                                    
+                                if (_data) {
+                                    _model = change.doc.data();
+
+                                    // Updates view item
+                                    _data.model = _model;
+                                    _data.viewItem.update(_model);
+                                }
+                            } #}
                         });
                     });
 
@@ -261,6 +288,10 @@
                 _.each(MESSAGE_TYPE, function(type) {
                     _notyItemContainers[type] = $('<div class="noty-item-container ' + type + '">');
                 })
+
+                // init Pnotify
+                PNotify.prototype.options.delay = 5000;
+                PNotify.prototype.options.styling = 'bootstrap3';
             }
 
             function goToUserMenu(id) {
@@ -332,6 +363,12 @@
                                         showMessageDialog(message);
                                     }
                                 });
+
+                                // Store in cache.
+                                _messageItems[message.documentId] = {
+                                    model: message,
+                                    viewItem: item
+                                };
                             } else {
                                 item = ComplianceMessageItem(message, {
                                     goToUser: function(userId) {
@@ -422,29 +459,20 @@
                         let _type = _.isNumber(type) ? type : 2;
                         
                         if (message.to_user == '2') {
-                            _type  = 4;
+                            _type  = 2; // doctor
                         } else if (message.from_user == '1' || message.from_user == '2') {
-                            _type  = 3;
+                            _type  = 3; // reminder
                         }
 
-                        if (message.reporter) {
-                            message.reporter.get().then(function(doc) {
-                                if (doc) {
-                                    let reporter = doc.data();
-                                    reporter.documentId = doc.id;
-
-                                    replyMessage(message.documentId, reporter.documentId, reporter.fullname, texts.title,
-                                        texts.message, _type);
+                        // normal messages
+                        replyMessage(message.documentId, message.from_user, message.from_name, texts.title,
+                            texts.message, _type, function(replyRef) {
+                                let data = _messageItems[message.documentId];
+                                if (data) {
+                                    data.model.reply = replyRef;
+                                    data.viewItem.update(data.model);
                                 }
                             });
-                        } else if (_type == 3) {
-                            // compliance
-                            replyMessage(message.documentId, message.to_user, message.to_name, texts.title,
-                                texts.message, _type);
-                        } else {
-                            replyMessage(message.documentId, message.from_user, message.from_name, texts.title,
-                                texts.message, _type);
-                        }
                     }
 
                     dialog.hide();
@@ -483,20 +511,20 @@
 
                 loadCurrentUser(function(currentUser) {
                     if (currentUser.role == 1) {
-                        _newData.from_id = '1';
+                        _newData.from_user = '1';
                     } else if (currentUser.role == 2) {
-                        _newData.from_id = '1';
+                        _newData.from_user = '2';
                     } else {
-                        _newData.from_id = currentUser.documentId;
+                        _newData.from_user = currentUser.documentId;
+                        _newData.from_name = currentUser.fullname;
                     }
-                    _newData.from_name = currentUser.fullname;
 
                     let docRef = _db.collection('messages').doc();
                     docRef.set(_newData).then(function() {
                         _db.collection('messages').doc(replyId).update({
                             reply: docRef
                         }).then(function() {
-                            _callback();
+                            _callback(docRef);
                         });
                     });
                 });
@@ -554,15 +582,14 @@
                         descLabel = $('<div class="noty-item-desc-label">');
                     let locateContainer = $('<div class="noty-item-locate-container">'),
                         nameLabel = $('<div class="noty-item-name-label">'),
-                        replyNameLabel = $('<div class="noty-item-replyname-label">> REPLY</div>'),
                         timeagoLabel = $('<div class="noty-item-timeago-label">');
-                    let messageButton = $('<div class="noty-item-msg-btn">');
+                    let messageButton = $('<div class="noty-item-msg-btn">'),
+                        replyButton = $('<div class="noty-item-reply-btn">');
                     let closeButton = $('<div class="noty-item-close-btn">');
 
-                    container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
+                    container.append(profile, contentContainer, messageButton, replyButton, timeagoLabel, closeButton);
                     contentContainer.append(titleLabel, descLabel, locateContainer);
-                    locateContainer.append(nameLabel, replyNameLabel);
-                    replyNameLabel.hide(); // TODO
+                    locateContainer.append(nameLabel);
 
                     // init handlers
                     messageButton.click(function() {
@@ -586,13 +613,24 @@
                         }
                         _callbacks.goToUser(userId);
                     });
-                    replyNameLabel.click(function() {
+                    replyButton.click(function() {
                         // TODO!
                         _model.reply.get().then(function(doc) {
                             let reply = doc.data();
-                            reply.documentId = doc.id;
-                            let dialog = MessageDialog();
-                            dialog.show($('.right_col'), reply);
+                            if (reply) {
+                                reply.documentId = doc.id;
+                                let dialog = MessageDialog();
+                                dialog.show($('.right_col'), reply);
+                            } else {
+                                new PNotify({
+                                    type: 'error',
+                                    text: 'The reply seems to deleted and cannot be displayed.'
+                                });
+                                // TODO: remove reply field?
+
+                                replyButton.hide();
+                                messageButton.show();
+                            }
                         });
                     });
 
@@ -602,8 +640,8 @@
                     _views.titleLabel = titleLabel;
                     _views.descLabel = descLabel;
                     _views.nameLabel = nameLabel;
-                    _views.replyNameLabel = replyNameLabel;
                     _views.messageButton = messageButton;
+                    _views.replyButton = replyButton;
                     _views.closeButton = closeButton;
                     _views.timeagoLabel = timeagoLabel;
 
@@ -629,14 +667,16 @@
 
                     // Only show message button for clinic
                     if (model.to_user == 2) {
-                        _views.messageButton.show();
+                        if (model.reply) {
+                            _views.replyButton.show();
+                            _views.messageButton.hide();
+                        } else {
+                            _views.replyButton.hide();
+                            _views.messageButton.show();
+                        }
                     } else {
                         _views.messageButton.hide();
-                    }
-
-                    // TODO
-                    if (model.reply) {
-                        _views.replyNameLabel.show();
+                        _views.replyButton.hide();
                     }
 
                     // load profile image
@@ -660,7 +700,7 @@
 
                 return {
                     render: render,
-                    upate: update,
+                    update: update,
                     blink: blink
                 }
             }
@@ -1024,7 +1064,13 @@
                     render();
 
                     if (reply) {
-                        _views.fromNameValueLabel.text(reply.from_name);
+                        let _fromName = 'Admin';
+                        if (reply.from_name) {
+                            _fromName = reply.from_name;
+                        } else if (reply.from_user == '2') {
+                            _fromName = 'Clinic';
+                        }
+                        _views.fromNameValueLabel.text(_fromName);
                         _views.fromTitleValueLabel.text(reply.title);
                         _views.messageValueLabel.text(reply.message);
                     }
@@ -1092,7 +1138,6 @@
 
                 function show(parent, message) {
                     render();
-
 
                     // Updates the views.
                     if (message) {

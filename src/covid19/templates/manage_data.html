@@ -73,15 +73,19 @@
                 };
 
             let _db = firebase.firestore(),
-                _stats;
+                _stats,
+                _statsDate;
             let _statViewItems = {};
 
 
             // init
+            initialize();
             initHandlers();
             // load stats
             loadStats(function(stats) {
                 _stats = stats;
+                _statsDate = new Date(stats.ts.seconds * 1000);
+
                 buildStatsItems(stats);
             });
 
@@ -115,18 +119,57 @@
                     });
             }
 
-            function updateStats(documentId, newStats) {
-                $('.si-update-label').text('');
+            function addStats(newStats, callbacks) {
+                let _callbacks = callbacks || {
+                    success: _.noop,
+                    error: _.noop
+                };
+                if (newStats)  {
+                    let _data = _.extend(newStats, {
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    let ref = _db.collection('covid19_stats').doc();
+                    ref.set(_data).then(function() {
+                        // Updates stats date for update next time.
+                        _statsDate = new Date();
+                        _stats.documentId = ref.id;
+
+                        _callbacks.success();
+                    }).catch(function() {
+                        _callbacks.error();
+                    });
+                } else {
+                    console.warn('Failed to add new stats by given data is null.');
+                    _callbacks.error();
+                }
+            }
+
+            function updateStats(documentId, newStats, callbacks) {
+                let _callbacks = callbacks || {
+                    success: _.noop,
+                    error: _.noop
+                };
+
                 if (documentId && newStats) {
                     let _data = _.extend(newStats, {
                         ts: firebase.firestore.FieldValue.serverTimestamp()
                     });
+
                     _db.collection('covid19_stats').doc(documentId).update(_data).then(function() {
-                        $('.si-update-label').text('Manual stats updated successfully.');
+                        _callbacks.success();
                     }).catch(function() {
-                        $('.si-update-label').text('Failed to manual update stats.');
+                        _callbacks.error();
                     });
+                } else {
+                    _callbacks.error();
                 }
+            }
+
+            function initialize() {
+                // init Noty
+                PNotify.prototype.options.delay = 5000;
+                PNotify.prototype.options.styling = 'bootstrap3';
             }
 
             function initHandlers() {
@@ -142,20 +185,82 @@
                     });
 
                     if (!_.isEmpty(_newStats)) {
-                        updateStats(_stats.documentId, _newStats);
-                        // TODO: if success
-                        _.each(_newStats, function(value, key) {
-                            let _viewItem = _statViewItems[key];
-                            if (_viewItem) {
-                                _viewItem.update(value);
-                            }
+                        let _statsDate,
+                            _todayDate = new Date();
+                        if (!_.isEmpty(_stats.ts)) {
+                            _statsDate = new Date(_stats.ts.seconds * 1000);
+                        }
+
+                        if (isFutureDay(_statsDate, _todayDate)) {
+                            // Adds new stats.
+                            _newStats = _.extend(_stats, _newStats);
+
+                            addStats(_newStats, {
+                                success: function() {
+                                    updateStats(_newStats);
+                                    new PNotify({
+                                        type: 'success',
+                                        text: 'Manual stats updated successfully.'
+                                    });
+                                }, error: function() {
+                                    new PNotify({
+                                        type: 'error',
+                                        text: 'Failed to manual update stats.'
+                                    });
+                                }
+                            });
+                        } else {
+                            // Updates current stats.
+                            updateStats(_stats.documentId, _newStats, {
+                                success: function() {
+                                    updateStats(_newStats);
+                                    new PNotify({
+                                        type: 'success',
+                                        text: 'Manual stats updated successfully.'
+                                    });
+                                }, error: function() {
+                                    new PNotify({
+                                        type: 'error',
+                                        text: 'Failed to manual update stats.'
+                                    });
+                                }
+                            });
+                        }
+                    } else {
+                        new PNotify({
+                            type: 'notice',
+                            text: 'There is no changes.'
                         });
                     }
                 });
             }
 
-            function isYesterDay(source, target) {
-                let sourceFullYear = source.getFullYear();
+            function isFutureDay(source, target) {
+                let result = false;
+                if (source && target)  {
+                    let sourceFullYear = source.getFullYear(),
+                        sourceMonth = source.getMonth(),
+                        sourceDate = source.getDate(),
+                        targetFullYear = target.getFullYear(),
+                        targetMonth = source.getMonth(),
+                        targetDate = source.getDate();
+
+                    return sourceFullYear < targetFullYear || sourceMonth < targetMonth ||
+                        sourceDate || targetDate;
+                } else {
+                    console.warn('Cannot check date by given source or target is null.');
+                }
+
+                return result;
+            }
+
+            function updateStatsItem(newStats) {
+                _.each(newStats, function(value, key) {
+                    let _viewItem = _statViewItems[key];
+                    if (_viewItem) {
+                        _viewItem.update(value);
+                    }
+                });
             }
 
             function StatItem(title, value) {

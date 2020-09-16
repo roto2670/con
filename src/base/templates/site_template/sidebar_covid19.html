@@ -126,11 +126,7 @@
         level = {{current_user.level | safe}};
 
       if (!emiratesId || emiratesId == 'None') {
-        if (level == 0) {
-          emiratesId = '999-0000-0000000-3';
-        } else {
-          window.alert('Cannot found your id. please check your id.');
-        }
+        window.alert('Cannot found your Covid ID. please check your ID.');
       }
      
       auth({
