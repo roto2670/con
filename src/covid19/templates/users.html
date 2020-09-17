@@ -83,10 +83,6 @@
                 <div class="user-filter-title-label">Clinic Commands</div>
             </div>
             <div class="user-filter-bottom-container">
-                <div class="command-btn release-clinic">
-                    <div class="command-btn-icn hide"></div>
-                    <div class="command-btn-label">Release</div>
-                </div>
                 <div class="command-btn quarantine">
                     <div class="command-btn-icn hide"></div>
                     <div class="command-btn-label">Quarantine</div>
@@ -98,6 +94,10 @@
                 <div class="command-btn refer">
                     <div class="command-btn-icn hide"></div>
                     <div class="command-btn-label">Refer Test</div>
+                </div>
+                <div class="command-btn release-clinic">
+                    <div class="command-btn-icn hide"></div>
+                    <div class="command-btn-label">Release</div>
                 </div>
             </div>
         </div>
@@ -152,6 +152,7 @@
             <div class="user-item-header-label">Location</div>
             <div class="user-item-header-label">Job</div>
             <div class="user-item-header-label">App Installed</div>
+            <div class="user-item-header-label">Commands</div>
         </div>
 
         <!-- User Item -->
@@ -504,30 +505,35 @@
                     }
 
                     // handle command buttons
-                    if ($(this).attr('id') === 'quarantine-required') {
+                    let filterId = $(this).attr('id');
+                    if (filterId === 'quarantine-required') {
                         $('.command-btn.confirm-quarantine').removeClass('disabled');
                     } else {
                         $('.command-btn.confirm-quarantine').addClass('disabled');
                     }
 
-                    if ($(this).attr('id') === 'isolation-required') {
+                    if (filterId === 'isolation-required') {
                         $('.command-btn.confirm-isolation').removeClass('disabled');
                     } else {
                         $('.command-btn.confirm-isolation').addClass('disabled');
                     }
 
-                    if ($(this).attr('id') === 'quarantine-required' || $(this).attr('id') === 'isolation-required') {
+                    if (filterId === 'quarantine-required' || filterId === 'isolation-required' ||
+                        filterId === 'close-contact' || filterId === 'symptom-suspected') {
+                        $('.command-btn.release-clinic').removeClass('disabled');
+                    } else {
+                        $('.command-btn.release-clinic').addClass('disabled');
+                    }
+                    if (filterId === 'quarantine-confirmed' || filterId === 'isolation-confirmed') {
                         $('.command-btn.release-op').removeClass('disabled');
                     } else {
                         $('.command-btn.release-op').addClass('disabled');
                     }
 
-                    if ($(this).attr('id') === 'close-contact' || $(this).attr('id') === 'symptom-suspected') {
-                        $('.command-btn.release-clinic').removeClass('disabled');
+                    if (filterId === 'close-contact' || filterId === 'symptom-suspected') {
                         $('.command-btn.quarantine').removeClass('disabled');
                         $('.command-btn.isolate').removeClass('disabled');
                     } else {
-                        $('.command-btn.release-clinic').addClass('disabled');
                         $('.command-btn.quarantine').addClass('disabled');
                         $('.command-btn.isolate').addClass('disabled');
                     }
@@ -570,12 +576,33 @@
                             });
                             dialog.doLoading(_.size(testList) <= 0);
                         } else {
-                            // TODO: ui?
-                            window.alert('No test results reported.');
+                            new PNotify({
+                                type: 'info',
+                                text: 'No test results reported.'
+                            });
                         }
                     });
                 } else {
                     console.warn('Failed to display history dialog by given user id cannot be null.');
+                }
+            }
+
+            function showSelfReportsDialog(userId) {
+                if (userId) {
+                    _lastSelfReportDoc = null; // refresh.
+                    loadSelfReports(userId, function(reportList, lastDocument) {
+                        if (!_.isEmpty(reportList)) {
+                            let _dialog = SelfReportDialog();
+                            _dialog.show($('.right_col'), reportList);
+                        } else {
+                            new PNotify({
+                                type: 'info',
+                                text: 'No self reports found.'
+                            });
+                        }
+                    });
+                } else {
+                    console.warn('Failed to show self report dialog given user id is null.');
                 }
             }
 
@@ -607,6 +634,42 @@
                         _callback(testList, lastDoc);
                     });
                     // TODO: if error
+            }
+
+            function loadSelfReports(userId, callback) {
+                if (userId) {
+                    let _callback = callback || _.noop,
+                    _userRef = _db.collection('users').doc(userId);
+
+                    let _query = _db.collection('self_reports')
+                                    .where('score', '>', 0)
+                                    .where('owner', '==', _userRef);
+                    
+                    // do query
+                    _query.get().then(function(snapshot) {
+                        let _reportList = [],
+                            _lastDoc;
+
+                        if (!snapshot.empty) {
+                            _lastDoc = _.last(snapshot.docs);
+                            snapshot.forEach(function(doc) {
+                                let _report = doc.data();
+                                _reportList.push(_report);
+                            });
+
+                            // Sorting is not possible on the firestore.
+                            _reportList = _.sortBy(_reportList, function(report) {
+                                return -report.ts.seconds
+                            });
+                        } else {
+                            // there is no reports.
+                        }
+
+                        _callback(_reportList, _lastDoc);
+                    });
+                } else {
+                    console.warn('Failed to load self reports by ginve id is null.');
+                }
             }
 
             function getSelectedUsers() {
@@ -740,6 +803,9 @@
                                 let userItem = UserItem(user, {
                                     selectedHistory: function(user) {
                                         showHistoryDialog(user.documentId);
+                                    },
+                                    selectedSelfReports: function(user) {
+                                        showSelfReportsDialog(user.documentId);
                                     }
                                 });
                                 container.append(userItem.render());
@@ -780,6 +846,9 @@
                             let userItem = UserItem(user, {
                                 selectedHistory: function(user) {
                                     showHistoryDialog(user.documentId);
+                                },
+                                selectedSelfReports: function(user) {
+                                    showSelfReportsDialog(user.documentId);
                                 }
                             });
                             container.append(userItem.render());
@@ -923,7 +992,8 @@
                 var _model = model,
                     _views = {},
                     _callbacks = callbacks || {
-                        selectedHistory: _.noop
+                        selectedHistory: _.noop,
+                        selectedSelfReports: _.noop
                     };
 
                 function render() {
@@ -935,7 +1005,6 @@
                         idLabel = $('<div class="user-item-id-label">');
                     let statusCell = $('<div class="user-item-cell status">'),
                         statusLabel = $('<div class="user-item-label status">'),
-                        historyButton = $('<div class="user-item-btn history">'),
                         genderLabel = $('<div class="user-item-label gender">'),
                         nationalLabel = $('<div class="user-item-label national">'),
                         employerLabel = $('<div class="user-item-label employer">'),
@@ -949,13 +1018,17 @@
                         locateLabel = $('<div class="user-item-label locate">'),
                         timeagoLabel = $('<div class="user-item-label timeago">');
                         appInstalledLabel = $('<div class="user-item-label app-installed">');
+                    let commandsCell = $('<div class="user-item-cell commands">'),
+                        historyButton = $('<div class="user-item-btn history">'),
+                        selfReportsButton = $('<div class="user-item-btn self-reports">');
                     
                     container.append(nameCell, statusCell, genderLabel, nationalLabel,
                         employerLabel, campLabel, roomLabel, phoneLabel, departmentLabel, locateLabel, jobContainer,
-                        appInstalledLabel);
+                        appInstalledLabel, commandsCell);
                     nameCell.append(checkbox, profile, nameLabel, idLabel);
-                    statusCell.append(statusLabel, historyButton);
+                    statusCell.append(statusLabel);
                     jobContainer.append(jobCat1Label, jobCat2Label);
+                    commandsCell.append(historyButton, selfReportsButton);
 
                     // Store id.
                     container.attr('uid', model.documentId);
@@ -964,6 +1037,9 @@
                     // init handlers
                     historyButton.click(function() {
                         _callbacks.selectedHistory(model);
+                    });
+                    selfReportsButton.click(function() {
+                        _callbacks.selectedSelfReports(model);
                     });
 
                     // Store views.
@@ -1034,20 +1110,42 @@
                     let container = $('<div class="c-modal-dialog cmessage-dialog">'),
                         contentContainer = $('<div class="c-modal-dialog-content cmessage-dialog-content">'),
                         closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">'),
+                        messaegSelector = $('<select name="message" class="cmessage-selector dialog-selector">');
                         titleTextbox = $('<input type="text" class="dialog-textbox cmessage-dialog-title-textbox" placeholder="Stay Home">'),
                         messageTextarea = $('<textarea class="dialog-textarea cmessage-dialog-message-textarea" placeholder="Please do not come to work today.\nOne of our medical staff will be in contact soon.">');
                     let sendButton = $('<div class="dialog-btn cmessage-dialog-send-btn">'),
                         sendButtonLabel = $('<div class="cmessage-dialog-send-btn-label">Send</div>'),
                         sendButtonIcon = $('<div class="cmessage-dialog-send-btn-icon">');
 
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, messaegSelector, titleTextbox, messageTextarea, sendButton);
+                    sendButton.append(sendButtonLabel, sendButtonIcon);
+
+                    messaegSelector.append($('<option value="pre" selected="selected">Pre-defined Message</option>'))
+                        .append($('<option value="stay">Stay home</option>'))
+                        .append($('<option value="test">Get your test</option>'))
+                        .append($('<option value="report">Report immediately</option>'));
+
                     // init handlers
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
+                    messaegSelector.change(function() {
+                        let selected = $('option:selected', this);
+                        if (selected.val() === 'pre') {
+                            titleTextbox.val('');
+                        } else {
+                            titleTextbox.val(selected.text());
+                        }
+                    });
                     container.click(function() {
                         // hide();
                     });
                     closeButton.click(function() {
                         hide();
                     })
-
                     sendButton.click(function() {
                         let title = titleTextbox.val(),
                             message = messageTextarea.val();
@@ -1066,10 +1164,6 @@
                             // TODO:
                         }
                     });
-
-                    container.append(contentContainer);
-                    contentContainer.append(closeButton, titleTextbox, messageTextarea, sendButton);
-                    sendButton.append(sendButtonLabel, sendButtonIcon);
 
                     // Store views
                     _views = {};
@@ -1410,6 +1504,166 @@
                 }
             }
 
+            function SelfReportDialog() {
+                let _views = {},
+                    _model;
+
+                function render() {
+                    let container = $('<div class="self-test-dialog c-modal-dialog">'),
+                        closeButton = $('<div class="self-test-dialog-close-btn c-modal-dialog-close-btn">'),
+                        contentContainer = $('<div class="sr-content-container c-modal-dialog-content">'),
+                        titleContainer = $('<div class="sr-title-container">'),
+                        itemsContainer = $('<div class="sr-items-container">');
+                    
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, titleContainer, itemsContainer);
+                    titleContainer.append(
+                        $('<div class="sr-title-label">Contacted</div>'),
+                        $('<div class="sr-title-label">Cough</div>'),
+                        $('<div class="sr-title-label">Fever</div>'),
+                        $('<div class="sr-title-label">Headache</div>'),
+                        $('<div class="sr-title-label">No smell taste</div>'),
+                        $('<div class="sr-title-label">Short breath</div>'),
+                        $('<div class="sr-title-label">Soar throat</div>'),
+                        $('<div class="sr-title-label">Etc</div>'),
+                        $('<div class="sr-title-label">Owner</div>'),
+                        $('<div class="sr-title-label">Reporter</div>'),
+                        $('<div class="sr-title-label">Time</div>')
+                    );
+
+                    closeButton.click(function() {
+                        hide();
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
+
+                    _views = {
+                        container: container,
+                        itemsContainer: itemsContainer
+                    };
+                }
+
+                function show(parent, reportList) {
+                    render();
+
+                    parent.append(_views.container);
+                    addItems(reportList);
+                }
+
+                function hide() {
+                    if (_views) {
+                        _views.container.remove();
+                        _views = null;
+                    }
+                }
+
+                function addItems(reports) {
+                    let container = _views.itemsContainer;
+                    _.each(reports, function(report) {
+                        let viewItem = ReportItem(report);
+                        container.append(viewItem.render());
+                    });
+                }
+
+                function ReportItem(model) {
+                    let _model = model,
+                        _owner = null,
+                        _reporter = null,
+                        _views = {};
+
+                    function render() {
+                        let container = $('<div class="report-item">');
+                        let contactedLabel = $('<div class="r-value-label contacted">'),
+                            coughLabel = $('<div class="r-value-label cough">'),
+                            etcLabel = $('<div class="r-value-label etc">'),
+                            feverLabel = $('<div class="r-value-label fever">'),
+                            headacheLabel = $('<div class="r-value-label headache">'),
+                            noSmellTasteLabel = $('<div class="r-value-label no-smell-teaste">'),
+                            ownerLabel = $('<div class="r-value-label owner">'),
+                            reporterLabel = $('<div class="r-value-label reporter">'),
+                            scoreLabel = $('<div class="r-value-label score">'),
+                            shortBreathLabel = $('<div class="r-value-label short-breath">'),
+                            soarThroatLabel = $('<div class="r-value-label soar-throat">'),
+                            timeLabel = $('<div class="r-value-label time">');
+                        
+                        container.append(contactedLabel, coughLabel, feverLabel, headacheLabel, noSmellTasteLabel,
+                            shortBreathLabel, soarThroatLabel, etcLabel, ownerLabel, reporterLabel, timeLabel);
+
+                        _views = {
+                            contactedLabel: contactedLabel,
+                            coughLabel: coughLabel,
+                            feverLabel: feverLabel,
+                            headacheLabel: headacheLabel,
+                            noSmellTasteLabel: noSmellTasteLabel,
+                            shortBreathLabel: shortBreathLabel,
+                            soarThroatLabel: soarThroatLabel,
+                            etcLabel: etcLabel,
+                            ownerLabel: ownerLabel,
+                            reporterLabel: reporterLabel,
+                            timeLabel: timeLabel
+                        };
+
+                        update(model);
+
+                        return container;
+                    }
+
+                    function update(model) {
+                        _model = model;
+
+                        _views.contactedLabel.text(_model.contacted ? 'Yes' : 'No');
+                        _views.contactedLabel.addClass(_model.contacted ? 'warn' : '');
+                        _views.coughLabel.text(_model.cough ? 'Yes' : 'No');
+                        _views.coughLabel.addClass(_model.cough ? 'warn' : '');
+                        _views.feverLabel.text(_model.fever ? 'Yes' : 'No');
+                        _views.feverLabel.addClass(_model.fever ? 'warn' : '');
+                        _views.headacheLabel.text(_model.headache ? 'Yes' : 'No');
+                        _views.headacheLabel.addClass(_model.headache ? 'warn' : '');
+                        _views.noSmellTasteLabel.text(_model.no_smell_taste ? 'Yes' : 'No');
+                        _views.noSmellTasteLabel.addClass(_model.no_smell_taste ? 'warn' : '');
+                        _views.shortBreathLabel.text(_model.short_breath ? 'Yes' : 'No');
+                        _views.shortBreathLabel.addClass(_model.short_breath ? 'warn' : '');
+                        _views.soarThroatLabel.text(_model.soar_throat ? 'Yes' : 'No');
+                        _views.soarThroatLabel.addClass(_model.soar_throat ? 'warn' : '');
+                        _views.etcLabel.text(_model.etc || 'N/A');
+                        _views.timeLabel.text(new Date(_model.ts.seconds * 1000).toLocaleString());
+
+                        if (_model.owner) {
+                            _model.owner.get().then(function(doc) {
+                                if (doc) {
+                                    _owner = doc.data();
+                                    _owner.documentId = doc.id;
+
+                                    _views.ownerLabel.text(_owner.fullname || 'Unnamed');
+                                }
+                            });
+                        }
+
+                        if (_model.reporter) {
+                            _model.reporter.get().then(function(doc) {
+                                _reporter = doc.data();
+                                _reporter.documentId = doc.id;
+
+                                _views.reporterLabel.text(_reporter.fullname || 'Unnamed');
+                            })
+                        }
+                    }
+
+                    return {
+                        render: render,
+                        update: update
+                    }
+                }
+
+                return {
+                    show: show,
+                    hide: hide,
+                    addItems: addItems
+                }
+            }
         })();
     </script>
 {% endblock javascripts %}

@@ -73,6 +73,15 @@
 .status-title-widget.alert {
     background-color: #FF4A4A;
 }
+.status-title-widget.alertphase.level1 {
+    background-color: #b5b51a;
+}
+.status-title-widget.alertphase.level2 {
+    background-color: #f7ad26;
+}
+.status-title-widget.alertphase.level3 {
+    background-color: #FF4A4A;
+}
 
 .status-title-widget-upper-container {
     font-size: 2em;

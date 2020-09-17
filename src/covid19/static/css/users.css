@@ -250,6 +250,9 @@
     box-sizing: border-box;
     font-size: 0.85em;
 }
+.user-item:hover {
+    background-color: #ef80092b;
+}
 
 .user-item-checkbox {
 }
@@ -300,6 +303,9 @@
     width: 8em;
     flex-wrap: nowrap;
 }
+.user-item-cell.commands {
+    justify-content: center;
+}
 .user-item-label {
     width: 6em;
     margin: auto;
@@ -331,15 +337,22 @@
     width: 3em;
 }
 .user-item-btn {
-    width: 2.0em;
-    height: 2.0em;
+    width: 2.8em;
+    height: 2.8em;
     background-color: #EF8009;
-    background-size: 1.3em 1.3em;
+    background-size: 1.8em 1.8em;
     background-repeat: no-repeat;
     background-position: center;
-    background-image: url(../img/icn_history.svg);
-    border-radius: 2em;
+    border-radius: 0.2em;
     cursor: pointer;
+    box-shadow: 1px 1px #c1c1c1;
+}
+.user-item-btn.history {
+    background-image: url(../img/icn_history.svg);
+}
+.user-item-btn.self-reports {
+    margin-left: 1em;
+    background-image: url(../img/icn_checkbox.svg);
 }
 
 .user-item-locate-container {
@@ -593,4 +606,80 @@
 
 .loading .hd-dialog-loader-label {
     display: none;
+}
+
+.sr-content-container {
+    width: 65%;
+    min-width: 80em;
+}
+.sr-title-container {
+    width: 100%;
+    font-size: 0.9em;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    background-color: #EDEDED;
+    padding: 0.4em 0;
+    margin-top: 1.2em;
+}
+.sr-items-container {
+    width: 100%;
+    max-height: 40em;
+    overflow: auto;
+    overflow-x: hidden;
+    margin-top: 1.6em;
+}
+.sr-title-label {
+    font-weight: 500;
+    width: 5em;
+    margin: auto;
+    text-align: center;
+    color: #848484;
+}
+.sr-title-label:nth-child(9) {
+    width: 8em;
+}
+.sr-title-label:nth-child(10) {
+    width: 8em;
+}
+.sr-title-label:nth-child(11) {
+    width: 10em;
+}
+.report-item {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    font-size: 0.9em;
+    margin-bottom: 0.4em;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 1em 0;
+}
+.r-value-label {
+    width: 5em;
+    margin: auto;
+    text-align: center;
+    word-break: break-word;
+}
+.r-value-label.warn {
+    color: #ff2929;
+    font-weight: 500;
+}
+.r-value-label:nth-child(9) {
+    width: 8em;
+}
+.r-value-label:nth-child(10) {
+    width: 8em;
+}
+.r-value-label:nth-child(11) {
+    width: 10em;
+}
+
+.cmessage-dialog {
+}
+.cmessage-selector {
+    margin-top: 1em;
+    margin-bottom: 0;
+}
+.cmessage-dialog-title-textbox {
+    margin-top: 0.4em;
 }

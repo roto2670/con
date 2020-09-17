@@ -329,6 +329,9 @@
                     $('.status-title-widget.alertphase .status-title-widget-title-label').text('Level');
                     $('.status-title-widget.alertphase .status-title-widget-value-label').text(
                         getStatDisplayName(stats.alert_phase));
+
+                    // Fill colors by level
+                    $('.status-title-widget.alertphase').addClass('level' + stats.alert_phase);
                 }
                 $('.status-widget.cconfirmed .status-w-value-label').text(getStatDisplayName(stats.country_total_cases));
                 $('.status-widget.cdeaths .status-w-value-label').text(getStatDisplayName(stats.country_total_deaths));
