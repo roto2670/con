@@ -518,22 +518,18 @@
                         $('.command-btn.confirm-isolation').addClass('disabled');
                     }
 
-                    if (filterId === 'quarantine-required' || filterId === 'isolation-required' ||
-                        filterId === 'close-contact' || filterId === 'symptom-suspected') {
-                        $('.command-btn.release-clinic').removeClass('disabled');
-                    } else {
-                        $('.command-btn.release-clinic').addClass('disabled');
-                    }
-                    if (filterId === 'quarantine-confirmed' || filterId === 'isolation-confirmed') {
+                    if (filterId === 'quarantine-required' || filterId === 'isolation-required') {
                         $('.command-btn.release-op').removeClass('disabled');
                     } else {
                         $('.command-btn.release-op').addClass('disabled');
                     }
 
                     if (filterId === 'close-contact' || filterId === 'symptom-suspected') {
+                        $('.command-btn.release-clinic').removeClass('disabled');
                         $('.command-btn.quarantine').removeClass('disabled');
                         $('.command-btn.isolate').removeClass('disabled');
                     } else {
+                        $('.command-btn.release-clinic').addClass('disabled');
                         $('.command-btn.quarantine').addClass('disabled');
                         $('.command-btn.isolate').addClass('disabled');
                     }
@@ -813,6 +809,7 @@
                                 _loadingUsers = false;
                                 callback();
                             } else {
+                                container.append('<div class="user-item-cotainer-empty">No users.</div>');
                                 console.warn('Failed to display user for ' + userId);
                             }
                         });
@@ -842,18 +839,21 @@
                         }
 
                         // render users.
-                        $.each(users, function(index, user) {
-                            let userItem = UserItem(user, {
-                                selectedHistory: function(user) {
-                                    showHistoryDialog(user.documentId);
-                                },
-                                selectedSelfReports: function(user) {
-                                    showSelfReportsDialog(user.documentId);
-                                }
+                        if (!_.isEmpty(users)) {
+                            $.each(users, function(index, user) {
+                                let userItem = UserItem(user, {
+                                    selectedHistory: function(user) {
+                                        showHistoryDialog(user.documentId);
+                                    },
+                                    selectedSelfReports: function(user) {
+                                        showSelfReportsDialog(user.documentId);
+                                    }
+                                });
+                                container.append(userItem.render());
                             });
-                            container.append(userItem.render());
-                        });
-
+                        } else if (container.children().length <= 0) {
+                            container.append('<div class="user-item-container-empty">No users</div>');
+                        }
                         _loadingUsers = false;
                         callback();
                     });
@@ -1525,6 +1525,7 @@
                         $('<div class="sr-title-label">No smell taste</div>'),
                         $('<div class="sr-title-label">Short breath</div>'),
                         $('<div class="sr-title-label">Soar throat</div>'),
+                        $('<div class="sr-title-label">Body temperature</div>'),
                         $('<div class="sr-title-label">Etc</div>'),
                         $('<div class="sr-title-label">Owner</div>'),
                         $('<div class="sr-title-label">Reporter</div>'),
@@ -1587,10 +1588,12 @@
                             scoreLabel = $('<div class="r-value-label score">'),
                             shortBreathLabel = $('<div class="r-value-label short-breath">'),
                             soarThroatLabel = $('<div class="r-value-label soar-throat">'),
+                            bodyTempLabel = $('<div class="r-value-label bt">'),
                             timeLabel = $('<div class="r-value-label time">');
                         
                         container.append(contactedLabel, coughLabel, feverLabel, headacheLabel, noSmellTasteLabel,
-                            shortBreathLabel, soarThroatLabel, etcLabel, ownerLabel, reporterLabel, timeLabel);
+                            shortBreathLabel, soarThroatLabel, bodyTempLabel, etcLabel, ownerLabel, reporterLabel,
+                            timeLabel);
 
                         _views = {
                             contactedLabel: contactedLabel,
@@ -1600,6 +1603,7 @@
                             noSmellTasteLabel: noSmellTasteLabel,
                             shortBreathLabel: shortBreathLabel,
                             soarThroatLabel: soarThroatLabel,
+                            bodyTempLabel: bodyTempLabel,
                             etcLabel: etcLabel,
                             ownerLabel: ownerLabel,
                             reporterLabel: reporterLabel,
@@ -1628,6 +1632,7 @@
                         _views.shortBreathLabel.addClass(_model.short_breath ? 'warn' : '');
                         _views.soarThroatLabel.text(_model.soar_throat ? 'Yes' : 'No');
                         _views.soarThroatLabel.addClass(_model.soar_throat ? 'warn' : '');
+                        _views.bodyTempLabel.text(_.isNumber(_model.bt) ? _model.bt + '\xB0' : 'N/A');
                         _views.etcLabel.text(_model.etc || 'N/A');
                         _views.timeLabel.text(new Date(_model.ts.seconds * 1000).toLocaleString());
 

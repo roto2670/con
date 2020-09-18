@@ -239,6 +239,12 @@
 .user-item-container {
     width: 100%;
 }
+.user-item-container-empty {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: 500;
+    color: #6b6b6b;
+}
 
 .user-item {
     width: 100%;
@@ -636,13 +642,13 @@
     text-align: center;
     color: #848484;
 }
-.sr-title-label:nth-child(9) {
-    width: 8em;
-}
 .sr-title-label:nth-child(10) {
     width: 8em;
 }
 .sr-title-label:nth-child(11) {
+    width: 8em;
+}
+.sr-title-label:nth-child(12) {
     width: 10em;
 }
 .report-item {
@@ -664,13 +670,13 @@
     color: #ff2929;
     font-weight: 500;
 }
-.r-value-label:nth-child(9) {
-    width: 8em;
-}
 .r-value-label:nth-child(10) {
     width: 8em;
 }
 .r-value-label:nth-child(11) {
+    width: 8em;
+}
+.r-value-label:nth-child(12) {
     width: 10em;
 }
 
