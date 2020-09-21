@@ -108,3 +108,11 @@
     border-radius: 0.2em;
     margin-bottom: 0.2em;
 }
+
+/* tooltip */
+.tooltip.left .tooltip-inner {
+    background-color: #E0002A !important; 
+}
+.tooltip.left .tooltip-arrow {
+    border-bottom-color: #E0002A !important;
+}

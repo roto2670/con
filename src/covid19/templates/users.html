@@ -17,9 +17,17 @@
 {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
     <div class="top-upper-container">
-        <div class="user-searchbox-container">
-            <input type="text" class="user-serach-box hidden-textfield">
-            <div class="searchbox-icon"></div>
+        <div class="user-filter-container search">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-icn"></div>
+                <div class="user-filter-title-label">Search</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-searchbox-container">
+                    <input type="text" class="user-serach-box hidden-textfield" placeholder="ID">
+                    <div class="searchbox-icon"></div>
+                </div>
+            </div>
         </div>
         <div class="user-filter-container user">
             <div class="user-filter-top-container">
@@ -273,13 +281,21 @@
                 })
 
                 $('.user-serach-box').keypress(function(event) {
-                    let keycode = (event.keyCode ? event.keyCode : event.which);
-                    if(keycode == '13'){
-                        alert('Not ready yet!');  
+                    let _keycode = (event.keyCode ? event.keyCode : event.which),
+                        _value = $(this).val().trim();
+                    if(_keycode == '13' && _value) {
+                        displayUser(_value);
+                        return;
+                        window.location.hash = '#' + _value;
                     }
                 });
                 $('.searchbox-icon').click(function() {
-                    alert('Not ready yet!');  
+                    let _value = $(this).val().trim();
+                    if(_value) {
+                        displayUser(_value);
+                        return;
+                        window.location.hash = '#' + _value;
+                    }
                 });
 
                 // init filter buttons.
@@ -392,6 +408,8 @@
                                         text: 'Successfully release.'
                                     });
                                     refreshUserList();
+                                }, {
+                                    clinic_status: CLINIC_STATUS_VALUE['none'] // Op release should be set with clinic none
                                 });
                             }
                         } else {
@@ -745,10 +763,11 @@
                 }
             }
 
-            function doUpdateStatus(userIds, type, status, callback) {
+            function doUpdateStatus(userIds, type, status, callback, data) {
+                // TODO: multiple status
                 let _userData = userIds.shift(),
                     _callback = callback || _.noop,
-                    _data = {},
+                    _data = _.extend({}, data),
                     _pass = false;
                 if (_userData) {
                     if (type === STATUS_TYPE.CLINIC) {
@@ -771,12 +790,12 @@
                         _db.collection('users').doc(_userData.id).set(_data, {
                             merge: true
                         }).then(function() {
-                            doUpdateStatus(userIds, type, status, callback);
+                            doUpdateStatus(userIds, type, status, callback, data);
                         }).catch(function() {
-                            doUpdateStatus(userIds, type, status, callback);
+                            doUpdateStatus(userIds, type, status, callback, data);
                         });
                     } else {
-                        doUpdateStatus(userIds, type, status, callback);
+                        doUpdateStatus(userIds, type, status, callback, data);
                     }
                 } else {
                     _callback();
@@ -805,13 +824,12 @@
                                     }
                                 });
                                 container.append(userItem.render());
-
-                                _loadingUsers = false;
                                 callback();
                             } else {
-                                container.append('<div class="user-item-cotainer-empty">No users.</div>');
+                                container.append('<div class="user-item-container-empty">No users</div>');
                                 console.warn('Failed to display user for ' + userId);
                             }
+                            _loadingUsers = false;
                         });
                     } else {
                         console.debug("Already loading users.");
@@ -869,7 +887,10 @@
                 _db.collection('users').doc(userId).get().then(function(snapshot) {
                     if (!!snapshot) {
                         let user = snapshot.data();
-                        user.documentId = userId;
+                        if (user) {
+                            user.documentId = userId;
+                        }
+
                         callback(user);
                     } else {
                         callback();
@@ -989,7 +1010,28 @@
 
 
             function UserItem(model, callbacks) {
-                var _model = model,
+                const PRE_MED_DISPLAY = {
+                    diabetes: 'Diabetes',
+                    obesity: 'Obesity',
+                    hypertension: 'Hypertension',
+                    respiratory: 'Respiratory problems',
+                    allergic: 'Allergic Rhinitis',
+                    asthma: 'Bronchial Asthma',
+                    epilepsy: 'Epilepsy',
+                    sinusitis: 'Sinusitis',
+                    psychiatric: 'Psychiatric Illness',
+                    hepatitis: 'Hepatitis',
+                    hiv: 'HIV',
+                    tuberculosis: 'Tuberculosis',
+                    arthritis: 'Arthritis',
+                    heart_failure: 'Heart Failure',
+                    chronic_liver: 'Chronic Liver Disease',
+                    ischemic_heart: 'Ischemic Heart Disease',
+                    active_cancer: 'Active Cancer Patient',
+                    chronic_renal: 'Chronic Renal Disease'
+                };
+
+                let _model = model,
                     _views = {},
                     _callbacks = callbacks || {
                         selectedHistory: _.noop,
@@ -1001,7 +1043,7 @@
                     let checkbox = $('<input type="checkbox" class="user-item-checkbox">');
                     let profile = $('<div class="user-item-avatar">');
                     let nameCell = $('<div class="user-item-cell name">'),
-                        nameLabel = $('<div class="user-item-name-label">')
+                        nameLabel = $('<div class="user-item-name-label">');
                         idLabel = $('<div class="user-item-id-label">');
                     let statusCell = $('<div class="user-item-cell status">'),
                         statusLabel = $('<div class="user-item-label status">'),
@@ -1020,7 +1062,8 @@
                         appInstalledLabel = $('<div class="user-item-label app-installed">');
                     let commandsCell = $('<div class="user-item-cell commands">'),
                         historyButton = $('<div class="user-item-btn history">'),
-                        selfReportsButton = $('<div class="user-item-btn self-reports">');
+                        selfReportsButton = $('<div class="user-item-btn self-reports">'),
+                        preMedButton = $('<div class="user-item-btn pre-med" data-placement="left"">');
                     
                     container.append(nameCell, statusCell, genderLabel, nationalLabel,
                         employerLabel, campLabel, roomLabel, phoneLabel, departmentLabel, locateLabel, jobContainer,
@@ -1028,7 +1071,9 @@
                     nameCell.append(checkbox, profile, nameLabel, idLabel);
                     statusCell.append(statusLabel);
                     jobContainer.append(jobCat1Label, jobCat2Label);
-                    commandsCell.append(historyButton, selfReportsButton);
+                    commandsCell.append(historyButton, selfReportsButton, preMedButton);
+
+                    preMedButton.tooltip();
 
                     // Store id.
                     container.attr('uid', model.documentId);
@@ -1048,6 +1093,7 @@
                         checkbox: checkbox,
                         profile: profile,
                         nameLabel: nameLabel,
+                        preMedButton: preMedButton,
                         idLabel: idLabel,
                         statusLabel: statusLabel,
                         genderLabel: genderLabel,
@@ -1079,6 +1125,29 @@
                             _views.profile.css('background-image', 'url(' + profileUrl + ')');
                         })
                         .attr('src', profileUrl);
+                    
+                    // handle pre medical info
+                    if (_.isArray(model.pre_med_conds)) {
+                        _views.preMedButton.show();
+                        let _preMedMessage = '',
+                            _key,
+                            _display;
+                        _.each(model.pre_med_conds, function(info) {
+                            _key = info.replace('sign_in.form.', '');
+                            _display = PRE_MED_DISPLAY[_key];
+                            if (_display) {
+                                _preMedMessage +=  _display + ', ';
+                            } else {
+                                console.warn('Failed to parse pre medical codition, unknown key.', info);
+                            }
+                        });
+                        _preMedMessage = _preMedMessage.slice(0, -2);
+
+                        _views.preMedButton.attr('data-original-title', _preMedMessage);
+                    } else {
+                        _views.preMedButton.hide();
+                        _views.preMedButton.attr('data-original-title', '');
+                    }
 
                     _views.nameLabel.text(model.fullname || '-');
                     _views.idLabel.text('');

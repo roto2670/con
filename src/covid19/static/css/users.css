@@ -11,7 +11,8 @@
 
 .user-searchbox-container {
     height: 3em;
-    display: none; /* original flex */
+    font-size: 0.8em;
+    display: flex;
     border: 1px solid #EF8009;
     padding: 0.2em 0.4em;
     border-radius: 0.3em;
@@ -22,6 +23,7 @@
 .searchbox-icon {
     width: 1.8em;
     height: 1.8em;
+    cursor: pointer;
     background-image: url(../img/icn_search.svg);
     background-size: 100% 100%;
     background-repeat: no-repeat;
@@ -52,6 +54,9 @@
     background-position: center;
     box-sizing: border-box;
     margin-right: 0.4em;
+}
+.search .user-filter-title-icn {
+    background-image: url(../img/icn_user_search_filter.svg);
 }
 .user .user-filter-title-icn {
     background-image: url(../img/icn_user_filter.svg);
@@ -234,6 +239,8 @@
     /* lang */
 }
 .user-item-header-label:nth-last-child(1) {
+    /* commands */
+    width: 9em;
 }
 
 .user-item-container {
@@ -310,6 +317,7 @@
     flex-wrap: nowrap;
 }
 .user-item-cell.commands {
+    width: 9em;
     justify-content: center;
 }
 .user-item-label {
@@ -352,13 +360,19 @@
     border-radius: 0.2em;
     cursor: pointer;
     box-shadow: 1px 1px #c1c1c1;
+    margin-left: 0.4em;
+}
+.user-item-btn:nth-child(1) {
+    margin-left: 0;
 }
 .user-item-btn.history {
     background-image: url(../img/icn_history.svg);
 }
 .user-item-btn.self-reports {
-    margin-left: 1em;
     background-image: url(../img/icn_checkbox.svg);
+}
+.user-item-btn.pre-med {
+    background-image: url(../img/icn_pre_medical.svg);
 }
 
 .user-item-locate-container {
