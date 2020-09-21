@@ -124,7 +124,7 @@ class _Work(db.Model):
   blast_id = Column(String(75), ForeignKey('_blast.id'))
   work_history_list = relationship("_WorkHistory", backref="work",
                                    cascade="all, delete",
-                                   order_by="desc(_WorkHistory.created_time)")
+                                   order_by="desc(_WorkHistory.timestamp)")
   pause_history_list = relationship("_PauseHistory", backref="work",
                                     cascade="all, delete",
                                     order_by="desc(_PauseHistory.created_time)")

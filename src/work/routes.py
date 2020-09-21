@@ -587,7 +587,6 @@ def add_completed_work():
     send_request(BLAST_UPDATE, [_blast_data])
     _create_start_work_log(data)
     _create_finish_work_log(data)
-
     return json.dumps(True)
   except:
     logging.exception("Fail to add work.")
@@ -952,6 +951,102 @@ def stop_work():
     return json.dumps(ret)
   except:
     logging.exception("Failed to stop work. Data : %s", data)
+    return json.dumps(False)
+
+
+@blueprint.route('/work/stop/completed', methods=["POST"])
+@util.require_login
+def stop_completed_work():
+  pre_timestamp = None
+  post_timestamp = None
+  total_pause_time = 0
+  data = request.get_json()
+  try:
+    work_data = work_apis.get_work(data['work_id'])
+    blast_data = work_apis.get_blast(work_data.blast_id)
+    start_timestamp = data['start_time']
+    end_timestamp = data['end_time']
+    data['start_time'] = datetime.datetime.fromtimestamp(data['start_time'])
+    data['end_time'] = datetime.datetime.fromtimestamp(data['end_time'])
+    pause_data = work_apis.create_pause_history(data)
+    send_request(PAUSE_HISTORY_ADD,
+                 [_convert_dict_by_pause_history(pause_data)])
+
+    work_history_list = work_apis.get_work_history_list_by_work(data['work_id'])
+    for work in work_history_list:
+      if work.timestamp > data['start_time']:
+        index = work_history_list.index(work)
+        pre_timestamp = time.mktime(work_history_list[index - 1].timestamp.
+                                    timetuple())
+        history_id = work.id
+        break
+
+    pre_work_history = work_history_list[index - 1]
+    history_data = {}
+    history_data['typ'] = data['typ']
+    history_data['state'] = WORK_STATE_STOP
+    history_data['timestamp'] = data['start_time']
+    history_data['work_id'] = data['work_id']
+    history_data['accum_time'] = pre_work_history.accum_time +\
+                                 start_timestamp - int(pre_timestamp)
+    tmp_accum_time = history_data['accum_time']
+    work_apis.create_work_history(history_data)
+
+    for work in work_history_list:
+      if work.timestamp > data['end_time']:
+        index = work_history_list.index(work)
+        post_timestamp = time.mktime(work_history_list[index].timestamp.
+                                     timetuple())
+        history_id = work.id
+        break
+
+    history_data = {}
+    history_data['typ'] = data['typ']
+    history_data['work_id'] = data['work_id']
+    if end_timestamp == post_timestamp:
+      history_data['id'] = history_id
+      history_data['accum_time'] = tmp_accum_time
+      work_apis.update_work_history(history_data)
+    else:
+      history_data['state'] = WORK_STATE_IN_PROGRESS
+      history_data['timestamp'] = data['end_time']
+      history_data['accum_time'] = tmp_accum_time
+      work_apis.create_work_history(history_data)
+      history_data = {}
+      history_data['id'] = history_id
+      history_data['typ'] = data['typ']
+      history_data['work_id'] = data['work_id']
+
+      if pre_work_history.state == 1 and pre_work_history.accum_time == 0:
+        history_data['accum_time'] = (int(post_timestamp) - end_timestamp) + \
+                                     (start_timestamp - int(pre_timestamp))
+      else:
+        history_data['accum_time'] = pre_work_history.accum_time + \
+                                     (int(post_timestamp) - end_timestamp) + \
+                                     (start_timestamp - int(pre_timestamp))
+      work_apis.update_work_history(history_data)
+
+      pause_list = work_apis.get_pause_history_list_by_work(data['work_id'])
+      for pause_data in pause_list:
+        total_pause_time += pause_data.accum_time
+      work_accum_time = work_data.accum_time - data['accum_time']
+
+    ret_work_data = work_apis.update_state_and_accum(data['work_id'],
+                                                     work_data.state,
+                                                     work_accum_time,
+                                                     total_pause_time)
+    send_request(WORK_UPDATE, [_convert_dict_by_work(ret_work_data)])
+
+    ret_blast_data = work_apis.update_blast_state_and_accum(blast_data.id,
+                                                            blast_data.state,
+                                                            work_accum_time,
+                                                            data['category'],
+                                                            True)
+    send_request(BLAST_UPDATE, [_convert_dict_by_blast(ret_blast_data)])
+
+    return json.dumps(True)
+  except:
+    logging.exception("Fail to adding stop work data.")
     return json.dumps(False)
 
 
@@ -1381,8 +1476,8 @@ def get_work_search_page():
     end_time = ":".join(datetime_list[1].split(",")[3:])
     start = "{} {}".format(start_date, start_time)
     end = "{} {}".format(end_date, end_time)
-    return render_template("search_work.html", data=data,
-                           work_list=work_list, activity_list=ACTIVITY_NAME,
+    return render_template("search_work.html", data=data, work_list=work_list,
+                           activity_list=ACTIVITY_NAME,
                            start_date=start, end_date=end)
 
 
