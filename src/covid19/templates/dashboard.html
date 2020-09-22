@@ -78,7 +78,7 @@
             </div>
         </div>
 
-        <div class="w-middle-container">
+        <div class="w-middle-container upper">
             <div class="status-widget actptv small">
                 <div class="status-w-left-container">
                     <div class="status-widget-icon actptv"></div>
@@ -132,10 +132,66 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="status-widget suspected small">
+        <div class="w-middle-container lower">
+            <div class="status-widget close-contact small">
                 <div class="status-w-left-container">
-                    <div class="status-widget-icon suspected"></div>
+                    <div class="status-widget-icon close-contact"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Close contacts
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget symptomatics small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon symptomatics"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Suspected<br>Symptom
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget hospitalized small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon hospitalized"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">
+                        Hospitalized
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-widget self-asse small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon self-asse"></div>
                 </div>
                 <div class="status-w-right-container">
                     <div class="status-w-right-upper-container">
@@ -146,7 +202,7 @@
                         </div>
                     </div>
                     <div class="status-w-right-lower-container status-w-title-label">
-                        Suspected
+                        Self-Assessments
                     </div>
                 </div>
             </div>
@@ -319,7 +375,11 @@
                 $('.status-widget.actptv .status-w-value-label').text(getStatDisplayName(stats.active_positives));
                 $('.status-widget.quarantined .status-w-value-label').text(getStatDisplayName(stats.quarantined));
                 $('.status-widget.isolated .status-w-value-label').text(getStatDisplayName(stats.isolated));
-                $('.status-widget.suspected .status-w-value-label').text(getStatDisplayName(stats.suspected));
+
+                $('.status-widget.close-contact .status-w-value-label').text(getStatDisplayName(stats.close_contacts));
+                $('.status-widget.symptomatics .status-w-value-label').text(getStatDisplayName(stats.symptomatics));
+                $('.status-widget.hospitalized .status-w-value-label').text(getStatDisplayName(stats.hospitalized));
+                $('.status-widget.self-asse .status-w-value-label').text(getStatDisplayName(stats.selfassessments));
 
                 // handle alert phase
                 if (stats.alert_phase == 0) {

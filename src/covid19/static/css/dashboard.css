@@ -153,6 +153,18 @@
 .status-widget-icon.uae {
     background-image: url(../img/icn_uae.svg);
 }
+.status-widget-icon.close-contact {
+    background-image: url(../img/icn_close_contact.svg);
+}
+.status-widget-icon.symptomatics {
+    background-image: url(../img/icn_symptomatics.svg);
+}
+.status-widget-icon.hospitalized {
+    background-image: url(../img/icn_hospitalized.svg);
+}
+.status-widget-icon.self-asse {
+    background-image: url(../img/icn_self_asse.svg);
+}
 
 .status-w-right-container {
     margin-left: auto;
@@ -212,7 +224,8 @@
     overflow: hidden;
 }
 .small .status-w-title-label {
-    font-size: 2em
+    font-size: 2em;
+    line-height: 0.8em;
 }
 
 .alert-item {
