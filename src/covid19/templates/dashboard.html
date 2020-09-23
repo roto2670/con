@@ -16,12 +16,14 @@
 
 {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
-    <div class="sub-title-container">
+    <div class="sub-title-container status-container">
         Overview
+        <div class="status-maximize-btn"></div>
     </div>
 
     <!-- Status widget -->
     <div class="content-container status-widgets">
+        <div class="status-minimize-btn"></div>
         <div class="w-upper-container">
             <div class="status-widget confirmed">
                 <div class="status-w-left-container">
@@ -320,6 +322,16 @@
                         _this.removeClass('loading');
                     });
                 });
+
+                // handle maximize and minimize.
+                $('.status-maximize-btn').click(function() {
+                    $('.status-widgets').addClass('maximize');
+                    $('.status-minimize-btn').show();
+                });
+                $('.status-minimize-btn').click(function() {
+                    $('.status-widgets').removeClass('maximize');
+                    $('.status-minimize-btn').hide();
+                });
             }
 
             function initSnapshots() {
@@ -348,6 +360,10 @@
             }
 
             function display() {
+                // defaults minimize
+                $('.status-widgets').removeClass('maximize');
+                $('.status-minimize-btn').hide();
+
                 loadStats(function(today, yesterday) {
 
                     updateStats(today);

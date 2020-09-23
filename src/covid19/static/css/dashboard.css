@@ -1,3 +1,46 @@
+.status-container {
+    display: flex;
+    align-items: center;
+}
+.status-widgets {
+    transition: all 300ms ease;
+}
+.status-widgets.maximize {
+    z-index: 10000;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: white;
+    margin: 0;
+    padding: 1em;
+}
+.status-maximize-btn {
+    width: 1em;
+    height: 1em;
+    cursor: pointer;
+    margin-left: auto;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url(../img/icn_fullscreen.svg);
+    box-sizing: border-box;
+    margin-right: 0.4em;
+}
+.status-minimize-btn {
+    width: 1.8em;
+    height: 1.8em;
+    cursor: pointer;
+    margin-left: auto;
+    margin-bottom: 0.8em;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url(../img/icn_minimize.svg);
+    box-sizing: border-box;
+    margin-right: 0.4em;
+}
 .w-upper-container {
     width: 100%;
     display: flex;
