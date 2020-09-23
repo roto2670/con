@@ -33,7 +33,7 @@
     margin: 0 0.4em;
 }
 .status-widget.small {
-    height: 8em;
+    height: 9.4em;
 }
 .status-widget.wide {
     flex-grow: 2;
@@ -225,7 +225,8 @@
 }
 .small .status-w-title-label {
     font-size: 2em;
-    line-height: 0.8em;
+    word-break: break-word;
+    line-height: 1.2em;
 }
 
 .alert-item {

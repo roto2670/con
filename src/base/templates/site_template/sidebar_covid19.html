@@ -5,6 +5,21 @@
   .sk-sub {
     background-color: #EF8009;
   }
+  .menu-profile {
+    position: absolute;
+    bottom: 1em;
+    width: 100%;
+    padding: 0 1em;
+    text-align: center;
+    color: #e6e6e6;
+  }
+  .mf-name-label {
+    font-weight: 500;
+  }
+  .mf-id-label {
+    font-size: 0.8em;
+    color: #d8d8d8;
+  }
 </style>
 
 <div class="left_col scroll-view">
@@ -62,6 +77,11 @@
         {% endif %}
       </ul>
     </div>
+
+    <div class="menu-profile">
+      <div class="mf-name-label"></div>
+      <div class="mf-id-label"></div>
+    </div>
   </div>
 </div>
 
@@ -98,28 +118,18 @@
     // Try get logged user first.
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
+        displayProfile();
         console.debug('Logged user, skip custom login');
       } else {
         console.log('There is no logged user, try custom login without cache.');
-        authToFirebase();
+        authToFirebase(function() {
+          displayProfile();
+        });
       }
     });
 
-{# 
-    let token = localStorage.getItem(TOKEN_KEY);
-    if (!!token) {
-      console.debug('Try firebase login by token from storage');
-      firebase.auth().signInWithCustomToken(token).catch(function(error) {
-        console.warn('Failed login to firebase from cache token, try refresh token.', error.code, error.message);
-        authToFirebase();
-      });
-    } else {
-      console.debug('There is no auth token in storage, try to issue.');
-      authToFirebase();
-    }
- #}
-
-    function authToFirebase() {
+    function authToFirebase(callback) {
+      let _callback = callback || _.noop;
       let functions = firebase.app().functions('asia-east2'),
         auth = functions.httpsCallable('auth'),
         emiratesId = '{{current_user.emirates_id | safe}}',
@@ -134,16 +144,34 @@
         'code': 'web!-adMIN-P2rm',
         'device_id': 'web'
       }).then(function(result) {
-        firebase.auth().signInWithCustomToken(result.data.token).catch(function(error) {
-          console.error('Firebase login was fail.', error.code, error.message);
-        });
-
-        // TODO: move in auth success
-        // Set in local storage
-        localStorage.setItem(TOKEN_KEY, result.data.token);
+        firebase.auth().signInWithCustomToken(result.data.token)
+          .then(function() {
+            displayProfile();
+            console.log('Firebase custom login success.');
+          })
+          .catch(function(error) {
+            console.error('Firebase login was fail.', error.code, error.message);
+          });
       });
     }
 
+    function displayProfile() {
+      let _currentUser = firebase.auth().currentUser;
+      if (_currentUser) {
+        firebase.firestore().collection('users').doc(_currentUser.uid).get().then(function(doc) {
+            let user = doc.data();
+            if (user) {
+              $('.mf-name-label').text(user.fullname);
+              $('.mf-id-label').text(doc.id);
+            } else {
+              console.warn('Failed to display current user\'s profile by cannot found current user by given id.',
+                _currentUser.uid);
+            }
+        });
+      } else {
+        console.warn('Failed to display current user\'s profile by cannot found current user.');
+      }
+    }
   })();
 </script>
 {% endblock javascripts %}

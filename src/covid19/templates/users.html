@@ -1127,7 +1127,7 @@
                         .attr('src', profileUrl);
                     
                     // handle pre medical info
-                    if (_.isArray(model.pre_med_conds)) {
+                    if (_.isArray(model.pre_med_conds) && !_.isEmpty(model.pre_med_conds)) {
                         _views.preMedButton.show();
                         let _preMedMessage = '',
                             _key,
@@ -1143,7 +1143,12 @@
                         });
                         _preMedMessage = _preMedMessage.slice(0, -2);
 
-                        _views.preMedButton.attr('data-original-title', _preMedMessage);
+                        if (_preMedMessage.trim().length > 0) {
+                            _views.preMedButton.show();
+                            _views.preMedButton.attr('data-original-title', _preMedMessage);
+                        } else {
+                            _views.preMedButton.hide();
+                        }
                     } else {
                         _views.preMedButton.hide();
                         _views.preMedButton.attr('data-original-title', '');

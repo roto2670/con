@@ -114,5 +114,5 @@
     background-color: #E0002A !important; 
 }
 .tooltip.left .tooltip-arrow {
-    border-bottom-color: #E0002A !important;
+    border-left-color: #E0002A !important;
 }

@@ -904,7 +904,12 @@
                     });
                     closeButton.click(function() {
                         hide();
-                    })
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
 
                     sendButton.click(function() {
                         let title = titleTextbox.val(),
@@ -981,7 +986,12 @@
                     });
                     closeButton.click(function() {
                         hide();
-                    })
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
 
                     sendButton.click(function() {
                         let message = messageTextarea.val();
@@ -1045,7 +1055,12 @@
                     });
                     closeButton.click(function() {
                         hide();
-                    })
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
 
                     container.append(contentContainer);
                     contentContainer.append(closeButton, fromNameTitleLabel, fromNameValueLabel, fromTitleTitleLabel,
@@ -1121,7 +1136,12 @@
                     });
                     closeButton.click(function() {
                         hide();
-                    })
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
 
                     container.append(contentContainer);
                     contentContainer.append(closeButton, resolverTitleLabel, resolverValueLabel, typeTitleLabel,

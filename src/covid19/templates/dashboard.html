@@ -545,6 +545,15 @@
                 }
             }
 
+            function isIPUrl() {
+                return isIP(window.location.origin);
+            }
+
+            function isIP( address ){ 
+                r = RegExp('^http[s]?:\/\/((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])');
+                return r.test( address )
+            }
+
             function StatItem(value, displayName) {
                 function render () {
                     return ;
@@ -556,6 +565,13 @@
             }
 
             function AlertItem(model, callbacks) {
+                const DOWNLOAD_URL_BUILDERS = {
+                        INTERNAL: _.template('//172.16.5.8:8888/image/image/<%= id %>'),
+                        EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/image/<%= id %>')
+                    },
+                    // DOWNLOAD_URL_BUILDER = isIPUrl() ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
+                    DOWNLOAD_URL_BUILDER = DOWNLOAD_URL_BUILDERS.EXTERNAL;
+
                 let _model = model,
                     _callbacks = callbacks || {
                         goToUser: _.noop
@@ -610,7 +626,9 @@
                     _views.nameLabel.text(model.from_name || '');
 
                     // load profile image
-                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + model.from_user;
+                    let profileUrl = DOWNLOAD_URL_BUILDER({
+                        id: model.from_user
+                    });
                     $('<img/>')
                         .load(function() {
                             _views.profile.css('background-image', 'url(' + profileUrl + ')');

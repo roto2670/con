@@ -52,25 +52,31 @@
 
 {% block javascripts %}
     {{ super() }}
+    <script src="static/js/vendor/moment/moment.min.js"></script>
+    <script src="static/js/vendor/moment/moment-timezone-with-data.min.js"></script>
     <script>
         (function() {
-            const MANUAL_STATS_KEY_LIST = ["confirmed", "deaths", "recovered", "suspected", "active_positives",
-                "quarantined", "isolated", "country_total_cases", "country_total_deaths", "stringency_index", 
-                "headcount", "alert_phase"],
+            const MANUAL_STATS_KEY_LIST = ["confirmed", "deaths", "recovered", "active_positives",
+                "quarantined", "isolated", "hospitalized", "country_total_cases", "country_total_deaths",
+                "stringency_index", "headcount", "alert_phase"],
                 MANUAL_STATS_DISPLAY = {
                     'confirmed': 'Confirmed',
                     'deaths': 'Deaths',
                     'recovered': 'Recovered',
-                    'suspected': 'Suspected',
                     'active_positives': "Active/Positive",
                     'quarantined': 'Quarantined',
                     'isolated': 'Isolated',
+                    'close_contacts': 'Close Contacts',
+                    'symptomatics': 'Suspected symptom',
+                    'hospitalized': 'Hospitalized',
+                    'selfassessments': 'Self-Assessments',
                     'country_total_cases': 'UAE Total cases',
                     'country_total_deaths': 'UAE Total deaths',
                     'stringency_index': 'Stringency Index',
                     'headcount': 'Headcount',
                     'alert_phase': 'Alert Phase'
-                };
+                },
+                TIMEZONE = 'Asia/Dubai';
 
             let _db = firebase.firestore(),
                 _stats,
@@ -238,15 +244,17 @@
             function isFutureDay(source, target) {
                 let result = false;
                 if (source && target)  {
-                    let sourceFullYear = source.getFullYear(),
-                        sourceMonth = source.getMonth(),
-                        sourceDate = source.getDate(),
-                        targetFullYear = target.getFullYear(),
-                        targetMonth = source.getMonth(),
-                        targetDate = source.getDate();
+                    let convertedSource = moment(source).tz(TIMEZONE),
+                        convertedTarget = moment(target).tz(TIMEZONE);
+                    let sourceFullYear = convertedSource.year(),
+                        sourceMonth = convertedSource.month(),
+                        sourceDate = convertedSource.day(),
+                        targetFullYear = convertedTarget.year(),
+                        targetMonth = convertedTarget.month(),
+                        targetDate = convertedTarget.day();
 
                     return sourceFullYear < targetFullYear || sourceMonth < targetMonth ||
-                        sourceDate || targetDate;
+                        sourceDate < targetDate;
                 } else {
                     console.warn('Cannot check date by given source or target is null.');
                 }
