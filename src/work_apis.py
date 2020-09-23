@@ -233,20 +233,30 @@ def update_blast(data):
   return _data
 
 
-def update_blast_state_and_accum(blast_id, state, accum_time, category):
+def update_blast_state_and_accum(blast_id, state, accum_time, category,
+                                 completed=None):
   cur_time = get_servertime()
   data = get_blast(blast_id)
   data.state = state
-  data.accum_time += accum_time
-  if category == 0:
-    # Main Work
-    data.m_accum_time += accum_time
-  elif category == 1:
-    # Supporting
-    data.s_accum_time += accum_time
+  if completed:
+    data.accum_time = accum_time
+    if category == 0:
+      # Main Work
+      data.m_accum_time = accum_time
+    elif category == 1:
+      # Supporting
+      data.s_accum_time = accum_time
+    else:
+      # Idle Time
+      data.i_accum_time = accum_time
   else:
-    # Idle Time
-    data.i_accum_time += accum_time
+    data.accum_time += accum_time
+    if category == 0:
+      data.m_accum_time += accum_time
+    elif category == 1:
+      data.s_accum_time += accum_time
+    else:
+      data.i_accum_time += accum_time
   data.last_updated_time = cur_time
   data.last_updated_user = current_user.email
   db.session.commit()
@@ -516,10 +526,15 @@ def create_complete_finish_work_history(data):
 
 def update_work_history(data):
   # TODO:
-  _id = None
+  _id = data['id']
   cur_time = get_servertime()
-  data = get_work_history(_id)
-  data.last_updated_time = cur_time
+  _data = get_work_history(_id)
+  _data.last_updated_time = cur_time
+  _data.typ = data['typ']
+  _data.state = data['state'] if 'state' in data else _data.state
+  _data.timestamp = data['timestamp'] if 'timestamp' in data else _data.timestamp
+  _data.accum_time = data['accum_time']
+  _data.last_updated_user = current_user.email
   db.session.commit()
   return data
 
@@ -537,7 +552,8 @@ def get_work_history(_id):
 
 
 def get_work_history_list_by_work(work_id):
-  data_list = WorkHistory.query.filter_by(work_id=work_id).all()
+  data_list = WorkHistory.query.filter_by(work_id=work_id).\
+      order_by(WorkHistory.timestamp).all()
   return data_list
 
 
