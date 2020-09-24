@@ -202,20 +202,22 @@ def download_current_worker_list(key):
   csv_str = "\uFEFF"
   csv_str += "ID,Name,Group,EntranceTime,WorkingTime\n"
   for k, v in worker_list.items():
-    working_time = base.routes.during_time(v['event_time'])
-    r_str = "{},{},{},{},{}\n".format(v['user_id']['user_id'],
-                                      v['user_id']['name'],
-                                      v['user_group_id']['name'],
-                                      v['event_time'],
-                                      str(working_time).replace(",", " "))
+    if v and v['event_time']:
+      working_time = base.routes.during_time(v['event_time'])
+      r_str = "{},{},{},{},{}\n".format(v['user_id']['user_id'],
+                                        v['user_id']['name'],
+                                        v['user_group_id']['name'],
+                                        v['event_time'],
+                                        str(working_time).replace(",", " "))
     csv_str += r_str
   for k, v in operator_list.items():
-    working_time = base.routes.during_time(v['event_time'])
-    r_str = "{},{},{},{},{}\n".format(v['device_name'],
-                                      v['device_name'],
-                                      count.GADGET_INFO[v['tag']],
-                                      v['event_time'],
-                                      str(working_time).replace(",", " "))
+    if v and v['event_time']:
+      working_time = base.routes.during_time(v['event_time'])
+      r_str = "{},{},{},{},{}\n".format(v['device_name'],
+                                        v['device_name'],
+                                        count.GADGET_INFO[v['tag']],
+                                        v['event_time'],
+                                        str(working_time).replace(",", " "))
     csv_str += r_str
   return _get_download_csv_response(csv_str, filename)
 
@@ -230,13 +232,14 @@ def download_current_equip_list(key):
   csv_str = "\uFEFF"
   csv_str += "Name,Kind,Count,EntranceTiem,WorkingTime\n"
   for k, v in equip_list.items():
-    working_time = base.routes.during_time(v['event_time'])
-    count_kind = "Yes" if v['tag'] in count_equip_list else ""
-    r_str = "{},{},{},{},{}\n".format(v['device_name'],
-                                      count.GADGET_INFO[v['tag']],
-                                      count_kind,
-                                      v['event_time'],
-                                      str(working_time).replace(",", " "))
+    if v and v['event_time']:
+      working_time = base.routes.during_time(v['event_time'])
+      count_kind = "Yes" if v['tag'] in count_equip_list else ""
+      r_str = "{},{},{},{},{}\n".format(v['device_name'],
+                                        count.GADGET_INFO[v['tag']],
+                                        count_kind,
+                                        v['event_time'],
+                                        str(working_time).replace(",", " "))
     csv_str += r_str
   return _get_download_csv_response(csv_str, filename)
 
