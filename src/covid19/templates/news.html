@@ -360,7 +360,8 @@
             function uploadFile(file, callbacks) {
                 let _callbacks = callbacks || {
                     progress: _.noop,
-                    success: _.noop
+                    success: _.noop,
+                    error: _.noop
                 };
                 if (file) {
                     let formData = new FormData();
@@ -385,7 +386,7 @@
                         },
                     });
                 } else {
-                    _callback();
+                    _callbacks.error();
                 }
             }
 

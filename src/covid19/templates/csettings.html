@@ -43,6 +43,39 @@
                 </div>
             </div>
         </div>
+        
+        <!-- for logs -->
+        <div class="setting-content-container">
+            <div class="setting-item">
+                <div class="si-title-label logs nightly" id="nightly">
+                    <i class="fa fa-angle-right nightly" aria-hidden="true"></i>
+                    Nightly
+                </div>
+                <div class="si-content-container logs">
+                    <div class="log-panel nightly">Loading...</div>
+                </div>
+                <div class="si-title-label logs daily" id="daily">
+                    <i class="fa fa-angle-right daily" aria-hidden="true"></i>
+                    Daily
+                </div>
+                <div class="si-content-container logs">
+                    <div class="log-panel daily">Loading...</div>
+                </div>
+                <div class="si-title-label logs weekly" id="weekly">
+                    <i class="fa fa-angle-right wekkly" aria-hidden="true"></i>
+                    Weekly
+                </div>
+                <div class="si-content-container logs">
+                    <div class="log-panel weekly">Loading...</div>
+                </div>
+                <div class="si-title-label logs monthly" id="monthly">
+                    <i class="fa fa-angle-right monthly" aria-hidden="true"></i>
+                    Monthly</div>
+                <div class="si-content-container logs">
+                    <div class="log-panel monthly">Loading...</div>
+                </div>
+            </div>
+        </div>
 
         <div class="setting-content-container hide">
             <div class="setting-item">
@@ -85,6 +118,40 @@
                 }
                 initCodesSnapshotHandler();
             });
+            _.defer(function() {
+                loadLogs();
+            });
+
+
+            function loadLogs() {
+                function _logLog(type, display) {
+                    $.getJSON('https://skec-fujairah.loc8.dev:10443/api/upload/time?id=' + type + '.log', function(data) {
+                        if (data && data.time) {
+                            let timeDisplay = new Date(data.time * 1000).toLocaleString();
+                            $('.si-title-label.' + type).text(display + '(' + timeDisplay + ')');
+
+                            $.get('https://skec-fujairah.loc8.dev:10443/api/download/res/' + type + '.log', function(text) {
+                                if (text) {
+                                    $('.log-panel.' + type).text(text);
+                                }
+                            }).fail(function(error) {
+                                console.warn('Failed to load ' + type + ' logs.', error);
+                                $('.log-panel.' + type).text('Failed to load log.');
+                            });
+                        } else {
+                            $('.log-panel.' + type).text('N/A');
+                        }
+                    }).fail(function() {
+                        $('.log-panel.' + type).text('N/A');
+                    });
+                }
+
+                // Nightly
+                _logLog('nightly', 'Nightly');
+                _logLog('daily', 'Daily');
+                _logLog('weekly', 'Weekly');
+                _logLog('monthly', 'Monthly');
+            }
 
 
             function initHandlers() {
@@ -110,6 +177,30 @@
 
                 $('.si-btn.userid').click(function() {
                     window.alert('Not ready yet!');
+                });
+
+                // handle log buttons
+                $('.si-title-label.logs').click(function() {
+                    let type = $(this).attr('id'),
+                        logPanel = $('.log-panel.' + type),
+                        arrow = $('.fa.' + type);
+                    if (logPanel) {
+                        if (logPanel.hasClass('max')) {
+                            logPanel.removeClass('max');
+                        } else {
+                            logPanel.addClass('max');
+                        }
+                    }
+                    
+                    if (arrow) {
+                        if (arrow.hasClass('fa-angle-right')) {
+                            arrow.removeClass('fa-angle-right');
+                            arrow.addClass('fa-angle-down');
+                        } else {
+                            arrow.addClass('fa-angle-right');
+                            arrow.removeClass('fa-angle-down');
+                        }
+                    }
                 });
             }
 

@@ -37,15 +37,26 @@
         <!-- Upload box -->
         <div class="title-container">
             <div class="title-icon tests"></div>
-            <div class="title-label">Tests</div>
+            <div class="title-label">Master File</div>
         </div>
         <div class="upload-container">
             <div class="upload-icon"></div>
             <div class="desc-label">Drag & Drop a file containing data to upload</div>
             <div class="or-label">or</div>
-            <div class="browse-button btn">Browse (.csv)</div>
+            <input type="file" class="browse-button btn" accept=".csv"><div>Only (.csv) file</div>
         </div>
-        <div class="submit-button btn">Submit</div>
+        <div class="buttons-container">
+            <div class="submit-button btn">Submit</div>
+            <div class="submit-button-loader loader hide"></div>
+            <div class="users-download-btn"></div>
+        </div>
+        <div class="log-panel users hide">
+            <div class="log-panel-title">
+                <i class="fa fa-angle-right users-log" aria-hidden="true"></i>
+                Logs
+            </div>
+            <div class="log-panel-value"></div>
+        </div>
     </div>
 </div>
 {% endblock content %}
@@ -77,6 +88,15 @@
                     'alert_phase': 'Alert Phase'
                 },
                 TIMEZONE = 'Asia/Dubai';
+            const UPLOAD_URL_BUILDER = {
+                    USERS: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/csv?id=<%= name %>')
+                },
+                USERS_DOWNLOAD_URL = 'https://skec-fujairah.loc8.dev:10443/api/download/res/users.log';
+            const USERS_UPLOAD_ERROR_MESSAGE = {
+                '-1': 'Failed to apply master file. It\'s an unknown error.',
+                0: 'Failed to apply master file. The master file seems to invalid. See logs.',
+                1: 'An error occurred while applying the master file. See logs.'
+            };
 
             let _db = firebase.firestore(),
                 _stats,
@@ -93,6 +113,16 @@
                 _statsDate = new Date(stats.ts.seconds * 1000);
 
                 buildStatsItems(stats);
+            });
+            // make download link for users.csv if has
+            $.getJSON('https://skec-fujairah.loc8.dev:10443/api/upload/time?id=users.csv', function(data) {
+                if (data && data.time) {
+                    $('.users-download-btn').text('Last upload: ' + new Date(data.time * 1000).toLocaleString());
+                }
+            });
+            // Load users logs.
+            _.defer(function() {
+                loadUsersLog();
             });
 
 
@@ -239,7 +269,195 @@
                         });
                     }
                 });
+
+                // for upload csv
+                $('.browse-button').change(function() {
+                    let file = _.first($(this).prop('files'));
+                });
+                $('.submit-button').click(function() {
+                    if (!window.confirm('Are you sure you want to upload the master file?')) {
+                        return;
+                    }
+                    let localTime = moment().tz(TIMEZONE);
+                    if (localTime.hour() == 0) {
+                        new PNotify({
+                            type: 'notice',
+                            text: 'Master file cannot be applied from 0:00 AM to 1:00 AM. Please try again later. '
+                        });
+                        return;
+                    }
+
+                    let file = _.first($('.browse-button').prop('files'));
+
+                    // check extenstion.
+                    if (file) {
+                        // clear file
+                        $('.browse-button').val('');
+
+                        // check file extention
+                        if (_.first((/[.]/.exec(file.name)) ? /[^.]+$/.exec(file.name) : null) == 'csv' || file.type != 'text/csv') {
+                            // do upload
+                            $('.submit-button-loader').removeClass('hide');
+                            $('.submit-button').addClass('hide');
+
+                            uploadFile(file, UPLOAD_URL_BUILDER.USERS({
+                                name: 'users.csv'
+                            }), {
+                                progress: function() {
+                                },
+                                success: function() {
+                                    $('.submit-button-loader').addClass('hide');
+                                    $('.submit-button').removeClass('hide');
+                                    new PNotify({
+                                        type: 'success',
+                                        text: 'The file has been uploaded. The stats will be updated soon.'
+                                    });
+
+                                    loadUsersLog();
+                                },
+                                error: function(reason) {
+                                    $('.submit-button-loader').addClass('hide');
+                                    $('.submit-button').removeClass('hide');
+                                    
+                                    new PNotify({
+                                        type: 'error',
+                                        text: USERS_UPLOAD_ERROR_MESSAGE[reason]
+                                    });
+
+                                    loadUsersLog();
+                                }
+                            });
+                        } else {
+                            new PNotify({
+                                type: 'notice',
+                                text: 'Please upload the csv file.'
+                            });
+                        }
+                    } else {
+                        new PNotify({
+                            type: 'notice',
+                            text: 'Please select a file to upload(.csv)'
+                        });
+                    }
+                });
+                $('.upload-container').on('dragenter', function(event) {
+                    event.preventDefault();
+                    $(this).addClass('hover');
+                });
+                $('.upload-container').on('dragleave', function(event) {
+                    event.preventDefault();
+                    $(this).removeClass('hover');
+                });
+                $('.upload-container').on('dragover', function(event) {
+                    event.preventDefault();
+                    console.log(event.originalEvent.dataTransfer.files);
+                });
+                $('.upload-container').on('drop', function(event) {
+                    event.preventDefault();
+                    $(this).removeClass('hover');
+
+                    let file = _.first(event.originalEvent.dataTransfer.files);
+                    if (_.first((/[.]/.exec(file.name)) ? /[^.]+$/.exec(file.name) : null) != 'csv' && file.type != 'text/csv') {
+                        new PNotify({
+                            type: 'notice',
+                            text: 'Please upload the csv file.'
+                        });
+                    } else {
+                        $('.browse-button').prop('files', event.originalEvent.dataTransfer.files);
+                    }
+                });
+
+                // download csv
+                $('.users-download-btn').click(function() {
+                    downloadURI('https://skec-fujairah.loc8.dev:10443/api/download/csv/users.csv');
+                });
+
+                // log panel
+                $('.log-panel-title').click(function() {
+                    let valuePanel = $('.log-panel-value'),
+                        arrow = $('.fa.users-log');
+                    if (valuePanel.hasClass('max')) {
+                        valuePanel.removeClass('max');
+                    } else {
+                        valuePanel.addClass('max');
+                    }
+
+                    if (arrow) {
+                        if (arrow.hasClass('fa-angle-right')) {
+                            arrow.removeClass('fa-angle-right');
+                            arrow.addClass('fa-angle-down');
+                        } else {
+                            arrow.addClass('fa-angle-right');
+                            arrow.removeClass('fa-angle-down');
+                        }
+                    }
+                });
             }
+
+            function loadUsersLog() {
+                // Load users logs.
+                $.get('https://skec-fujairah.loc8.dev:10443/api/download/res/users.log', function(text) {
+                    $('.log-panel.users').removeClass('hide');
+                    $('.log-panel.users').children('.log-panel-value').text(text);
+                });
+            }
+
+            function uploadFile(file, url, callbacks) {
+                let _callbacks = callbacks || {
+                    progress: _.noop,
+                    success: _.noop,
+                    error: _.noop
+                };
+                if (file) {
+                    let formData = new FormData();
+                    formData.append('file', file, file.name); 
+
+                    $.ajax({
+                        url: url,
+                        data: formData,
+                        type: 'post',
+                        contentType: false,
+                        processData: false,
+                        xhr: function() {
+                            let xhr = $.ajaxSettings.xhr();
+                            xhr.upload.onprogress = function(event) {
+                                _callbacks.progress(event.loaded * 100 / event.total);
+                            }
+
+                            return xhr;
+                        },
+                        success: function(result) {
+                            let resultCode = -1;
+                            try {
+                                let parsed = $.parseJSON(result);
+                                resultCode = _.isNumber(parsed.code) ? parsed.code : -1;
+                            } catch(error) {
+                                console.warn('Failed to parse upload result', error);
+                            }
+                            
+                            if (resultCode == 0) {
+                                _callbacks.success(resultCode);
+                            } else {
+                                _callbacks.error(resultCode);
+                            }
+                        },
+                    });
+                } else {
+                    _callbacks.error();
+                }
+            }
+            
+            function downloadURI(uri, name) {
+                var link = document.createElement("a");
+                // If you don't know the name or want to use
+                // the webserver default set name = ''
+                link.setAttribute('download', name);
+                link.href = uri;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            }
+
 
             function isFutureDay(source, target) {
                 let result = false;

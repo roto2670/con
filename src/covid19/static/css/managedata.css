@@ -114,6 +114,9 @@
     flex-direction: column;
     align-items: center;
 }
+.upload-container.hover {
+    border: 0.4em dotted #E0002A;
+}
 
 .upload-icon {
     width: 5.5em;
@@ -134,11 +137,65 @@
     font-size: 1.6em;
 }
 
+.buttons-container {
+    width: 100%;
+    position: relative;
+}
+
 .browse-button {
     padding: 0.8em 1em;
+    background-color: inherit !important;
+    border: 1px solid #EF8009;
+    color: #636363;
 }
 
 .submit-button {
     padding: 0.8em 2.8em;
     margin-top: 0.4em;
+}
+
+.submit-button-loader {
+    margin: 1em 0 0.8em 1em;
+}
+.users-download-btn {
+    cursor: pointer;
+    color: #EF8009;
+    text-decoration: underline;
+    position: absolute;
+    right: 0;
+    top: 0.8em;
+}
+
+.log-panel {
+    width: 100%;
+}
+.log-panel.users {
+    border-top: 1px solid #d0d0d0;
+    margin-top: 1em;
+}
+.log-panel-title {
+    cursor: pointer;
+    color: #EF8009;
+    font-size: 1em;
+    padding-top: 0.4em;
+    padding-left: 0.4em;
+}
+.users .log-panel-value {
+    width: 100%;
+    font-size: 0.9em;
+    max-height: 0em;
+    overflow: hidden;
+    white-space: pre-line;
+    background-color: #cacaca;
+    border-radius: 0.4em;
+    margin: 0.6em 0;
+    box-sizing: border-box;
+
+    transition: max-height 300ms ease-in-out;
+}
+.users .log-panel-value.max {
+    width: 100%;
+    max-height: 20em;
+    padding: 1em 0.8em;
+    overflow: auto;
 }
