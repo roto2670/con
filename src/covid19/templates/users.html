@@ -179,6 +179,13 @@
 
     <script>
         (function() {
+            const IS_INTERNAL = {{is_internal|tojson}};
+            const DOWNLOAD_URL_BUILDERS = {
+                    INTERNAL: _.template('//172.16.5.8:8888/<%= type %>/<%= id %>'),
+                    EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
+                },
+                DOWNLOAD_URL_BUILDER = IS_INTERNAL? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
+
             const STATUS_DISPLAY = {
                 '0': 'Not Registered',
                 '1': 'On Duty',
@@ -1119,7 +1126,10 @@
                     _model = model;
 
                     // load profile image
-                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + model.documentId;
+                    let profileUrl = DOWNLOAD_URL_BUILDER({
+                        type: 'image',
+                        id: model.documentId
+                    });
                     $('<img/>')
                         .load(function() {
                             _views.profile.css('background-image', 'url(' + profileUrl + ')');
@@ -1350,7 +1360,6 @@
                 }
 
                 function HistoryItem(model) {
-                    const DOWNLOAD_URL_BUILDER = _.template('https://skec-fujairah.loc8.dev:10443/api/download/file/<%= id %>');
                     const REASON_FOR_TEST_DISPLAY = {
                         1: '1st recovery test',
                         2: '2nd recovery test',
@@ -1496,6 +1505,7 @@
                             let viewItem = $('<div class="shi-attachment">');
                             viewItem.click(function() {
                                 window.open(DOWNLOAD_URL_BUILDER({
+                                    type: 'file',
                                     id: _model.attachment
                                 }));
                             });

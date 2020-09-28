@@ -27,6 +27,9 @@ SERVER_ADDR = {}
 def set_server_addr(local_addr):
   SERVER_ADDR['internal'] = local_addr.strip()
 
+def get_internal_server_addr():
+  return SERVER_ADDR['internal']
+
 
 @blueprint.route('/location/info', methods=["GET"])
 @util.require_login

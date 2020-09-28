@@ -76,6 +76,12 @@
 
     <script>
         (function() {
+            const IS_INTERNAL = {{is_internal|tojson}};
+            const DOWNLOAD_URL_BUILDERS = {
+                    INTERNAL: _.template('//172.16.5.8:8888/<%= type %>/<%= id %>'),
+                    EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
+                },
+                DOWNLOAD_URL_BUILDER = IS_INTERNAL? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
             const PAGE_SIZE = 10, // chunk size
                 MESSAGE_TYPE = {
                     ADMIN: 'admin',
@@ -92,7 +98,6 @@
                     NONE: 0
                 },
                 USER_MENU_URL_PREFIX='users';
-            const DOWNLOAD_URL_BUILDER = _.template('https://skec-fujairah.loc8.dev:10443/api/download/file/<%= id %>');
 
             let _db = firebase.firestore(),
                 _currentUser = null;
@@ -680,7 +685,10 @@
                     }
 
                     // load profile image
-                    let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + profileUserId;
+                    let profileUrl = DOWNLOAD_URL_BUILDER({
+                        type: 'image',
+                        id: profileUserId
+                    });
                     $('<img/>')
                         .load(function() {
                             _views.profile.css('background-image', 'url(' + profileUrl + ')');
@@ -835,7 +843,10 @@
                                 updateName(_reporter.fullname);
 
                                 // load profile image
-                                let profileUrl = 'https://skec-fujairah.loc8.dev:10443/api/download/image/' + _reporter.documentId;
+                                let profileUrl = DOWNLOAD_URL_BUILDER({
+                                    type: 'image',
+                                    id: _reporter.documentId
+                                });
                                 $('<img/>')
                                     .load(function() {
                                         _views.profile.css('background-image', 'url(' + profileUrl + ')');
@@ -850,6 +861,7 @@
                         let viewItem = $('<div class="noty-item-attachment">');
                         viewItem.click(function() {
                             window.open(DOWNLOAD_URL_BUILDER({
+                                type: 'file',
                                 id: attachmentId
                             }));
                         });

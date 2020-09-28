@@ -278,7 +278,8 @@
 
     <script>
         (function() {
-            const STAT_DISPLAY_NAME = {
+            const IS_INTERNAL = {{is_internal|tojson}},
+            STAT_DISPLAY_NAME = {
                 'active_positives': "Active/Positive",
                 'confirmed': "Confirmed",
                 'country_total_cases': "Country Total Cases",
@@ -310,8 +311,10 @@
 
             let _db = firebase.firestore(),
                 _loadingAlerts = false,
-                _lastAlertSnapshot;
-        
+                _lastAlertSnapshot,
+                _currentStats,
+                _yesterdayStats;
+
 
             // Init
             initHandlers();
@@ -354,6 +357,10 @@
                             // update stat value view
                             if (!!data) {
                                 updateStats(data);
+                                updateCompareStats(_yesterdayStats, data);
+
+                                // refresh current stats
+                                _currentStats = data;
                             } else {
                                 console.warn('Received new stats data, but cannot parse data from shapshot.');
                             }
@@ -369,7 +376,9 @@
                 $('.status-minimize-btn').hide();
 
                 loadStats(function(today, yesterday) {
-
+                    // store today
+                    _currentStats = today;
+                    _yesterdayStats = yesterday;
                     updateStats(today);
 
                     // update compare view
@@ -586,11 +595,10 @@
 
             function AlertItem(model, callbacks) {
                 const DOWNLOAD_URL_BUILDERS = {
-                        INTERNAL: _.template('//172.16.5.8:8888/image/image/<%= id %>'),
+                        INTERNAL: _.template('//172.16.5.8:8888/image/<%= id %>'),
                         EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/image/<%= id %>')
                     },
-                    // DOWNLOAD_URL_BUILDER = isIPUrl() ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
-                    DOWNLOAD_URL_BUILDER = DOWNLOAD_URL_BUILDERS.EXTERNAL;
+                    DOWNLOAD_URL_BUILDER = IS_INTERNAL? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
 
                 let _model = model,
                     _callbacks = callbacks || {

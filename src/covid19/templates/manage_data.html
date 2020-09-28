@@ -18,10 +18,10 @@
 <div id="scroll-style-hidden" class="right_col base" role="main">
     <div class="title-container">
         <div class="title-icon stats"></div>
-        <div class="title-label">Stats</div>
+        <div class="title-label">Data Management</div>
     </div>
     <div class="content-container stats">
-        <div class="sub-title-label">Manual</div>
+        <div class="sub-title-label">Stats</div>
         <div class="items-container stats">
             <div class="items-desc-label">
                 Manually update the stats to display on the dashboard
@@ -33,12 +33,12 @@
             </div>
         </div>
     </div>
+    <div class="title-container">
+        <div class="title-icon tests"></div>
+        <div class="title-label">Master File</div>
+    </div>
     <div class="content-container tests">
         <!-- Upload box -->
-        <div class="title-container">
-            <div class="title-icon tests"></div>
-            <div class="title-label">Master File</div>
-        </div>
         <div class="upload-container">
             <div class="upload-icon"></div>
             <div class="desc-label">Drag & Drop a file containing data to upload</div>
@@ -58,6 +58,22 @@
             <div class="log-panel-value"></div>
         </div>
     </div>
+
+    <!-- Download files -->
+    <div class="title-container">
+        <div class="title-icon downloads"></div>
+        <div class="title-label">Downloads</div>
+    </div>
+    <div class="content-container donwloads">
+        <div class="si-content-container logs">
+            <div class="log-download-container">
+                <div class="log-download-btn disabled" id="master">Master file(Loading...)</div>
+                <div class="log-download-btn disabled" id="daily">Daily app usage report(Loading...)</div>
+                <div class="log-download-btn disabled" id="observation">Observation report(Loading...)</div>
+            </div>
+        </div>
+    </div>
+    </div>
 </div>
 {% endblock content %}
 
@@ -67,6 +83,23 @@
     <script src="static/js/vendor/moment/moment-timezone-with-data.min.js"></script>
     <script>
         (function() {
+            const IS_INTERNAL = {{is_internal|tojson}};
+            const UPLOAD_URL_BUILDERS = {
+                INTERNAL: _.template('//172.16.5.8:5678/<%= type %>?id=<%= id %>'),
+                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>')
+            },
+            DOWNLOAD_URL_BUILDERS = {
+                INTERNAL: _.template('//172.16.5.8:5678/<%= type %>/<%= id %>'),
+                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
+            },
+            TIME_URL_BUILDERS = {
+                INTERNAL: _.template('//172.16.5.8:5678/upload/time?id=<%= id %>'),
+                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/time?id=<%= id %>')
+            },
+            UPLOAD_URL_BUILDER = IS_INTERNAL ? UPLOAD_URL_BUILDERS.INTERNAL : UPLOAD_URL_BUILDERS.EXTERNAL,
+            DOWNLOAD_URL_BUILDER = IS_INTERNAL ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL,
+            TIME_URL_BUILDER = IS_INTERNAL ? TIME_URL_BUILDERS.INTERNAL : TIME_URL_BUILDERS.EXTERNAL;
+
             const MANUAL_STATS_KEY_LIST = ["confirmed", "deaths", "recovered", "active_positives",
                 "quarantined", "isolated", "hospitalized", "country_total_cases", "country_total_deaths",
                 "stringency_index", "headcount", "alert_phase"],
@@ -88,15 +121,21 @@
                     'alert_phase': 'Alert Phase'
                 },
                 TIMEZONE = 'Asia/Dubai';
-            const UPLOAD_URL_BUILDER = {
-                    USERS: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/csv?id=<%= name %>')
-                },
-                USERS_DOWNLOAD_URL = 'https://skec-fujairah.loc8.dev:10443/api/download/res/users.log';
             const USERS_UPLOAD_ERROR_MESSAGE = {
                 '-1': 'Failed to apply master file. It\'s an unknown error.',
                 0: 'Failed to apply master file. The master file seems to invalid. See logs.',
                 1: 'An error occurred while applying the master file. See logs.'
             };
+            const DONWLOAD_FILENAME = {
+                    master: 'master_file.csv',
+                    daily: 'daily_app_usage_report.csv',
+                    observation: 'observations_report.csv'
+                },
+                DOWNLOAD_FILE_DISPLAY = {
+                    master: 'Master file',
+                    daily: 'Daily app usage report',
+                    observation: 'Observation report'
+                };
 
             let _db = firebase.firestore(),
                 _stats,
@@ -114,15 +153,11 @@
 
                 buildStatsItems(stats);
             });
-            // make download link for users.csv if has
-            $.getJSON('https://skec-fujairah.loc8.dev:10443/api/upload/time?id=users.csv', function(data) {
-                if (data && data.time) {
-                    $('.users-download-btn').text('Last upload: ' + new Date(data.time * 1000).toLocaleString());
-                }
-            });
             // Load users logs.
             _.defer(function() {
                 loadUsersLog();
+                loadFileTime();
+                loadDownloadFiles();
             });
 
 
@@ -234,6 +269,8 @@
                             addStats(_newStats, {
                                 success: function() {
                                     updateStats(_newStats);
+                                    // update view item
+                                    updateStatsItem(_newStats);
                                     new PNotify({
                                         type: 'success',
                                         text: 'Manual stats updated successfully.'
@@ -250,6 +287,8 @@
                             updateStats(_stats.documentId, _newStats, {
                                 success: function() {
                                     updateStats(_newStats);
+                                    // update view item
+                                    updateStatsItem(_newStats);
                                     new PNotify({
                                         type: 'success',
                                         text: 'Manual stats updated successfully.'
@@ -300,8 +339,9 @@
                             $('.submit-button-loader').removeClass('hide');
                             $('.submit-button').addClass('hide');
 
-                            uploadFile(file, UPLOAD_URL_BUILDER.USERS({
-                                name: 'users.csv'
+                            uploadFile(file, UPLOAD_URL_BUILDER({
+                                type: 'csv',
+                                id: 'master_file.csv'
                             }), {
                                 progress: function() {
                                 },
@@ -314,6 +354,7 @@
                                     });
 
                                     loadUsersLog();
+                                    loadFileTime();
                                 },
                                 error: function(reason) {
                                     $('.submit-button-loader').addClass('hide');
@@ -369,7 +410,10 @@
 
                 // download csv
                 $('.users-download-btn').click(function() {
-                    downloadURI('https://skec-fujairah.loc8.dev:10443/api/download/csv/users.csv');
+                    downloadURI(DOWNLOAD_URL_BUILDER({
+                        type: 'csv',
+                        id: 'master_file.csv'
+                    }));
                 });
 
                 // log panel
@@ -392,14 +436,71 @@
                         }
                     }
                 });
+
+                // handle download logs button
+                $('.log-download-btn').click(function() {
+                    let type = $(this).attr('id');
+                    downloadURI(DOWNLOAD_URL_BUILDER({
+                        type: 'csv',
+                        id: DONWLOAD_FILENAME[type]
+                    }));
+                });
             }
 
             function loadUsersLog() {
                 // Load users logs.
-                $.get('https://skec-fujairah.loc8.dev:10443/api/download/res/users.log', function(text) {
+                let requestUrl = DOWNLOAD_URL_BUILDER({
+                    type: 'res',
+                    id: 'users.log'
+
+                });
+                $.get(requestUrl, function(text) {
                     $('.log-panel.users').removeClass('hide');
                     $('.log-panel.users').children('.log-panel-value').text(text);
                 });
+            }
+
+            function loadFileTime() {
+                // make download link for users.csv if has
+                let requestUrl = TIME_URL_BUILDER({
+                    id: 'master_file.csv'
+                });
+                $.getJSON(requestUrl, function(data) {
+                    if (data && data.time) {
+                        $('.users-download-btn').text('Last upload: ' + new Date(data.time * 1000).toLocaleString());
+                    }
+                });
+            }
+
+            function loadDownloadFiles() {
+                function _loadFileTime(type) {
+                    if (type) {
+                        let button = $('.log-download-btn#' + type),
+                            requestUrl = TIME_URL_BUILDER({
+                                id: DONWLOAD_FILENAME[type]
+                            });
+
+                        button.text(DOWNLOAD_FILE_DISPLAY[type] + '(Loading...)');
+                        $.getJSON(requestUrl, function(data) {
+                            if (data && data.time) {
+                                let timeDisplay = new Date(data.time * 1000).toLocaleString();
+                                button.text(DOWNLOAD_FILE_DISPLAY[type] + '(' + timeDisplay + ')');
+                                button.removeClass('disabled');
+                            } else {
+                                button.text(DOWNLOAD_FILE_DISPLAY[type] + '(N/A)');
+                                button.addClass('disabled').off();
+                            }
+                        }).fail(function() {
+                            button.text(DOWNLOAD_FILE_DISPLAY[type] + '(N/A)');
+                            button.addClass('disabled').off();
+                        });
+                    }
+                }
+
+                // load donwload times
+                _loadFileTime('master');
+                _loadFileTime('daily');
+                _loadFileTime('observation');
             }
 
             function uploadFile(file, url, callbacks) {

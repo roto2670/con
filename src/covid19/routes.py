@@ -20,38 +20,47 @@ import base
 import util
 import models
 import in_apis
+import dash.routes
 from covid19 import blueprint
+
+
+def is_internal(request):
+  req_host = request.headers['Host']
+  req_host = req_host.strip().split(":")[0]
+  internal_addr = dash.routes.get_internal_server_addr()
+
+  return req_host == internal_addr
 
 
 @blueprint.route('/')
 @util.require_login
 def route_default():
-  return render_template("dashboard.html")
+  return render_template("dashboard.html", is_internal = is_internal(request))
 
 
 @blueprint.route('/users')
 @util.require_login
 def route_users():
-  return render_template("users.html")
+  return render_template("users.html", is_internal = is_internal(request))
 
 
 @blueprint.route('/notifications')
 @util.require_login
 def route_notifications():
-  return render_template("notifications.html")
+  return render_template("notifications.html", is_internal = is_internal(request))
 
 
 @blueprint.route('/managedata')
 @util.require_login
 def route_manage_data():
-  return render_template("manage_data.html")
+  return render_template("manage_data.html", is_internal = is_internal(request))
 
 @blueprint.route('/news')
 @util.require_login
 def route_news():
-  return render_template("news.html")
+  return render_template("news.html", is_internal = is_internal(request))
 
 @blueprint.route('/settings')
 @util.require_login
 def route_settings():
-  return render_template("csettings.html")
+  return render_template("csettings.html", is_internal = is_internal(request))

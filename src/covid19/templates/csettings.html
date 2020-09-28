@@ -98,8 +98,24 @@
 
     <script>
         (function() {
-            const PROFILE_URL_BUILDER = _.template('https://skec-fujairah.loc8.dev:10443/api/download/image/<%= id %>'),
-                CODE_PAGE_SIZE = 10;
+            const IS_INTERNAL = {{is_internal|tojson}};
+            const UPLOAD_URL_BUILDERS = {
+                INTERNAL: _.template('//172.16.5.8:5678/<%= type %>?id=<%= id %>'),
+                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>')
+            },
+            DOWNLOAD_URL_BUILDERS = {
+                INTERNAL: _.template('//172.16.5.8:5678/<%= type %>/<%= id %>'),
+                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
+            },
+            TIME_URL_BUILDERS = {
+                INTERNAL: _.template('//172.16.5.8:5678/upload/time?id=<%= id %>'),
+                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/time?id=<%= id %>')
+            },
+            UPLOAD_URL_BUILDER = IS_INTERNAL ? UPLOAD_URL_BUILDERS.INTERNAL : UPLOAD_URL_BUILDERS.EXTERNAL,
+            DOWNLOAD_URL_BUILDER = IS_INTERNAL ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL,
+            TIME_URL_BUILDER = IS_INTERNAL ? TIME_URL_BUILDERS.INTERNAL : TIME_URL_BUILDERS.EXTERNAL;
+
+            const CODE_PAGE_SIZE = 10;
 
             let _db = firebase.firestore(),
                 _currentUserRef;
@@ -125,14 +141,24 @@
 
             function loadLogs() {
                 function _logLog(type, display) {
-                    $.getJSON('https://skec-fujairah.loc8.dev:10443/api/upload/time?id=' + type + '.log', function(data) {
+                    let timeRequestUrl = TIME_URL_BUILDER({
+                        id: type + '.log'
+                    }),
+                    downloadReuqestUrl = DOWNLOAD_URL_BUILDER({
+                        type: 'res',
+                        id: type + '.log'
+                    });
+                    
+                    $.getJSON(timeRequestUrl, function(data) {
                         if (data && data.time) {
                             let timeDisplay = new Date(data.time * 1000).toLocaleString();
                             $('.si-title-label.' + type).text(display + '(' + timeDisplay + ')');
 
-                            $.get('https://skec-fujairah.loc8.dev:10443/api/download/res/' + type + '.log', function(text) {
+                            $.get(downloadReuqestUrl, function(text) {
                                 if (text) {
                                     $('.log-panel.' + type).text(text);
+                                } else {
+                                    $('.log-panel.' + type).text('N/A');
                                 }
                             }).fail(function(error) {
                                 console.warn('Failed to load ' + type + ' logs.', error);
@@ -146,7 +172,7 @@
                     });
                 }
 
-                // Nightly
+                // load logs
                 _logLog('nightly', 'Nightly');
                 _logLog('daily', 'Daily');
                 _logLog('weekly', 'Weekly');
@@ -348,6 +374,16 @@
                 });
             }
 
+            function downloadURI(uri, name) {
+                var link = document.createElement("a");
+                // If you don't know the name or want to use
+                // the webserver default set name = ''
+                link.setAttribute('download', name);
+                link.href = uri;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            }
 
             function CodeItem(model, callbacks) {
                 let _model = model,
@@ -394,7 +430,8 @@
                         // load user
                         _model.issuer.get().then(function(snapshot) {
                             let user = snapshot.data(),
-                                profileUrl = PROFILE_URL_BUILDER({
+                                profileUrl = DOWNLOAD_URL_BUILDER({
+                                    type: 'image',
                                     id: snapshot.id
                                 });
 

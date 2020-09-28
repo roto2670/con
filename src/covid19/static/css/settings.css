@@ -193,6 +193,8 @@
     margin-bottom: 0.8em;
 }
 .si-title-label.logs {
+    font-size: 1em;
+    font-weight: inherit;
     color: #EF8009;
     cursor: pointer;
 }
