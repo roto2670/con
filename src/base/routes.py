@@ -235,4 +235,8 @@ def is_dict(value):
 
 
 def second_to_time_format(value):
-  return str(datetime.timedelta(seconds=value))
+  duration = datetime.timedelta(seconds=value)
+  hours = (duration.days * 24) + int((duration.seconds / 3600))
+  minutes = round(duration.seconds % 3600 / 60)
+  ret = "{hours}:{minutes}".format(hours=hours, minutes=minutes)
+  return ret
