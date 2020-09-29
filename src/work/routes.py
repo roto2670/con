@@ -1830,9 +1830,9 @@ def csv_str_formatting(csv_str, work_log_list, tunnel_id):
           total_data_list.append(pre_blasting_time.strftime("%Y-%m-%d"))
           total_data_list.append(pre_blasting_time.strftime("%I:%M %p"))
           if current_blasting_time and pre_blasting_time:
-            overall = str(current_blasting_time - pre_blasting_time)
-            overall = overall.replace(",", ".")
-            total_data_list.append(overall[0:-3])
+            overall = current_blasting_time - pre_blasting_time
+            overall_ret = second_to_time_format(overall, is_duration=True)
+            total_data_list.append(overall_ret)
           else:
             total_data_list.append(INIT_DATA)
         else:
@@ -1849,9 +1849,14 @@ def csv_str_formatting(csv_str, work_log_list, tunnel_id):
   return csv_str
 
 
-def second_to_time_format(value):
-  time_data = str(datetime.timedelta(seconds=value))
-  ret = time_data[0:-3]
+def second_to_time_format(value, is_duration=False):
+  if is_duration:
+    duration = value
+  else:
+    duration = datetime.timedelta(seconds=value)
+  hours = (duration.days * 24) + int((duration.seconds / 3600))
+  minutes = round(duration.seconds % 3600 / 60)
+  ret = "{hours}:{minutes}".format(hours=hours, minutes=minutes)
   return ret
 
 
