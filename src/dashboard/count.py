@@ -22,7 +22,7 @@ import constants
 import local_apis
 import in_config_apis
 from util import RedisStore
-from constants import KIND_IPCAM, KIND_SPEAKER, KIND_ROUTER
+from constants import KIND_IPCAM, KIND_SPEAKER, KIND_ROUTER, KIND_NEW_BEACON
 from config_models import FACE_STATION_TYPE
 from config_models import SCANNER_TYPE
 
@@ -363,7 +363,7 @@ def beacon_list():
   raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
   data_list = []
   for raw_data in raw_datas.values():
-    if raw_data['kind'] == 'mibsskec':
+    if raw_data['kind'] in ['mibsskec', KIND_NEW_BEACON] :
       data_list.append(raw_data)
   return data_list
 

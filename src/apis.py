@@ -44,6 +44,39 @@ def _get_user_header(is_json=False):
 # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.tauhkpflgrmp
 
 
+# {{{ Accounts
+def get_new_beacon_info(account_id):
+  # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.o0rze6j27nlq
+  url = BASE_URL + 'accounts/' + account_id + '/newbeaconinfo'
+  try:
+    if IS_DEV:
+      _test_data = {
+        "uuid": "9cba31e2-0237-eb44-45f2-7b288dbe1c44",
+        "major": 43819,
+        "minor": 12290,
+        "interval": 700,
+        "during_second": 0
+      }
+      return _test_data
+    else:
+      logging.info("Get new beacon info Request. Url : %s", url)
+      resp = requests.get(url, headers=HEADERS, verify=False)
+      if resp.ok:
+        value = resp.json()
+        logging.warning("Get new beacon info Resp : %s", value)
+        return value['v']
+      else:
+        logging.warning("Failed to get new beacon info response. Code : %s, Text : %s",
+                        resp.status_code, resp.text)
+        return None
+  except:
+    logging.exception("Raise error while get new beacon info. url : %s",
+                      url)
+    return None
+
+# }}}
+
+
 # {{{ User
 
 
