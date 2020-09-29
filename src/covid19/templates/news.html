@@ -79,12 +79,12 @@
                 UPLOAD_COUNT_LIMIT = 3,
                 UPLOAD_SIZE_LIMIT = 5; // 5mb
             const UPLOAD_URL_BUILDERS = {
-                INTERNAL: _.template('//172.16.5.8:5678/<%= type %>?id=<%= id %>'),
-                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>')
+                INTERNAL: _.template('//172.16.5.8:10443/api/upload/<%= type %>?id=<%= id %>'),
+                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>')
             },
             DOWNLOAD_URL_BUILDERS = {
-                INTERNAL: _.template('//172.16.5.8:8888/<%= type %>/<%= id %>'),
-                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
+                INTERNAL: _.template('//172.16.5.8:10443/api/download/<%= type %>/<%= id %>'),
+                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
             },
             UPLOAD_URL_BUILDER = IS_INTERNAL ? UPLOAD_URL_BUILDERS.INTERNAL : UPLOAD_URL_BUILDERS.EXTERNAL,
             DOWNLOAD_URL_BUILDER = IS_INTERNAL ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;

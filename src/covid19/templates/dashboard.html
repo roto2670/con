@@ -595,8 +595,8 @@
 
             function AlertItem(model, callbacks) {
                 const DOWNLOAD_URL_BUILDERS = {
-                        INTERNAL: _.template('//172.16.5.8:8888/image/<%= id %>'),
-                        EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/image/<%= id %>')
+                        INTERNAL: _.template('//172.16.5.8:10443/api/download/image/<%= id %>'),
+                        EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/download/image/<%= id %>')
                     },
                     DOWNLOAD_URL_BUILDER = IS_INTERNAL? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
 

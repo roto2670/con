@@ -181,8 +181,8 @@
         (function() {
             const IS_INTERNAL = {{is_internal|tojson}};
             const DOWNLOAD_URL_BUILDERS = {
-                    INTERNAL: _.template('//172.16.5.8:8888/<%= type %>/<%= id %>'),
-                    EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
+                    INTERNAL: _.template('//172.16.5.8:10443/api/download/<%= type %>/<%= id %>'),
+                    EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
                 },
                 DOWNLOAD_URL_BUILDER = IS_INTERNAL? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
 
