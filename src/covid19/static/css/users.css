@@ -235,8 +235,13 @@
     /* phone */
     width: 7em;
 }
+.user-item-header-label:nth-child(11) {
+    /* job */
+    width: 7em;
+}
 .user-item-header-label:nth-child(12) {
-    /* lang */
+    /* app installed */
+    width: 4em;
 }
 .user-item-header-label:nth-last-child(1) {
     /* commands */
@@ -255,6 +260,7 @@
 
 .user-item {
     width: 100%;
+    height: 5em;
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
@@ -286,31 +292,47 @@
 }
 
 .user-item-name-label {
+    width: 100%;
     text-overflow: ellipsis;
     overflow: hidden;
-    -webkit-line-clamp: 2;
-    display: -webkit-inline-box;
-    -webkit-box-orient: vertical;
-    margin-left: 1em;
-    width: 10em;
 }
 
 .user-item-id-label {
+    width: 100%;
     font-size: 0.85em;
     color: #8A8A8A;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.user-item-content-container {
+    width: 6em;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+}
+.user-item-content-container.name {
+    width: 10em;
+    margin-left: 1em;
+    line-height: 1.2em;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .user-item-cell {
     width: 6em;
+    height: 100%;
     margin: auto;
     display: inline-flex;
+    justify-content: center;
     align-items: center;
 }
 .user-item-cell:nth-child(1) {
     margin-left: 0;
 }
 .user-item-cell.name {
-    width: 15em;
+    width: 16em;
 }
 .user-item-cell.status {
     width: 8em;
@@ -347,8 +369,8 @@
     width: 100%;
     font-size: 0.7em;
 }
-.user-item-label.lang {
-    width: 3em;
+.user-item-label.app-installed {
+    width: 4em;
 }
 .user-item-btn {
     width: 2.8em;
@@ -383,7 +405,7 @@
 }
 
 .user-item-cell.job {
-    width: 6em;
+    width: 7em;
     margin: auto;
     text-align: center;
     flex-wrap: wrap;

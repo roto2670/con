@@ -1050,6 +1050,7 @@
                     let checkbox = $('<input type="checkbox" class="user-item-checkbox">');
                     let profile = $('<div class="user-item-avatar">');
                     let nameCell = $('<div class="user-item-cell name">'),
+                        nameContainer = $('<div class="user-item-content-container name">'),
                         nameLabel = $('<div class="user-item-name-label">');
                         idLabel = $('<div class="user-item-id-label">');
                     let statusCell = $('<div class="user-item-cell status">'),
@@ -1075,7 +1076,8 @@
                     container.append(nameCell, statusCell, genderLabel, nationalLabel,
                         employerLabel, campLabel, roomLabel, phoneLabel, departmentLabel, locateLabel, jobContainer,
                         appInstalledLabel, commandsCell);
-                    nameCell.append(checkbox, profile, nameLabel, idLabel);
+                    nameCell.append(checkbox, profile, nameContainer);
+                    nameContainer.append(nameLabel, idLabel);
                     statusCell.append(statusLabel);
                     jobContainer.append(jobCat1Label, jobCat2Label);
                     commandsCell.append(historyButton, selfReportsButton, preMedButton);
@@ -1100,8 +1102,8 @@
                         checkbox: checkbox,
                         profile: profile,
                         nameLabel: nameLabel,
-                        preMedButton: preMedButton,
                         idLabel: idLabel,
+                        preMedButton: preMedButton,
                         statusLabel: statusLabel,
                         genderLabel: genderLabel,
                         nationalLabel: nationalLabel,
@@ -1164,8 +1166,9 @@
                         _views.preMedButton.attr('data-original-title', '');
                     }
 
+                    _views.container.attr('title', (model.fullname || '-') + '(' + (model.documentId || '-') + ')');
                     _views.nameLabel.text(model.fullname || '-');
-                    _views.idLabel.text('');
+                    _views.idLabel.text('(' + (model.documentId || '-') + ')');
                     _views.statusLabel.text(STATUS_DISPLAY[model.status] || '-');
                     _views.genderLabel.text(model.gender || '');
                     _views.nationalLabel.text(model.nationality || '');

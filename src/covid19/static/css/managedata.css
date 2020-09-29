@@ -66,7 +66,6 @@
     padding-top: 0.8em;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
 }
 
 .stat-item {
@@ -206,6 +205,11 @@
 .log-download-container {
     padding: 1em 0.4em 0 0.4em;
 }
+.log-download-btn-container {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+}
 .log-download-btn {
     margin-bottom: 0.4em;
     font-size: 1em;
@@ -217,4 +221,8 @@
     font-size: 1em;
     text-decoration: inherit;
     color: #868686;
+}
+.log-download-run-btn {
+    margin-left: 1em;
+    font-size: 1em;
 }

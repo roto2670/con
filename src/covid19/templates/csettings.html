@@ -47,26 +47,26 @@
         <!-- for logs -->
         <div class="setting-content-container">
             <div class="setting-item">
-                <div class="si-title-label logs nightly" id="nightly">
-                    <i class="fa fa-angle-right nightly" aria-hidden="true"></i>
-                    Nightly
+                <div class="si-title-label logs update_stats" id="update_stats">
+                    <i class="fa fa-angle-right update_stats" aria-hidden="true"></i>
+                    Update Stats(Nightly)
                 </div>
                 <div class="si-content-container logs">
-                    <div class="log-panel nightly">Loading...</div>
+                    <div class="log-panel update_stats">Loading...</div>
                 </div>
-                <div class="si-title-label logs daily" id="daily">
-                    <i class="fa fa-angle-right daily" aria-hidden="true"></i>
-                    Daily
-                </div>
-                <div class="si-content-container logs">
-                    <div class="log-panel daily">Loading...</div>
-                </div>
-                <div class="si-title-label logs weekly" id="weekly">
-                    <i class="fa fa-angle-right wekkly" aria-hidden="true"></i>
-                    Weekly
+                <div class="si-title-label logs daily_app_usage_report" id="daily_app_usage_report">
+                    <i class="fa fa-angle-right daily_app_usage_report" aria-hidden="true"></i>
+                    App Usage Report(Daily)
                 </div>
                 <div class="si-content-container logs">
-                    <div class="log-panel weekly">Loading...</div>
+                    <div class="log-panel daily_app_usage_report">Loading...</div>
+                </div>
+                <div class="si-title-label logs observation_report" id="observation_report">
+                    <i class="fa fa-angle-right observation_report" aria-hidden="true"></i>
+                    Observation Report
+                </div>
+                <div class="si-content-container logs">
+                    <div class="log-panel observation_report">Loading...</div>
                 </div>
                 <div class="si-title-label logs monthly" id="monthly">
                     <i class="fa fa-angle-right monthly" aria-hidden="true"></i>
@@ -152,7 +152,9 @@
                     $.getJSON(timeRequestUrl, function(data) {
                         if (data && data.time) {
                             let timeDisplay = new Date(data.time * 1000).toLocaleString();
-                            $('.si-title-label.' + type).text(display + '(' + timeDisplay + ')');
+                            $('.si-title-label.' + type).text('')
+                                .append('<i class="fa fa-angle-right ' + type + '" aria-hidden="true">')
+                                .append(' ' + display + ' - ' + timeDisplay);
 
                             $.get(downloadReuqestUrl, function(text) {
                                 if (text) {
@@ -173,9 +175,9 @@
                 }
 
                 // load logs
-                _logLog('nightly', 'Nightly');
-                _logLog('daily', 'Daily');
-                _logLog('weekly', 'Weekly');
+                _logLog('update_stats', 'Update Stats(Nightly)');
+                _logLog('daily_app_usage_report', 'App Usage Report(Daily)');
+                _logLog('observation_report', 'Observation Report');
                 _logLog('monthly', 'Monthly');
             }
 

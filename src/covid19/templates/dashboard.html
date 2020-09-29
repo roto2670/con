@@ -275,7 +275,8 @@
 
 {% block javascripts %}
     {{ super() }}
-
+    <script src="static/js/vendor/moment/moment.min.js"></script>
+    <script src="static/js/vendor/moment/moment-timezone-with-data.min.js"></script>
     <script>
         (function() {
             const IS_INTERNAL = {{is_internal|tojson}},
@@ -300,14 +301,15 @@
                 'recovered': "recovered",
                 'suspected': "suspected",
                 'hospitalized': "hospitalized",
-                'close_contacts': "close_contact",
+                'close_contacts': "close-contact",
                 'symptomatics': "symptomatics",
                 'selfassessments': "self-asse",
                 'isolated': "isolated",
                 'alert_phase': "alertphase"
             },
             USER_MENU_URL_PREFIX = 'users',
-            ALERT_PAGE_SIZE = 5;
+            ALERT_PAGE_SIZE = 5,
+            TIMEZONE = 'Asia/Dubai';
 
             let _db = firebase.firestore(),
                 _loadingAlerts = false,
@@ -357,6 +359,21 @@
                             // update stat value view
                             if (!!data) {
                                 updateStats(data);
+
+                                // check ts is none(when server fetching...)
+                                let todayDate = new Date();
+                                if (!data.ts) {
+                                    data.ts = {
+                                        seconds: todayDate.getTime() / 1000
+                                    };
+                                }
+
+                                // check date changed.
+                                if (isFutureDay(new Date(_yesterdayStats.ts.seconds * 1000), todayDate)) {
+                                    _yesterdayStats = _currentStats;
+                                }
+                                
+                                // Updates the view.
                                 updateCompareStats(_yesterdayStats, data);
 
                                 // refresh current stats
@@ -582,6 +599,28 @@
                 r = RegExp('^http[s]?:\/\/((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])');
                 return r.test( address )
             }
+
+            function isFutureDay(source, target) {
+                let result = false;
+                if (source && target)  {
+                    let convertedSource = moment(source).tz(TIMEZONE),
+                        convertedTarget = moment(target).tz(TIMEZONE);
+                    let sourceFullYear = convertedSource.year(),
+                        sourceMonth = convertedSource.month(),
+                        sourceDate = convertedSource.day(),
+                        targetFullYear = convertedTarget.year(),
+                        targetMonth = convertedTarget.month(),
+                        targetDate = convertedTarget.day();
+
+                    return sourceFullYear < targetFullYear || sourceMonth < targetMonth ||
+                        sourceDate < targetDate;
+                } else {
+                    console.warn('Cannot check date by given source or target is null.');
+                }
+
+                return result;
+            }
+
 
             function StatItem(value, displayName) {
                 function render () {
