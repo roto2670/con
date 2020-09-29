@@ -473,7 +473,9 @@
                 // handle run script button
                 $('.log-download-run-btn#observation').click(function() {
                     // make observation report.
-                    runScript('observation');
+                    if (window.confirm('Are you sure?')) {
+                        runScript('observation');
+                    }
                 });
             }
 
