@@ -10,6 +10,7 @@
     {{ super() }}
     <link type="text/css" rel="stylesheet" href="static/css/common.css">
     <link type="text/css" rel="stylesheet" href="static/css/dashboard.css">
+    <link type="text/css" rel="stylesheet" href="static/css/vendors/animate/animate.min.css">
 {% endblock stylesheets %}
 
 {% block title %}{% endblock title %}
@@ -356,6 +357,13 @@
                                 data = snapshot.docs[snapshot.docs.length - 1].data();
                             }
 
+                            // Check updates item is not exist.
+                            if (change.type === 'added' && _currentStats.documentId == data.id) {
+                                console.warn('Received add new stats data,but it\'s the same document as current.');
+                                return;
+                            }
+                            console.log('Received ' + change.type + ' stats. try update.'); 
+
                             // update stat value view
                             if (!!data) {
                                 updateStats(data);
@@ -369,7 +377,10 @@
                                 }
 
                                 // check date changed.
-                                if (isFutureDay(new Date(_yesterdayStats.ts.seconds * 1000), todayDate)) {
+                                {# if (isFutureDay(new Date(_yesterdayStats.ts.seconds * 1000), todayDate)) {
+                                    _yesterdayStats = _currentStats;
+                                } #}
+                                if (change.type === 'added') {
                                     _yesterdayStats = _currentStats;
                                 }
                                 
@@ -378,6 +389,7 @@
 
                                 // refresh current stats
                                 _currentStats = data;
+                                _currentStats.documentId = data.id;
                             } else {
                                 console.warn('Received new stats data, but cannot parse data from shapshot.');
                             }
@@ -396,6 +408,9 @@
                     // store today
                     _currentStats = today;
                     _yesterdayStats = yesterday;
+                    _currentStats.documentId = today.id;
+                    _yesterdayStats.documentId = yesterday.id;
+
                     updateStats(today);
 
                     // update compare view
@@ -446,13 +461,13 @@
             function updateCompareStats(source, target) {
                 if (!!source && !!target) {
                     let targetTypes = _.keys(_.omit(target, 'avg_new_cases', 'avg_new_deaths', 'country_avg_new_cases',
-                        'country_avg_new_deaths', 'headcount', 'ts', 'recovered'));
+                        'country_avg_new_deaths', 'headcount', 'ts', 'recovered', 'documentId'));
                     _.each(targetTypes, function(type) {
                         updateCompareStat(type, source[type], target[type]);
                     });
 
                     // good for the increase
-                    targetTypes = ['recovered'];
+                    targetTypes = ['recovered', 'selfassessments'];
                     _.each(targetTypes, function(type) {
                         updateCompareStat(type, source[type], target[type], true);
                     });
@@ -481,7 +496,6 @@
                                 arrow.addClass('fa-caret-down ngtv');
                             }
                         }
-
 
                         label.text(different);
                 } else {

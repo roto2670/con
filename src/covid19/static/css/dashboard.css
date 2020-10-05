@@ -228,6 +228,11 @@
     font-size: 3.2em;
     font-weight: 400;
     padding-right: 0.3em;
+    animation-duration: 1.5s;
+    animation-iteration-count: 5;
+}
+.status-w-value-label.changing {
+    animation-name: flash;
 }
 .small .status-w-value-label {
     font-size: 2.8em;

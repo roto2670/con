@@ -53,7 +53,7 @@
         <div class="log-panel users hide">
             <div class="log-panel-title">
                 <i class="fa fa-angle-right users-log" aria-hidden="true"></i>
-                Logs
+                <span class="log-panel-title-label">Logs</span>
             </div>
             <div class="log-panel-value"></div>
         </div>
@@ -67,10 +67,10 @@
     <div class="content-container donwloads">
         <div class="si-content-container logs">
             <div class="log-download-container">
-                <div class="log-download-btn disabled" id="master">Master file(Loading...)</div>
-                <div class="log-download-btn disabled" id="app_usage">Daily app usage report(Loading...)</div>
+                <div class="log-download-btn" id="master">Master file</div>
+                <div class="log-download-btn" id="app_usage">Daily app usage report</div>
                 <div class="log-download-btn-container">
-                    <div class="log-download-btn disabled" id="observation">Observation report(Loading...)</div>
+                    <div class="log-download-btn" id="observation">Observation report</div>
                     <div class="log-download-run-btn btn" id="observation">Run</div>
                 </div>
             </div>
@@ -146,11 +146,13 @@
                 },
                 SCRIPT_ID = {
                     observation: 'observation_report'
-                }
+                },
+                OBSERVATION_VALID_DAY = 7;
 
             let _db = firebase.firestore(),
                 _stats,
                 _statsDate;
+            let _downloadFilesTime = {};
             let _statViewItems = {};
 
 
@@ -472,9 +474,29 @@
 
                 // handle run script button
                 $('.log-download-run-btn#observation').click(function() {
-                    // make observation report.
-                    if (window.confirm('Are you sure?')) {
-                        runScript('observation');
+                    // check validate date
+                    if (_downloadFilesTime.observation) {
+                        let sourceDate = moment(_downloadFilesTime.observation),
+                            todayDate = moment(),
+                            diffDay = todayDate.diff(sourceDate, 'day');
+
+                        if (diffDay > OBSERVATION_VALID_DAY) {
+                            // make observation report.
+                            if (window.confirm('Are you sure?')) {
+                                runScript('observation');
+                            }
+                        } else {
+                            new PNotify({
+                                type: 'notice',
+                                text: 'Must be ' + OBSERVATION_VALID_DAY + 'days after the last run. ' + 
+                                    'Please try again in ' + ((OBSERVATION_VALID_DAY - diffDay) + 1) + 'day(s).'
+                            });
+                        }
+                    } else {
+                        new PNotify({
+                            type: 'error',
+                            text: 'Please try again when the last execution date displayed.'
+                        }
                     }
                 });
             }
@@ -485,11 +507,27 @@
                     type: 'res',
                     id: 'users.log'
 
+                }),
+                titleLabel = $('.log-panel.users').find('.log-panel-title-label');
+                titleLabel.addClass('Logs(Fetching time...)');
+
+                $.getJSON(TIME_URL_BUILDER({
+                    id: 'users.log'
+                }), function(data) {
+                    if (data && data.time) {
+                        let timeDisplay = new Date(data.time * 1000).toLocaleString();
+                        $.get(requestUrl, function(text) {
+                            titleLabel.text('Logs(' + timeDisplay + ')');
+                            $('.log-panel.users').removeClass('hide');
+                            $('.log-panel.users').children('.log-panel-value').text(text);
+                        }).fail(function() {
+                            titleLabel.text('Logs(N/A)');
+                        });
+                    } else {
+                        $('.log-panel.' + type).text('Logs(N/A)');
+                    }
                 });
-                $.get(requestUrl, function(text) {
-                    $('.log-panel.users').removeClass('hide');
-                    $('.log-panel.users').children('.log-panel-value').text(text);
-                });
+
             }
 
             function runScript(type) {
@@ -503,9 +541,7 @@
                     return;
                 }
 
-                _button.addClass('disabled');
                 $.getJSON(_requestUrl, function(data) {
-                    _button.removeClass('disabled');
                     if (data && data.code == 0) {
                         loadDownloadFile(type);
                         new PNotify({
@@ -550,19 +586,20 @@
                                 id: DONWLOAD_FILENAME[type]
                             });
                         
-                        button.addClass('disabled').text(DOWNLOAD_FILE_DISPLAY[type] + '(Loading...)');
+                        button.text(DOWNLOAD_FILE_DISPLAY[type] + '(Fetching time...)');
                         $.getJSON(requestUrl, function(data) {
                             if (data && data.time) {
-                                let timeDisplay = new Date(data.time * 1000).toLocaleString();
+                                let time = new Date(data.time * 1000),
+                                    timeDisplay = time.toLocaleString();
                                 button.text(DOWNLOAD_FILE_DISPLAY[type] + '(' + timeDisplay + ')');
-                                button.removeClass('disabled');
+
+                                // Store.
+                                _downloadFilesTime[type] = time;
                             } else {
                                 button.text(DOWNLOAD_FILE_DISPLAY[type] + '(N/A)');
-                                button.addClass('disabled').off();
                             }
                         }).fail(function() {
                             button.text(DOWNLOAD_FILE_DISPLAY[type] + '(N/A)');
-                            button.addClass('disabled').off();
                         });
                     }
                 }
