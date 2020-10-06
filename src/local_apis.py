@@ -20,6 +20,95 @@ import dashboard.count
 from constants import THIRD_BASE_URL, BASE_URL, REG_HUB_ID
 
 
+def register_new_beacon(gadget_info):
+  hid = REG_HUB_ID
+  url = "{base}hubs/{hid}/event".format(base=BASE_URL, hid=hid)
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=hid)
+  }
+  body = {
+    "topic": "gadget.added",
+    "value": gadget_info
+  }
+  try:
+    logging.info("## register new beacon url : %s", url)
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
+    if resp.ok:
+      logging.info("register new beacon successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed register new beacon. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while register new beacon. Body : %s",
+                      body)
+    return None
+
+
+def remove_new_beacon(router_id):
+  hid = REG_HUB_ID
+  _router = dashboard.count.get_router(router_id)
+  url = "{base}hubs/{hid}/event".format(base=BASE_URL, hid=hid)
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=hid)
+  }
+  body = {
+    "topic": "gadget.removed",
+    "value": _router
+  }
+  try:
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
+    if resp.ok:
+      logging.info("remove new beacon successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed remove new beacon router. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while remove router. Body : %s",
+                      body)
+    return None
+
+
+def update_new_beacon_info(gadget_info, white_list_id):
+  url = "{base}gadgets/{gid}".format(base=BASE_URL, gid=gadget_info['id'])
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=gadget_info['hub_id'])
+  }
+  body = {
+    "name": gadget_info['name'],
+    "tags": gadget_info['tags'],
+    "custom": gadget_info['custom'],
+    "blacklist": ["*"],
+    "whitelist": [white_list_id],
+    "permission": 7
+  }
+
+  try:
+    logging.info("## update new beacon url : %s", url)
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
+    if resp.ok:
+      logging.info("update beacon information successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed update beacon information. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while update beacon information. Body : %s",
+                      body)
+    return None
+
+
+
 def update_beacon_information(gid, hid, name, kind, moi, ipcam_id):
   url = "{base}gadgets/{gid}".format(base=BASE_URL, gid=gid)
   headers = {

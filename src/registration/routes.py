@@ -18,6 +18,7 @@ import logging
 from flask import render_template, redirect, request  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
 
+import apis
 import base
 import util
 import in_apis
@@ -26,7 +27,8 @@ import in_config_apis
 from dashboard import count
 from registration import blueprint
 from constants import REG_HUB_ID, REG_ACCOUNT_ID, BEACON_SPEC
-from constants import KIND_IPCAM, KIND_SPEAKER, KIND_ROUTER
+from constants import KIND_IPCAM, KIND_SPEAKER, KIND_ROUTER, KIND_NEW_BEACON
+from constants import WHITE_LIST
 from config_models import SCANNER_TYPE
 
 
@@ -57,6 +59,68 @@ def beacon_list_route():
     return render_template("beacon_list.html", beacon_list=new_list,
                            category=count.GADGET_INFO,
                            selected_category=selected_category)
+
+
+@blueprint.route('/beacon/create', methods=['GET', 'POST'])
+@util.require_login
+def reg_beacon():
+  if request.method == "GET":
+    beacon_info = apis.get_new_beacon_info(REG_ACCOUNT_ID)
+    # KIND_NEW_BEACON = mibs00001 -> KIND_NEW_BEACON[:4] = mibs
+    return render_template("register_beacon.html", beacon_info=beacon_info,
+                           category=count.GADGET_INFO, new_name=KIND_NEW_BEACON[:4])
+  else:
+    device_id = request.form.get('deviceId')
+    tag = request.form.get('tag')
+    name = request.form.get('name')
+    _uuid = request.form.get('uuid')
+    _major = request.form.get('major')
+    _minor = request.form.get('minor')
+
+    mac_hash = hashlib.md5()
+    mac_hash.update(device_id.encode('utf-8'))
+    mac_addr = mac_hash.hexdigest()[:12]
+    new_id_hash = hashlib.md5()
+    new_id_hash.update(mac_addr.encode('utf-8'))
+    new_id = new_id_hash.hexdigest()
+    security = uuid.uuid4().hex[:24]
+
+    value = {
+      "id": new_id,
+      "mac": mac_addr,
+      "name": name,
+      "kind": KIND_NEW_BEACON,
+      "protocol": 0,
+      "firmware_version": "1.0.0",
+      "model_number": 0,
+      "model_name": "SKEC New Beacon",
+      "sdk_version": "0.1",
+      "beacon": REG_ACCOUNT_ID,
+      "security": security,
+      "hub_id": REG_HUB_ID,
+      "account_id": REG_ACCOUNT_ID,
+      "status": 0,
+      "locale": "US",
+      "rssi": 0,
+      "battery": 0,
+      "progress": 0,
+      "latest_version": "0.0.0",
+      "is_depr": 0,
+      "custom": {},
+      "tags": [tag],
+      "beacon_spec": {
+          "uuid": _uuid,
+          "major": int(_major),
+          "minor": int(_minor),
+          "interval": 700,
+          "during_second": 0
+      },
+      "img_url": ""
+    }
+    ret = local_apis.register_new_beacon(value)
+    logging.info("Register new beacon resp : %s", ret)
+    local_apis.update_new_beacon_info(value, WHITE_LIST)
+    return redirect("/registration/beacon")
 
 
 @blueprint.route('/beacon/<gid>/update', methods=['GET', 'POST'])

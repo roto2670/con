@@ -11,6 +11,10 @@
 {% block javascripts %}
   {{ super() }}
   <script>
+    function register() {
+      window.location.href = "/registration/beacon/create";
+    }
+
     function exportTableToCsv(tableId, filename) {
       if (filename == null || typeof filename == undefined)
           filename = tableId;
@@ -90,7 +94,13 @@
             <table id="beacon-table" class="table table-striped projects">
               <thead>
                 <tr>
-                  <th></th>
+                  <th>
+                    <button type="button" class="btn btn-default btn-xs"
+                        onclick="register()"
+                        style="margin-bottom: 0;">
+                      Register
+                    </button>
+                  </th>
                   <th></th>
                   <th>
                     <form id="category" action="/registration/beacon" method="POST">

@@ -20,6 +20,7 @@ if IS_DEV:
   REG_HUB_ID = '''463d638edc74a0b5feaf7507f0ecb7ca'''
   REG_ACCOUNT_ID = '''9cba31e20237eb4445f27b288dbe1c44'''
   BEACON_SPEC = '''9cba31e2-0237-eb44-45f2-7b288dbe1c44'''
+  WHITE_LIST = '''e5f6fe47a4e43835b72b0e8fa9a002d4'''
 else:
   THIRD_BASE_URL = '''http://172.16.5.4/v1/'''
   BASE_URL = '''http://172.16.5.4/i/v1/'''
@@ -28,11 +29,13 @@ else:
   REG_HUB_ID = '''bc298b66bd67a950a49bdd64b09d37a0'''  # Galaxy A30
   REG_ACCOUNT_ID = '''d526b46a854d018d355b90ee2527fd4e'''
   BEACON_SPEC = '''d526b46a-854d-018d-355b-90ee2527fd4e'''
+  WHITE_LIST = '''bc298b66bd67a950a49bdd64b09d37a0'''
 
 ORG_ID = '''ac983bfaa401d89475a45952e0a642cf'''
 KIND_IPCAM = '''ipcam'''
 KIND_SPEAKER = '''speaker'''
 KIND_ROUTER = '''router'''
+KIND_NEW_BEACON = '''mibs00001'''
 
 WORK_STATE_STOP = 0
 WORK_STATE_IN_PROGRESS = 1

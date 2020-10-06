@@ -1,0 +1,185 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+  <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_registration.html" %}
+  </div>
+{% endblock sidebar %}
+
+{% block title %} Register Beacon {% endblock title %}
+
+{% block javascripts %}
+  {{ super() }}
+  <script>
+// Button click handler to start scanning and configuring
+      async function scanAndConfigure(uuid, majorNumber, minorNumber, name) {
+        let major = majorNumber;
+        let minor = minorNumber;
+        if (!major || !minor) {
+          major = Math.floor((Math.random() * 65534) + 1);
+          minor = Math.floor((Math.random() * 65534) + 1);
+          document.getElementById("major").value = major;
+          document.getElementById("minor").value = minor;
+        }
+
+
+        document.getElementById("scanButton").disabled = true;
+        // output(`Scanning... ${major}:${minor}`);
+        const beaconUuidBytes = Uint8Array.of(0xd5,0x26,0xb4,0x6a,0x85,0x4d,0x01,0x8d,0x35,0x5b,0x90,0xee,0x25,0x27,0xfd,0x4e);
+        // Let's scan and configure!
+        const device = await startScanning(beaconUuidBytes, major, minor, name);
+        if (device.id) {
+          document.getElementById("deviceId").value = device.id;
+          document.getElementById("registerButton").disabled = false;
+        } else {
+          document.getElementById("deviceId").value = "";
+          window.alert("Beacon is not set. Please try again.");
+          document.getElementById("scanButton").disabled = false;
+        }
+      }
+
+      // **API**
+      // Scan for a beacon and wait for a selection.
+      //   uuidBytes: Uint8Array
+      //   major: uint (no larger than 65535)
+      //   minor uint (no larger than 65535)
+      // Return: Bluetooth Device
+      async function startScanning(uuidBytes, major, minor, name) {
+        if (major >= 0xFFFF || minor >= 0xFFFF) {
+          throw "Major Minor cannot be larger than 65535";
+        }
+        if (!navigator.bluetooth) {
+          throw "Web Bluetooth API must be enabled.";
+        }
+
+        const serviceId = 0xFF00;
+        const uuidCharId = 0xFF01;
+        const nameCharId = 0xFF09;
+        const majorCharId = 0xFF02;
+        const minorCharId = 0xFF03;
+        const pwCharId = 0xFF06;
+        const idCharId = 0xFF08;
+
+        let filters = [
+          {namePrefix: 'S'}, // Beacon names start with "S0"
+          {namePrefix: 'MkiBeacon_'},
+          {namePrefix: 'mibs'}
+        ];
+        let options = {
+          filters: filters,
+          optionalServices: [serviceId]
+        };
+
+        try {
+          // Start scanning. Wait for the user to select a beacon to configure.
+          const device = await navigator.bluetooth.requestDevice(options);
+          // A Beacon is selected. See how it looks like.
+          const server = await device.gatt.connect();
+          const service = await server.getPrimaryService(serviceId);
+          const pwCharacteristic = await service.getCharacteristic(pwCharId);
+          await pwCharacteristic.writeValueWithResponse(Uint8Array.from([77, 111, 107, 111, 52, 51, 50, 49])); // Moko4321
+          const uuidCharacteristic = await service.getCharacteristic(uuidCharId);
+          await uuidCharacteristic.writeValueWithResponse(uuidBytes);
+          const majorCharacteristic = await service.getCharacteristic(majorCharId);
+          await majorCharacteristic.writeValueWithResponse(Uint8Array.of((major >> 8) & 0xFF, major & 0xFF));
+          const minorCharacteristic = await service.getCharacteristic(minorCharId);
+          await minorCharacteristic.writeValueWithResponse(Uint8Array.of((minor >> 8) & 0xFF, minor & 0xFF));
+          const nameCharacteristic = await service.getCharacteristic(nameCharId);
+          await nameCharacteristic.writeValueWithResponse(Uint8Array.from(Array.from(name).map(x => x.charCodeAt(0))));
+          const idCharacteristic = await service.getCharacteristic(idCharId);
+          await idCharacteristic.writeValueWithResponse(Uint8Array.from(Array.from('00001').map(x => x.charCodeAt(0))));
+          console.log('Successfully configured.');
+          await device.gatt.disconnect();
+          // All done!
+          return device;
+        } catch (e) {
+          return e;
+        }
+      }
+
+      function output(text) {
+          document.getElementById("output").innerHTML = text;
+      }
+
+
+  </script>
+{% endblock javascripts %}
+
+{% block content %}
+  <div id="scroll-style-hidden" class="right_col" role="main">
+    <div class="">
+
+      <div class="row">  <!-- Start row -->
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel tile">  <!-- start x_panel -->
+
+            <div class="x_title">
+              <div class="x_title_left_div">
+                <h3>Beacon</h3>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+
+
+            <div class="x_content">  <!-- start x_content -->
+              <form id="create" action="/registration/beacon/create"
+                class="form-horizontal form-label-left" method="post">
+                <div class="col-md-9">
+                  <br>
+                  <div class="item form-group">
+                    <label class="control-label col-md-4" for="name">
+                      Beacon <span class="required">*</span>
+                    </label>
+                    <div class="col-md-8">
+                      <button id="scanButton" type="button" class="btn btn-default btn-xl"
+                          onclick="scanAndConfigure('{{beacon_info.uuid}}', '{{beacon_info.major}}', '{{beacon_info.minor}}', '{{new_name}}')"
+                          >Scan & Select</button>
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-4" for="name">
+                      Name <span class="required">*</span>
+                    </label>
+                    <div class="col-md-8">
+                      <input type="text" id="name" name="name" value=""
+                          class="form-control col-md-6 col-xs-6" required="required">
+                    </div>
+                  </div>
+                  <div class="item form-group">
+                    <label class="control-label col-md-4">
+                      Category <span class="required">*</span>
+                    </label>
+                    <div class="col-md-8">
+                      <select id="kind" name="kind" class="form-control" required="required">
+                        {% for k, v in category.items() %}
+                          <option id="{{ k }}" value="{{ k }}">{{ v }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <br>
+                  <input type="hidden" id="uuid" name="uuid" value="{{ beacon_info.uuid }}"
+                      class="form-control col-md-6 col-xs-6">
+                  <input type="hidden" id="major" name="major" value="{{ beacon_info.major }}"
+                      class="form-control col-md-6 col-xs-6">
+                  <input type="hidden" id="minor" name="minor" value="{{ beacon_info.minor }}"
+                      class="form-control col-md-6 col-xs-6">
+                  <input type="hidden" id="deviceId" name="deviceId" value=""
+                      class="form-control col-md-6 col-xs-6">
+                  <div style="text-align: right">
+                  <!-- TODO : check -->
+                    <button id="registerButton" type="submit" class="btn btn-default" disabled>Register</button>
+                  </div>
+                </div>
+              </form>
+
+            </div>  <!-- End x_content -->
+
+          </div>  <!-- End x_panel -->
+        </div>
+      </div>  <!-- End row-->
+
+    </div>
+  </div>
+
+{% endblock content %}
