@@ -643,7 +643,7 @@ def _create_finish_work_log(data):
                                                    history_data['accum_time'],
                                                    pause_time)
       send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
-      if int(data['typ']) == 114:  # finish work
+      if int(data['typ']) == 114:  # finish work, 114 is blasting activity
         blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
                                                             history_data['accum_time'],
                                                             latest_work.category)
