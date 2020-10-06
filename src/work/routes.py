@@ -582,9 +582,6 @@ def add_completed_work():
     #TODO: send : work -> blast -> start -> finish
     work_apis.create_work(data)
     send_request(WORK_ADD, [data])
-    blast_data = work_apis.get_blast(data['blast_id'])
-    _blast_data = _convert_dict_by_blast(blast_data)
-    send_request(BLAST_UPDATE, [_blast_data])
     _create_start_work_log(data)
     _create_finish_work_log(data)
     return json.dumps(True)
@@ -646,7 +643,7 @@ def _create_finish_work_log(data):
                                                    history_data['accum_time'],
                                                    pause_time)
       send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
-      if data['typ'] == 114:  # finish work
+      if int(data['typ']) == 114:  # finish work
         blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
                                                             history_data['accum_time'],
                                                             latest_work.category)
