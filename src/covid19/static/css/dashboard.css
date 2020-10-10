@@ -5,6 +5,15 @@
 .status-widgets {
     transition: all 300ms ease;
 }
+.level1 .status-widget {
+    background-color: #b5b51a;
+}
+.level2 .status-widget {
+    background-color: #f7ad26;
+}
+.level3 .status-widget {
+    background-color: #FF4A4A;
+}
 .status-widgets.maximize {
     z-index: 10000;
     position: absolute;
@@ -116,13 +125,13 @@
 .status-title-widget.alert {
     background-color: #FF4A4A;
 }
-.status-title-widget.alertphase.level1 {
+.level1 .status-title-widget {
     background-color: #b5b51a;
 }
-.status-title-widget.alertphase.level2 {
+.level2 .status-title-widget {
     background-color: #f7ad26;
 }
-.status-title-widget.alertphase.level3 {
+.level3 .status-title-widget {
     background-color: #FF4A4A;
 }
 
