@@ -337,7 +337,7 @@
                     queue.push({
                         filename: file.name || 'unnamed',
                         upload_url: makeUploadUrl(image, fileId),
-                        download_url: makeDownloadUrl(image, fileId),
+                        download_url: makeDownloadUrl(image, fileId, true),
                         file: file
                     })
                 });
@@ -646,15 +646,25 @@
                 return max + UNPIN_ORDER_INCREMENT;
             }
 
-            function makeUploadUrl(image, fileId) {
-                return UPLOAD_URL_BUILDER({
+            function makeUploadUrl(image, fileId, external) {
+                let builder = UPLOAD_URL_BUILDER;
+                if (external) {
+                    builder = UPLOAD_URL_BUILDERS.EXTERNAL;
+                }
+
+                return builder({
                     type: image ? 'image' : 'file',
                     id: fileId || makeUUID()
                 });
             }
 
-            function makeDownloadUrl(image, fileId) {
-                return DOWNLOAD_URL_BUILDER({
+            function makeDownloadUrl(image, fileId, external) {
+                let builder = DOWNLOAD_URL_BUILDER;
+                if (external) {
+                    builder = DOWNLOAD_URL_BUILDERS.EXTERNAL;
+                }
+
+                return builder({
                     type: image ? 'image' : 'file',
                     id: fileId || makeUUID()
                 });
@@ -666,6 +676,29 @@
                     return v.toString(16);
                   });
             }
+
+            function downloadURI(uri, name) {
+                let downloadUrl = urlConverter(uri),
+                    link = document.createElement("a"),
+                    fileName = name || '';
+
+                // If you don't know the name or want to use
+                // the webserver default set name = ''
+                link.setAttribute('download', fileName);
+                link.href = downloadUrl;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            }
+
+            function urlConverter(url) {
+                if (IS_INTERNAL) {
+                    return url.replace('skec-fujairah.loc8.dev', '172.16.5.8');
+                } else {
+                    return url.replace('172.16.5.8', 'skec-fujairah.loc8.dev');
+                }
+            }
+
 
             function NewsItem(model, callbacks) {
                 let _views = {},
@@ -697,7 +730,7 @@
 
                     // Init handlers
                     thumbnail.click(function() {
-                        window.open(model.media_url);
+                        window.open(urlConverter(model.media_url));
                     });
                     removeButton.click(function() {
                         _callbacks.selectedRemove(model.documentId);
@@ -731,7 +764,7 @@
                     _views.container.data('documentId', model.documentId);
 
                     if (model.type === "image") {
-                        _views.thumbnail.css('background-image', 'url("' + model.media_url + '")')
+                        _views.thumbnail.css('background-image', 'url("' + urlConverter(model.media_url) + '")')
                     } else if (model.type === 'youtube') {
                         let parsed = null;
                         try { parsed = getVideoId(model.media_url);
@@ -763,8 +796,7 @@
                         _views.lowerContainer.append(item);
 
                         item.click(function() {
-                            // TODO: fix
-                            window.open(file.download_url);
+                            downloadURI(file.download_url);
                         });
                     });
 
