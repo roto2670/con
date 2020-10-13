@@ -488,11 +488,12 @@ def update_user_password(user_id, password):
     db.session.commit()
 
 
-def update_user_information(user_id, name, department):
+def update_user_information(user_id, name, department, emirates_id):
   user = User.query.filter_by(id=user_id).one_or_none()
   if user:
     user.name = name
     user.sign_in_provider = department
+    user.emirates_id = emirates_id
     db.session.commit()
 
 

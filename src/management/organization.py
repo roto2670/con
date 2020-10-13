@@ -170,7 +170,8 @@ def member_update(user_id):
   else:
     username = request.form['username']
     department = request.form['department']
-    in_apis.update_user_information(user_id, username, department)
+    emirates_id = request.form.get('emiratesId', '')
+    in_apis.update_user_information(user_id, username, department, emirates_id)
     return redirect('/management/organization/member')
 
 
