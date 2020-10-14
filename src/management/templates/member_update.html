@@ -52,8 +52,13 @@
                     Covid ID
                   </label>
                   <div class="col-md-6 col-sm-6 col-xs-12">
-                    <input type="text" id="emiratesId" name="emiratesId" value="{{ user.emirates_id}}"
-                        class="form-control col-md-6 col-xs-6">
+                    {% if user.emirates_id %}
+                      <input type="text" id="emiratesId" name="emiratesId" value="{{ user.emirates_id}}"
+                          class="form-control col-md-6 col-xs-6">
+                    {% else %}
+                      <input type="text" id="emiratesId" name="emiratesId" value=""
+                          class="form-control col-md-6 col-xs-6">
+                    {% endif %}
                   </div>
                 </div>
                 <div class="ln_solid"></div>
