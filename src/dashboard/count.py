@@ -65,6 +65,7 @@ IN_OUT_SETTING_ID = {
 
 ACCESS_1_ID = 1
 ACCESS_2_ID = 2
+MUCK_ID = 10
 BUS_WORKSHOP_ID = 3
 BUS_ACCESS_1_ID = 4
 BUS_ACCESS_2_ID = 5
@@ -81,6 +82,7 @@ ACCESS_2_OPERATOR_ID = 4
 ACCESS_POINT = {
   ACCESS_1_ID: "AT 1",
   ACCESS_2_ID: "AT 2",
+  MUCK_ID: "MUCK",
   BUS_WORKSHOP_ID: "BUS WORKSHOP",
   BUS_ACCESS_1_ID: "BUS AT 1",
   BUS_ACCESS_2_ID: "BUS AT 2",
@@ -103,6 +105,7 @@ OUT_LIST = set([])   # [device_id, ..]
 CHECKING_DEVICE_LIST = set([])  # [device_id, ..]
 AT_1_DEVICE_LIST = set([])
 AT_2_DEVICE_LIST = set([])
+MUCK_DEVICE_LIST = set([])
 
 # user_id == bus_id
 BUS_CHECKING_LIST = {}  # {device_id: user_id, ..}  # in checking start, not in checking end
@@ -136,6 +139,7 @@ def test_count():
   a['CHECKING_DEVICE_LIST'] = list(CHECKING_DEVICE_LIST)
   a['AT_1_DEVICE_LIST'] = list(AT_1_DEVICE_LIST)
   a['AT_2_DEVICE_LIST'] = list(AT_2_DEVICE_LIST)
+  a['MUCK_DEVICE_LIST'] = list(MUCK_DEVICE_LIST)
   return a
 
 
@@ -183,7 +187,8 @@ SHOT_GADGET_INFO = {
 SCANNER_LOCATION = {
     "0": "PORTAL",
     "1": "AT1",
-    "2": "AT2"
+    "2": "AT2",
+    "10": "MUCK"
 }
 
 
@@ -194,6 +199,7 @@ SCANNER_LOCATION = {
 S_CHECKING_DEVICE_LIST = set([])  # [device_id, ..]
 S_AT_1_DEVICE_LIST = set([])
 S_AT_2_DEVICE_LIST = set([])
+S_MUCK_DEVICE_LIST = set([])
 
 # }}}
 
@@ -439,6 +445,9 @@ def __fs_set_access_point(ap, device_id):
   elif ap == ACCESS_2_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     AT_2_DEVICE_LIST.add(device_id)
+  elif ap == MUCK_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    MUCK_DEVICE_LIST.add(device_id)
   elif ap == BUS_WORKSHOP_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     BUS_WORKSHOP_DEVICE_LIST.add(device_id)
@@ -457,6 +466,10 @@ def __fs_set_access_point(ap, device_id):
       AT_2_DEVICE_LIST.remove(device_id)
       if not AT_2_DEVICE_LIST:
         clear_keys(ACCESS_2_ID)
+    elif device_id in MUCK_DEVICE_LIST:
+      MUCK_DEVICE_LIST.remove(device_id)
+      if not MUCK_DEVICE_LIST:
+        clear_keys(MUCK_ID)
     elif device_id in BUS_WORKSHOP_DEVICE_LIST:
       # TODO: clear keys?
       BUS_WORKSHOP_DEVICE_LIST.remove(device_id)
@@ -475,15 +488,22 @@ def __sc_set_access_point(ap, device_id):
   elif ap == ACCESS_2_ID:
     S_CHECKING_DEVICE_LIST.add(device_id)
     S_AT_2_DEVICE_LIST.add(device_id)
+  elif ap == MUCK_ID:
+    S_CHECKING_DEVICE_LIST.add(device_id)
+    S_MUCK_DEVICE_LIST.add(device_id)
   else:
     if device_id in AT_1_DEVICE_LIST:
       S_AT_1_DEVICE_LIST.remove(device_id)
       if not S_AT_1_DEVICE_LIST:
         clear_keys_of_sc(ACCESS_1_ID)
-    else:
+    elif device_id in AT_2_DEVICE_LIST:
       S_AT_2_DEVICE_LIST.remove(device_id)
       if not AT_2_DEVICE_LIST:
         clear_keys_of_sc(ACCESS_2_ID)
+    else:
+      S_MUCK_DEVICE_LIST.remove(device_id)
+      if not MUCK_DEVICE_LIST:
+        clear_keys_of_sc(MUCK_ID)
 
 
 def set_device(device_id):
@@ -508,6 +528,8 @@ def _delete_device_of_facestation(device_id):
     AT_1_DEVICE_LIST.remove(device_id)
   if device_id in AT_2_DEVICE_LIST:
     AT_2_DEVICE_LIST.remove(device_id)
+  if device_id in MUCK_DEVICE_LIST:
+    MUCK_DEVICE_LIST.remove(device_id)
   if device_id in BUS_WORKSHOP_DEVICE_LIST:
     BUS_WORKSHOP_DEVICE_LIST.remove(device_id)
   if device_id in BUS_AT_1_DEVICE_LIST:
@@ -527,6 +549,8 @@ def _delete_device_of_scanner(device_id):
     S_AT_1_DEVICE_LIST.remove(device_id)
   if device_id in S_AT_2_DEVICE_LIST:
     S_AT_2_DEVICE_LIST.remove(device_id)
+  if device_id in S_MUCK_DEVICE_LIST:
+    S_MUCK_DEVICE_LIST.remove(device_id)
 
 
 def delete_device(device_id, typ):
@@ -684,6 +708,9 @@ def set_worker_count(org_id, user_id, name, event_data):
                           org_id)
       elif device_id in AT_2_DEVICE_LIST:
         _set_worker_count(device_id, ACCESS_2_ID, user_id, name, event_data,
+                          org_id)
+      elif device_id in MUCK_DEVICE_LIST:
+        _set_worker_count(device_id, MUCK_ID, user_id, name, event_data,
                           org_id)
       elif device_id in BUS_WORKSHOP_DEVICE_LIST:
         if user_group_id == BUS_USER_GROUP_ID:
@@ -879,6 +906,8 @@ def set_equip_count(org_id, hid, dist_data_list):
           _set_equip_count(ACCESS_1_ID, org_id, gid, hid)
         elif not EXPIRE_CACHE.exists(gid) and hid in S_AT_2_DEVICE_LIST:
           _set_equip_count(ACCESS_2_ID, org_id, gid, hid)
+        elif not EXPIRE_CACHE.exists(gid) and hid in S_MUCK_DEVICE_LIST:
+          _set_equip_count(MUCK_ID, org_id, gid, hid)
 
 
 def get_total_equip():
@@ -936,6 +965,9 @@ def _set_access_point(access_point, device_id):
   elif access_point == ACCESS_2_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     AT_2_DEVICE_LIST.add(device_id)
+  elif access_point == MUCK_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    MUCK_DEVICE_LIST.add(device_id)
   elif access_point == BUS_WORKSHOP_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     BUS_WORKSHOP_DEVICE_LIST.add(device_id)
@@ -961,6 +993,9 @@ def _set_access_point_of_sc(access_point, device_id):
   elif access_point == ACCESS_2_ID:
     S_CHECKING_DEVICE_LIST.add(device_id)
     S_AT_2_DEVICE_LIST.add(device_id)
+  elif access_point == MUCK_ID:
+    S_CHECKING_DEVICE_LIST.add(device_id)
+    S_MUCK_DEVICE_LIST.add(device_id)
 
 
 def _set_bus_setting(bus_beacon_id, bus_user_id):
