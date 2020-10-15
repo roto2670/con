@@ -122,27 +122,6 @@ DEVICE_LIST_TIME = {}  # {org_id : time}  # FaceStation Device refresh time
 INTERVAL_TIME = 600  # 10m
 
 
-def test():
-  a = {}
-  a['BUS_CHECKING_LIST'] = BUS_CHECKING_LIST
-  a['BUS_WORKSHOP_DEVICE_LIST'] = list(BUS_WORKSHOP_DEVICE_LIST)
-  a['BUS_AT_1_DEVICE_LIST'] = list(BUS_AT_1_DEVICE_LIST)
-  a['BUS_AT_2_DEVICE_LIST'] = list(BUS_AT_2_DEVICE_LIST)
-  a['BUS_SETTING_DATA'] = BUS_SETTING_DATA
-  return a
-
-
-def test_count():
-  a = {}
-  a['IN_LiST'] = list(IN_LIST)
-  a['OUT_LiST'] = list(OUT_LIST)
-  a['CHECKING_DEVICE_LIST'] = list(CHECKING_DEVICE_LIST)
-  a['AT_1_DEVICE_LIST'] = list(AT_1_DEVICE_LIST)
-  a['AT_2_DEVICE_LIST'] = list(AT_2_DEVICE_LIST)
-  a['MUCK_DEVICE_LIST'] = list(MUCK_DEVICE_LIST)
-  return a
-
-
 GADGET_INFO = {
     "1": "JUMBO DRILL(2B)",
     "2": "JUMBO DRILL(3B)",
@@ -202,6 +181,31 @@ S_AT_2_DEVICE_LIST = set([])
 S_MUCK_DEVICE_LIST = set([])
 
 # }}}
+
+
+def test():
+  a = {}
+  a['BUS_CHECKING_LIST'] = BUS_CHECKING_LIST
+  a['BUS_WORKSHOP_DEVICE_LIST'] = list(BUS_WORKSHOP_DEVICE_LIST)
+  a['BUS_AT_1_DEVICE_LIST'] = list(BUS_AT_1_DEVICE_LIST)
+  a['BUS_AT_2_DEVICE_LIST'] = list(BUS_AT_2_DEVICE_LIST)
+  a['BUS_SETTING_DATA'] = BUS_SETTING_DATA
+  return a
+
+
+def test_count():
+  a = {}
+  a['IN_LiST'] = list(IN_LIST)
+  a['OUT_LiST'] = list(OUT_LIST)
+  a['CHECKING_DEVICE_LIST'] = list(CHECKING_DEVICE_LIST)
+  a['AT_1_DEVICE_LIST'] = list(AT_1_DEVICE_LIST)
+  a['AT_2_DEVICE_LIST'] = list(AT_2_DEVICE_LIST)
+  a['MUCK_DEVICE_LIST'] = list(MUCK_DEVICE_LIST)
+  a['S_CHECKING_DEVICE_LIST'] = list(S_CHECKING_DEVICE_LIST)
+  a['S_AT_1_DEVICE_LIST'] = list(S_AT_1_DEVICE_LIST)
+  a['S_AT_2_DEVICE_LIST'] = list(S_AT_2_DEVICE_LIST)
+  a['S_MUCK_DEVICE_LIST'] = list(S_MUCK_DEVICE_LIST)
+  return a
 
 
 # {{{ emergency

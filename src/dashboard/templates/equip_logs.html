@@ -306,6 +306,46 @@
       </div> <!-- End row -->
 
 
+      <div class="row">  <!-- Start Row Muck -->
+
+        <div class="col-md-6 col-sm-6 col-xs-12">
+          <div class="x_panel tile" style="border-radius:0px;">
+            <div class="x_title">
+              <h3>Muck Check-In</h3>
+            </div>
+            <div class="x_content">
+              <div class="accordionInMuck" id="scroll-style-hidden" role="tablist" aria-multiselectable="true"
+                  style="overflow:scroll;max-height: 500px;">
+              </div>
+                <script>
+                  function getLogs(){
+                    url = "/dash/equip_log/in/10";
+                    jQuery.get(url, { 'page_num': 1})
+                      .done(function (data) {
+                        var logList = JSON.parse(data);
+                        if (logList) {
+                          logList.forEach(function (log) {
+                            var logId = log.id,
+                                timestamp = log.event_time,
+                                payLoad = log.text;
+                            var addObj= "<div class=''>" +
+                                            "<h3 class='panel-title'>" + timestamp +
+                                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                            payLoad + "</h3>" +
+                                        "</div>"
+
+                            $(".accordionInMuck").append(addObj);
+                          });
+                        }
+                      });
+                  }
+                  getLogs();
+                </script>
+            </div> <!-- end x_content -->
+          </div> <!-- end x_panel -->
+        </div>
+
+      </div> <!-- End row -->
 
     </div>
   </div>
