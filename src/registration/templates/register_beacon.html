@@ -16,10 +16,7 @@
         let major = majorNumber;
         let minor = minorNumber;
         if (!major || !minor) {
-          major = Math.floor((Math.random() * 65534) + 1);
-          minor = Math.floor((Math.random() * 65534) + 1);
-          document.getElementById("major").value = major;
-          document.getElementById("minor").value = minor;
+          window.alert("Major or Minor is empty. Please refresh and try again.");
         }
 
 
