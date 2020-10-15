@@ -67,6 +67,7 @@ def reg_beacon():
   if request.method == "GET":
     beacon_info = apis.get_new_beacon_info(REG_ACCOUNT_ID)
     # KIND_NEW_BEACON = mibs00001 -> KIND_NEW_BEACON[:4] = mibs
+    logging.info("## Beacon spec info : %s", beacon_info)
     return render_template("register_beacon.html", beacon_info=beacon_info,
                            category=count.GADGET_INFO, new_name=KIND_NEW_BEACON[:4])
   else:
@@ -84,7 +85,8 @@ def reg_beacon():
     new_id_hash.update(mac_addr.encode('utf-8'))
     new_id = new_id_hash.hexdigest()
     security = uuid.uuid4().hex[:24]
-
+    logging.info("## Beacon name : %s, uuid : %s, major : %s, minor : %s",
+                 name, _uuid, _major, _minor)
     value = {
       "id": new_id,
       "mac": mac_addr,
@@ -121,6 +123,13 @@ def reg_beacon():
     logging.info("Register new beacon resp : %s", ret)
     local_apis.update_new_beacon_info(value, WHITE_LIST)
     return redirect("/registration/beacon")
+
+
+@blueprint.route('/beacon/<gid>/delete', methods=['GET'])
+@util.require_login
+def beacon_delete_route(gid):
+  local_apis.remove_new_beacon(gid)
+  return redirect("/registration/beacon")
 
 
 @blueprint.route('/beacon/<gid>/update', methods=['GET', 'POST'])
