@@ -32,7 +32,7 @@ def register_new_beacon(gadget_info):
     "value": gadget_info
   }
   try:
-    logging.info("## register new beacon url : %s", url)
+    logging.info("## register new beacon url : %s, body : %s", url, body)
     resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
     if resp.ok:
       logging.info("register new beacon successful. Code : %s, Text : %s",
@@ -48,9 +48,9 @@ def register_new_beacon(gadget_info):
     return None
 
 
-def remove_new_beacon(router_id):
+def remove_new_beacon(beacon_id):
   hid = REG_HUB_ID
-  _router = dashboard.count.get_router(router_id)
+  _beacon = dashboard.count.get_beacon(beacon_id)
   url = "{base}hubs/{hid}/event".format(base=BASE_URL, hid=hid)
   headers = {
     "Content-Type": "application/json",
@@ -58,7 +58,7 @@ def remove_new_beacon(router_id):
   }
   body = {
     "topic": "gadget.removed",
-    "value": _router
+    "value": _beacon
   }
   try:
     resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
@@ -67,11 +67,11 @@ def remove_new_beacon(router_id):
                    resp.status_code, resp.text)
       return True
     else:
-      logging.warning("Failed remove new beacon router. Code : %s, Text : %s",
+      logging.warning("Failed remove new beacon. Code : %s, Text : %s",
                       resp.status_code, resp.text)
       return False
   except:
-    logging.exception("Raise error while remove router. Body : %s",
+    logging.exception("Raise error while remove new beacon. Body : %s",
                       body)
     return None
 
@@ -86,13 +86,14 @@ def update_new_beacon_info(gadget_info, white_list_id):
     "name": gadget_info['name'],
     "tags": gadget_info['tags'],
     "custom": gadget_info['custom'],
+    "beacon_spec": gadget_info['beacon_spec'],
     "blacklist": ["*"],
     "whitelist": [white_list_id],
     "permission": 7
   }
 
   try:
-    logging.info("## update new beacon url : %s", url)
+    logging.info("## update new beacon url : %s, data : %s", url, body)
     resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
     if resp.ok:
       logging.info("update beacon information successful. Code : %s, Text : %s",

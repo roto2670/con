@@ -100,6 +100,11 @@
                       class="form-control col-md-6 col-xs-6">
                   <div style="text-align: right">
                     <button type="submit" class="btn btn-default">Update</button>
+                    {% if beacon.kind == "mibs00001" %}
+                      <a href="/registration/beacon/{{ beacon.id }}/delete">
+                        <button type="button" class="btn btn-danger">Remove</button>
+                      </a>
+                    {% endif %}
                   </div>
                 </div>
               </form>
