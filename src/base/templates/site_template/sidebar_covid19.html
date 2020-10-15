@@ -43,11 +43,14 @@
 
     <div class="menu_section">
       <ul class="nav side-menu nav_sm_hidden">
+        {% if current_user.level in [0, 1, 7, 8] %}
         <li>
           <a href="/covid19">
             <i class="fa fa-columns"></i>Dashboard
           </a>
         </li>
+        {% endif %}
+        {% if current_user.level in [0, 7, 8] %}
         <li>
           <a href="/covid19/users">
             <i class="fa fa-users"></i>Staff List
@@ -58,8 +61,9 @@
             <i class="fa fa-bell"></i>Messages
           </a>
         </li>
-        <li>
+        {% endif %}
         {% if current_user.level in [0, 7] %}
+        <li>
           <a href="/covid19/managedata">
             <i class="fa fa-database"></i>Manage Data
           </a>

@@ -35,7 +35,10 @@ def is_internal(request):
 @blueprint.route('/')
 @util.require_login
 def route_default():
-  return render_template("dashboard.html", is_internal = is_internal(request))
+  if current_user.level in [models.SK_ADMIN, models.SK_NORMAL, models.COVID19_ADMIN, models.COVID19_TEAMDOCTOR]:
+    return render_template("dashboard.html", is_internal = is_internal(request))
+  else:
+    return redirect('/')
 
 
 @blueprint.route('/users')
