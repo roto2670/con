@@ -90,7 +90,8 @@ ACCESS_POINT = {
 }
 REVERSE_ACCESS_POINT = {
   ACCESS_1_ID: ACCESS_2_ID,
-  ACCESS_2_ID: ACCESS_1_ID
+  ACCESS_2_ID: ACCESS_1_ID,
+  MUCK_ID: MUCK_ID
 }
 OPERATOR_COUNT_KEY = {
   ACCESS_1_ID: ACCESS_1_OPERATOR_ID,
@@ -812,10 +813,16 @@ def _set_equip_count(key, org_id, gid, hid):
       if has_count_operator:
         operator_key = OPERATOR_COUNT_KEY[key]
         _handle_operator_count(operator_key, gid)
-      text = EQUIP_EXIT_TEXT.format(device_name, ACCESS_POINT[key])
-      log = in_config_apis.create_entrance_equip_log(OUT_SETTING_ID, key, device_tag,
-                                                     hid, scanner_name, gid,
-                                                     device_name, text, org_id)
+      if key == MUCK_ID:  # Muck is only enter, because it is turning point
+        text = EQUIP_ENTER_TEXT.format(device_name, ACCESS_POINT[key])
+        log = in_config_apis.create_entrance_equip_log(IN_SETTING_ID, key, device_tag,
+                                                       hid, scanner_name, gid,
+                                                       device_name, text, org_id)
+      else:
+        text = EQUIP_EXIT_TEXT.format(device_name, ACCESS_POINT[key])
+        log = in_config_apis.create_entrance_equip_log(OUT_SETTING_ID, key, device_tag,
+                                                       hid, scanner_name, gid,
+                                                       device_name, text, org_id)
       _set_expire_equip_cache(gid, device_name)
       _send_equip_log(log)
 
