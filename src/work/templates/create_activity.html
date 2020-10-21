@@ -9,6 +9,29 @@
 
 {% block title %} Activity {% endblock title %}
 
+{% block javascripts %}
+  {{ super() }}
+  <script>
+    function validation() {
+        var fi = document.getElementById('file'),
+            fileSize = (fi.files[0].size / 1024).toFixed(2),
+            fileType = fi.files[0].type;
+        if (fileSize > 256) {
+            document.getElementById('send').disabled = true;
+            alert("The file size is too large. Please upload a file that is less than 256KB. ( Current file size : " + fileSize + " KB )")
+        } else {
+            document.getElementById('send').disabled = false;
+        }
+        if (!!!(fileType == "image/png" || fileType == "image/svg+xml")) {
+            document.getElementById('send').disabled = true;
+            alert("Image file not available as icon. Please select another file.")
+        } else {
+            document.getElementById('send').disabled = false;
+        }
+    }
+  </script>
+{% endblock javascripts %}
+
 {% block content %}
 <div id="scroll-style-hidden" class="right_col" role="main">
     <div class="">
@@ -25,7 +48,7 @@
                     <div class="x_content">  <!-- start x_content -->
                         <br />
                         <form class="form-horizontal form-label-left" method="post"
-                            action="/work/reg/activity/create">
+                            action="/work/reg/activity/create" enctype="multipart/form-data">
 
                             <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12">Name <span class="required">*</span>
@@ -48,11 +71,18 @@
                                 </div>
                             </div>
 
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">File
+                                </label>
+                                <input type="file" id="file" name="file" accept="image/png, image/svg+xml" onchange="validation();"
+                                       class="control-label col-md-3 col-sm-3 col-xs-12"/>
+                            </div>
+
                             <div class="ln_solid"></div>
                             <div class="form-group">
                                 <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                                     <a href="/work/reg/activity"><button class="btn btn-primary" type="button">Cancel</button></a>
-                                    <button type="submit" class="btn btn-success">Create</button>
+                                    <button id="send" type="submit" class="btn btn-success">Create</button>
                                 </div>
                             </div>
 

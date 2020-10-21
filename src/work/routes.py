@@ -9,8 +9,10 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import os
 import json
 import time
+import uuid
 import logging
 import requests
 import datetime
@@ -26,6 +28,11 @@ from work import blueprint
 from constants import API_SERVER
 from constants import WORK_STATE_STOP, WORK_STATE_IN_PROGRESS
 from constants import WORK_STATE_FINISH
+from apscheduler.schedulers.gevent import GeventScheduler
+
+
+SCHED_DATA = {}
+sched = GeventScheduler()
 
 HEADERS = {
   'Content-Type': 'application/json'
@@ -61,6 +68,7 @@ MESSAGE_REMOVE = '''message.removed'''
 TEAM_ADD = '''team.added'''
 TEAM_UPDATE = '''team.updated'''
 TEAM_REMOVE = '''team.removed'''
+ACTIVITY_ADD = '''activity.added'''
 INIT_DATA = '''0'''
 
 
@@ -198,6 +206,8 @@ def _convert_dict_by_activity(data):
       "id": data.id,
       "name": data.name,
       "category": data.category,
+      "activity_id": data.activity_id,
+      "file_path": data.file_path,
       "order": data.order
   }
 
@@ -551,8 +561,13 @@ def get_blast_info_list():
 
 @blueprint.route('/work/add', methods=["POST"])
 @util.require_login
-def add_work():
-  data = request.get_json()
+def add_work(_data=None):
+  auto_add = None
+  if _data:
+    auto_add = True
+    data = _data
+  else:
+    data = request.get_json()
   try:
     #latest_work = work_apis.get_latest_work_by_blast(data['blast_id'])
     #if latest_work:
@@ -568,6 +583,14 @@ def add_work():
     blast_data = work_apis.get_blast(data['blast_id'])
     _blast_data = _convert_dict_by_blast(blast_data)
     send_request(BLAST_UPDATE, [_blast_data])
+    if auto_add:
+      auto_start_data = {
+          'id': data['id'],
+          'category': data['category'],
+          'typ': data['typ'],
+          'blast_id': data['blast_id']
+      }
+      start_work(auto_start_data)
     return json.dumps(True)
   except:
     logging.exception("Fail to add work.")
@@ -823,14 +846,18 @@ def get_pause_history_list_by_work():
 
 @blueprint.route('/work/start', methods=["POST"])
 @util.require_login
-def start_work():
+def start_work(_data=None):
   """
   data = {'id': str, 'category': int, 'typ': int, 'blast_id': str}
   -> work_data
   """
-  data = request.get_json()
+  if _data:
+    data = _data
+  else:
+    data = request.get_json()
   try:
     ret = False
+    start_time = None
     history_data = {
         'typ': data['typ'],
         'work_id': data['id']
@@ -873,9 +900,19 @@ def start_work():
         ret = True
     else:
       # Init data
+      end_time = None
+      if 'start_time' in data:
+        start_time = datetime.datetime.fromtimestamp(data['start_time'])
+        end_time = datetime.datetime.fromtimestamp(time.time() + 5400)
+        added_job = sched.add_job(finish_work, trigger='cron', args=[data],
+                                  year=end_time.year, month=end_time.month,
+                                  day=end_time.day, hour=end_time.hour,
+                                  minute=end_time.minute, second=end_time.second)
+        history_data['job_id'] = added_job.id
       history_data['state'] = WORK_STATE_IN_PROGRESS
-      history_data['timestamp'] = work_apis.get_servertime()
+      history_data['timestamp'] = start_time if start_time else work_apis.get_servertime()
       history_data['accum_time'] = 0
+      history_data['auto_end'] = end_time
       pause_time = 0
       _data = work_apis.create_work_history(history_data)
       send_request(WORK_HISTORY_ADD,
@@ -1049,12 +1086,22 @@ def stop_completed_work():
 
 @blueprint.route('/work/finish', methods=["POST"])
 @util.require_login
-def finish_work():
+def finish_work(_data=None):
   """
   data = {'id': str, 'category': int, 'typ': int, 'blast_id': str}
   -> work_data
   """
-  data = request.get_json()
+  auto_finish = None
+  if _data:
+    auto_finish = True
+    data = _data
+  else:
+    data = request.get_json()
+    his_list = work_apis.get_work_history_list_by_work(data['id'])
+    for _history in his_list:
+      if _history.typ == 101 or _history.typ == '101':
+        if _history.state == 1 and _history.auto_end and _history.job_id:
+          sched.remove_job(_history.job_id)
   try:
     ret = False
     history_data = {
@@ -1146,6 +1193,20 @@ def finish_work():
                                                               latest_work.category)
         send_request(BLAST_UPDATE, [_convert_dict_by_blast(blast_data)])
         ret = True
+    start_history = work_apis.get_work_history_have_auto_end(data['id'])
+    start_data = _convert_dict_by_work_history(start_history)
+    work_apis.update_work_history(start_data)
+    if auto_finish:
+      auto_add_data = {
+          'id': uuid.uuid4().hex,
+          'category': '2',
+          'typ': '304',
+          'state': 0,
+          'accum_time': 0,
+          'p_accum_time': 0,
+          'blast_id': data['blast_id']
+      }
+      add_work(auto_add_data)
     return json.dumps(ret)
   except:
     logging.exception("Failed to stop work. Data : %s", data)
@@ -1343,7 +1404,6 @@ ACTIVITY_NAME = {
     112: "SURVEYING & MARKING",
     113: "CHARGING",
     114: "BLASTING",
-    115: "UNDER CUT BREAKING",
     200: "SHOTCRETE",
     201: "ROCK BOLT MARKING",
     202: "ROCK BOLT DRILLING",
@@ -1375,7 +1435,6 @@ TUNNEL_DIRECTION = {
     1: "WEST"
 }
 ACTIVITY_CATEGORY = {
-    0: "Main Work",
     1: "Supporting Work",
     2: "Idling Activity"
 }
@@ -1424,6 +1483,46 @@ TUNNEL_TYPE_STR = {
     "C1": "Main Cavern 1",
     "C2": "Main Cavern 2",
     "C3": "Main Cavern 3"
+}
+MAIN = {
+    101: 'main/ventilation.svg',
+    102: 'main/first_mucking.svg',
+    103: 'main/mechanical_scaling.svg',
+    104: 'main/manual_scaling.svg',
+    105: 'main/second_mucking.svg',
+    106: 'main/geo_mapping.svg',
+    107: 'main/water_spray.svg',
+    108: 'main/concrete.svg',
+    109: 'main/probhole.svg',
+    110: 'main/cleaning.svg',
+    111: 'main/face_drilling.svg',
+    112: 'main/surveying_marking.svg',
+    113: 'main/charging.svg',
+    114: 'main/blasting.svg',
+}
+SUPPORTING = {
+    200: 'support/support_concrete.svg',
+    201: 'support/rockbolt_marking.svg',
+    202: 'support/rockbolt_drilling.svg',
+    203: 'support/rockbolt_injection.svg',
+    204: 'support/drilling_for_grouting.svg',
+    205: 'support/grouting.svg',
+    206: 'support/grouting_curing.svg',
+    207: 'support/grouting_check_holes.svg',
+    208: 'support/core_drilling.svg',
+}
+IDLE = {
+    300: 'idle/TBM.svg',
+    301: 'idle/interference.svg',
+    302: 'idle/evacuation.svg',
+    303: 'idle/equipment_breakdown.svg',
+    304: 'idle/no_work.svg',
+    305: 'idle/preperation.svg',
+    306: 'idle/resource_not_available.svg',
+    307: 'idle/shift_change.svg',
+    308: 'idle/explosive_delivery.svg',
+    309: 'idle/others.svg',
+    310: 'idle/none.svg',
 }
 
 
@@ -1504,11 +1603,39 @@ def route_reg_activity_create():
   else:
     name = request.form['name']
     category = request.form['category']
+    upload_file = request.files['file']
+    file_path = None
+    content = upload_file.read()
+    last_activity = work_apis.get_activity_by_last_id(category)
+    activity_id = int(last_activity.activity_id) + 1
     activity_data = {
        "name": name,
-       "category": int(category)
+       "category": int(category),
+       "activity_id": activity_id
     }
+    if content:
+      src_path = os.path.dirname(os.path.abspath(__file__))
+      base_path = os.path.join(src_path, 'static', 'imgs')
+      if not os.path.exists(base_path):
+        os.makedirs(base_path)
+      file_type = upload_file.filename.split('.')[-1]
+      file_name = name.replace(' ', '_') + '.' + file_type
+
+      if int(category) == 1:
+        file_path = os.path.join('support', file_name)
+      elif int(category) == 2:
+        file_path = os.path.join('idle', file_name)
+      else:
+        file_path = file_name
+      total_path = os.path.join(base_path, file_path)
+      with open(total_path, 'wb') as f:
+        f.write(content)
+    else:
+      pass
+    activity_data['file_path'] = file_path
     work_apis.create_activity(activity_data)
+    _data = work_apis.get_activity_by_activity_id(activity_id)
+    send_request(ACTIVITY_ADD, [_convert_dict_by_activity(_data)])
     return redirect("/work/reg/activity")
 
 
@@ -1865,3 +1992,66 @@ def _get_download_csv_response(csv_str, filename):
       format(filename)
   resp.headers['Content-Length'] = len(csv_str)
   return resp
+
+
+def init():
+  sched_start()
+  activity_init()
+
+
+def sched_start():
+  sched.start()
+  data_list = work_apis.get_all_work_history_for_auto_end()
+  for _data in data_list:
+    if _data.auto_end > datetime.datetime.now():
+      work = work_apis.get_work(_data.work_id)
+      data = {
+          'id': work.id,
+          'category': work.category,
+          'typ': work.typ,
+          'blast_id': work.blast_id
+      }
+      added_job = sched.add_job(finish_work, trigger='cron', args=[data],
+                                year=_data.auto_end.year,
+                                month=_data.auto_end.month,
+                                day=_data.auto_end.day,
+                                hour=_data.auto_end.hour,
+                                minute=_data.auto_end.minute,
+                                second=_data.auto_end.second)
+      history_data = {
+          'id': _data.id,
+          'typ': work.typ,
+          'work_id': work.id,
+          'job_id': added_job.id,
+          'state': WORK_STATE_IN_PROGRESS,
+          'timestamp': _data.timestamp,
+          'accum_time': work.accum_time,
+          'auto_end': _data.auto_end
+      }
+      work_apis.update_work_history(history_data, True)
+
+
+def activity_init():
+  for activity_id, name in ACTIVITY_NAME.items():
+    activity_data = work_apis.get_activity_by_activity_id(activity_id)
+    if not activity_data:
+      if int(activity_id / 100) == 1:
+        category = 0
+        file_path = MAIN[activity_id]
+      elif int(activity_id / 100) == 2:
+        category = 1
+        file_path = SUPPORTING[activity_id]
+      elif int(activity_id / 100) == 3:
+        category = 2
+        file_path = IDLE[activity_id]
+      data = {
+          'name': name,
+          'category': category,
+          'activity_id': activity_id,
+          'file_path': file_path
+      }
+      work_apis.create_activity(data)
+      logging.warning("Activity data saved successfully. %s, %s", activity_id,
+                      name)
+    else:
+      logging.warning("The data already exists. %s, %s", activity_id, name)
