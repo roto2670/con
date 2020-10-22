@@ -136,6 +136,9 @@
     border-radius: 0.2em;
     margin-bottom: 0.2em;
 }
+.dialog-checkbox {
+    margin: 0 !important;
+}
 
 /* tooltip */
 .tooltip.left .tooltip-inner {

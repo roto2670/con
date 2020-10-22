@@ -1,0 +1,615 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/kiosks.css">
+{% endblock stylesheets %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="top-upper-container">
+        <div class="filter-container search hide">
+            <div class="filter-top-container">
+                <div class="filter-title-icn"></div>
+                <div class="filter-title-label">ID</div>
+            </div>
+            <div class="filter-bottom-container">
+                <div class="searchbox-container">
+                    <input type="text" class="serach-box hidden-textfield" placeholder="ID">
+                    <div class="searchbox-icon"></div>
+                </div>
+            </div>
+        </div>
+        <div class="filter-container location hide">
+            <div class="filter-top-container">
+                <div class="filter-title-icn"></div>
+                <div class="filter-title-label">Location</div>
+            </div>
+            <div class="filter-bottom-container">
+                <div class="filter-btn" id="main_hall">Main Hall</div>
+                <div class="filter-btn" id="camp_a">Camp A</div>
+                <div class="filter-btn" id="camp_b">Camp B</div>
+                <div class="filter-btn" id="camp_c">Camp C</div>
+            </div>
+        </div>
+        <div class="filter-container command">
+            <div class="filter-top-container">
+                <div class="filter-title-icn"></div>
+                <div class="filter-title-label">Commands</div>
+            </div>
+            <div class="filter-bottom-container">
+                <div class="command-btn refresh disabled">
+                    <div class="command-btn-icn hide"></div>
+                    <div class="command-btn-label">Refresh</div>
+                </div>
+                <div class="command-btn add">
+                    <div class="command-btn-icn hide"></div>
+                    <div class="command-btn-label">Add a New Kiosk</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- item list container -->
+    <div class="content-container">
+        <!-- header item -->
+        <div class="item-header-container">
+            <div class="item-header-label">Name</div>
+            <div class="item-header-label">Location</div>
+            <div class="item-header-label">Status</div>
+            <div class="item-header-label">Created</div>
+            <div class="item-header-label">Features</div>
+            <div class="item-header-label">Version</div>
+        </div>
+
+        <!--Code Items -->
+        <div class="code-item-container"></div>
+        
+        <div class="loader-btn loading">
+            <div class="loader-icon"></div>
+            <div class="loader-label">Load more</div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+    <script src="static/js/vendor/jsrsasign/jsrsasign-all-min.js"> </script>
+    <script src="static/js/vendor/qrcode/qrcode.min.js"> </script>
+    <script src="static/js/vendor/moment/moment.min.js"></script>
+    <script>
+        (function() {
+            const IS_INTERNAL = {{is_internal|tojson}};
+            const THE_KEY = 'CopeWithCOVID-19',
+                PAGE_SIZE = 10;
+            const KIOSK_OFFLINE_MIN_DIFF = 65;
+
+            let _db = firebase.firestore();
+
+            let _selectedFilters = {},
+                _kioskItems = {},
+                _lastUserSnapShot = null,
+                _initializedSnapshotHandler = false,
+                _loadingKiosks = false;
+
+
+            // init
+            initialize();
+            initHandlers();
+            initSnapshotHandler();
+            start();
+
+
+            function start() {
+                displayKiosks(_selectedFilters, true, function() {
+                    hideLoader();
+                });
+            }
+
+            function displayKiosks(filters, clean, callback) {
+                callback = callback || _.noop;
+
+                let container = $('.code-item-container');
+                if (!!clean) {
+                    container.children().detach().remove();
+                }
+
+                if (!_loadingKiosks) {
+                    _loadingKiosks = true;
+                    _selectedFilters = filters;
+                    loadKiosks(_lastUserSnapShot, filters, function(kiosks, lastSnapShot) {
+                        if (!!lastSnapShot) {
+                            _lastUserSnapShot = lastSnapShot;
+                        }
+
+                        // render users.
+                        if (!_.isEmpty(kiosks)) {
+                            $.each(kiosks, function(index, kiosk) {
+                                addKioskItem(kiosk, container);
+                            });
+                        } else if (container.children().length <= 0) {
+                            container.append('<div class="item-container-empty">No Kiosks</div>');
+                        }
+                        _loadingKiosks = false;
+                        callback();
+                    });
+                } else {
+                    console.debug("Already loading users.");
+                    callback();
+                }
+            }
+
+            function loadKiosks(startAt, filters, callback) {
+                var query;
+                query = _db.collection('kiosks').orderBy('name')
+                if (!!startAt) {
+                    // Paging
+                    query = query.startAfter(startAt)
+                } 
+                query = query.limit(PAGE_SIZE);
+
+                // Adds filter if has
+                if (!!filters) {
+                    // nothing yet.
+                }
+
+                // do query
+                query.get().then(function(snapshots) {
+                    var kioskList = [],
+                        lastSnapShot;
+                    if (!!!snapshots.empty) {
+                        lastSnapShot = _.last(snapshots.docs);
+                        snapshots.forEach(function(doc) {
+                            let kiosk = doc.data();
+                            kiosk.documentId = doc.id;
+                            kioskList.push(kiosk);
+                        });
+                    } else {
+                        // no more kiosks.
+                    }
+
+                    callback(kioskList, lastSnapShot);
+                }).catch(function(error) {
+                    console.warn('Failed to load kiosks from server.', error);
+                    callback();
+                });
+            }
+
+            function addKiosk(name, location, allowSA) {
+                if (_.isString(name) && !_.isEmpty(name)) {
+                    let _data = {
+                        name: name,
+                        location: location,
+                        enable_sa: allowSA || false,
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    _db.collection('kiosks').doc().set(_data);
+                } else {
+                    console.warn('Failed to create new kisok, name cannot be empty or null.'); 
+                }
+            }
+
+            function addKioskItem(model, parent) {
+                if (model) {
+                    let viewItem = KioskItem(model, {
+                            selected: function(model) {
+                                showQRCodeDialog(model);
+                            }
+                        }),
+                    container = parent || $('.code-item-container');
+                    
+                    // Appends the view.
+                    container.append(viewItem.render());
+
+                    // Store in cache.
+                    _kioskItems[model.documentId] = {
+                        model: model,
+                        viewItem: viewItem
+                    }
+                } else {
+                    console.warn('Failed to add new kiosk item by given item is null.');
+                }
+            }
+
+            function updateKioskItem(model) {
+                if (model) {
+                    let itemData = _kioskItems[model.documentId];
+                    if (itemData) {
+                        itemData.model = model;
+                        itemData.viewItem.update(model);
+                    } else {
+                        console.warn('Failed to update new kiosk item, cannot find data by given id.', model);
+                    }
+                } else {
+                    console.warn('Failed to update new kiosk item by given item is null.');
+                }
+            }
+
+            function showCreateNewKioskDialog() {
+                let dialog = KioskDialog();
+                dialog.show($('.right_col'), function(name, location, allowSA) {
+                    addKiosk(name, location, allowSA);
+                    dialog.hide();
+                });
+            }
+
+            function showQRCodeDialog(model) {
+                if (model) {
+                    let dialog = QRCodeDialog();
+                    dialog.show($('.right_col'), model);
+                } else {
+                    console.warn('Failed to show qr code dialog by given model is null or empty.');
+                }
+            }
+
+            function hideLoader() {
+                $('.loader-btn').removeClass('loading');
+            }
+
+            function generateKioskSign(kioskId) {
+                let header = {
+                    alg: 'HS256'
+                },
+                payload = {
+                    iss: 'SOS',
+                    sub: 'KIOSK',
+                    id: kioskId
+                };
+
+                let sHeader = JSON.stringify(header),
+                    sPayload = JSON.stringify(payload);
+
+                return KJUR.jws.JWS.sign("HS256", sHeader, sPayload, THE_KEY);
+            }
+
+            function downloadURI(uri, name) {
+                var link = document.createElement("a");
+                // If you don't know the name or want to use
+                // the webserver default set name = ''
+                link.setAttribute('download', name);
+                link.href = uri;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            }
+
+            function initialize() {
+                // init Noty
+                PNotify.prototype.options.delay = 5000;
+                PNotify.prototype.options.styling = 'bootstrap3';
+            }
+
+            function initHandlers() {
+                // handle load more button
+                $('.loader-btn').click(function() {
+                    let _this = $(this);
+                    _this.addClass('loading');
+                    displayKiosks(_selectedFilters, false, function () {
+                        _this.removeClass('loading');
+                    });
+                });
+
+
+                $('.command-btn.add').click(function() {
+                    showCreateNewKioskDialog();
+                });
+            }
+
+            function initSnapshotHandler() {
+                // listen new item.
+                _db.collection('kiosks')
+                    .orderBy('ts', 'desc')
+                    .limit(1)
+                    .onSnapshot(function(snapshot) {
+                        if (!_initializedSnapshotHandler) {
+                            // FIXME: OnSnapshot first loads all the documents that match the query.
+                            _initializedSnapshotHandler = true;
+                            return;
+                        }
+                        snapshot.docChanges().forEach(function(change) {
+                            if (change.type === 'added') {
+                                let model = change.doc.data();
+
+                                model.documentId = change.doc.id;
+                                if (snapshot.metadata.hasPendingWrites) {
+                                    // This has not yet been recorded on the server, so must manually set the time field.
+                                    model.ts = {
+                                        seconds: new Date().getTime() / 1000
+                                    };
+                                }
+                                if (!_.has(_kioskItems, change.doc.id)) {
+                                    addKioskItem(model);
+                                } else {
+                                    updateKioskItem(model);
+                                }
+                            }
+                        });
+                    });
+            }
+
+            function KioskItem(model, callbacks) {
+                let _model = model,
+                    _views = {},
+                    _callbacks = callbacks || {
+                        selected: _.noop
+                    };
+
+                function render() {
+                    let container = $('<div class="kiosk-item">');
+                    let checkbox = $('<input type="checkbox" class="kiosk-item-checkbox">');
+                    let nameCell = $('<div class="kiosk-item-cell name">'),
+                        nameContainer = $('<div class="kiosk-item-content-container name">'),
+                        nameLabel = $('<div class="kiosk-item-name-label">');
+                        idLabel = $('<div class="kiosk-item-id-label">');
+                    let locationLabel = $('<div class="kiosk-item-label location">'),
+                        statusCell = $('<div class="kiosk-item-cell status">'),
+                        statusLabel = $('<div class="kiosk-item-label">'),
+                        statusIcon = $('<div class="kiosk-item-icon">');
+                    let createdLabel = $('<div class="kiosk-item-label created">');
+                    let featuresCell = $('<div class="kiosk-item-cell features">'),
+                        selfAssessmentIcon = $('<div class="kiosk-item-feature"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M17.5 15.833V14.1663H6.66667V15.833H17.5ZM17.5 10.833V9.16634H6.66667V10.833H17.5ZM6.66667 5.83301H17.5V4.16634H6.66667V5.83301ZM3.33333 4.16634V5.83301H5V4.16634H3.33333ZM2.5 4.16634C2.5 3.94533 2.5878 3.73337 2.74408 3.57709C2.90036 3.42081 3.11232 3.33301 3.33333 3.33301H5C5.22101 3.33301 5.43298 3.42081 5.58926 3.57709C5.74554 3.73337 5.83333 3.94533 5.83333 4.16634V5.83301C5.83333 6.05402 5.74554 6.26598 5.58926 6.42226C5.43298 6.57854 5.22101 6.66634 5 6.66634H3.33333C3.11232 6.66634 2.90036 6.57854 2.74408 6.42226C2.5878 6.26598 2.5 6.05402 2.5 5.83301V4.16634ZM3.33333 9.16634V10.833H5V9.16634H3.33333ZM2.5 9.16634C2.5 8.94533 2.5878 8.73337 2.74408 8.57709C2.90036 8.4208 3.11232 8.33301 3.33333 8.33301H5C5.22101 8.33301 5.43298 8.4208 5.58926 8.57709C5.74554 8.73337 5.83333 8.94533 5.83333 9.16634V10.833C5.83333 11.054 5.74554 11.266 5.58926 11.4223C5.43298 11.5785 5.22101 11.6663 5 11.6663H3.33333C3.11232 11.6663 2.90036 11.5785 2.74408 11.4223C2.5878 11.266 2.5 11.054 2.5 10.833V9.16634ZM3.33333 14.1663V15.833H5V14.1663H3.33333ZM2.5 14.1663C2.5 13.9453 2.5878 13.7334 2.74408 13.5771C2.90036 13.4208 3.11232 13.333 3.33333 13.333H5C5.22101 13.333 5.43298 13.4208 5.58926 13.5771C5.74554 13.7334 5.83333 13.9453 5.83333 14.1663V15.833C5.83333 16.054 5.74554 16.266 5.58926 16.4223C5.43298 16.5785 5.22101 16.6663 5 16.6663H3.33333C3.11232 16.6663 2.90036 16.5785 2.74408 16.4223C2.5878 16.266 2.5 16.054 2.5 15.833V14.1663Z" fill="#999999"></svg></div>'),
+                        thermometerIcon = $('<div class="kiosk-item-feature"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M7.5 13.3333C7.51683 13.9852 7.78761 14.6047 8.25462 15.0598C8.72162 15.5149 9.34792 15.7696 10 15.7696C10.6521 15.7696 11.2784 15.5149 11.7454 15.0598C12.2124 14.6047 12.4832 13.9852 12.5 13.3333C12.5 13.0392 12.44 12.7617 12.3467 12.5H7.65333C7.55457 12.7669 7.5027 13.0488 7.5 13.3333Z" fill="#999999"/> <path d="M15 5.00033V3.33366H12.3458C12.1747 2.8477 11.8573 2.42662 11.4373 2.12821C11.0173 1.82981 10.5152 1.66869 10 1.66699C8.62167 1.66699 7.5 2.78866 7.5 4.16699V9.00033C6.74096 9.44118 6.11072 10.0733 5.67207 10.8336C5.23343 11.5939 5.00171 12.4559 5 13.3337C5 16.0912 7.2425 18.3337 10 18.3337C12.7575 18.3337 15 16.0912 15 13.3337C14.9983 12.4559 14.7666 11.5939 14.3279 10.8336C13.8893 10.0733 13.259 9.44118 12.5 9.00033V8.33366H15V6.66699H12.5V5.00033H15ZM11.3292 10.2703C11.9236 10.5326 12.4292 10.9615 12.7849 11.5052C13.1406 12.0489 13.3311 12.684 13.3333 13.3337C13.3333 15.172 11.8383 16.667 10 16.667C8.16167 16.667 6.66667 15.172 6.66667 13.3337C6.66667 12.0128 7.45333 10.8112 8.67083 10.2703L9.16667 10.0512V4.16699C9.16667 3.94598 9.25446 3.73402 9.41074 3.57774C9.56702 3.42146 9.77899 3.33366 10 3.33366C10.221 3.33366 10.433 3.42146 10.5893 3.57774C10.7455 3.73402 10.8333 3.94598 10.8333 4.16699V10.0512L11.3292 10.2703Z" fill="#999999"/> </svg></div>');
+                    let versionLabel = $('<div class="kiosk-item-label version">');
+                    
+                    container.append(nameCell, locationLabel, statusCell, createdLabel, featuresCell, versionLabel);
+                    nameCell.append(checkbox, nameContainer);
+                    nameContainer.append(nameLabel, idLabel);
+                    statusCell.append(statusIcon, statusLabel);
+                    featuresCell.append(selfAssessmentIcon, thermometerIcon);
+
+                    // Store id.
+                    container.attr('uid', model.documentId);
+                    checkbox.attr('uid', model.documentId);
+
+                    // init handlers
+                    container.click(function() {
+                        _callbacks.selected(_model);
+                    });
+
+                    // Store views.
+                    _views = {
+                        container: container,
+                        checkbox: checkbox,
+                        nameLabel: nameLabel,
+                        idLabel: idLabel,
+                        locationLabel: locationLabel,
+                        statusIcon: statusIcon,
+                        statusLabel: statusLabel,
+                        createdLabel: createdLabel,
+                        selfAssessmentIcon: selfAssessmentIcon,
+                        thermometerIcon: thermometerIcon,
+                        versionLabel: versionLabel
+                    }
+
+                    update(_model);
+
+                    return container;
+                }
+
+                function update(model) {
+                    _model = model;
+
+                    _views.nameLabel.text(model.name || '-');
+                    _views.idLabel.text('(' + (model.device_id || '-') + ')');
+                    _views.locationLabel.text(model.location || '-');
+                    _views.createdLabel.text(new Date(model.ts.seconds * 1000).toLocaleString() || '-');
+
+                    // Handle features.
+                    if (model.enable_sa) {
+                        _views.selfAssessmentIcon.addClass('enabled');
+                    } else {
+                        _views.selfAssessmentIcon.removeClass('enabled');
+                    }
+                    if (model.thermometer) {
+                        _views.thermometerIcon.addClass('enabled');
+                    } else {
+                        _views.thermometerIcon.removeClass('enabled');
+                    }
+
+                    // handle Status
+                    updateStatus();
+
+                    _views.versionLabel.text(model.version || 'N/A');
+                }
+
+                function updateStatus() {
+                    if (_model && _views) {
+                        if (!_.isString(model.f_token) || _.isEmpty(model.f_token.trim())) {
+                            _views.statusIcon.empty();
+                            _views.statusIcon.addClass('hide');
+                            _views.statusLabel.removeClass('hide');
+                            _views.statusLabel.text('Not configured');
+                        }  else if (_model.last_ping) {
+                            let pongDate = moment(_model.last_ping.seconds * 1000),    
+                                todayDate = moment(),
+                                diffMin = todayDate.diff(pongDate, 'minutes'),
+                                offline = false;
+                            offline = diffMin >= KIOSK_OFFLINE_MIN_DIFF;
+
+                            _views.statusLabel.text('');
+                            _views.statusIcon.removeClass('hide');
+                            _views.statusLabel.addClass('hide');
+                            if (offline) {
+                                _views.statusIcon.addClass('offline');
+                            } else {
+                                _views.statusIcon.removeClass('offline');
+                            }
+                        }
+                    }
+                }
+
+                return {
+                    render: render
+                }
+            }
+
+
+            function QRCodeDialog() {
+                let _views,
+                    _model = null,
+                    _callback = _.noop;
+
+                function render() {
+                    let container = $('<div class="c-modal-dialog cmessage-dialog">'),
+                        contentContainer = $('<div class="c-modal-dialog-content cmessage-dialog-content">'),
+                        closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">');
+                    let qrCodeContainer = $('<div class="dialog-qr-code-container"/>');
+                    let downloadButton = $('<div class="dialog-btn">Download</div>');
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, qrCodeContainer, downloadButton);
+
+                    // init handlers
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                        }
+                    });
+                    closeButton.click(function() {
+                        hide();
+                    });
+                    downloadButton.click(function() {
+                        let fileName = _model.name;
+                        if (location) {
+                            fileName = '(' + _model.location + ')' + fileName;
+                        }
+                        fileName = fileName + '.png';
+                        downloadURI(_views.qrCodeContainer.children('img').attr('src'), fileName);
+                    });
+
+                    // Store views
+                    _views = {};
+                    _views.container = container;
+                    _views.qrCodeContainer = qrCodeContainer;
+                }
+
+                function show(parent, model, callback) {
+                    _callback = callback || _.noop;
+                    _model = model;
+
+                    render();
+                    parent.append(_views.container);
+
+                    renderQRCode(generateKioskSign(model.documentId));
+                }
+
+                function hide() {
+                    if (_views && _views.container) {
+                        _views.container.remove();
+                    }
+                    _views = null;
+                    _callback = _.noop;
+                }
+
+                function renderQRCode(text, name, location) {
+                    if (_views) {
+                        let generator = new QRCode(_views.qrCodeContainer.get(0));
+                        generator.makeCode(text);
+
+                        return;
+                        // Render download button
+                        let fileName = name;
+                        if (location) {
+                            fileName = '(' + location + ')' + fileName;
+                        }
+                        let downloadButton = $('<a download="' + fileName + '">Download</a>');
+                        _views.downloadContainer.empty().append(downloadButton);
+                        downloadButton.attr('href', _views.qrCodeContainer.children('img').attr('src'));
+                        console.warn(_views.qrCodeContainer.children('img').attr('src'));
+                    }
+                }
+
+                return {
+                    show: show,
+                    hide: hide
+                }
+            }
+
+            function KioskDialog() {
+                let _views,
+                    _callback = _.noop;
+
+                function render() {
+                    let container = $('<div class="c-modal-dialog cmessage-dialog kiosk-dialog">'),
+                        contentContainer = $('<div class="c-modal-dialog-content cmessage-dialog-content">'),
+                        closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">');
+                    let bodyContainer = $('<div class="kiosk-dialog-body" />');
+                    let nameTitleLabel = $('<div class="dialog-title-label">Name</div>'),
+                        nameTextBox = $('<input type="text" class="dialog-textbox" placeholder="Kiosk Name"></div>'),
+                        locationTitleLabel = $('<div class="dialog-title-label">Location</div>'),
+                        locationTextBox = $('<input type="text" class="dialog-textbox" placeholder="Place where the kiosk is installed"></div>');
+                    let saContainer = $('<div class="kiosk-sa-container">'),
+                        saTitleLabel = $('<div class="dialog-title-label">Self-Assessment</div>'),
+                        saCheckbox = $('<input type="checkbox" id="sa-checkbox">'),
+                        saLabel = $('<label class="kiosk-sa-desc-label" for="sa-checkbox">Check to support the self-assessment on the kiosk.</label>');
+                    let registerButton = $('<div class="dialog-btn">Register</div>');
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, bodyContainer, registerButton, saTitleLabel, saContainer);
+                    bodyContainer.append(nameTitleLabel, nameTextBox, locationTitleLabel, locationTextBox);
+                    saContainer.append(saCheckbox, saLabel);
+
+                    // init handlers
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
+                    closeButton.click(function() {
+                        hide();
+                    });
+                    registerButton.click(function() {
+                        let name = nameTextBox.val().trim();
+                        let location = locationTextBox.val().trim();
+
+                        if (_.isEmpty(name)) {
+                            new PNotify({
+                                type: 'notice',
+                                text: 'Please enter Kiosk name'
+                            });
+
+                            return;
+                        }
+
+                        _callback(name, location, saCheckbox.is(':checked'));
+                    });
+
+                    // Store views
+                    _views = {};
+                    _views.container = container;
+                    _views.nameTextBox = nameTextBox;
+                    _views.locationTextBox = locationTextBox;
+                }
+
+                function show(parent, callback) {
+                    _callback = callback || _.noop;
+                    render();
+                    parent.append(_views.container);
+                }
+
+                function hide() {
+                    if (_views && _views.container) {
+                        _views.container.remove();
+                    }
+                    _views = null;
+                    _callback = _.noop;
+                }
+
+                return {
+                    show: show,
+                    hide: hide
+                }
+            }
+        })();
+    </script>
+{% endblock javascripts %}
