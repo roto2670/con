@@ -63,6 +63,11 @@ def route_manage_data():
 def route_news():
   return render_template("news.html", is_internal = is_internal(request))
 
+@blueprint.route('/kiosks')
+@util.require_login
+def route_kiosks():
+  return render_template("kiosks.html", is_internal = is_internal(request))
+
 @blueprint.route('/settings')
 @util.require_login
 def route_settings():
