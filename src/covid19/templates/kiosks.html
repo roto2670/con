@@ -47,9 +47,13 @@
                 <div class="filter-title-label">Commands</div>
             </div>
             <div class="filter-bottom-container">
-                <div class="command-btn refresh disabled">
+                <div class="command-btn refresh disabled hide">
                     <div class="command-btn-icn hide"></div>
                     <div class="command-btn-label">Refresh</div>
+                </div>
+                <div class="command-btn remove disabled">
+                    <div class="command-btn-icn hide"></div>
+                    <div class="command-btn-label">Remove</div>
                 </div>
                 <div class="command-btn add">
                     <div class="command-btn-icn hide"></div>
@@ -67,8 +71,9 @@
             <div class="item-header-label">Location</div>
             <div class="item-header-label">Status</div>
             <div class="item-header-label">Created</div>
-            <div class="item-header-label">Features</div>
             <div class="item-header-label">Version</div>
+            <div class="item-header-label">Features</div>
+            <div class="item-header-label">Commands</div>
         </div>
 
         <!--Code Items -->
@@ -189,7 +194,7 @@
                 if (_.isString(name) && !_.isEmpty(name)) {
                     let _data = {
                         name: name,
-                        location: location,
+                        location: location || '',
                         enable_sa: allowSA || false,
                         ts: firebase.firestore.FieldValue.serverTimestamp()
                     };
@@ -199,11 +204,43 @@
                 }
             }
 
+            function updateKiosk(documentId, name, location, allowSA) {
+                if (_.isString(documentId) && !_.isEmpty(documentId) && _.isString(name) && !_.isEmpty(name)) {
+                    let _data = {
+                        name: name,
+                        location: location || '',
+                        enable_sa: allowSA || false,
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    _db.collection('kiosks').doc(documentId).update(_data);
+                } else {
+                    console.warn('Failed to create new kisok, name and document id cannot be empty or null.'); 
+                }
+            }
+
+            function removeKiosks(idList) {
+                if (!_.isEmpty(idList)) {
+                    let batch = _db.batch();
+                    _.each(idList, function(id) {
+                        batch.delete(_db.collection('kiosks').doc(id));
+                    });
+                    batch.commit();
+                } else {
+                    console.warn('Failed to remove kiosk list, given id list is empty or null.');
+                }
+            }
+
             function addKioskItem(model, parent) {
                 if (model) {
                     let viewItem = KioskItem(model, {
-                            selected: function(model) {
+                            selectedQr: function(model) {
                                 showQRCodeDialog(model);
+                            },
+                            selectedEdit: function(model) {
+                                showKioskDialog(model);
+                            },
+                            checkboxChanged: function(checked) {
+                                onKioskSelectChanged(); 
                             }
                         }),
                     container = parent || $('.code-item-container');
@@ -221,6 +258,16 @@
                 }
             }
 
+            function removeKioskItems(idList) {
+                _.each(idList, function(id) {
+                    let data = _kioskItems[id];
+                    if (data) {
+                        data.viewItem.destroy();
+                        delete _kioskItems[id];
+                    }
+                });
+            }
+
             function updateKioskItem(model) {
                 if (model) {
                     let itemData = _kioskItems[model.documentId];
@@ -235,10 +282,19 @@
                 }
             }
 
-            function showCreateNewKioskDialog() {
+            function showKioskDialog(model) {
                 let dialog = KioskDialog();
-                dialog.show($('.right_col'), function(name, location, allowSA) {
-                    addKiosk(name, location, allowSA);
+                dialog.show($('.right_col'), model, function(name, location, allowSA) {
+                    if (!model) {
+                        addKiosk(name, location, allowSA);
+                    } else {
+                        updateKiosk(model.documentId, name, location, allowSA);
+                        updateKioskItem(_.extend(model, {
+                            name: name,
+                            location: location,
+                            enable_sa: allowSA
+                        }));
+                    }
                     dialog.hide();
                 });
             }
@@ -249,6 +305,15 @@
                     dialog.show($('.right_col'), model);
                 } else {
                     console.warn('Failed to show qr code dialog by given model is null or empty.');
+                }
+            }
+
+            function onKioskSelectChanged() {
+                let removeButton = $('.command-btn.remove');
+                if (_.isEmpty(getSelectedKiosks())) {
+                    removeButton.addClass('disabled');
+                } else {
+                    removeButton.removeClass('disabled');
                 }
             }
 
@@ -270,6 +335,18 @@
                     sPayload = JSON.stringify(payload);
 
                 return KJUR.jws.JWS.sign("HS256", sHeader, sPayload, THE_KEY);
+            }
+
+            function getSelectedKiosks() {
+                let idList = [];
+                
+                _.each(_kioskItems, function(pair) {
+                    if (pair.viewItem.isChecked()) {
+                        idList.push(pair.viewItem.getId());
+                    }
+                });
+
+                return idList;
             }
 
             function downloadURI(uri, name) {
@@ -301,7 +378,17 @@
 
 
                 $('.command-btn.add').click(function() {
-                    showCreateNewKioskDialog();
+                    showKioskDialog();
+                });
+                $('.command-btn.remove').click(function() {
+                    if (!$(this).hasClass('disabled')) {
+                        if (window.confirm('Are you sure?')) {
+                            let selectedIdList = getSelectedKiosks();
+                            removeKioskItems(selectedIdList);
+                            removeKiosks(selectedIdList);
+                            onKioskSelectChanged();
+                        }
+                    }
                 });
             }
 
@@ -341,7 +428,9 @@
                 let _model = model,
                     _views = {},
                     _callbacks = callbacks || {
-                        selected: _.noop
+                        selectedQr: _.noop,
+                        selectedEdit: _.noop,
+                        checkboxChanged: _.noop
                     };
 
                 function render() {
@@ -360,20 +449,31 @@
                         selfAssessmentIcon = $('<div class="kiosk-item-feature"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M17.5 15.833V14.1663H6.66667V15.833H17.5ZM17.5 10.833V9.16634H6.66667V10.833H17.5ZM6.66667 5.83301H17.5V4.16634H6.66667V5.83301ZM3.33333 4.16634V5.83301H5V4.16634H3.33333ZM2.5 4.16634C2.5 3.94533 2.5878 3.73337 2.74408 3.57709C2.90036 3.42081 3.11232 3.33301 3.33333 3.33301H5C5.22101 3.33301 5.43298 3.42081 5.58926 3.57709C5.74554 3.73337 5.83333 3.94533 5.83333 4.16634V5.83301C5.83333 6.05402 5.74554 6.26598 5.58926 6.42226C5.43298 6.57854 5.22101 6.66634 5 6.66634H3.33333C3.11232 6.66634 2.90036 6.57854 2.74408 6.42226C2.5878 6.26598 2.5 6.05402 2.5 5.83301V4.16634ZM3.33333 9.16634V10.833H5V9.16634H3.33333ZM2.5 9.16634C2.5 8.94533 2.5878 8.73337 2.74408 8.57709C2.90036 8.4208 3.11232 8.33301 3.33333 8.33301H5C5.22101 8.33301 5.43298 8.4208 5.58926 8.57709C5.74554 8.73337 5.83333 8.94533 5.83333 9.16634V10.833C5.83333 11.054 5.74554 11.266 5.58926 11.4223C5.43298 11.5785 5.22101 11.6663 5 11.6663H3.33333C3.11232 11.6663 2.90036 11.5785 2.74408 11.4223C2.5878 11.266 2.5 11.054 2.5 10.833V9.16634ZM3.33333 14.1663V15.833H5V14.1663H3.33333ZM2.5 14.1663C2.5 13.9453 2.5878 13.7334 2.74408 13.5771C2.90036 13.4208 3.11232 13.333 3.33333 13.333H5C5.22101 13.333 5.43298 13.4208 5.58926 13.5771C5.74554 13.7334 5.83333 13.9453 5.83333 14.1663V15.833C5.83333 16.054 5.74554 16.266 5.58926 16.4223C5.43298 16.5785 5.22101 16.6663 5 16.6663H3.33333C3.11232 16.6663 2.90036 16.5785 2.74408 16.4223C2.5878 16.266 2.5 16.054 2.5 15.833V14.1663Z" fill="#999999"></svg></div>'),
                         thermometerIcon = $('<div class="kiosk-item-feature"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M7.5 13.3333C7.51683 13.9852 7.78761 14.6047 8.25462 15.0598C8.72162 15.5149 9.34792 15.7696 10 15.7696C10.6521 15.7696 11.2784 15.5149 11.7454 15.0598C12.2124 14.6047 12.4832 13.9852 12.5 13.3333C12.5 13.0392 12.44 12.7617 12.3467 12.5H7.65333C7.55457 12.7669 7.5027 13.0488 7.5 13.3333Z" fill="#999999"/> <path d="M15 5.00033V3.33366H12.3458C12.1747 2.8477 11.8573 2.42662 11.4373 2.12821C11.0173 1.82981 10.5152 1.66869 10 1.66699C8.62167 1.66699 7.5 2.78866 7.5 4.16699V9.00033C6.74096 9.44118 6.11072 10.0733 5.67207 10.8336C5.23343 11.5939 5.00171 12.4559 5 13.3337C5 16.0912 7.2425 18.3337 10 18.3337C12.7575 18.3337 15 16.0912 15 13.3337C14.9983 12.4559 14.7666 11.5939 14.3279 10.8336C13.8893 10.0733 13.259 9.44118 12.5 9.00033V8.33366H15V6.66699H12.5V5.00033H15ZM11.3292 10.2703C11.9236 10.5326 12.4292 10.9615 12.7849 11.5052C13.1406 12.0489 13.3311 12.684 13.3333 13.3337C13.3333 15.172 11.8383 16.667 10 16.667C8.16167 16.667 6.66667 15.172 6.66667 13.3337C6.66667 12.0128 7.45333 10.8112 8.67083 10.2703L9.16667 10.0512V4.16699C9.16667 3.94598 9.25446 3.73402 9.41074 3.57774C9.56702 3.42146 9.77899 3.33366 10 3.33366C10.221 3.33366 10.433 3.42146 10.5893 3.57774C10.7455 3.73402 10.8333 3.94598 10.8333 4.16699V10.0512L11.3292 10.2703Z" fill="#999999"/> </svg></div>');
                     let versionLabel = $('<div class="kiosk-item-label version">');
+                    let commandsCell = $('<div class="kiosk-item-cell commands">'),
+                        qrCodeButton = $('<div class="kiosk-item-btn qr">'),
+                        editButton = $('<div class="kiosk-item-btn edit">');
                     
-                    container.append(nameCell, locationLabel, statusCell, createdLabel, featuresCell, versionLabel);
+                    container.append(nameCell, locationLabel, statusCell, createdLabel, versionLabel, featuresCell,
+                        commandsCell);
                     nameCell.append(checkbox, nameContainer);
                     nameContainer.append(nameLabel, idLabel);
                     statusCell.append(statusIcon, statusLabel);
                     featuresCell.append(selfAssessmentIcon, thermometerIcon);
+                    commandsCell.append(qrCodeButton, editButton);
 
                     // Store id.
                     container.attr('uid', model.documentId);
                     checkbox.attr('uid', model.documentId);
 
                     // init handlers
-                    container.click(function() {
-                        _callbacks.selected(_model);
+                    qrCodeButton.click(function() {
+                        _callbacks.selectedQr(_model);
+                    });
+                    editButton.click(function() {
+                        _callbacks.selectedEdit(_model);
+                    });
+                    checkbox.change(function() {
+                        _callbacks.checkboxChanged($(this).is(':checked'));
                     });
 
                     // Store views.
@@ -448,8 +548,29 @@
                     }
                 }
 
+                function isChecked() {
+                    return _views && _views.checkbox.is(':checked');
+                }
+
+                function getId() {
+                    return _model && _model.documentId;
+                }
+
+                function destroy() {
+                    if (_views) {
+                        _views.container.remove();
+                    }
+                    _views = null;
+                    _callbacks = null;
+                    _model = null;
+                }
+
                 return {
-                    render: render
+                    render: render,
+                    update: update,
+                    isChecked: isChecked,
+                    getId: getId,
+                    destroy: destroy
                 }
             }
 
@@ -537,9 +658,10 @@
 
             function KioskDialog() {
                 let _views,
+                    _model = null,
                     _callback = _.noop;
 
-                function render() {
+                function render(model) {
                     let container = $('<div class="c-modal-dialog cmessage-dialog kiosk-dialog">'),
                         contentContainer = $('<div class="c-modal-dialog-content cmessage-dialog-content">'),
                         closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">');
@@ -584,6 +706,14 @@
                         _callback(name, location, saCheckbox.is(':checked'));
                     });
 
+                    // Updates the value if has model
+                    if (model) {
+                        nameTextBox.val(model.name || '');
+                        locationTextBox.val(model.location || '');
+                        saCheckbox.prop('checked', model.enable_sa);
+                        registerButton.text('Update');
+                    }
+
                     // Store views
                     _views = {};
                     _views.container = container;
@@ -591,9 +721,11 @@
                     _views.locationTextBox = locationTextBox;
                 }
 
-                function show(parent, callback) {
+                function show(parent, model, callback) {
                     _callback = callback || _.noop;
-                    render();
+                    _model = model;
+
+                    render(model);
                     parent.append(_views.container);
                 }
 

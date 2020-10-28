@@ -1,4 +1,3 @@
-
 .top-upper-container {
     display: flex;
     flex-wrap: nowrap;
@@ -153,10 +152,13 @@
     /* Created */
 }
 .item-header-label:nth-child(4) {
+    /* Version */
+}
+.item-header-label:nth-child(4) {
     /* Features */
 }
 .item-header-label:nth-last-child(1) {
-    /* Version */
+    /* Commands */
 }
 
 .item-container {
@@ -179,7 +181,6 @@
     padding: 0.6em 0.4em;
     box-sizing: border-box;
     font-size: 0.85em;
-    cursor: pointer;
 }
 .kiosk-item:hover {
     background-color: #ef80092b;
@@ -257,6 +258,27 @@
 }
 .kiosk-item-feature.enabled > svg > * {
     fill: #EF8009;
+}
+.kiosk-item-btn {
+    width: 2.8em;
+    height: 2.8em;
+    background-color: #EF8009;
+    background-size: 1.8em 1.8em;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 0.2em;
+    cursor: pointer;
+    box-shadow: 1px 1px #c1c1c1;
+    margin-left: 0.4em;
+}
+.kiosk-item-btn:nth-child(1) {
+    margin-left: 0;
+}
+.kiosk-item-btn.qr {
+    background-image: url(../img/icn_qr.svg);
+}
+.kiosk-item-btn.edit {
+    background-image: url(../img/icn_edit.svg);
 }
 
 .loader-btn {
