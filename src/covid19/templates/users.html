@@ -240,6 +240,15 @@
                 CLINIC: '_cnc_',
                 OP: '_op_',
                 COMMAND: '_cmd_'
+            },
+            CLINIC_ACTION = {
+                QUARANTINE_ORDERED: 1,
+                ISOLATION_ORDERED: 2,
+                REFER_TEST: 3,
+                CLINIC_RELEASE: 4,
+                QUARANTINE_CONFIRMED: 5,
+                ISOLATION_CONFIRMED: 6,
+                OP_RELEASE: 7
             };
             const DEFAULT_FILTER = CLINIC_STATUS_VALUE['symptom-suspected'];
             let USER_PAGE_SIZE = 10,
@@ -317,7 +326,10 @@
                         let userIds = getSelectedUsers();
                         if (!_.isEmpty(userIds)) {
                             if (window.confirm('Have you confirmed the selected persons are in QUARANTINE?')) {
+                                let idList = _.pluck(userIds, 'id');
                                 doUpdateStatus(userIds, STATUS_TYPE.COMMAND, OP_STATUS_VALUE['quarantine-confirmed'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.QUARANTINE_CONFIRMED);
+
                                     new PNotify({
                                         type: 'success',
                                         text: 'Successfully changed status.'
@@ -340,7 +352,10 @@
                         let userIds = getSelectedUsers();
                         if (!_.isEmpty(userIds)) {
                             if (window.confirm('Have you confirmed the selected persons are in ISOLATION?')) {
+                                let idList = _.pluck(userIds, 'id');
                                 doUpdateStatus(userIds, STATUS_TYPE.OP, OP_STATUS_VALUE['isolation-confirmed'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.ISOLATION_CONFIRMED);
+
                                     new PNotify({
                                         type: 'success',
                                         text: 'Successfully changed status.'
@@ -363,7 +378,10 @@
                         let userIds = getSelectedUsers();
                         if (!_.isEmpty(userIds)) {
                             if (window.confirm('Do you want the selected persons to get tested?')) {
+                                let idList = _.pluck(userIds, 'id');
                                 doUpdateStatus(userIds, STATUS_TYPE.COMMAND, COMMAND_STATUS_VALUE.REFER_TEST, function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.REFER_TEST);
+
                                     new PNotify({
                                         type: 'success',
                                         text: 'Successfully refer test.'
@@ -386,7 +404,10 @@
                         let userIds = getSelectedUsers();
                         if (!_.isEmpty(userIds)) {
                             if (window.confirm('Do you confirm that the selected persons currently have no risk of COVID-19?')) {
+                                let idList = _.pluck(userIds, 'id');
                                 doUpdateStatus(userIds, STATUS_TYPE.CLINIC, CLINIC_STATUS_VALUE['none'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.CLINIC_RELEASE);
+
                                     new PNotify({
                                         type: 'success',
                                         text: 'Successfully release.'
@@ -409,7 +430,10 @@
                         let userIds = getSelectedUsers();
                         if (!_.isEmpty(userIds)) {
                             if (window.confirm('Do you confirm that the selected persons do not require quarantine or isolation?')) {
+                                let idList = _.pluck(userIds, 'id');
                                 doUpdateStatus(userIds, STATUS_TYPE.OP, OP_STATUS_VALUE['none'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.OP_RELEASE);
+
                                     new PNotify({
                                         type: 'success',
                                         text: 'Successfully release.'
@@ -434,7 +458,10 @@
                         let userIds = getSelectedUsers();
                         if (!_.isEmpty(userIds)) {
                             if (window.confirm('Do you want to quarantine the selected persons?')) {
+                                let idList = _.pluck(userIds, 'id');
                                 doUpdateStatus(userIds, STATUS_TYPE.CLINIC, CLINIC_STATUS_VALUE['quarantine-required'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.QUARANTINE_ORDERED);
+
                                     new PNotify({
                                         type: 'success',
                                         text: 'Successfully release.'
@@ -457,7 +484,10 @@
                         let userIds = getSelectedUsers();
                         if (!_.isEmpty(userIds)) {
                             if (window.confirm('Do you want to isolation the selected persons?')) {
+                                let idList = _.pluck(userIds, 'id');
                                 doUpdateStatus(userIds, STATUS_TYPE.CLINIC, CLINIC_STATUS_VALUE['isolation-required'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.ISOLATION_ORDERED);
+
                                     new PNotify({
                                         type: 'success',
                                         text: 'Successfully release.'
@@ -806,6 +836,50 @@
                     }
                 } else {
                     _callback();
+                }
+            }
+
+            function logClinicAction(userId, staffId, action, callback) {
+                let _callback = callback || _.noop;
+                if (!_.isString(userId) || _.isEmpty(userId)) {
+                    console.warn('Failed to log clinic action by given user id is null.');
+                    _callback();
+                    return;
+                }
+                if (_.isEmpty(staffId)) {
+                    console.log('Staff id is null, try use logged user.');
+                }
+                if (!_.isNumber(action)) {
+                    console.warn('Failed to log clinic action, action should be number.');
+                    _callback();
+                    return;
+                }
+
+                let _log = firebase.app().functions('asia-east2').httpsCallable('logClinicAction'),
+                    _staffId = staffId || firebase.auth().currentUser.uid,
+                    _userId = userId; 
+
+                // do request
+                _log({
+                    userId: _userId,
+                    staffId: _staffId,
+                    action: action
+                }).then(function(result) {
+                    _callback();
+                });
+            }
+
+            function logClinicActions(userIds, staffId, action) {
+                if (!_.isArray(userIds)) {
+                    console.warn('Failed to log clinic action by give id list is null.');
+                    return;
+                }
+
+                let _userId = userIds.shift();
+                if (_userId) {
+                    logClinicAction(_userId, staffId, action, function() {
+                        logClinicActions(userIds, staffId, action);
+                    });
                 }
             }
 
