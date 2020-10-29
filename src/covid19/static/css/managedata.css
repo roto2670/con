@@ -226,3 +226,11 @@
     margin-left: 1em;
     font-size: 1em;
 }
+
+.download-sub-container {
+    margin-bottom: 1.2em;
+}
+.download-title-label {
+    font-weight: 500;
+    font-size: 1.4em;
+}
