@@ -67,11 +67,24 @@
     <div class="content-container donwloads">
         <div class="si-content-container logs">
             <div class="log-download-container">
-                <div class="log-download-btn" id="master">Master file</div>
-                <div class="log-download-btn" id="app_usage">Daily app usage report</div>
-                <div class="log-download-btn-container">
-                    <div class="log-download-btn" id="observation">Observation report</div>
-                    <div class="log-download-run-btn btn" id="observation">Run</div>
+                <div class="download-sub-container master">
+                    <div class="download-title-label">Master</div>
+                    <div class="log-download-btn" id="master">Master file</div>
+                </div>
+                <div class="download-sub-container logs">
+                    <div class="download-title-label">Logs</div>
+                    <div class="log-download-btn" id="app_usage">Daily app usage report</div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="observation">Observation report</div>
+                        <div class="log-download-run-btn btn" id="observation">Run</div>
+                    </div>
+                </div>
+                <div class="download-sub-container qr">
+                    <div class="download-title-label">QR Codes</div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="qr_codes">All QR Codes</div>
+                        <div class="log-download-run-btn btn" id="qr_codes">Generate</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -137,15 +150,32 @@
             const DONWLOAD_FILENAME = {
                     master: 'master_file.csv',
                     app_usage: 'daily_app_usage_report.csv',
-                    observation: 'observation_report.csv'
+                    observation: 'observation_report.csv',
+                    qr_codes: 'qrcodes.zip'
                 },
                 DOWNLOAD_FILE_DISPLAY = {
                     master: 'Master file',
                     app_usage: 'Daily app usage report',
-                    observation: 'Observation report'
+                    observation: 'Observation report',
+                    qr_codes: 'All QR codes'
                 },
                 SCRIPT_ID = {
-                    observation: 'observation_report'
+                    observation: 3,
+                    qr_codes: 8
+
+                },
+                RUN_SCRIPT_MESSAGE = {
+                    SUCCESS: {
+                        observation: 'Generated an observation report.',
+                        qr_codes: 'Generating QR codes, Please reload after a few minutes.'
+                    },
+                    ERROR: {
+                        observation: 'Failed to generation an observation report. Check the logs in Settings menu.',
+                        qr_codes: 'Failed to start QR codes generation. Please try again later.'
+                    },
+                    BUSY: {
+                        qr_codes: 'Already generating QR codes. Please check later.'
+                    }
                 },
                 OBSERVATION_VALID_DAY = 7;
 
@@ -465,9 +495,14 @@
 
                 // handle download logs button
                 $('.log-download-btn').click(function() {
-                    let type = $(this).attr('id');
+                    let type = $(this).attr('id'),
+                        fileType = 'csv';
+                    if (type == 'qr_codes') {
+                        fileType = 'res';
+                    }
+
                     downloadURI(DOWNLOAD_URL_BUILDER({
-                        type: 'csv',
+                        type: fileType,
                         id: DONWLOAD_FILENAME[type]
                     }));
                 });
@@ -499,6 +534,14 @@
                         });
                     }
                 });
+
+                // add lisnter for generate qr codes
+                $('.log-download-run-btn#qr_codes').click(function() {
+                    if (window.confirm('This is a heavy task and may not be response for a few minutes. Are you sure?')) {
+                        runScript('qr_codes');
+                        $('.log-download-btn#qr_codes').text(DOWNLOAD_FILE_DISPLAY['qr_codes'] + '(Generating...)');
+                    }
+                }); 
             }
 
             function loadUsersLog() {
@@ -509,7 +552,7 @@
 
                 }),
                 titleLabel = $('.log-panel.users').find('.log-panel-title-label');
-                titleLabel.addClass('Logs(Fetching time...)');
+                titleLabel.text('Logs(Fetching creation date...)');
 
                 $.getJSON(TIME_URL_BUILDER({
                     id: 'users.log'
@@ -542,22 +585,28 @@
                 }
 
                 $.getJSON(_requestUrl, function(data) {
-                    if (data && data.code == 0) {
+                    let _data = data || {};
+                    if (_data.code == 0) {
                         loadDownloadFile(type);
                         new PNotify({
                             type: 'success',
-                            text: 'Generated an observation report.'
+                            text: RUN_SCRIPT_MESSAGE.SUCCESS[type]
+                        });
+                    } else if (_data.code == 3) {
+                        new PNotify({
+                            type: 'notice',
+                            text: RUN_SCRIPT_MESSAGE.BUSY[type]
                         });
                     } else {
                         new PNotify({
                             type: 'error',
-                            text: 'Failed to generation an observation report. Check the logs in Settings menu.'
+                            text: RUN_SCRIPT_MESSAGE.ERROR[type]
                         });
                     }
                 }).fail(function() {
                     new PNotify({
                         type: 'error',
-                        text: 'Report generation request failed.'
+                        text: 'Failed to request.'
                     });
                 });
             }
@@ -586,7 +635,7 @@
                                 id: DONWLOAD_FILENAME[type]
                             });
                         
-                        button.text(DOWNLOAD_FILE_DISPLAY[type] + '(Fetching time...)');
+                        button.text(DOWNLOAD_FILE_DISPLAY[type] + '(Fetching creation date...)');
                         $.getJSON(requestUrl, function(data) {
                             if (data && data.time) {
                                 let time = new Date(data.time * 1000),
@@ -595,6 +644,8 @@
 
                                 // Store.
                                 _downloadFilesTime[type] = time;
+                            } else if (data.code == 3) {
+                                button.text(DOWNLOAD_FILE_DISPLAY[type] + '(Generating...)');
                             } else {
                                 button.text(DOWNLOAD_FILE_DISPLAY[type] + '(N/A)');
                             }
@@ -611,6 +662,7 @@
                     _loadFileTime('master');
                     _loadFileTime('app_usage');
                     _loadFileTime('observation');
+                    _loadFileTime('qr_codes');
                 }
             }
 
