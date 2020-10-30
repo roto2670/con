@@ -26,6 +26,7 @@ import apis
 import common
 import base.routes
 import dash.routes
+import work.routes
 import dashboard.count
 from base import db, login_manager, socket_io
 from config import DebugConfig, ProductionConfig
@@ -138,6 +139,7 @@ def create_app():
   common.start()
   set_local_address()
   conf_socket(app)
+  work.routes.init()
   return app
 
 

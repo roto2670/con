@@ -482,11 +482,21 @@ def get_all_work():
 
 def create_work_history(data):
   cur_time = get_servertime()
+  if 'auto_end' in data:
+    auto_end = data['auto_end']
+  else:
+    auto_end = None
+  if 'job_id' in data:
+    job_id = data['job_id']
+  else:
+    job_id = None
   data = WorkHistory(typ=data['typ'],
                      state=data['state'],
                      timestamp=data['timestamp'],
                      accum_time=data['accum_time'],
                      created_time=cur_time,
+                     auto_end=auto_end,
+                     job_id=job_id,
                      last_updated_user=current_user.email,
                      work_id=data['work_id'])
   db.session.add(data)
@@ -524,8 +534,16 @@ def create_complete_finish_work_history(data):
   return data
 
 
-def update_work_history(data):
+def update_work_history(data, sched=None):
   # TODO:
+  if 'auto_end' in data:
+    auto_end = data['auto_end']
+  else:
+    auto_end = None
+  if 'job_id' in data:
+    job_id = data['job_id']
+  else:
+    job_id = None
   _id = data['id']
   cur_time = get_servertime()
   _data = get_work_history(_id)
@@ -534,7 +552,10 @@ def update_work_history(data):
   _data.state = data['state'] if 'state' in data else _data.state
   _data.timestamp = data['timestamp'] if 'timestamp' in data else _data.timestamp
   _data.accum_time = data['accum_time']
-  _data.last_updated_user = current_user.email
+  _data.auto_end = auto_end
+  _data.job_id = job_id
+  if not sched:
+    _data.last_updated_user = current_user.email
   db.session.commit()
   return data
 
@@ -557,8 +578,22 @@ def get_work_history_list_by_work(work_id):
   return data_list
 
 
+def get_work_history_have_auto_end(work_id):
+  data = WorkHistory.query.filter_by(work_id=work_id, state=1).one_or_none()
+  return data
+
+
 def get_all_work_history():
   data_list = WorkHistory.query.all()
+  return data_list
+
+
+def get_all_work_history_for_auto_end():
+  data_list = []
+  _data_list = WorkHistory.query.filter_by(state=1).all()
+  for data in _data_list:
+    if data.auto_end:
+      data_list.append(data)
   return data_list
 
 
@@ -613,8 +648,10 @@ def create_activity(data):
   cur_time = get_servertime()
   data = Activity(name=data['name'],
                   category=data['category'],
+                  activity_id=data['activity_id'],
+                  file_path=data['file_path'],
                   created_time=cur_time,
-                  last_updated_user=current_user.email,
+                  last_updated_user=current_user.email if current_user else "Auto",
                   last_updated_time=cur_time)
   db.session.add(data)
   db.session.commit()
@@ -630,6 +667,17 @@ def remove_activity(_id):
 def get_activity(_id):
   data = Activity.query.filter_by(id=_id).one_or_none()
   return data
+
+
+def get_activity_by_activity_id(activity_id):
+  data = Activity.query.filter_by(activity_id=activity_id).one_or_none()
+  return data
+
+
+def get_activity_by_last_id(category):
+  data_list = Activity.query.filter_by(category=category).\
+      order_by(desc(Activity.activity_id)).all()
+  return data_list[0]
 
 
 def get_all_activity():
