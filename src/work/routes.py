@@ -69,6 +69,8 @@ TEAM_ADD = '''team.added'''
 TEAM_UPDATE = '''team.updated'''
 TEAM_REMOVE = '''team.removed'''
 ACTIVITY_ADD = '''activity.added'''
+ACTIVITY_REMOVE = '''activity.removed'''
+ACTIVITY_UPDATE = '''activity.updated'''
 INIT_DATA = '''0'''
 
 
@@ -1101,7 +1103,8 @@ def finish_work(_data=None):
     for _history in his_list:
       if _history.typ == 101 or _history.typ == '101':
         if _history.state == 1 and _history.auto_end and _history.job_id:
-          sched.remove_job(_history.job_id)
+          if sched.get_job(_history.job_id):
+            sched.remove_job(_history.job_id)
   try:
     ret = False
     history_data = {
@@ -1591,8 +1594,14 @@ def route_analyze():
 @util.require_login
 def route_reg_activity():
   activity_list = work_apis.get_all_activity()
+  wip_work_list = work_apis.get_work_list_in_progress()
+  wip_work_typ_list = []
+  for work in wip_work_list:
+    wip_work_typ_list.append(work.typ)
+  wip_work_typ_list = list(set(wip_work_typ_list))
   return render_template("reg_activity_list.html",
-                         activity_list=activity_list)
+                         activity_list=activity_list,
+                         wip_work_typ_list=wip_work_typ_list)
 
 
 @blueprint.route('/reg/activity/create', methods=['GET', 'POST'])
@@ -1637,6 +1646,82 @@ def route_reg_activity_create():
     work_apis.create_activity(activity_data)
     _data = work_apis.get_activity_by_activity_id(activity_id)
     send_request(ACTIVITY_ADD, [_convert_dict_by_activity(_data)])
+    return redirect("/work/reg/activity")
+
+
+@blueprint.route('/reg/activity/delete/<aid>', methods=['POST'])
+@util.require_login
+def route_reg_activity_remove(aid):
+  activity_data = work_apis.get_activity(aid)
+  src_path = os.path.dirname(os.path.abspath(__file__))
+  base_path = os.path.join(src_path, 'static', 'imgs')
+  last_file_path = activity_data.file_path
+  if last_file_path:
+    remove_file_path = os.path.join(base_path, last_file_path)
+    os.remove(remove_file_path)
+  work_apis.remove_activity(aid)
+  ret = {
+      "activity_id": activity_data.activity_id,
+      "category": activity_data.category,
+      "name": activity_data.name
+  }
+  send_request(ACTIVITY_REMOVE, [ret])
+  return redirect("/work/reg/activity")
+
+
+@blueprint.route('/reg/activity/edit/<aid>', methods=['GET', 'POST'])
+@util.require_login
+def route_reg_activity_edit(aid):
+  if request.method == "GET":
+    activity_data = work_apis.get_activity(aid)
+    return render_template("edit_activity.html",
+                           activity_category=ACTIVITY_CATEGORY,
+                           activity_data=activity_data)
+  else:
+    activity_data = work_apis.get_activity(aid)
+    name = request.form['name']
+    category = request.form['category']
+    upload_file = request.files['file']
+    file_path = None
+    activity_id = None
+    content = upload_file.read()
+    if int(category) != activity_data.category:
+      last_activity = work_apis.get_activity_by_last_id(category)
+      activity_id = int(last_activity.activity_id) + 1
+    else:
+      activity_id = activity_data.activity_id
+    update_data = {
+        "id": aid,
+        "name": name,
+        "category": category,
+        "activity_id": activity_id
+    }
+    src_path = os.path.dirname(os.path.abspath(__file__))
+    base_path = os.path.join(src_path, 'static', 'imgs')
+    if content:
+      src_path = os.path.dirname(os.path.abspath(__file__))
+      base_path = os.path.join(src_path, 'static', 'imgs')
+      if not os.path.exists(base_path):
+        os.makedirs(base_path)
+      file_type = upload_file.filename.split('.')[-1]
+      file_name = name.replace(' ', '_') + '.' + file_type
+
+      if int(category) == 1:
+        file_path = os.path.join('support', file_name)
+      elif int(category) == 2:
+        file_path = os.path.join('idle', file_name)
+      else:
+        file_path = file_name
+      total_path = os.path.join(base_path, file_path)
+      with open(total_path, 'wb') as f:
+        f.write(content)
+    last_file_path = activity_data.file_path
+    if last_file_path:
+      remove_file_path = os.path.join(base_path, last_file_path)
+      os.remove(remove_file_path)
+    update_data['file_path'] = file_path
+    ret = work_apis.update_activity(update_data)
+    send_request(ACTIVITY_UPDATE, [_convert_dict_by_activity(ret)])
     return redirect("/work/reg/activity")
 
 
