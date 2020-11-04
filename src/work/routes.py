@@ -1152,7 +1152,7 @@ def finish_work(_data=None):
                                                               history_data['accum_time'],
                                                               latest_work.category)
         send_request(BLAST_UPDATE, [_convert_dict_by_blast(blast_data)])
-        ret = True
+        ret = _convert_dict_by_blast(blast_data)
       elif _data.state == WORK_STATE_FINISH:
         ret = False
       else:
@@ -1192,10 +1192,11 @@ def finish_work(_data=None):
                                                               history_data['accum_time'],
                                                               latest_work.category)
         send_request(BLAST_UPDATE, [_convert_dict_by_blast(blast_data)])
-        ret = True
+        ret = _convert_dict_by_blast(blast_data)
     start_history = work_apis.get_work_history_have_auto_end(data['id'])
-    start_data = _convert_dict_by_work_history(start_history)
-    work_apis.update_work_history(start_data)
+    if start_history:
+      start_data = _convert_dict_by_work_history(start_history)
+      work_apis.update_work_history(start_data)
     if auto_finish:
       auto_add_data = {
           'id': uuid.uuid4().hex,

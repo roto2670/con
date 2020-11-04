@@ -579,7 +579,12 @@ def get_work_history_list_by_work(work_id):
 
 
 def get_work_history_have_auto_end(work_id):
-  data = WorkHistory.query.filter_by(work_id=work_id, state=1).one_or_none()
+  data = None
+  data_list = WorkHistory.query.filter_by(work_id=work_id, state=1).\
+      order_by(WorkHistory.timestamp).all()
+  for _data in data_list:
+    if _data.auto_end:
+      data = _data
   return data
 
 
