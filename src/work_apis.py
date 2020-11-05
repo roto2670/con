@@ -475,6 +475,11 @@ def get_work_list_by_blast(blast_id):
   return data_list
 
 
+def get_work_list_in_progress():
+  data_list = Work.query.filter_by(state=1).all()
+  return data_list
+
+
 def get_all_work():
   data_list = Work.query.order_by(desc(Work.created_time)).all()
   return data_list
@@ -688,6 +693,19 @@ def get_activity_by_last_id(category):
 def get_all_activity():
   data_list = Activity.query.all()
   return data_list
+
+
+def update_activity(data):
+  cur_time = get_servertime()
+  _data = get_activity(data['id'])
+  _data.name = data['name']
+  _data.category = data['category']
+  _data.activity_id = data['activity_id']
+  _data.file_path = data['file_path']
+  _data.last_updated_time = cur_time
+  _data.last_updated_user = current_user.email
+  db.session.commit()
+  return _data
 
 
 def create_operator(data):
