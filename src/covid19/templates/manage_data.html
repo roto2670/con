@@ -78,6 +78,10 @@
                         <div class="log-download-btn" id="observation">Observation report</div>
                         <div class="log-download-run-btn btn" id="observation">Run</div>
                     </div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="clinic_reports">Clinic Report</div>
+                        <div class="log-download-run-btn btn" id="clinic_reports">Run</div>
+                    </div>
                 </div>
                 <div class="download-sub-container qr">
                     <div class="download-title-label">QR Codes</div>
@@ -151,27 +155,32 @@
                     master: 'master_file.csv',
                     app_usage: 'daily_app_usage_report.csv',
                     observation: 'observation_report.csv',
-                    qr_codes: 'qrcodes.zip'
+                    qr_codes: 'qrcodes.zip',
+                    clinic_reports: 'clinic_reports.csv'
                 },
                 DOWNLOAD_FILE_DISPLAY = {
                     master: 'Master file',
                     app_usage: 'Daily app usage report',
                     observation: 'Observation report',
-                    qr_codes: 'All QR codes'
+                    qr_codes: 'All QR codes',
+                    clinic_reports: 'Clinic Reports'
                 },
                 SCRIPT_ID = {
                     observation: 3,
-                    qr_codes: 8
+                    qr_codes: 8,
+                    clinic_reports: 9
 
                 },
                 RUN_SCRIPT_MESSAGE = {
                     SUCCESS: {
                         observation: 'Generated an observation report.',
-                        qr_codes: 'Generating QR codes, Please reload after a few minutes.'
+                        qr_codes: 'Generating QR codes, Please reload after a few minutes.',
+                        clinic_reports: 'Generated a clinic report.'
                     },
                     ERROR: {
                         observation: 'Failed to generation an observation report. Check the logs in Settings menu.',
-                        qr_codes: 'Failed to start QR codes generation. Please try again later.'
+                        qr_codes: 'Failed to start QR codes generation. Please try again later.',
+                        clinic_reports: 'Failed to generation a clinic report. Check the logs in Settings menu.',
                     },
                     BUSY: {
                         qr_codes: 'Already generating QR codes. Please check later.'
@@ -540,6 +549,13 @@
                     if (window.confirm('This is a heavy task and may not be response for a few minutes. Are you sure?')) {
                         runScript('qr_codes');
                         $('.log-download-btn#qr_codes').text(DOWNLOAD_FILE_DISPLAY['qr_codes'] + '(Generating...)');
+                    }
+                }); 
+
+                // add lisnter for clinic reports.
+                $('.log-download-run-btn#clinic_reports').click(function() {
+                    if (window.confirm('Aure you sure?')) {
+                        runScript('clinic_reports');
                     }
                 }); 
             }
