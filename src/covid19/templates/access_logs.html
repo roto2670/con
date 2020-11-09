@@ -1,0 +1,494 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/accesslogs.css">
+    <!-- bootstrap-daterangepicker -->
+    <link href="{{ url_for('static', filename='vendors/bootstrap-daterangepicker/daterangepicker.css') }}" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="sub-title-container status-container none-border">
+        <i class="fa fa-sign-in"></i> INSIDE
+    </div>
+    <div class="content-container">
+        <div class="count-container">
+            <div class="count-container-title">Tunnel</div>
+            <div id="tunnelIn" class="count-container-message">0</div>
+        </div>
+        <div class="count-container">
+            <div class="count-container-title">Camp A/B</div>
+            <div id="campAB" class="count-container-message">0</div>
+        </div>
+        <div class="count-container">
+            <div class="count-container-title">Camp C/D</div>
+            <div id="campCD" class="count-container-message">0</div>
+        </div>
+    </div>
+    <div class="sub-title-container status-container none-border">
+        <i class="fa fa-sign-out"></i> OUTSIDE
+    </div>
+    <div class="content-container">
+        <div class="count-container">
+            <div class="count-container-title"> Outside</div>
+            <div id="tunnelOut" class="count-container-message">1222</div>
+        </div>
+    </div>
+    <div class="sub-title-container status-container">
+        <i class="fa fa-search"></i> Search
+        <div class="status-maximize-btn"></div>
+    </div>
+    <div class="top-upper-container">
+        <div class="user-filter-container search">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-label">ID</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-searchbox-container">
+                    <input id="workerId" type="text" class="user-serach-box hidden-textfield" placeholder="ID">
+                </div>
+            </div>
+        </div>
+        <div class="user-filter-container search">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-label">Name</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-searchbox-container">
+                    <input id="workerName" type="text" class="user-serach-box hidden-textfield" placeholder="Name">
+                </div>
+            </div>
+        </div>
+        <div class="user-filter-container search">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-label">Department</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-searchbox-container">
+                    <input id="department" type="text" class="user-serach-box hidden-textfield" placeholder="Department">
+                </div>
+            </div>
+        </div>
+        <div class="user-filter-container search">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-label">In/Out</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-searchbox-container">
+                    <select id="inout" name="inout" class="user-serach-box hidden-selectfield">
+                        <option id="0" value="0" selected>ALL</option>
+                        <option id="1" value="1">IN</option>
+                        <option id="2" value="2">OUT</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="user-filter-container search">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-label">Location</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-searchbox-container">
+                    <select id="location" name="location" class="user-serach-box hidden-selectfield">
+                        <option id="0" value="0" selected>ALL</option>
+                        <option id="1" value="1">AT1</option>
+                        <option id="2" value="2">AT2</option>
+                        <option id="30" value="30">CAMP A/B</option>
+                        <option id="31" value="31">CAMP C/D</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="top-lower-container">
+        <div class="user-filter-container search">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-label">Violation</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-searchbox-container">
+                    <select id="violation" name="violation" class="user-serach-box hidden-selectfield">
+                        <option id="100" value="100" selected>ALL</option>
+                        <option id="1" value="1">Normal</option>
+                        <option id="2" value="2">Violation</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="user-filter-container search">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-label">Datetime</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-searchbox-container">
+                      <div id="reportrange_right" class="pull-left" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                        <span>December 30, 2014 - January 28, 2015</span> <b class="caret"></b>
+                      </div>
+                      <input type="hidden" id="datetime" name="datetime" value="[]"
+                          class="form-control col-md-6 col-xs-6" >
+                </div>
+            </div>
+        </div>
+        <div class="user-filter-container search">
+            <div class="user-filter-top-container">
+                <div class="user-filter-title-icn hide"></div>
+                <div class="user-filter-title-label"></div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="search-btn message">
+                    <div class="search-btn-icn hide"></div>
+                    <div class="search-btn-label">Search</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content-container">
+        <!-- filter item -->
+        <div class="user-item-header-container">
+            <div class="user-item-header-label">Name</div>
+            <div class="user-item-header-label">Deparment</div>
+            <div class="user-item-header-label">Time</div>
+            <div class="user-item-header-label">In/Out</div>
+            <div class="user-item-header-label">Location</div>
+            <div class="user-item-header-label">Violation</div>
+        </div>
+
+        <!-- User Item -->
+        <div class="user-item-container"></div>
+
+        <div class="user-item-loader-btn loading">
+            <div class="user-item-loader-icon"></div>
+            <div class="user-item-loader-label">Load more</div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='vendors/socketio/socket.io.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendors/moment/min/moment.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendors/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+
+    <script>
+        (function() {
+            const TUNNEL_1 = "1",
+                  TUNNEL_2 = "2",
+                  CAMP_AB = "30",
+                  CAMP_CD = "31";
+            const INOUT = {
+                1: 'IN',
+                2: 'OUT'
+            };
+            const LOCATION = {
+                1: "AT1",
+                2: "AT2",
+                30: "CAMP A/B",
+                31: "CAMP C/D"
+            };
+            const VIOLATION = {
+                0: "Normal",
+                1: "Violation"
+            };
+            let _lastUserSnapShot,
+                _loadingUsers = false,
+                _selectedFilters = null,
+                _pageNumber = 1;
+            let _sock = null;
+
+            start();
+
+            function start() {
+                initHandlers();
+                initSocketHandlers();
+	            init_daterangepicker_right()
+                displayUsers({
+                }, [], function() {
+                    $('.user-item-loader-btn').removeClass('loading');
+                }, false);
+            }
+
+            function stop() {
+            }
+
+            function init_daterangepicker_right() {
+				if( typeof ($.fn.daterangepicker) === 'undefined'){ return; }
+				//console.log('init_daterangepicker_right');
+
+				var cb = function(start, end, label) {
+                    //console.log("CB : " , start.toISOString(), end.toISOString(), label);
+                    $('#reportrange_right span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+				};
+
+				var optionSet1 = {
+                    //startDate: moment().subtract(29, 'days'),
+                    startDate: moment(),
+                    endDate: moment(),
+                    minDate: '01/01/2019',
+                    maxDate: '12/31/2025',
+                    dateLimit: {
+                        days: 30
+                    },
+                    showDropdowns: true,
+                    showWeekNumbers: true,
+                    timePicker: false,
+                    timePickerIncrement: 1,
+                    timePicker12Hour: true,
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 30 Days': [moment().subtract(29, 'days'), moment()]
+                        //'This Month': [moment().startOf('month'), moment().endOf('month')],
+                        //'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    },
+                    opens: 'right',
+                    buttonClasses: ['btn btn-default'],
+                    applyClass: 'btn-small btn-primary',
+                    cancelClass: 'btn-small',
+                    format: 'MM/DD/YYYY',
+                    separator: ' to ',
+                    autoApply: true,
+                    showCustomRangeLabel: true,
+                    locale: {
+                        applyLabel: 'Submit',
+                        cancelLabel: 'Clear',
+                        fromLabel: 'From',
+                        toLabel: 'To',
+                        customRangeLabel: 'Custom',
+                        daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+                        monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                        firstDay: 1
+                    }
+				};
+
+				$('#reportrange_right span').html(moment().format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+                document.getElementById('datetime').value = JSON.stringify([
+                    moment().format('YYYY,MM,DD') + ',00,00,00',
+                    moment().format('YYYY,MM,DD,HH,mm,ss')
+                ]);
+
+				$('#reportrange_right').daterangepicker(optionSet1, cb);
+
+				$('#reportrange_right').on('show.daterangepicker', function() {
+                    //console.log("show event fired");
+				});
+				$('#reportrange_right').on('hide.daterangepicker', function() {
+                    //console.log("hide event fired");
+				});
+				$('#reportrange_right').on('apply.daterangepicker', function(ev, picker) {
+                    //console.log("apply event fired, start/end dates are " + picker.startDate.format('MMMM D, YYYY') + " to " + picker.endDate.format('MMMM D, YYYY'));
+                    //console.log("apply event fired, start/end dates are " + picker.startDate.format('YYYY-MM-DD HH:mm:ss') + " to " + picker.endDate.format('MMMM D, YYYY'));
+                    var datetimeList = [
+                        picker.startDate.format('YYYY,MM,DD,HH,mm,ss'),
+                        picker.endDate.format('YYYY,MM,DD,HH,mm,ss')
+                    ];
+                    document.getElementById('datetime').value = JSON.stringify(datetimeList);
+                });
+                $('#reportrange_right').on('cancel.daterangepicker', function(ev, picker) {
+                    //console.log("cancel event fired");
+                    document.getElementById('datetime').value = JSON.stringify([]);
+                    // REMOVE data
+                });
+            }
+
+            function initHandlers() {
+                let keysQuery = "?count=1,2,30,31"
+                jQuery.get("/dashboard/count/covid/counting/each" + keysQuery).done(function(data){
+                    let jsonData = JSON.parse(data);
+                    setTunnelIn(jsonData[TUNNEL_1] + jsonData[TUNNEL_2]);
+                    setCampAB(jsonData[CAMP_AB]);
+                    setCampCD(jsonData[CAMP_CD]);
+                });
+                $('.search-btn').click(function() {
+                    getAccessLog(true);
+                });
+            }
+
+            function getAccessLog(clean) {
+                let workerId = document.getElementById('workerId').value,
+                    workerName = document.getElementById('workerName').value,
+                    department = document.getElementById('department').value,
+                    inout = document.getElementById('inout').value,
+                    location = document.getElementById('location').value,
+                    violation = document.getElementById('violation').value,
+                    datetime = document.getElementById('datetime').value;
+                let query = "?num=" + _pageNumber;
+                query += "&wid=" + workerId;
+                query += "&wname=" + workerName;
+                query += "&depart=" + department;
+                query += "&inout=" + inout;
+                query += "&locate=" + location;
+                query += "&violation=" + violation;
+                query += "&datetime=" + datetime;
+
+                jQuery.get("/dashboard/search/covid/worker" + query).done(function(data) {
+                    let jsonData = JSON.parse(data);
+                    _pageNumber = jsonData.next_page;
+                    displayUsers({
+                    }, jsonData.data_list, function() {
+                        $('.user-item-loader-btn').removeClass('loading');
+                    }, clean);
+                });
+            }
+
+            function initSocketHandlers() {
+                let host = window.location.hostname;
+                // TODO:
+                _sock = io.connect('http://' + host + '5000:/ws/count');
+                _sock.on('connect', function(){
+                    _sock.send("connect");
+                });
+
+                _sock.on('disconnect', function(msg){
+                    _sock.send("disconnect");
+                });
+
+                _sock.on('msg', function(msg){
+                    console.log('Received Message : ',msg);
+                });
+
+                _sock.on('worker', function(msg){
+                    console.log("worker sum tunnel : " +msg);
+                    setTunnelIn(msg);
+                });
+                _sock.on('worker_ab', function(msg){
+                    console.log("campab : " +msg);
+                    setCampAB(msg);
+                });
+                _sock.on('worker_cd', function(msg){
+                    console.log("campcd : " +msg);
+                    setCampCD(msg);
+                });
+            }
+
+            function setTunnelIn(count) {
+                document.getElementById("tunnelIn").innerText = count;
+            }
+
+            function setTunnelOut(count) {
+                document.getElementById("tunnelOut").innerText = count;
+            }
+
+            function setCampAB(count) {
+                document.getElementById("campAB").innerText = count;
+            }
+
+            function setCampCD(count) {
+                document.getElementById("campCD").innerText = count;
+            }
+
+            function displayUsers(filters, users, callback, clean) {
+                callback = callback || _.noop;
+
+                let container = $('.user-item-container');
+                if (!!clean) {
+                    container.children().detach().remove();
+                }
+                if (!_loadingUsers) {
+                    _loadingUsers = true;
+                    _selectedFilters = filters;
+                    // render users.
+                    if (!_.isEmpty(users)) {
+                        $.each(users, function(index, user) {
+                            let userItem = UserItem(user);
+                            container.append(userItem.render());
+                        });
+                        if (_pageNumber == 0) {
+                            container.append('<div class="user-item-container-empty">No more accesslogs</div>');
+                            _pageNumber = 1;
+                        } else {
+                            let loadMoreButton = $('<div class="hd-dialog-loader-btn">')
+                                .append($('<div class="hd-dialog-loader-icon">'))
+                                .append($('<div class="hd-dialog-loader-label">Load more</div>'));
+                            loadMoreButton.click(function() {
+                                loadMoreButton.remove();
+                                getAccessLog(false);
+                            });
+                            container.append(loadMoreButton);
+                        }
+                    } else {
+                        container.append('<div class="user-item-container-empty">No accesslogs</div>');
+                    }
+
+                    _loadingUsers = false;
+                } else {
+                    console.debug("Already loading users.");
+                    callback();
+                }
+            }
+
+            function UserItem(model) {
+                let _model = model,
+                    _views = {};
+
+                function render() {
+                    let container = $('<div class="user-item">');
+                    let nameCell = $('<div class="user-item-cell name">'),
+                        nameContainer = $('<div class="user-item-content-container name">'),
+                        nameLabel = $('<div class="user-item-name-label">');
+                        idLabel = $('<div class="user-item-id-label">');
+                    let inoutLabel = $('<div class="user-item-label status">'),
+                        violationLabel = $('<div class="user-item-label violation">'),
+                        accessPointLabel = $('<div class="user-item-label camp">'),
+                        departmentLabel = $('<div class="user-item-label department">'),
+                        eventTimeLabel = $('<div class="user-item-label locate">'),
+                        appInstalledLabel = $('<div class="user-item-label app-installed">');
+
+                    container.append(nameCell,
+                        departmentLabel, eventTimeLabel, inoutLabel, accessPointLabel, violationLabel);
+                    nameCell.append(nameContainer);
+                    nameContainer.append(nameLabel, idLabel);
+
+
+                    // Store id.
+                    container.attr('uid', model.documentId);
+
+                    // Store views.
+                    _views = {
+                        container: container,
+                        nameLabel: nameLabel,
+                        idLabel: idLabel,
+                        inoutLabel: inoutLabel,
+                        violationLabel: violationLabel,
+                        accessPointLabel: accessPointLabel,
+                        departmentLabel: departmentLabel,
+                        eventTimeLabel: eventTimeLabel
+                    }
+
+                    update(model);
+
+                    return container;
+                }
+
+                function update(model) {
+                    _model = model;
+
+                    _views.container.attr('title', (model.fullname || '-') + '(' + (model.documentId || '-') + ')');
+                    _views.nameLabel.text(model.worker_name || '-');
+                    _views.idLabel.text('(' + (model.worker_id || '-') + ')');
+                    _views.inoutLabel.text(INOUT[model.inout] || '-');
+                    _views.violationLabel.text(VIOLATION[model.typ] || '');
+                    _views.accessPointLabel.text(LOCATION[model.access_point] || '-');
+                    _views.departmentLabel.text(model.worker_group || '-');
+                    _views.eventTimeLabel.text(model.event_time || '-');
+                }
+
+                return {
+                    render: render
+                }
+            }
+        })();
+    </script>
+{% endblock javascripts %}

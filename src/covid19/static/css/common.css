@@ -42,6 +42,10 @@
     border: 0px none;
 }
 
+.hidden-selectfield {
+    border: 0px none;
+}
+
 .sub-title-container {
     width: 100%;
     font-weight: 500;
@@ -126,7 +130,7 @@
     flex-wrap: nowrap;
     border-radius: 0.2em;
     justify-content: center;
-    align-items: center; 
+    align-items: center;
     color: white;
 }
 .dialog-selector {
@@ -142,7 +146,7 @@
 
 /* tooltip */
 .tooltip.left .tooltip-inner {
-    background-color: #E0002A !important; 
+    background-color: #E0002A !important;
 }
 .tooltip.left .tooltip-arrow {
     border-left-color: #E0002A !important;
