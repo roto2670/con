@@ -462,11 +462,17 @@ def get_work(_id):
 
 
 def get_latest_work_by_blast(blast_id, typ):
-  data = Work.query.filter_by(blast_id=blast_id, typ=typ).all()
+  data = Work.query.filter_by(blast_id=blast_id, typ=typ).\
+    order_by(desc(Work.created_time)).all()
   if data:
     return data[0]
   else:
     return None
+
+
+def get_same_type_by_blast(blast_id, typ):
+  data = Work.query.filter_by(blast_id=blast_id, typ=typ).all()
+  return data
 
 
 def get_work_list_by_blast(blast_id):
