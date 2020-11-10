@@ -13,7 +13,7 @@
 import logging
 import datetime
 from flask_login import current_user  # noqa : pylint: disable=import-error
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 
 from base import db
 from work_models import _BasePoint as BasePoint
@@ -487,7 +487,7 @@ def get_work_list_in_progress():
 
 
 def get_all_work():
-  data_list = Work.query.order_by(desc(Work.created_time)).all()
+  data_list = Work.query.filter(or_(Work.state == 1, Work.state == 2)).all()
   return data_list
 
 

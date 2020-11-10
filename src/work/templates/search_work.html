@@ -284,12 +284,20 @@
                     <td>{{ data.tunnel_category[work.work.blast.tunnel.category] }}</td>
                     <td>{{ data.tunnel_direction[work.work.blast.tunnel.direction] }}</td>
                     <td>{{ work.work.blast.tunnel.tunnel_id }}</td>
-                    <td>{{ work.work.blast.blast_info_list[0].blasting_time }}</td>
+                    {% if work.work.blast.blast_info_list[0].blasting_time %}
+                      <td>{{ work.work.blast.blast_info_list[0].blasting_time }}</td>
+                    {% else %}
+                      <td> No time entered </td>
+                    {% endif %}
                     <td>{{ work.work.blast.blast_info_list[0].start_point }}</td>
                     <td>{{ work.work.blast.blast_info_list[0].finish_point }}</td>
                     <td>{{ work.work.blast.blast_info_list[0].blasting_length }}</td>
                     <td>{{ work.work.blast.accum_time|secondToTimeFormat }}</td>
-                    <td>{{ data.activity_name[work.typ] }}</td>
+                    {% if work.typ in activity_list %}
+                      <td>{{ activity_list[work.typ] }}</td>
+                    {% else %}
+                      <td>Deleted Activity</td>
+                    {% endif %}
                     <td>{{ work.accum_time|secondToTimeFormat }}</td>
                   </tr>
                 {% endfor %}
