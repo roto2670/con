@@ -157,7 +157,7 @@
         <!-- filter item -->
         <div class="user-item-header-container">
             <div class="user-item-header-label">Name</div>
-            <div class="user-item-header-label">Deparment</div>
+            <div class="user-item-header-label">Department</div>
             <div class="user-item-header-label">Time</div>
             <div class="user-item-header-label">In/Out</div>
             <div class="user-item-header-label">Location</div>
@@ -207,6 +207,9 @@
                 _pageNumber = 1;
             let _sock = null;
             let _db = firebase.firestore();
+            let tunnelCount = 0,
+                campABCount = 0,
+                campCDCount = 0;
 
             start();
 
@@ -331,6 +334,7 @@
                     setTunnelIn(jsonData[TUNNEL_1] + jsonData[TUNNEL_2]);
                     setCampAB(jsonData[CAMP_AB]);
                     setCampCD(jsonData[CAMP_CD]);
+                    updateOutsideCount();
                 });
                 $('.search-btn').click(function() {
                     getAccessLog(true);
@@ -367,7 +371,7 @@
             function updateOutsideCount() {
                 loadHeadCount(function(headCount) {
                     // TODO:
-                    let _totalCount = headCount - 500;
+                    let _totalCount = headCount - (tunnelCount + campABCount + campCDCount);
                     $('.count-container-message#tunnelOut').text(_totalCount || '-');
                 });
             }
@@ -391,31 +395,33 @@
                 _sock.on('worker', function(msg){
                     console.log("worker sum tunnel : " +msg);
                     setTunnelIn(msg);
+                    updateOutsideCount();
                 });
                 _sock.on('worker_ab', function(msg){
                     console.log("campab : " +msg);
                     setCampAB(msg);
+                    updateOutsideCount();
                 });
                 _sock.on('worker_cd', function(msg){
                     console.log("campcd : " +msg);
                     setCampCD(msg);
+                    updateOutsideCount();
                 });
             }
 
             function setTunnelIn(count) {
                 document.getElementById("tunnelIn").innerText = count;
-            }
-
-            function setTunnelOut(count) {
-                document.getElementById("tunnelOut").innerText = count;
+                tunnelCount = count;
             }
 
             function setCampAB(count) {
                 document.getElementById("campAB").innerText = count;
+                campABCount = count;
             }
 
             function setCampCD(count) {
                 document.getElementById("campCD").innerText = count;
+                campCDCount = count;
             }
 
             function displayLogs(filters, users, callback, clean) {
@@ -448,7 +454,7 @@
                             container.append(loadMoreButton);
                         }
                     } else {
-                        container.append('<div class="user-item-container-empty">No more logs</div>');
+                        container.append('<div class="user-item-container-empty">Please search</div>');
                     }
 
                     _loadingLogs = false;
@@ -468,17 +474,18 @@
                         nameContainer = $('<div class="user-item-content-container name">'),
                         nameLabel = $('<div class="user-item-name-label">');
                         idLabel = $('<div class="user-item-id-label">');
-                    let inoutLabel = $('<div class="user-item-label status">'),
+                    let inoutLabel = $('<div class="user-item-label inout">'),
                         violationLabel = $('<div class="user-item-label violation">'),
-                        accessPointLabel = $('<div class="user-item-label camp">'),
+                        accessPointLabel = $('<div class="user-item-label location">'),
                         departmentLabel = $('<div class="user-item-label department">'),
-                        eventTimeLabel = $('<div class="user-item-label locate">'),
+                        eventTimeLabel = $('<div class="user-item-label time">'),
                         appInstalledLabel = $('<div class="user-item-label app-installed">');
 
                     container.append(nameCell,
                         departmentLabel, eventTimeLabel, inoutLabel, accessPointLabel, violationLabel);
                     nameCell.append(nameContainer);
-                    nameContainer.append(nameLabel, idLabel);
+                    //nameContainer.append(nameLabel, idLabel);
+                    nameContainer.append(nameLabel);
 
 
                     // Store id.

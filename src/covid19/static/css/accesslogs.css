@@ -216,43 +216,26 @@
     text-align: center;
 }
 .user-item-header-label:nth-child(1) {
-    width: 15em;
+    /* name */
+    width: 16em;
     margin-left: 0;
 }
 .user-item-header-label:nth-child(2) {
-    /* status */
+    /* department */
     width: 8em;
 }
 .user-item-header-label:nth-child(3) {
-    /* gender */
-    width: 4em;
+    /* time */
+    width: 8em;
 }
 .user-item-header-label:nth-child(4) {
+    /* in/out */
 }
 .user-item-header-label:nth-child(5) {
+    /* location */
 }
 .user-item-header-label:nth-child(6) {
-    /* camp */
-}
-.user-item-header-label:nth-child(7) {
-    /* room */
-    width: 3em;
-}
-.user-item-header-label:nth-child(8) {
-    /* phone */
-    width: 7em;
-}
-.user-item-header-label:nth-child(11) {
-    /* job */
-    width: 7em;
-}
-.user-item-header-label:nth-child(12) {
-    /* app installed */
-    width: 4em;
-}
-.user-item-header-label:nth-last-child(1) {
-    /* commands */
-    width: 9em;
+    /* violation */
 }
 
 .user-item-container {
@@ -263,6 +246,7 @@
     font-size: 1.2em;
     font-weight: 500;
     color: #6b6b6b;
+    margin-top: 1.2em;
 }
 
 .user-item {
@@ -358,26 +342,14 @@
 .user-item-label:nth-last-child(1) {
 }
 .user-item-label.inout {
-    margin: 0;
 }
 .user-item-label.violation {
-    width: 4em;
 }
-.user-item-label.phone {
-    width: 7em;
+.user-item-label.department {
+    width: 8em;
 }
-.user-item-label.room {
-    width: 3em;
-}
-.user-item-label.jobcat1 {
-    width: 100%;
-}
-.user-item-label.jobcat2 {
-    width: 100%;
-    font-size: 0.7em;
-}
-.user-item-label.app-installed {
-    width: 4em;
+.user-item-label.time {
+    width: 8em;
 }
 .user-item-btn {
     width: 2.8em;
