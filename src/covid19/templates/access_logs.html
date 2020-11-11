@@ -19,7 +19,7 @@
 {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
     <div class="sub-title-container status-container none-border">
-        <i class="fa fa-sign-in"></i> INSIDE
+        <i class="fa fa-sign-in"></i> Inside
     </div>
     <div class="content-container">
         <div class="count-container">
@@ -36,12 +36,12 @@
         </div>
     </div>
     <div class="sub-title-container status-container none-border">
-        <i class="fa fa-sign-out"></i> OUTSIDE
+        <i class="fa fa-sign-out"></i> Outside
     </div>
     <div class="content-container">
-        <div class="count-container">
+        <div class="count-container outside">
             <div class="count-container-title"> Outside</div>
-            <div id="tunnelOut" class="count-container-message">1222</div>
+            <div id="tunnelOut" class="count-container-message">-</div>
         </div>
     </div>
     <div class="sub-title-container status-container">
@@ -201,30 +201,51 @@
                 0: "Normal",
                 1: "Violation"
             };
-            let _lastUserSnapShot,
-                _loadingUsers = false,
+            let _loadingLogs = false,
                 _selectedFilters = null,
+                _headCount = null;
                 _pageNumber = 1;
             let _sock = null;
+            let _db = firebase.firestore();
 
             start();
 
             function start() {
                 initHandlers();
                 initSocketHandlers();
-	            init_daterangepicker_right()
-                displayUsers({
+	            initDaterangePickerRight();
+                displayLogs({
                 }, [], function() {
                     $('.user-item-loader-btn').removeClass('loading');
                 }, false);
+                updateOutsideCount();
             }
 
             function stop() {
             }
 
-            function init_daterangepicker_right() {
+            function loadHeadCount(callback) {
+                let _callback = callback || _.noop;
+                if (_.isNumber(_headCount)) {
+                    _callback(headcount);
+                } else {
+                    _db.collection('covid19_stats')
+                        .orderBy('ts', 'desc')
+                        .limit(1).get().then((snapshots) => {
+                            if (!snapshots.empty) {
+                                let _stats = _.last(snapshots.docs).data();
+                                _headCount = _stats.headcount || 0;
+
+                                callback(_headCount);
+                            }
+                        });
+                        // TODO: error?
+                }
+            }
+
+            function initDaterangePickerRight() {
 				if( typeof ($.fn.daterangepicker) === 'undefined'){ return; }
-				//console.log('init_daterangepicker_right');
+				//console.log('initDaterangePickerRight');
 
 				var cb = function(start, end, label) {
                     //console.log("CB : " , start.toISOString(), end.toISOString(), label);
@@ -336,10 +357,18 @@
                 jQuery.get("/dashboard/search/covid/worker" + query).done(function(data) {
                     let jsonData = JSON.parse(data);
                     _pageNumber = jsonData.next_page;
-                    displayUsers({
+                    displayLogs({
                     }, jsonData.data_list, function() {
                         $('.user-item-loader-btn').removeClass('loading');
                     }, clean);
+                });
+            }
+
+            function updateOutsideCount() {
+                loadHeadCount(function(headCount) {
+                    // TODO:
+                    let _totalCount = headCount - 500;
+                    $('.count-container-message#tunnelOut').text(_totalCount || '-');
                 });
             }
 
@@ -389,20 +418,20 @@
                 document.getElementById("campCD").innerText = count;
             }
 
-            function displayUsers(filters, users, callback, clean) {
+            function displayLogs(filters, users, callback, clean) {
                 callback = callback || _.noop;
 
                 let container = $('.user-item-container');
                 if (!!clean) {
                     container.children().detach().remove();
                 }
-                if (!_loadingUsers) {
-                    _loadingUsers = true;
+                if (!_loadingLogs) {
+                    _loadingLogs = true;
                     _selectedFilters = filters;
                     // render users.
                     if (!_.isEmpty(users)) {
                         $.each(users, function(index, user) {
-                            let userItem = UserItem(user);
+                            let userItem = LogItem(user);
                             container.append(userItem.render());
                         });
                         if (_pageNumber == 0) {
@@ -419,17 +448,17 @@
                             container.append(loadMoreButton);
                         }
                     } else {
-                        container.append('<div class="user-item-container-empty">No accesslogs</div>');
+                        container.append('<div class="user-item-container-empty">No more logs</div>');
                     }
 
-                    _loadingUsers = false;
+                    _loadingLogs = false;
                 } else {
                     console.debug("Already loading users.");
                     callback();
                 }
             }
 
-            function UserItem(model) {
+            function LogItem(model) {
                 let _model = model,
                     _views = {};
 

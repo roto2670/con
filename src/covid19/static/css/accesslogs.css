@@ -85,6 +85,8 @@
 }
 .user-filter-title-label {
     color: #6B6B6B;
+    font-weight: 500;
+    font-size: 1.2em;
 }
 
 .user-filter-btn {
@@ -735,14 +737,16 @@
     width: 10em;
     height: 5em;
     align-items: center;
-    background-color: #EF8009;
+    background-color: #D58D03;
     justify-content: center;
     display: inline-block;
     color: white;
     padding: 0.4em 1.0em;
-    margin: 0 0.2em;
-    box-shadow: 1px 1px #c1c1c1;
-    cursor: pointer;
+    margin: 0 1.6em 0 0;
+    border-radius: 0.2em;
+}
+.count-container.outside {
+    background-color: #B09C1A;
 }
 .count-container-title {
     font-size: 1.0em;
