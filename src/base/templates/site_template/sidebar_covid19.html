@@ -79,6 +79,11 @@
           </a>
         </li>
         <li>
+          <a href="/covid19/accesslogs">
+            <i class="fa fa-search"></i>Access Logs
+          </a>
+        </li>
+        <li>
           <a href="/covid19/settings">
             <i class="fa fa-cogs"></i>Settings
           </a>
@@ -147,7 +152,7 @@
       if (!emiratesId || emiratesId == 'None') {
         window.alert('Cannot found your Covid ID. please check your ID.');
       }
-     
+
       auth({
         'emirates_id': emiratesId,
         'code': 'web!-adMIN-P2rm',

@@ -35,8 +35,9 @@ def is_internal(request):
 @blueprint.route('/')
 @util.require_login
 def route_default():
-  if current_user.level in [models.SK_ADMIN, models.SK_NORMAL, models.COVID19_ADMIN, models.COVID19_TEAMDOCTOR]:
-    return render_template("dashboard.html", is_internal = is_internal(request))
+  if current_user.level in [models.SK_ADMIN, models.SK_NORMAL,
+                            models.COVID19_ADMIN, models.COVID19_TEAMDOCTOR]:
+    return render_template("dashboard.html", is_internal=is_internal(request))
   else:
     return redirect('/')
 
@@ -44,31 +45,40 @@ def route_default():
 @blueprint.route('/users')
 @util.require_login
 def route_users():
-  return render_template("users.html", is_internal = is_internal(request))
+  return render_template("users.html", is_internal=is_internal(request))
 
 
 @blueprint.route('/notifications')
 @util.require_login
 def route_notifications():
-  return render_template("notifications.html", is_internal = is_internal(request))
+  return render_template("notifications.html", is_internal=is_internal(request))
 
 
 @blueprint.route('/managedata')
 @util.require_login
 def route_manage_data():
-  return render_template("manage_data.html", is_internal = is_internal(request))
+  return render_template("manage_data.html", is_internal=is_internal(request))
+
 
 @blueprint.route('/news')
 @util.require_login
 def route_news():
-  return render_template("news.html", is_internal = is_internal(request))
+  return render_template("news.html", is_internal=is_internal(request))
+
 
 @blueprint.route('/kiosks')
 @util.require_login
 def route_kiosks():
-  return render_template("kiosks.html", is_internal = is_internal(request))
+  return render_template("kiosks.html", is_internal=is_internal(request))
+
+
+@blueprint.route('/accesslogs')
+@util.require_login
+def route_accesslogs():
+  return render_template("access_logs.html", is_internal=is_internal(request))
+
 
 @blueprint.route('/settings')
 @util.require_login
 def route_settings():
-  return render_template("csettings.html", is_internal = is_internal(request))
+  return render_template("csettings.html", is_internal=is_internal(request))

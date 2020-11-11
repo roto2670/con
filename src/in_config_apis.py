@@ -9,8 +9,6 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
-import json
-import uuid
 import datetime
 
 import pytz

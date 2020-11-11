@@ -159,6 +159,41 @@ def get_total_worker_count():
   return json.dumps(total_worker_count)
 
 
+@blueprint.route('/count/covid/counting/each', methods=['GET'])
+@util.require_login
+def get_covid_count():
+  """
+  Request
+    ex) /count/covid/counting/each?count=1,2,3,4
+  Response
+    ex) {"1": 10, "2": 5, "3": 20, "4": 50}
+  """
+  req_args = request.args
+  count_key = req_args.get("count", "")
+  _count = {}
+  if count_key:
+    for key in count_key.split(","):
+      _count[key] = count.get_worker_count(key)
+  return json.dumps(_count)
+
+
+@blueprint.route('/count/covid/counting/total', methods=['GET'])
+@util.require_login
+def get_total_covid_count():
+  """
+  Request
+    ex) /count/covid/counting/total?count=1,2,3,4
+  Response
+    ex) 85
+  """
+  req_args = request.args
+  count_key = req_args.get("count", "")
+  _total_count = 0
+  if count_key:
+    _total_count = count.get_total_worker_count(count_key.split(","))
+  return json.dumps(_total_count)
+
+
 @blueprint.route('/count/equip/counting/<key>', methods=['GET'])
 @util.require_login
 def get_equip_count(key):
@@ -307,6 +342,53 @@ def get_enterence_worker_log():
 @util.require_login
 def get_enterence_equip_log():
   return render_template("equip_logs.html")
+
+
+def _convert_data(data_dict):
+  ret_data = {
+    "total": data_dict.total,
+    "next_page": data_dict.next_num if data_dict.next_num is not None else 0,
+    "pages": data_dict.pages
+  }
+  ret_list = []
+  for data in data_dict.items:
+    _data = {
+        "worker_id": data.worker_id,
+        "worker_name": data.worker_name,
+        "worker_group": data.worker_group,  # department
+        "event_time": str(data.event_time),
+        "inout": data.inout,
+        "access_point": data.access_point,
+        "typ": data.typ,  # violation
+        "device_name": data.device_name
+    }
+    ret_list.append(_data)
+  ret_data['data_list'] = ret_list
+  return ret_data
+
+
+@blueprint.route('/search/covid/worker', methods=["GET"])
+@util.require_login
+def get_covid_worker_search_page():
+  if request.method == "GET":
+    req_args = request.args
+    page_number = req_args.get("num", None)
+    worker_id = req_args.get("wid", None)
+    worker_name = req_args.get("wname", None)
+    department = req_args.get("depart", None)
+    inout = req_args.get("inout", None)
+    location = req_args.get("locate", None)
+    violation = req_args.get("violation", None)
+    raw_datetime_list = req_args.get("datetime", "")
+    datetime_list = json.loads(raw_datetime_list)
+    worker_log_list = in_config_apis.search_worker_log(worker_id, worker_name,
+                                                       datetime_list,
+                                                       int(location), int(inout),
+                                                       str(violation),
+                                                       department,
+                                                       int(page_number))
+    ret_list = _convert_data(worker_log_list)
+    return json.dumps(ret_list)
 
 
 @blueprint.route('/search/worker', methods=["GET", "POST"])
