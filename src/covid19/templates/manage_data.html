@@ -73,7 +73,10 @@
                 </div>
                 <div class="download-sub-container logs">
                     <div class="download-title-label">Logs</div>
-                    <div class="log-download-btn" id="app_usage">Daily app usage report</div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="app_usage">Daily app usage report</div>
+                        <div class="log-download-run-btn btn" id="app_usage">Run</div>
+                    </div>
                     <div class="log-download-btn-container">
                         <div class="log-download-btn" id="observation">Observation report</div>
                         <div class="log-download-run-btn btn" id="observation">Run</div>
@@ -166,6 +169,7 @@
                     clinic_reports: 'Clinic Reports'
                 },
                 SCRIPT_ID = {
+                    app_usage: 2,
                     observation: 3,
                     qr_codes: 8,
                     clinic_reports: 9
@@ -173,11 +177,13 @@
                 },
                 RUN_SCRIPT_MESSAGE = {
                     SUCCESS: {
+                        app_usage: 'Genearted an app usage report.',
                         observation: 'Generated an observation report.',
                         qr_codes: 'Generating QR codes, Please reload after a few minutes.',
                         clinic_reports: 'Generated a clinic report.'
                     },
                     ERROR: {
+                        app_usage: 'Failed to generation an app usage report. Check the logs in Settings menu.',
                         observation: 'Failed to generation an observation report. Check the logs in Settings menu.',
                         qr_codes: 'Failed to start QR codes generation. Please try again later.',
                         clinic_reports: 'Failed to generation a clinic report. Check the logs in Settings menu.',
@@ -543,6 +549,17 @@
                         });
                     }
                 });
+
+                // add lisnter for daily app usage reports.
+                $('.log-download-run-btn#app_usage').click(function() {
+                    if (window.confirm('Aure you sure?')) {
+                        runScript('app_usage');
+                        new PNotify({
+                            type: 'info',
+                            text: 'Please wait...'
+                        });
+                    }
+                }); 
 
                 // add lisnter for generate qr codes
                 $('.log-download-run-btn#qr_codes').click(function() {
