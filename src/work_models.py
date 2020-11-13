@@ -119,6 +119,8 @@ class _Work(db.Model):
   accum_time = Column(Integer)
   p_accum_time = Column(Integer)
   created_time = Column(DateTime)
+  start_time = Column(DateTime)
+  end_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
   blast_id = Column(String(75), ForeignKey('_blast.id'))

@@ -418,13 +418,16 @@ def update_work(data):
   return _data
 
 
-def update_state_and_accum(work_id, state, accum_time, pause_time):
+def update_state_and_accum(work_id, state, accum_time, pause_time,
+                           start_time=None, end_time=None):
   cur_time = get_servertime()
   data = get_work(work_id)
   data.state = state
   data.accum_time = accum_time
   data.p_accum_time = pause_time
   data.last_updated_time = cur_time
+  data.start_time = start_time if start_time else data.start_time
+  data.end_time = end_time if end_time else data.end_time
   data.last_updated_user = current_user.email
   db.session.commit()
   return data
@@ -836,26 +839,34 @@ def get_all_work_equipment():
 def search(tunnel_id, tunnel, activity, datetime_list, next_num=None):
   st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
   end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
+  all_work_query = db.session.query(Work)
   filter_list = []
-  t_filter_list = [
-    WorkHistory.timestamp > st_date,
-    WorkHistory.timestamp < end_date
+  t1_filter_list = [
+    Work.state == 1,
+    Work.start_time > st_date,
+    Work.start_time < end_date,
+  ]
+  t2_filter_list = [
+    Work.state == 2,
+    Work.start_time > st_date,
+    Work.end_time < end_date,
   ]
   if not next_num:
     next_num = 1
   if tunnel_id:
     filter_list.append(Tunnel.tunnel_id == tunnel_id)
-  # if worker_name:
-  #   filter_list.append(EnterenceWorkerLog.worker_name.like("%" + worker_name + "%"))
   if tunnel != 10000:
     filter_list.append(Tunnel.category == tunnel)
   if activity != 10000:
-    t_filter_list.append(WorkHistory.typ == activity)
+    t1_filter_list.append(Work.typ == activity)
+    t2_filter_list.append(Work.typ == activity)
+  t1_query = all_work_query.filter(*t1_filter_list)
+  t2_query = all_work_query.filter(*t2_filter_list)
+  base_query = t1_query.union(t2_query).order_by(Work.start_time)
+
   try:
-    work_list = db.session.query(WorkHistory).filter(*t_filter_list).\
-        join(Work).join(Blast).join(Tunnel).filter(*filter_list).\
-        paginate(int(next_num), 100, False)
-    return work_list
+    work_list = base_query.join(Blast).join(Tunnel).filter(*filter_list)
+    return work_list.paginate(int(next_num), 100, False)
   except:
     logging.exception("Raise Error by Search.")
 
@@ -940,19 +951,32 @@ def get_all_message():
   return data_list
 
 
-def csv_work_log(tunnel_id, tunnel, direction, datetime_list):
+def csv_work_log(tunnel_id, tunnel, activity, datetime_list):
   st_date = datetime.datetime(*[int(x) for x in datetime_list[0].split(",")])
   end_date = datetime.datetime(*[int(x) for x in datetime_list[1].split(",")])
+  all_work_query = db.session.query(Work)
   filter_list = []
-  t_filter_list = [
-    WorkHistory.timestamp > st_date,
-    WorkHistory.timestamp < end_date
+  t1_filter_list = [
+    Work.state == 1,
+    Work.start_time > st_date,
+    Work.start_time < end_date,
   ]
+  t2_filter_list = [
+    Work.state == 2,
+    Work.start_time > st_date,
+    Work.end_time < end_date,
+  ]
+  if tunnel_id:
+    filter_list.append(Tunnel.tunnel_id == tunnel_id)
   if tunnel != 10000:
     filter_list.append(Tunnel.category == tunnel)
-  if direction != 10000:
-    filter_list.append(Tunnel.direction == direction)
-  log_list = db.session.query(WorkHistory).filter(*t_filter_list). \
-              join(Work).join(Blast).join(Tunnel).filter(*filter_list). \
-              order_by(Tunnel.tunnel_id, WorkHistory.created_time).all()
+  if activity != 10000:
+    t1_filter_list.append(Work.typ == activity)
+    t2_filter_list.append(Work.typ == activity)
+  t1_query = all_work_query.filter(*t1_filter_list)
+  t2_query = all_work_query.filter(*t2_filter_list)
+  base_query = t1_query.union(t2_query).order_by(Work.start_time)
+
+  log_list = base_query.join(Blast).join(Tunnel). \
+    filter(*filter_list).all()
   return log_list

@@ -245,3 +245,11 @@ def second_to_time_format(value):
   minutes = round(duration.seconds % 3600 / 60)
   ret = "{hours}:{minutes}".format(hours=hours, minutes=minutes)
   return ret
+
+
+def convert_date_time_format(value):
+  '''
+    value = "%Y-%m-%d %H:%M:%S"
+    ex) 2020-10-30 14:41:09
+  '''
+  return value.strftime("%Y-%m-%d %H:%M")

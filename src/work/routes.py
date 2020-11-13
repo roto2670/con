@@ -663,10 +663,14 @@ def _create_finish_work_log(data):
       send_request(WORK_HISTORY_ADD,
                    [_convert_dict_by_work_history(_data)])
       pause_time = 0
+      start_time = datetime.datetime.fromtimestamp(data['start_time'])
+      end_time = datetime.datetime.fromtimestamp(data['finish_time'])
       work_data = work_apis.update_state_and_accum(data['id'],
                                                    history_data['state'],
                                                    history_data['accum_time'],
-                                                   pause_time)
+                                                   pause_time,
+                                                   start_time,
+                                                   end_time)
       send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
       if int(data['typ']) == 114:  # finish work, 114 is blasting activity
         blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
@@ -934,7 +938,9 @@ def start_work(_data=None):
         work_data = work_apis.update_state_and_accum(data['id'],
                                                      history_data['state'],
                                                      history_data['accum_time'],
-                                                     pause_time)
+                                                     pause_time,
+                                                     history_data['timestamp'],
+                                                     None)
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
         ret = True
     return json.dumps(ret)
@@ -1156,7 +1162,9 @@ def finish_work(_data=None):
         work_data = work_apis.update_state_and_accum(data['id'],
                                                      history_data['state'],
                                                      history_data['accum_time'],
-                                                     pause_time)
+                                                     pause_time,
+                                                     None,
+                                                     history_data['timestamp'])
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
         if data['typ'] == 114:  # finish work
           blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
@@ -1196,7 +1204,9 @@ def finish_work(_data=None):
         work_data = work_apis.update_state_and_accum(data['id'],
                                                      history_data['state'],
                                                      history_data['accum_time'],
-                                                     pause_time)
+                                                     pause_time,
+                                                     None,
+                                                     history_data['timestamp'])
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
         # TODO: handle blast data
         if data['typ'] == 114:  # finish work
@@ -1975,30 +1985,32 @@ def csv_str_formatting(work_log_list, tunnel_id):
              "Overall A=(1-2),Excvt.T,SV&MK,CG,Blst,VT,MU,Mc.SC,Mn.SC,MU-2,MP,"\
              "WS,SCT,PH,B.CL,F.DR,U.BK"
 
-  supporting_form = ["Supporting"]
-  idle_form = ["Idle"]
   activity_list = work_apis.get_all_activity()
   sup_list = []
   idle_list = []
   for activity in activity_list:
     if activity.category == 1:
-      sup_list.append(int(activity.activity_id))
+      sup_list.append(activity)
     elif activity.category == 2:
-      idle_list.append(int(activity.activity_id))
-  sup_list.sort()
-  idle_list.sort()
-  for sup_activity_id in sup_list:
-    if sup_activity_id in ACTIVITY_NAME:
-      supporting_form.append(ACTIVITY_NAME[sup_activity_id])
+      idle_list.append(activity)
+
+  supporting_form = [0 for index in range(len(SUPPORTING_TYPES))]
+  idle_form = [0 for index in range(len(IDLE_TYPES))]
+  supporting_form.insert(0, "Supporting")
+  idle_form.insert(0, "Idle")
+
+  for sup_activity in sup_list:
+    if int(sup_activity.activity_id) in ACTIVITY_NAME:
+      supporting_form[
+        CSV_INDEX[int(sup_activity.activity_id)]] = sup_activity.name
     else:
-      sup_activity_data = work_apis.get_activity_by_activity_id(sup_activity_id)
-      supporting_form.append(sup_activity_data.name)
-  for idle_activity_id in idle_list:
-    if idle_activity_id in ACTIVITY_NAME:
-      idle_form.append(ACTIVITY_NAME[idle_activity_id])
+      supporting_form.append(sup_activity.name)
+
+  for idle_activity in idle_list:
+    if int(idle_activity.activity_id) in ACTIVITY_NAME:
+      idle_form[CSV_INDEX[int(idle_activity.activity_id)]] = idle_activity.name
     else:
-      sup_idle_data = work_apis.get_activity_by_activity_id(idle_activity_id)
-      idle_form.append(sup_idle_data.name)
+      idle_form.append(idle_activity.name)
   supporting_form = ",".join(supporting_form)
   idle_form = ",".join(idle_form)
   csv_str = csv_str + "," + supporting_form + "," + idle_form + " \n"
@@ -2021,8 +2033,7 @@ def csv_str_formatting(work_log_list, tunnel_id):
     idle_total_times = 0
 
     for log in work_log_list:
-      if log.work.blast.tunnel.id == _blast.tunnel.id and log.accum_time and \
-          log.work.blast.id == _blast.id:
+      if log.blast.tunnel.id == _blast.tunnel.id and log.blast.id == _blast.id:
         if log.state == constants.WORK_STATE_FINISH:
           if log.typ in MAIN_TYPES:
             main_work_times[CSV_INDEX[log.typ]] += log.accum_time
