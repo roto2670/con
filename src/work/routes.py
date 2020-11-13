@@ -850,8 +850,13 @@ def get_pause_history_list_by_work():
 @util.require_login
 def start_work(_data=None):
   """
-  data = {'id': str, 'category': int, 'typ': int, 'blast_id': str}
-  -> work_data
+  <Manually Start >
+    data = {'id': str, 'category': int, 'typ': int, 'blast_id': str}
+    -> work_data
+
+  <Auto Start>
+    data = {'id': str, 'category': int, 'typ': int, 'blast_id': str,
+            'start_time': timestamp}
   """
   if _data:
     data = _data
@@ -903,28 +908,35 @@ def start_work(_data=None):
     else:
       # Init data
       end_time = None
-      if 'start_time' in data:
-        start_time = datetime.datetime.fromtimestamp(data['start_time'])
-        end_time = datetime.datetime.fromtimestamp(time.time() + 5400)
-        added_job = sched.add_job(finish_work, trigger='cron', args=[data],
-                                  year=end_time.year, month=end_time.month,
-                                  day=end_time.day, hour=end_time.hour,
-                                  minute=end_time.minute, second=end_time.second)
-        history_data['job_id'] = added_job.id
-      history_data['state'] = WORK_STATE_IN_PROGRESS
-      history_data['timestamp'] = start_time if start_time else work_apis.get_servertime()
-      history_data['accum_time'] = 0
-      history_data['auto_end'] = end_time
-      pause_time = 0
-      _data = work_apis.create_work_history(history_data)
-      send_request(WORK_HISTORY_ADD,
-                  [_convert_dict_by_work_history(_data)])
-      work_data = work_apis.update_state_and_accum(data['id'],
-                                                   history_data['state'],
-                                                   history_data['accum_time'],
-                                                   pause_time)
-      send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
-      ret = True
+      activity_list = work_apis.get_same_type_by_blast(data['blast_id'],
+                                                        data['typ'])
+      if len(activity_list) == 1:
+        if 'start_time' in data:
+          start_time = datetime.datetime.fromtimestamp(data['start_time'])
+          end_time = datetime.datetime.fromtimestamp(time.time() + 5400)
+          added_job = sched.add_job(finish_work, trigger='cron', args=[data],
+                                    year=end_time.year, month=end_time.month,
+                                    day=end_time.day, hour=end_time.hour,
+                                    minute=end_time.minute, second=end_time.second)
+          history_data['job_id'] = added_job.id
+
+      if len(activity_list) > 1 and data['category'] == '0':
+        ret = False
+      else:
+        history_data['state'] = WORK_STATE_IN_PROGRESS
+        history_data['timestamp'] = start_time if start_time else work_apis.get_servertime()
+        history_data['accum_time'] = 0
+        history_data['auto_end'] = end_time
+        pause_time = 0
+        _data = work_apis.create_work_history(history_data)
+        send_request(WORK_HISTORY_ADD,
+                    [_convert_dict_by_work_history(_data)])
+        work_data = work_apis.update_state_and_accum(data['id'],
+                                                     history_data['state'],
+                                                     history_data['accum_time'],
+                                                     pause_time)
+        send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
+        ret = True
     return json.dumps(ret)
   except:
     logging.exception("Failed to start work. Data : %s", data)
@@ -1157,6 +1169,7 @@ def finish_work(_data=None):
         send_request(BLAST_UPDATE, [_convert_dict_by_blast(blast_data)])
         ret = _convert_dict_by_blast(blast_data)
       elif _data.state == WORK_STATE_FINISH:
+        # Finish work history
         ret = False
       else:
         # Finish work history
