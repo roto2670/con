@@ -1449,7 +1449,11 @@ TUNNEL_CATEGORY = {
 }
 TUNNEL_DIRECTION = {
     0: "EAST",
-    1: "WEST"
+    1: "WEST",
+    2: "ES-EAST",
+    3: "ES-WEST",
+    4: "WS-EAST",
+    5: "WS-WEST"
 }
 ACTIVITY_CATEGORY = {
     1: "Supporting Work",
@@ -1554,9 +1558,12 @@ def route_default():
 def get_work_search_page():
 
   if request.method == "GET":
-    activity_list = ACTIVITY_NAME
+    activity_list = {}
     activity_list[10000] = "ALL"
-    return render_template("search_work_prepare.html", activity_list=ACTIVITY_NAME)
+    _activity_list = work_apis.get_all_activity()
+    for activity in _activity_list:
+      activity_list[int(activity.activity_id)] = activity.name
+    return render_template("search_work_prepare.html", activity_list=activity_list)
   else:
     tunnel_id = request.form.get('tunnelId')
     tunnel = request.form.get('tunnel')
@@ -1580,7 +1587,7 @@ def get_work_search_page():
     data = {
       "tunnel_id": tunnel_id, "tunnel": tunnel,
       "activity": activity, "datetime": raw_datetime_list,
-      "tunnel_category": TUNNEL_CATEGORY, "tunnel_direction":TUNNEL_DIRECTION ,
+      "tunnel_category": TUNNEL_CATEGORY, "tunnel_direction": TUNNEL_DIRECTION,
       "activity_name": ACTIVITY_NAME
     }
     start_date = "-".join(datetime_list[0].split(",")[:3])
@@ -1589,8 +1596,13 @@ def get_work_search_page():
     end_time = ":".join(datetime_list[1].split(",")[3:])
     start = "{} {}".format(start_date, start_time)
     end = "{} {}".format(end_date, end_time)
+    activity_list = {}
+    activity_list[10000] = "ALL"
+    _activity_list = work_apis.get_all_activity()
+    for activity in _activity_list:
+      activity_list[int(activity.activity_id)] = activity.name
     return render_template("search_work.html", data=data, work_list=work_list,
-                           activity_list=ACTIVITY_NAME,
+                           activity_list=activity_list,
                            start_date=start, end_date=end)
 
 
@@ -1952,22 +1964,46 @@ def download_work_log():
                                          datetime_list)
 
   filename = "Work Search_{}".format(str(in_config_apis.get_servertime()))
+  ret_csv_str = csv_str_formatting(work_log_list, tunnel_id)
+  return _get_download_csv_response(ret_csv_str, filename)
+
+
+def csv_str_formatting(work_log_list, tunnel_id):
   csv_str = "\uFEFF"
   csv_str += "Tunnel Type,Tunnel,Date,Time,Explosive Bulk,Explosive Cartridge,"\
              "Detonator Qty,Drilling Depth,Start,Finish,Actual L(m),Date,Time,"\
              "Overall A=(1-2),Excvt.T,SV&MK,CG,Blst,VT,MU,Mc.SC,Mn.SC,MU-2,MP,"\
-             "WS,SCT,PH,B.CL,F.DR,U.BK,Supporting,SC_Spraying,RB_Marking,"\
-             "RB_Drilling,RB_Injection,GT_Drilling,GT_Injection,GT_Curing,"\
-             "GT_Check Hole,CD_Core Drilling,Idle,TBM,Interference,Evacuation,"\
-             "Equipment B/D,Preperation,Resource not available,Shift Change,"\
-             "Explosive Delivery,No Work,Others,None\n"
-  ret_csv_str = csv_str_formatting(csv_str, work_log_list, tunnel_id)
-  return _get_download_csv_response(ret_csv_str, filename)
+             "WS,SCT,PH,B.CL,F.DR,U.BK"
 
+  supporting_form = ["Supporting"]
+  idle_form = ["Idle"]
+  activity_list = work_apis.get_all_activity()
+  sup_list = []
+  idle_list = []
+  for activity in activity_list:
+    if activity.category == 1:
+      sup_list.append(int(activity.activity_id))
+    elif activity.category == 2:
+      idle_list.append(int(activity.activity_id))
+  sup_list.sort()
+  idle_list.sort()
+  for sup_activity_id in sup_list:
+    if sup_activity_id in ACTIVITY_NAME:
+      supporting_form.append(ACTIVITY_NAME[sup_activity_id])
+    else:
+      sup_activity_data = work_apis.get_activity_by_activity_id(sup_activity_id)
+      supporting_form.append(sup_activity_data.name)
+  for idle_activity_id in idle_list:
+    if idle_activity_id in ACTIVITY_NAME:
+      idle_form.append(ACTIVITY_NAME[idle_activity_id])
+    else:
+      sup_idle_data = work_apis.get_activity_by_activity_id(idle_activity_id)
+      idle_form.append(sup_idle_data.name)
+  supporting_form = ",".join(supporting_form)
+  idle_form = ",".join(idle_form)
+  csv_str = csv_str + "," + supporting_form + "," + idle_form + " \n"
 
-def csv_str_formatting(csv_str, work_log_list, tunnel_id):
   sorted_blast_list = work_apis.get_blast_list_for_csv(tunnel_id)
-
   if not sorted_blast_list:
     return csv_str
 
@@ -1975,9 +2011,9 @@ def csv_str_formatting(csv_str, work_log_list, tunnel_id):
     blast_list = _blast.tunnel.blast_list
     blast_index = blast_list.index(_blast)
     blast_info = _blast.blast_info_list[0]
-    main_work_times = ["0" for index in range(16)]
-    support_times = ["0" for index in range(10)]
-    idle_times = ["0" for index in range(12)]
+    main_work_times = [0 for index in range(16)]
+    support_times = [0 for index in range(len(sup_list) + 1)]
+    idle_times = [0 for index in range(len(idle_list) + 1)]
     log_data_list = []
     total_data_list = []
     main_total_times = 0
@@ -1989,21 +2025,22 @@ def csv_str_formatting(csv_str, work_log_list, tunnel_id):
           log.work.blast.id == _blast.id:
         if log.state == constants.WORK_STATE_FINISH:
           if log.typ in MAIN_TYPES:
-            del main_work_times[CSV_INDEX[log.typ]]
-            main_work_times.insert(CSV_INDEX[log.typ],
-                                   second_to_time_format(log.accum_time))
+            main_work_times[CSV_INDEX[log.typ]] += log.accum_time
             main_total_times += log.accum_time
           elif log.typ in SUPPORTING_TYPES:
-            del support_times[CSV_INDEX[log.typ]]
-            support_times.insert(CSV_INDEX[log.typ],
-                                 second_to_time_format(log.accum_time))
+            support_times[CSV_INDEX[log.typ]] += log.accum_time
             support_total_times += log.accum_time
           elif log.typ in IDLE_TYPES:
-            del idle_times[CSV_INDEX[log.typ]]
-            idle_times.insert(CSV_INDEX[log.typ],
-                              second_to_time_format(log.accum_time))
+            idle_times[CSV_INDEX[log.typ]] += log.accum_time
             idle_total_times += log.accum_time
         log_data_list.append(log)
+
+    for index, main_work_time in enumerate(main_work_times):
+      main_work_times[index] = second_to_time_format(main_work_time)
+    for index, support_time in enumerate(support_times):
+      support_times[index] = second_to_time_format(support_time)
+    for index, idle_time in enumerate(idle_times):
+      idle_times[index] = second_to_time_format(idle_time)
 
     if main_total_times or support_total_times or idle_total_times:
       del main_work_times[0]
