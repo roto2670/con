@@ -46,6 +46,11 @@ def route_robots():
   return send_from_directory(path, 'robots.txt')
 
 
+@blueprint.route('/ping', methods=['GET'])
+def ping():
+  return json.dumps({"code": 200, "result": True})
+
+
 @blueprint.route('/verified')
 def route_verified():
   if current_user.is_anonymous:

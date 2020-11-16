@@ -9,6 +9,7 @@
 # | | |   |   _   |   |  | |   _   | | |   |
 # |_|  |__|__| |__|___|  |_|__| |__|_|  |__|
 
+import json
 import logging
 
 from bcrypt import checkpw
@@ -57,10 +58,8 @@ def login():
 def sign_in_progress():
   email = request.form.get('email')
   password = request.form.get('password')
-  user = in_apis.get_user_by_email(email, constants.ORG_ID)
-  if user and user.password and checkpw(password.encode('utf-8'), user.password):
-    in_apis.update_user_by_ip(user.id, util.get_ip_addr())
-    login_user(user, remember=False)
+  user = _sign_in_progress(email, password)
+  if user:
     if user.level == models.MOI:
       logging.info("MOI User login. User : %s", user)
       # TODO:
@@ -83,10 +82,82 @@ def sign_in_progress():
     return redirect("/auth/login?error=true")
 
 
+def _sign_in_progress(email, password):
+  user = in_apis.get_user_by_email(email, constants.ORG_ID)
+  if user and user.password and checkpw(password.encode('utf-8'), user.password):
+    in_apis.update_user_by_ip(user.id, util.get_ip_addr())
+    login_user(user, remember=False)
+    return user
+  else:
+    return False
+
+
 @blueprint.route('/sign-out')
 def sign_out():
   logout_user()
   return redirect(url_for('login_blueprint.login'))
+
+
+@blueprint.route('/m/signin', methods=['POST'])
+def sign_in_mobile_progress():
+  """ Signin by mobile
+
+  Returns:
+      Json Object:
+        - code : int
+        - result : boolean
+        - user_id : string if True else ""
+        - email : string
+      code
+        - 200 : Success
+        - 500 : Internal server error
+        - 1001 : Invalid access. Allow mobile only
+        - 1002 : Incorrect body
+        - 1003 : User not found
+        - 1004 : Invalid password
+  """
+  ret = {"result": False, "user_id": ""}
+  # if not util.is_mobile(request):
+  #   ret['code'] = 1001
+  #   return json.dumps(ret)
+
+  _data = request.get_json()
+  email = _data.get("email")
+  password = _data.get("password")
+  ret["email"] = email
+  if email and password:
+    user = in_apis.get_user_by_email(email, constants.ORG_ID)
+    if user:
+      if user.password and checkpw(password.encode('utf-8'), user.password):
+        in_apis.update_user_by_ip(user.id, util.get_ip_addr())
+        login_user(user, remember=False)
+        ret['code'] = 200
+        ret['result'] = True
+        ret['user_id'] = user.id
+        return json.dumps(ret)
+      else:
+        ret['code'] = 1004
+        return json.dumps(ret)
+    else:
+      ret['code'] = 1003
+      return json.dumps(ret)
+  else:
+    ret['code'] = 1002
+    return json.dumps(ret)
+
+
+@blueprint.route('/m/signout', methods=["POST"])
+def sign_out_mobile():
+  ret = {"result": False}
+  try:
+    logout_user()
+    ret["result"] = True
+    ret["code"] = 200
+    return json.dumps(ret)
+  except:
+    logging.exception("Failed to mobile user sign out.")
+    ret["code"] = 500
+    return json.dumps(ret)
 
 
 @blueprint.route('/<template>')
