@@ -13,6 +13,7 @@
 """The utility module.
 """
 
+import re
 import os
 import json
 import time
@@ -312,19 +313,44 @@ def get_expire_time():
   return T_CACHE['ept']
 
 
+def is_mobile(req):
+  # temp regex
+  # android|fennec|iemobile|iphone|opera (?:mini|mobi)|mobile
+  regex = re.compile(r".*(iphone|mobile|androidtouch)", re.IGNORECASE)
+  if regex.match(req.user_agent.string.lower()):
+    return True
+  else:
+    return False
+
+
 def require_login(f):
   @wraps(f)
   def check_email_auth(*args, **kwargs):
     if _is_expire():
-      return abort(401)
+      if is_mobile(request):
+        return json.dumps({"code": 401, "result": False})
+      else:
+        return abort(401)
     elif current_user is None:
-      return redirect(url_for('login_blueprint.login', next=request.url))
+      if is_mobile(request):
+        return json.dumps({"code": 401, "result": False})
+      else:
+        return redirect(url_for('login_blueprint.login', next=request.url))
     elif current_user.is_anonymous:
-      return redirect(url_for('login_blueprint.login', next=request.url))
+      if is_mobile(request):
+        return json.dumps({"code": 401, "result": False})
+      else:
+        return redirect(url_for('login_blueprint.login', next=request.url))
     elif not current_user.is_authenticated:
-      return redirect(url_for('login_blueprint.login', next=request.url))
+      if is_mobile(request):
+        return json.dumps({"code": 401, "result": False})
+      else:
+        return redirect(url_for('login_blueprint.login', next=request.url))
     elif not current_user.email_verified:
-      return redirect(url_for('base_blueprint.route_verified'))
+      if is_mobile(request):
+        return json.dumps({"code": 401, "result": False})
+      else:
+        return redirect(url_for('base_blueprint.route_verified'))
     # TODO: check session _fresh
     #elif not session.get('_fresh', False):
     #  return redirect(url_for('login_blueprint.login', next=request.url))
