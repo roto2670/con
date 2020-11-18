@@ -85,7 +85,7 @@ def _convert_dict_by_basepoint(data):
     }
 
 
-def _convert_dict_by_tunnel(data):
+def _convert_dict_by_tunnel(data, is_exclude=False):
   ret = {
       "id": data.id,
       "name": data.name,
@@ -104,14 +104,15 @@ def _convert_dict_by_tunnel(data):
       "height": data.height,
       "basepoint_id": data.basepoint_id
   }
-  blast_list = []
-  for blast in data.blast_list:
-    blast_list.append(_convert_dict_by_blast(blast))
-  ret['blast_list'] = blast_list
+  if not is_exclude:
+    blast_list = []
+    for blast in data.blast_list:
+      blast_list.append(_convert_dict_by_blast(blast))
+    ret['blast_list'] = blast_list
   return ret
 
 
-def _convert_dict_by_blast(data):
+def _convert_dict_by_blast(data, is_exclude=False):
   ret = {
       "id": data.id,
       "left_x_loc": data.left_x_loc,
@@ -127,10 +128,11 @@ def _convert_dict_by_blast(data):
       "tunnel_id": data.tunnel_id,
       "blast_info": _convert_dict_by_blast_info(data.blast_info_list[0])
   }
-  work_list = []
-  for work in data.work_list:
-    work_list.append(_convert_dict_by_work(work))
-  ret['work_list'] = work_list
+  if not is_exclude:
+    work_list = []
+    for work in data.work_list:
+      work_list.append(_convert_dict_by_work(work))
+    ret['work_list'] = work_list
   return ret
 
 
@@ -151,7 +153,7 @@ def _convert_dict_by_blast_info(data):
   }
 
 
-def _convert_dict_by_work(data):
+def _convert_dict_by_work(data, is_exclude=False):
   ret = {
       "id": data.id,
       "category": data.category,
@@ -162,22 +164,23 @@ def _convert_dict_by_work(data):
       "last_updated_time": str(data.last_updated_time).replace(' ', 'T'),
       "blast_id": data.blast_id
   }
-  history_list = []
-  if len(data.work_history_list) == 2:
-    if data.work_history_list[0].state == 1:
-      data.work_history_list.append(data.work_history_list[0])
-      del data.work_history_list[0]
-  for work_history in data.work_history_list:
-    history_list.append(_convert_dict_by_work_history(work_history))
-  ret['work_history_list'] = history_list
-  pause_list = []
-  for pause_history in data.pause_history_list:
-    pause_list.append(_convert_dict_by_pause_history(pause_history))
-  ret['pause_history_list'] = pause_list
-  work_equipment_list = []
-  for work_equipment in data.work_equipment_list:
-    work_equipment_list.append(_convert_dict_by_work_equipment(work_equipment))
-  ret['work_equipment_list'] = work_equipment_list
+  if not is_exclude:
+    history_list = []
+    if len(data.work_history_list) == 2:
+      if data.work_history_list[0].state == 1:
+        data.work_history_list.append(data.work_history_list[0])
+        del data.work_history_list[0]
+    for work_history in data.work_history_list:
+      history_list.append(_convert_dict_by_work_history(work_history))
+    ret['work_history_list'] = history_list
+    pause_list = []
+    for pause_history in data.pause_history_list:
+      pause_list.append(_convert_dict_by_pause_history(pause_history))
+    ret['pause_history_list'] = pause_list
+    work_equipment_list = []
+    for work_equipment in data.work_equipment_list:
+      work_equipment_list.append(_convert_dict_by_work_equipment(work_equipment))
+    ret['work_equipment_list'] = work_equipment_list
   return ret
 
 
@@ -375,12 +378,12 @@ def get_tunnel_list_by_basepoint():
 
 @blueprint.route('/tunnel/get/list', methods=["GET"])
 @util.require_login
-def get_tunnel_list():
+def get_tunnel_list(is_exclude=False):
   ret_list = []
   datas = work_apis.get_all_tunnel()
   try:
     for data in datas:
-      ret_list.append(_convert_dict_by_tunnel(data))
+      ret_list.append(_convert_dict_by_tunnel(data, is_exclude=is_exclude))
     return json.dumps(ret_list)
   except:
     logging.exception("Fail to get tunnel list")
@@ -444,13 +447,18 @@ def remove_blast():
 
 @blueprint.route('/blast/get/list/tunnel', methods=["POST"])
 @util.require_login
-def get_blast_list_by_tunnel():
-  data = request.get_json()
+def get_blast_list_by_tunnel(tunnel_id=None, is_exclude=False):
+  _tunnel_id = None
+  if tunnel_id:
+    _tunnel_id = tunnel_id
+  else:
+    _data = request.get_json()
+    _tunnel_id = _data['tunnel_id']
   ret_list = []
   try:
-    datas = work_apis.get_blast_list_by_tunnel(data['tunnel_id'])
+    datas = work_apis.get_blast_list_by_tunnel(_tunnel_id)
     for data in datas:
-      ret_list.append(_convert_dict_by_blast(data))
+      ret_list.append(_convert_dict_by_blast(data, is_exclude=is_exclude))
     return json.dumps(ret_list)
   except:
     logging.exception("Fail to get blast list by tunnel.")
@@ -459,12 +467,12 @@ def get_blast_list_by_tunnel():
 
 @blueprint.route('/blast/get/list', methods=["GET"])
 @util.require_login
-def get_blast_list():
+def get_blast_list(is_exclude=False):
   ret_list = []
   datas = work_apis.get_all_blast()
   try:
     for data in datas:
-      ret_list.append(_convert_dict_by_blast(data))
+      ret_list.append(_convert_dict_by_blast(data, is_exclude=is_exclude))
     return json.dumps(ret_list)
   except:
     logging.exception("Fail to get blast list.")
@@ -537,10 +545,15 @@ def remove_blast_info():
 
 @blueprint.route('/blastinfo/get/blast', methods=["POST"])
 @util.require_login
-def get_blast_info_by_blast():
-  data = request.get_json()
+def get_blast_info_by_blast(blast_id=None):
+  _blast_id = None
+  if blast_id:
+    _blast_id = blast_id
+  else:
+    data = request.get_json()
+    _blast_id = data['blast_id']
   try:
-    ret = work_apis.get_blast_info_by_blast(data['blast_id'])
+    ret = work_apis.get_blast_info_by_blast(_blast_id)
     return json.dumps(_convert_dict_by_blast_info(ret))
   except:
     logging.exception("Fail to get blast info by blast.")
@@ -722,13 +735,18 @@ def remove_work():
 
 @blueprint.route('/work/get/list/blast', methods=["POST"])
 @util.require_login
-def get_work_list_by_blast():
-  data = request.get_json()
+def get_work_list_by_blast(blast_id=None, is_exclude=False):
+  _blast_id = None
+  if blast_id:
+    _blast_id = blast_id
+  else:
+    data = request.get_json()
+    _blast_id = data['blast_id']
   ret_list = []
   try:
-    datas = work_apis.get_work_list_by_blast(data['blast_id'])
+    datas = work_apis.get_work_list_by_blast(_blast_id)
     for data in datas:
-      ret_list.append(_convert_dict_by_work(data))
+      ret_list.append(_convert_dict_by_work(data, is_exclude=is_exclude))
     return json.dumps(ret_list)
   except:
     logging.exception("Fail to get work list by blast.")
@@ -737,12 +755,12 @@ def get_work_list_by_blast():
 
 @blueprint.route('/work/get/list', methods=["GET"])
 @util.require_login
-def get_work_list():
+def get_work_list(is_exclude=False):
   ret_list = []
   try:
     datas = work_apis.get_all_work()
     for data in datas:
-      ret_list.append(_convert_dict_by_work(data))
+      ret_list.append(_convert_dict_by_work(data, is_exclude=is_exclude))
     return json.dumps(ret_list)
   except:
     logging.exception("Fail to get work list.")
