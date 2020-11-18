@@ -1,5 +1,5 @@
 <div class="left_col scroll-view">
-  {% if current_user.level != 0 %}
+  {% if current_user.level not in [0, 20] %}
     <script>
       window.location.href = "/";
     </script>

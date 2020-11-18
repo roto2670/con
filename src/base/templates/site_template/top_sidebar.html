@@ -43,6 +43,19 @@
         </a>
       </li>
     </ul>
+  {% elif current_user.level == 20 %}
+    <div class="logo_img_div">
+      <a href="/work">
+        <img class="logo_img_middle" src="/static/images/logo-main_page.png">
+      </a>
+    </div>
+    <ul class="nav side-menu">
+      <li>
+        <a href="/work" data-toggle-tip="tooltip" data-placement="right" title="" data-original-title="Progress Management">
+          <i class="fa fa-tasks"></i>
+        </a>
+      </li>
+    </ul>
   {% else %}  <!-- OTHER -->
     <div class="logo_img_div">
       <a href="/">

@@ -70,6 +70,7 @@ ADNOC_HQ = 5
 MOI = 6
 COVID19_ADMIN = 7
 COVID19_TEAMDOCTOR = 8
+MOBILE_SURVEYOR = 20
 
 
 class _User(UserMixin, db.Model):

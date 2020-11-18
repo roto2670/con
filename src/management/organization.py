@@ -42,7 +42,8 @@ USER_LEVEL = {
     models.ADNOC_HQ: "ADNOC HQ",
     models.MOI: "MOI",
     models.COVID19_ADMIN: "COVID19 OP",
-    models.COVID19_TEAMDOCTOR: "COVID19 Clinic"
+    models.COVID19_TEAMDOCTOR: "COVID19 Clinic",
+    models.MOBILE_SURVEYOR: "Surveyor"
 }
 
 
