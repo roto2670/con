@@ -74,7 +74,8 @@ def register_blueprints(app):
       'internal',
       'login',
       'covid19',
-      'work'
+      'work',
+      'mobile'
   ]
   for blueprint in blueprints:
     module = import_module('{}.routes'.format(blueprint))
