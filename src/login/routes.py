@@ -69,6 +69,9 @@ def sign_in_progress():
         user.level == models.COVID19_TEAMDOCTOR:
       # return redirect(url_for('covid19_blueprint.route_default'))
       return "<script>window.location.href = '/covid19/'; </script>"
+    elif user.level == models.MOBILE_SURVEYOR:
+      # return redirect(url_for('covid19_blueprint.route_default'))
+      return "<script>window.location.href = '/work/'; </script>"
     else:
       logging.info("SmartSystem User login. User : %s", user)
       # TODO:
