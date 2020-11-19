@@ -29,6 +29,8 @@ from work_models import _Operator as Operator
 from work_models import _WorkEquipment as WorkEquipment
 from work_models import _Team as Team
 from work_models import _Message as Message
+from work_models import _ChargingActInfo as ChargingActInfo
+from work_models import _BlastingActInfo as BlastingActInfo
 from constants import WORK_STATE_STOP, WORK_STATE_IN_PROGRESS, WORK_STATE_FINISH
 
 MAIN_TYPES = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,
@@ -136,9 +138,22 @@ def update_tunnel_blast_info(_id, initial_b_time, blasting_length):
   cur_time = get_servertime()
   data = get_tunnel(_id)
   data.initial_b_time = initial_b_time
-  #TODO
-  #data.b_accum_length = blasting_length
+  data.b_accum_length = blasting_length
   data.last_updated_time = cur_time
+  db.session.commit()
+  return data
+
+
+def update_b_acuum_length_by_add_blast(tunnel_id, length):
+  data = get_tunnel(tunnel_id)
+  data.b_accum_length += length
+  db.session.commit()
+  return data
+
+
+def update_b_acuum_length_by_remove_blast(tunnel_id, length):
+  data = get_tunnel(tunnel_id)
+  data.b_accum_length -= length
   db.session.commit()
   return data
 
@@ -190,6 +205,84 @@ def get_blast_list_for_csv(tunnel_id):
     blast_list = db.session.query(Blast).join(Tunnel).\
         order_by(Tunnel.section, Blast.blasting_time).all()
   return blast_list
+
+
+def create_blasting_detail(data):
+  _data = BlastingActInfo(blasting_time=data['blasting_time'],
+                          start_point=data['start_point'],
+                          finish_point=data['finish_point'],
+                          blasting_length=data['blasting_length'],
+                          blast_id=data['blast_id'],
+                          work_id=data['work_id'])
+  db.session.add(_data)
+  db.session.commit()
+
+
+def update_blasting_detail(data):
+  _data = get_blasting_data_by_work_id(data['work_id'])
+  _data.blasting_time = data['blasting_time'],
+  _data.start_point = data['start_point'],
+  _data.finish_point = data['finish_point'],
+  _data.blasting_length = data['blasting_length'],
+  _data.blast_id = data['blast_id'],
+  _data.work_id = data['work_id']
+  db.session.commit()
+
+
+def get_blasting_data_by_work_id(work_id):
+  data = BlastingActInfo.query.filter_by(work_id=work_id).one_or_none()
+  return data
+
+
+def get_blasting_data_by_blast_id(blast_id, blasting_id):
+  data = BlastingActInfo.query.filter_by(blast_id=blast_id, work_id=blasting_id).\
+    one_or_none()
+  return data
+
+
+def get_all_blasting():
+  data_list = BlastingActInfo.query.all()
+  return data_list
+
+
+def create_charging_detail(data):
+  _data = ChargingActInfo(explosive_bulk=data['explosive_bulk'],
+                          explosive_cartridge=data['explosive_cartridge'],
+                          detonator=data['detonator'],
+                          drilling_depth=data['drilling_depth'],
+                          team_id=data['team_id'],
+                          team_nos=data['team_nos'],
+                          blast_id=data['blast_id'],
+                          work_id=data['work_id'])
+  db.session.add(_data)
+  db.session.commit()
+
+
+def update_charging_detail(data):
+  _data = get_charging_data_by_work_id(data['work_id'])
+  _data.explosive_bulk = data['explosive_bulk'],
+  _data.explosive_cartridge = data['explosive_cartridge'],
+  _data.detonator = data['detonator'],
+  _data.drilling_depth = data['drilling_depth'],
+  _data.team_id = data['team_id'],
+  _data.team_nos = data['team_nos']
+  db.session.commit()
+
+
+def get_all_charging():
+  data_list = ChargingActInfo.query.all()
+  return data_list
+
+
+def get_charging_data_by_work_id(work_id):
+  data = ChargingActInfo.query.filter_by(work_id=work_id).one_or_none()
+  return data
+
+
+def get_charging_data_by_blast_id(blast_id, charging_id):
+  data = ChargingActInfo.query.filter_by(blast_id=blast_id, work_id=charging_id).\
+    one_or_none()
+  return data
 
 
 def create_blast(data):
@@ -275,6 +368,41 @@ def remove_blast(_id):
 def get_blast(_id):
   data = Blast.query.filter_by(id=_id).one_or_none()
   return data
+
+
+def get_latest_blast_by_tunnel(tunnel_id):
+  data = Blast.query.filter_by(tunnel_id=tunnel_id).\
+    order_by(desc(Blast.created_time)).all()
+  if data:
+    return data[0]
+  else:
+    return None
+
+
+def get_previous_blast_id(tunnel_id, blast_id):
+  id_list = []
+  data_list = Blast.query.filter_by(tunnel_id=tunnel_id).\
+    order_by(Blast.blasting_time).all()
+  for data in data_list:
+    id_list.append(data.id)
+  blast_index = id_list.index(blast_id)
+  if blast_index == 0:
+    return None
+  else:
+    return id_list[blast_index - 1]
+
+
+def get_next_blast_id(tunnel_id, blast_id):
+  id_list = []
+  data_list = Blast.query.filter_by(tunnel_id=tunnel_id).\
+    order_by(Blast.blasting_time).all()
+  for data in data_list:
+    id_list.append(data.id)
+  blast_index = id_list.index(blast_id)
+  if blast_index == len(id_list)-1:
+    return None
+  else:
+    return id_list[blast_index + 1]
 
 
 def get_blast_list_by_tunnel(tunnel_id):
@@ -391,11 +519,13 @@ def update_work(data):
       finish_history = _work_history
       original_accum_time = finish_history.accum_time
   if 'start_time' in data:
-    start_history.timestamp = datetime.datetime.\
-        fromtimestamp(data['start_time'])
+    start_time = datetime.datetime.fromtimestamp(data['start_time'])
+    start_history.timestamp = start_time
+    _data.start_time = start_time
   if 'finish_time' in data:
-    finish_history.timestamp = datetime.datetime.\
-        fromtimestamp(data['finish_time'])
+    finish_time = datetime.datetime.fromtimestamp(data['finish_time'])
+    finish_history.timestamp = finish_time
+    _data.end_time = finish_time
 
   finish_history.accum_time = data['finish_time'] - data['start_time']
   _data.accum_time = data['finish_time'] - data['start_time']
@@ -482,6 +612,16 @@ def get_work_list_by_blast(blast_id):
   data_list = Work.query.filter_by(blast_id=blast_id).\
       order_by(desc(Work.created_time)).all()
   return data_list
+
+
+def get_charging_id_by_blast(blast_id):
+  data = Work.query.filter_by(blast_id=blast_id, typ=113).one_or_none()
+  return data.id
+
+
+def get_blasting_id_by_blast(blast_id):
+  data = Work.query.filter_by(blast_id=blast_id, typ=114).one_or_none()
+  return data.id
 
 
 def get_work_list_in_progress():
@@ -590,6 +730,11 @@ def get_work_history_list_by_work(work_id):
   data_list = WorkHistory.query.filter_by(work_id=work_id).\
       order_by(WorkHistory.timestamp).all()
   return data_list
+
+
+def get_finish_work_history_by_work(work_id):
+  data = WorkHistory.query.filter_by(work_id=work_id, state=2).one_or_none()
+  return data
 
 
 def get_work_history_have_auto_end(work_id):

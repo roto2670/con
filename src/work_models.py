@@ -247,3 +247,31 @@ class _Message(db.Model):
   created_time = Column(DateTime)
   last_updated_time = Column(DateTime)
   last_updated_user = Column(String(75))
+
+
+class _ChargingActInfo(db.Model):
+  __tablename__ = '_chargingactinfo'
+  __bind_key__ = 'smart_work'
+
+  id = Column(Integer, primary_key=True)
+  explosive_bulk = Column(Float)
+  explosive_cartridge = Column(Float)
+  detonator = Column(Float)
+  drilling_depth = Column(Float)
+  team_id = Column(Integer)
+  team_nos = Column(Integer)
+  work_id = Column(String(75))
+  blast_id = Column(String(75))
+
+
+class _BlastingActInfo(db.Model):
+  __tablename__ = '_blastingactinfo'
+  __bind_key__ = 'smart_work'
+
+  id = Column(Integer, primary_key=True)
+  blasting_time = Column(DateTime)
+  start_point = Column(Float)
+  finish_point = Column(Float)
+  blasting_length = Column(Float)
+  work_id = Column(String(75))
+  blast_id = Column(String(75))

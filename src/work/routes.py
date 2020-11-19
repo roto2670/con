@@ -71,7 +71,14 @@ TEAM_REMOVE = '''team.removed'''
 ACTIVITY_ADD = '''activity.added'''
 ACTIVITY_REMOVE = '''activity.removed'''
 ACTIVITY_UPDATE = '''activity.updated'''
+CHARGING_ADD = '''charging.added'''
+CHARGING_REMOVE = '''charging.removed'''
+CHARGING_UPDATE = '''charging.updated'''
+BLASTING_ADD = '''blasting.added'''
+BLASTING_REMOVE = '''blasting.removed'''
+BLASTING_UPDATE = '''blasting.updated'''
 INIT_DATA = '''0'''
+LOCATION_LEN = 0.0709
 
 
 def _convert_dict_by_basepoint(data):
@@ -159,6 +166,8 @@ def _convert_dict_by_work(data, is_exclude=False):
       "category": data.category,
       "typ": data.typ,
       "state": data.state,
+      "start_time": str(data.start_time).replace(' ','T') if data.start_time else None,
+      "end_time": str(data.end_time).replace(' ', 'T') if data.end_time else None,
       "accum_time": data.accum_time,
       "p_accum_time": data.p_accum_time,
       "last_updated_time": str(data.last_updated_time).replace(' ', 'T'),
@@ -263,6 +272,32 @@ def _convert_dict_by_team(data):
       "name": data.name,
       "engineer": data.engineer,
       "member": data.member
+  }
+
+
+def _convert_dict_by_charging(data):
+  return {
+      "id": data.id,
+      "explosive_bulk": data.explosive_bulk,
+      "explosive_cartridge": data.explosive_cartridge,
+      "detonator": data.detonator,
+      "drilling_depth": data.drilling_depth,
+      "team_id": data.team_id,
+      "team_nos": data.team_nos,
+      "work_id": data.work_id,
+      "blast_id": data.blast_id
+  }
+
+
+def _convert_dict_by_blasting(data):
+  return {
+      "id": data.id,
+      "blasting_time": str(data.blasting_time),
+      "start_point": data.start_point,
+      "finish_point": data.finish_point,
+      "blasting_length": data.blasting_length,
+      "work_id": data.work_id,
+      "blast_id": data.blast_id
   }
 
 
@@ -395,6 +430,10 @@ def get_tunnel_list(is_exclude=False):
 def add_blast():
   data = request.get_json()
   try:
+    latest_blast = work_apis.get_latest_blast_by_tunnel(data['blast']['tunnel_id'])
+    if latest_blast:
+      data = _join_charging_and_blasting(data, latest_blast)
+
     # Blast Data
     blast_data = data['blast']
     work_apis.create_blast(blast_data)
@@ -403,7 +442,9 @@ def add_blast():
     work_apis.create_blast_info(blast_info_data)
 
     blast_data = work_apis.get_blast(blast_data['id'])
-    _tunnel_data = work_apis.get_tunnel(blast_data.tunnel_id)
+    _tunnel_data = work_apis.update_b_acuum_length_by_add_blast(blast_data.tunnel_id,
+                                                                blast_info_data['blasting_length'])
+
     send_request(BLAST_INFO_ADD, [blast_info_data])
     send_request(BLAST_ADD, [_convert_dict_by_blast(blast_data)])
     send_request(TUNNEL_UPDATE, [_convert_dict_by_tunnel(_tunnel_data)])
@@ -411,6 +452,39 @@ def add_blast():
   except:
     logging.exception("Fail to add blast.")
     return json.dumps(False)
+
+
+def _join_charging_and_blasting(data, latest_blast):
+  charging_id = work_apis.get_charging_id_by_blast(latest_blast.id)
+  blasting_id = work_apis.get_blasting_id_by_blast(latest_blast.id)
+  tunnel_data = work_apis.get_tunnel(data['blast']['tunnel_id'])
+  direction = tunnel_data.direction
+  charging = work_apis.get_charging_data_by_blast_id(latest_blast.id,
+                                                     charging_id)
+  blasting = work_apis.get_blasting_data_by_blast_id(latest_blast.id,
+                                                     blasting_id)
+  data['info']['explosive_bulk'] = charging.explosive_bulk
+  data['info']['explosive_cartridge'] = charging.explosive_cartridge
+  data['info']['detonator'] = charging.detonator
+  data['info']['team_id'] = charging.team_id
+  data['info']['team_nos'] = charging.team_nos
+  data['info']['drilling_depth'] = charging.drilling_depth
+  data['info']['start_point'] = blasting.start_point
+  data['info']['finish_point'] = blasting.finish_point
+  data['info']['blasting_length'] = blasting.blasting_length
+  blasting_date = str(blasting.blasting_time).split(' ')[0]
+  blasting_time = str(blasting.blasting_time).split(' ')[1].split('.')[0]
+  width = round(blasting.blasting_length * LOCATION_LEN, 4)
+  data['info']['blasting_date'] = blasting_date
+  data['info']['blasting_time'] = blasting_time
+  data['blast']['width'] = width
+  if direction == 0 or direction == 2 or direction == 4:
+    data['blast']['left_x_loc'] = latest_blast.right_x_loc
+    data['blast']['right_x_loc'] = latest_blast.right_x_loc + width
+  else:
+    data['blast']['right_x_loc'] = latest_blast.left_x_loc
+    data['blast']['left_x_loc'] = latest_blast.left_x_loc - width
+  return data
 
 
 @blueprint.route('/blast/update', methods=["POST"])
@@ -433,10 +507,13 @@ def update_blast():
 def remove_blast():
   data = request.get_json()
   try:
+    blast_info = work_apis.get_blast_info_by_blast(data['id'])
+    blasting_length = blast_info.blasting_length
     tunnel_id = work_apis.get_blast(data['id']).tunnel_id
     work_apis.remove_blast(data['id'])
     send_request(BLAST_REMOVE, [data['id']])
-    tunnel_data = work_apis.get_tunnel(tunnel_id)
+    tunnel_data = work_apis.update_b_acuum_length_by_remove_blast(tunnel_id,
+                                                                  blasting_length)
     _tunnel_data = _convert_dict_by_tunnel(tunnel_data)
     send_request(TUNNEL_UPDATE, [_tunnel_data])
     return json.dumps(True)
@@ -523,11 +600,59 @@ def update_blast_info():
       blasting_length += _blast_info['blasting_length']
     t_ret = work_apis.update_tunnel_blast_info(ret.tunnel.id,
                                                init_b_time, blasting_length)
+    update_charging_and_blasting(_blast_info, _blast)
     send_request(TUNNEL_UPDATE, [_convert_dict_by_tunnel(t_ret)])
     return json.dumps(True)
   except:
     logging.exception("Fail to update blast info. id : %s", data['id'])
     return json.dumps(False)
+
+
+def update_charging_and_blasting(info, blast_data):
+  pre_blast_id = work_apis.get_previous_blast_id(blast_data['tunnel_id'],
+                                                 blast_data['id'])
+  if pre_blast_id:
+    charging_id = work_apis.get_charging_id_by_blast(pre_blast_id)
+    blasting_id = work_apis.get_blasting_id_by_blast(pre_blast_id)
+    charging = {
+        'explosive_bulk': info['explosive_bulk'],
+        'explosive_cartridge': info['explosive_cartridge'],
+        'detonator': info['detonator'],
+        'drilling_depth': info['drilling_depth'],
+        'team_id': info['team_id'],
+        'team_nos': info['team_nos'],
+        'work_id': charging_id,
+    }
+    work_apis.update_charging_detail(charging)
+    blasting = {
+        'blasting_time': info['blasting_time'],
+        'start_point': info['start_point'],
+        'finish_point': info['finish_point'],
+        'blasting_length': info['blasting_length'],
+        'work_id': blasting_id,
+        'blast_id': pre_blast_id
+    }
+    work_apis.update_blasting_detail(blasting)
+    send_request(BLASTING_UPDATE, [blasting])
+    send_request(CHARGING_UPDATE, [charging])
+    work_data = work_apis.get_work(blasting_id)
+    end_time = datetime.datetime.strptime(info['blasting_time'],
+                                          '%Y-%m-%d %H:%M')
+    end_timestamp = time.mktime(end_time.timetuple())
+    update_work_data = {
+        "id": work_data.id,
+        "category": work_data.category,
+        "typ": work_data.typ,
+        "state": work_data.state,
+        "start_time": time.mktime(work_data.start_time.timetuple()),
+        "finish_time": end_timestamp,
+        "accum_time": work_data.accum_time,
+        "p_accum_time": work_data.p_accum_time,
+        "blast_id": work_data.blast_id
+    }
+    ret = work_apis.update_work(update_work_data)
+    resp_data = _convert_dict_by_work(ret)
+    send_request(WORK_UPDATE, [resp_data])
 
 
 @blueprint.route('/blastinfo/remove', methods=["POST"])
@@ -571,6 +696,203 @@ def get_blast_info_list():
     return json.dumps(ret_list)
   except:
     logging.exception("Fail to get blast info list.")
+    return json.dumps(ret_list)
+
+
+@blueprint.route('/blasting/detail/set', methods=["POST"])
+@util.require_login
+def set_blast_detail():
+  data = request.get_json()
+  try:
+    work_data = work_apis.get_work(data['work_id'])
+    saved_data = work_apis.get_blasting_data_by_work_id(data['work_id'])
+    if saved_data:
+      work_apis.update_blasting_detail(data)
+      send_request(BLASTING_UPDATE, [data])
+    else:
+      work_apis.create_blasting_detail(data)
+      send_request(BLASTING_ADD, [data])
+
+    if work_data.state == 2:
+      end_time = datetime.datetime.strptime(data['blasting_time'],
+                                            '%Y-%m-%d %H:%M')
+      end_timestamp = time.mktime(end_time.timetuple())
+      update_work_data = {
+          "id": work_data.id,
+          "category": work_data.category,
+          "typ": work_data.typ,
+          "state": work_data.state,
+          "start_time": time.mktime(work_data.start_time.timetuple()),
+          "finish_time": end_timestamp,
+          "accum_time": work_data.accum_time,
+          "p_accum_time": work_data.p_accum_time,
+          "blast_id": work_data.blast_id
+      }
+      ret = work_apis.update_work(update_work_data)
+      resp_data = _convert_dict_by_work(ret)
+      send_request(WORK_UPDATE, [resp_data])
+
+      blast_data = work_apis.get_blast(work_data.blast_id)
+      tunnel_id = blast_data.tunnel_id
+      next_blast_id = work_apis.get_next_blast_id(tunnel_id, work_data.blast_id)
+      if next_blast_id:
+        tunnel_data = work_apis.get_tunnel(tunnel_id)
+        next_info = json.loads(get_blast_info_by_blast(next_blast_id))
+        charging_id = work_apis.get_charging_id_by_blast(work_data.blast_id)
+        charging = work_apis.get_charging_data_by_blast_id(work_data.blast_id,
+                                                           charging_id)
+        update_blast_info_data = {
+            "id": next_info['id'],
+            "blasting_time": data['blasting_time'],
+            "start_point": data['start_point'],
+            "finish_point": data['finish_point'],
+            "blasting_length": data['blasting_length'],
+            "explosive_bulk": charging.explosive_bulk,
+            "explosive_cartridge": charging.explosive_cartridge,
+            "detonator": charging.detonator,
+            "drilling_depth": charging.drilling_depth,
+            "team_id": charging.team_id,
+            "team_nos": charging.team_nos
+        }
+        work_apis.update_blast_info(update_blast_info_data)
+        next_blast = work_apis.get_blast(next_blast_id)
+        width = round(data['blasting_length'] * LOCATION_LEN, 4)
+        direction = tunnel_data.direction
+        if direction == 0 or direction == 2 or direction == 4:
+          left_x_loc = blast_data.right_x_loc
+          right_x_loc = blast_data.right_x_loc + width
+        else:
+          right_x_loc = blast_data.left_x_loc
+          left_x_loc = blast_data.left_x_loc - width
+        update_blast_data = {
+            "id": next_blast_id,
+            "left_x_loc": left_x_loc,
+            "right_x_loc": right_x_loc,
+            "y_loc": next_blast.y_loc,
+            "width": width,
+            "height": next_blast.height,
+            "state": next_blast.state,
+            "accum_time": next_blast.accum_time,
+            "m_accum_time": next_blast.m_accum_time,
+            "i_accum_time": next_blast.i_accum_time,
+            "s_accum_time": next_blast.s_accum_time
+        }
+        ret = work_apis.update_blast(update_blast_data)
+        blasting_length = ret.tunnel.b_accum_length
+        resp_data = _convert_dict_by_blast(ret)
+        send_request(BLAST_INFO_UPDATE, [resp_data])
+
+        old_length = next_info['blasting_length']
+        if int(old_length) != 0:
+          if old_length != data['blasting_length']:
+            blasting_length -= old_length
+            blasting_length += data['blasting_length']
+        else:
+          blasting_length += data['blasting_length']
+        t_ret = work_apis.update_tunnel_blast_info(ret.tunnel.id,
+                                                   ret.tunnel.initial_b_time,
+                                                   blasting_length)
+        send_request(TUNNEL_UPDATE, [_convert_dict_by_tunnel(t_ret)])
+    return json.dumps(True)
+  except:
+    logging.exception("")
+    return json.dumps(False)
+
+
+@blueprint.route('/blasting/get/list', methods=["GET"])
+@util.require_login
+def get_blasting_list():
+  ret_list = []
+  try:
+    datas = work_apis.get_all_blasting()
+    for data in datas:
+      ret_list.append(_convert_dict_by_blasting(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to get charging list.")
+    return json.dumps(ret_list)
+
+
+@blueprint.route('/charging/detail/set', methods=["POST"])
+@util.require_login
+def set_charge_detail():
+  data = request.get_json()
+  try:
+    work_data = work_apis.get_work(data['work_id'])
+    saved_data = work_apis.get_charging_data_by_work_id(data['work_id'])
+    if saved_data:
+      work_apis.update_charging_detail(data)
+      send_request(CHARGING_UPDATE, [data])
+    else:
+      work_apis.create_charging_detail(data)
+      send_request(CHARGING_ADD, [data])
+
+    if work_data.state == 2:
+      blast_data = work_apis.get_blast(work_data.blast_id)
+      tunnel_id = blast_data.tunnel_id
+      next_blast_id = work_apis.get_next_blast_id(tunnel_id, work_data.blast_id)
+      if next_blast_id:
+        tunnel_data = work_apis.get_tunnel(tunnel_id)
+        next_info = json.loads(get_blast_info_by_blast(next_blast_id))
+        blasting_id = work_apis.get_blasting_id_by_blast(work_data.blast_id)
+        blasting = work_apis.get_blasting_data_by_blast_id(work_data.blast_id,
+                                                           blasting_id)
+        update_blast_info_data = {
+            "id": next_info['id'],
+            "blasting_time": blasting.blasting_time,
+            "start_point": blasting.start_point,
+            "finish_point": blasting.finish_point,
+            "blasting_length": blasting.blasting_length,
+            "explosive_bulk": data['explosive_bulk'],
+            "explosive_cartridge": data['explosive_cartridge'],
+            "detonator": data['detonator'],
+            "drilling_depth": data['drilling_depth'],
+            "team_id": data['team_id'],
+            "team_nos": data['team_nos']
+        }
+        work_apis.update_blast_info(update_blast_info_data)
+        next_blast = work_apis.get_blast(next_blast_id)
+        width = round(blasting.blasting_length * LOCATION_LEN, 4)
+        direction = tunnel_data.direction
+        if direction == 0 or direction == 2 or direction == 4:
+          left_x_loc = blast_data.right_x_loc
+          right_x_loc = blast_data.right_x_loc + width
+        else:
+          right_x_loc = blast_data.left_x_loc
+          left_x_loc = blast_data.left_x_loc - width
+        update_blast_data = {
+            "id": next_blast_id,
+            "left_x_loc": left_x_loc,
+            "right_x_loc": right_x_loc,
+            "y_loc": next_blast.y_loc,
+            "width": width,
+            "height": next_blast.height,
+            "state": next_blast.state,
+            "accum_time": next_blast.accum_time,
+            "m_accum_time": next_blast.m_accum_time,
+            "i_accum_time": next_blast.i_accum_time,
+            "s_accum_time": next_blast.s_accum_time
+        }
+        ret = work_apis.update_blast(update_blast_data)
+        resp_data = _convert_dict_by_blast(ret)
+        send_request(BLAST_INFO_UPDATE, [resp_data])
+    return json.dumps(True)
+  except:
+    logging.exception("")
+    return json.dumps(False)
+
+
+@blueprint.route('/charging/get/list', methods=["GET"])
+@util.require_login
+def get_charging_list():
+  ret_list = []
+  try:
+    datas = work_apis.get_all_charging()
+    for data in datas:
+      ret_list.append(_convert_dict_by_charging(data))
+    return json.dumps(ret_list)
+  except:
+    logging.exception("Fail to get charging list.")
     return json.dumps(ret_list)
 
 
@@ -704,10 +1026,72 @@ def update_work():
   try:
     # TODO:
     ret = work_apis.update_work(data)
-    resp_data = _convert_dict_by_work(ret)
+    work_resp_data = _convert_dict_by_work(ret)
     blast_data = work_apis.get_blast(ret.blast_id)
     _blast_data = _convert_dict_by_blast(blast_data)
-    send_request(WORK_UPDATE, [resp_data])
+    if data['typ'] == 114 and data['state'] == 2:
+      blasting_data = work_apis.get_blasting_data_by_work_id(data['id'])
+      blasting = {
+        'blasting_time': str(datetime.datetime.
+                             fromtimestamp(data['finish_time'])),
+        'start_point': blasting_data.start_point,
+        'finish_point': blasting_data.finish_point,
+        'blasting_length': blasting_data.blasting_length,
+        'work_id': data['id'],
+        'blast_id': data['blast_id']
+      }
+      work_apis.update_blasting_detail(blasting)
+      send_request(BLASTING_UPDATE, [blasting])
+
+      tunnel_id = blast_data.tunnel_id
+      next_blast_id = work_apis.get_next_blast_id(tunnel_id, data['blast_id'])
+      if next_blast_id:
+        tunnel_data = work_apis.get_tunnel(tunnel_id)
+        next_info = json.loads(get_blast_info_by_blast(next_blast_id))
+        charging_id = work_apis.get_charging_id_by_blast(data['blast_id'])
+        charging = work_apis.get_charging_data_by_blast_id(data['blast_id'],
+                                                           charging_id)
+        update_blast_info_data = {
+            "id": next_info['id'],
+            'blasting_time': datetime.datetime.fromtimestamp(data['finish_time']),
+            'start_point': blasting_data.start_point,
+            'finish_point': blasting_data.finish_point,
+            'blasting_length': blasting_data.blasting_length,
+            "explosive_bulk": charging.explosive_bulk,
+            "explosive_cartridge": charging.explosive_cartridge,
+            "detonator": charging.detonator,
+            "drilling_depth": charging.drilling_depth,
+            "team_id": charging.team_id,
+            "team_nos": charging.team_nos
+        }
+        work_apis.update_blast_info(update_blast_info_data)
+        next_blast = work_apis.get_blast(next_blast_id)
+        width = round(blasting_data.blasting_length * LOCATION_LEN, 4)
+        direction = tunnel_data.direction
+        if direction == 0 or direction == 2 or direction == 4:
+          left_x_loc = blast_data.right_x_loc
+          right_x_loc = blast_data.right_x_loc + width
+        else:
+          right_x_loc = blast_data.left_x_loc
+          left_x_loc = blast_data.left_x_loc - width
+        update_blast_data = {
+            "id": next_blast_id,
+            "left_x_loc": left_x_loc,
+            "right_x_loc": right_x_loc,
+            "y_loc": next_blast.y_loc,
+            "width": width,
+            "height": next_blast.height,
+            "state": next_blast.state,
+            "accum_time": next_blast.accum_time,
+            "m_accum_time": next_blast.m_accum_time,
+            "i_accum_time": next_blast.i_accum_time,
+            "s_accum_time": next_blast.s_accum_time
+        }
+        ret = work_apis.update_blast(update_blast_data)
+        resp_data = _convert_dict_by_blast(ret)
+        send_request(BLAST_INFO_UPDATE, [resp_data])
+
+    send_request(WORK_UPDATE, [work_resp_data])
     send_request(BLAST_UPDATE, [_blast_data])
     return json.dumps(True)
   except:
@@ -906,7 +1290,7 @@ def start_work(start_data=None):
       else:
         # Start work History
         history_data['state'] = WORK_STATE_IN_PROGRESS
-        history_data['timestamp'] = work_apis.get_servertime()
+        history_data['timestamp'] = work_apis.get_servertime().replace(second=0)
         history_data['accum_time'] = _data.accum_time
         _data = work_apis.create_work_history(history_data)
         send_request(WORK_HISTORY_ADD,
@@ -950,7 +1334,8 @@ def start_work(start_data=None):
         ret = False
       else:
         history_data['state'] = WORK_STATE_IN_PROGRESS
-        history_data['timestamp'] = start_time if start_time else work_apis.get_servertime()
+        history_data['timestamp'] = start_time if start_time \
+            else work_apis.get_servertime().replace(second=0)
         history_data['accum_time'] = 0
         history_data['auto_end'] = end_time
         pause_time = 0
@@ -997,7 +1382,7 @@ def stop_work(stop_data=None):
       if _data.state == WORK_STATE_IN_PROGRESS:
         # Stop work history
         history_data['state'] = WORK_STATE_STOP
-        history_data['timestamp'] = work_apis.get_servertime()
+        history_data['timestamp'] = work_apis.get_servertime().replace(second=0)
         work_time = history_data['timestamp'] - _data.timestamp
         history_data['accum_time'] = _data.accum_time + \
                                      int(work_time.total_seconds())
@@ -1164,7 +1549,7 @@ def finish_work(finish_data=None):
         # TODO: Not stop then can't finish?
         # Finish work history
         history_data['state'] = WORK_STATE_FINISH
-        history_data['timestamp'] = work_apis.get_servertime()
+        history_data['timestamp'] = work_apis.get_servertime().replace(second=0)
         work_time = history_data['timestamp'] - _data.timestamp
         history_data['accum_time'] = _data.accum_time + \
                                      int(work_time.total_seconds())
@@ -1209,11 +1594,11 @@ def finish_work(finish_data=None):
       else:
         # Finish work history
         history_data['state'] = WORK_STATE_FINISH
-        history_data['timestamp'] = work_apis.get_servertime()
-        history_data['accum_time'] = _data.accum_time
+        history_data['timestamp'] = work_apis.get_servertime().replace(second=0)
+        history_data['accum_time'] = finish_data.accum_time
         _data = work_apis.create_work_history(history_data)
         send_request(WORK_HISTORY_ADD,
-                     [_convert_dict_by_work_history(_data)])
+                     [_convert_dict_by_work_history(finish_data)])
         # Handle pause data
         pause_time = 0
         if latest_work.pause_history_list:
@@ -1261,10 +1646,56 @@ def finish_work(finish_data=None):
           'blast_id': data['blast_id']
       }
       add_work(work_data=auto_add_data, is_auto=True)
+    if data['typ'] == 114:
+      _handling_blasting_default(data, history_data)
+    elif data['typ'] == 113:
+      _handling_charging_default(data)
     return json.dumps(ret)
   except:
     logging.exception("Failed to stop work. Data : %s", data)
     return json.dumps(False)
+
+
+def _handling_blasting_default(data, history_data):
+  blasting_data = work_apis.get_blasting_data_by_work_id(data['id'])
+  if blasting_data:
+    _blasting_data = _convert_dict_by_blasting(blasting_data)
+    _blasting_data['blasting_time'] = str(history_data['timestamp'])
+    work_apis.update_blasting_detail(_blasting_data)
+    send_request(BLASTING_UPDATE, [_blasting_data])
+  else:
+    _blast_info = work_apis.get_blast_info_by_blast(data['blast_id'])
+    _data = {
+        "blasting_time": str(history_data['timestamp']),
+        "start_point": _blast_info.finish_point,
+        "finish_point": _blast_info.finish_point + 5,
+        "blasting_length": 5,
+        "work_id": data['id'],
+        "blast_id": data['blast_id']
+    }
+    work_apis.create_blasting_detail(_data)
+    send_request(BLASTING_ADD, [_data])
+
+
+def _handling_charging_default(data):
+  charging_data = work_apis.get_charging_data_by_work_id(data['id'])
+  if charging_data:
+    _charging_data = _convert_dict_by_charging(charging_data)
+    work_apis.update_charging_detail(_charging_data)
+    send_request(CHARGING_UPDATE, [_charging_data])
+  else:
+    _data = {
+        "explosive_bulk": 0,
+        "explosive_cartridge": 0,
+        "detonator": 0,
+        "drilling_depth": 0,
+        "team_id": 0,
+        "team_nos": 0,
+        "work_id": data['id'],
+        "blast_id": data['blast_id']
+    }
+    work_apis.create_charging_detail(_data)
+    send_request(CHARGING_ADD, [_data])
 
 
 @blueprint.route('/activity/get/list', methods=["GET"])
