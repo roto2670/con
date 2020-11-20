@@ -46,7 +46,6 @@ def _get_user_header(is_json=False):
 
 # {{{ Accounts
 def get_new_beacon_info(account_id):
-  # https://docs.google.com/document/d/1KZxebs5gkNqnUiD3ooKMfVcry5UD2USFaPaNyFQ2XCE/edit#heading=h.o0rze6j27nlq
   url = BASE_URL + 'accounts/' + account_id + '/newbeaconinfo'
   try:
     if IS_DEV:

@@ -180,6 +180,11 @@ def get_all_tunnel():
   return data_list
 
 
+def get_all_tunnel_by_sort():
+  data_list = Tunnel.query.order_by(Tunnel.tunnel_id).all()
+  return data_list
+
+
 def get_all_tunnel_for_csv():
   ret = {
       "C1": {},
