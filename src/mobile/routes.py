@@ -145,6 +145,74 @@ def m_get_work_list_by_blast(blast_id):
     return json.dumps(_ret)
 
 
+@blueprint.route('/work/action/start', methods=["POST"])
+@util.require_login
+def m_work_start():
+  """{'id': str, 'category': int, 'typ': int, 'blast_id': str}
+  """
+  _data = request.get_json()
+  _ret = {}
+  try:
+    ret = work.routes.start_work(start_data=_data)
+    if json.loads(ret):
+      _ret['code'] = 200
+      _ret['result'] = True
+    else:
+      _ret['code'] = 200
+      _ret['result'] = False
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while start work.")
+    _ret['code'] = 500
+    _ret['result'] = False
+    return json.dumps(_ret)
+
+
+@blueprint.route('/work/action/pause', methods=["POST"])
+@util.require_login
+def m_work_pause():
+  """{'id': str, 'category': int, 'typ': int, 'blast_id': str, 'message': str}
+  """
+  _data = request.get_json()
+  _ret = {}
+  try:
+    ret = work.routes.stop_work(stop_data=_data)
+    if json.loads(ret):
+      _ret['code'] = 200
+      _ret['result'] = True
+    else:
+      _ret['code'] = 200
+      _ret['result'] = False
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while pause work.")
+    _ret['code'] = 500
+    _ret['result'] = False
+    return json.dumps(_ret)
+
+
+@blueprint.route('/work/action/finish', methods=["POST"])
+@util.require_login
+def m_work_finish():
+  """{'id': str, 'category': int, 'typ': int, 'blast_id': str}
+  """
+  _data = request.get_json()
+  _ret = {}
+  try:
+    ret = work.routes.finish_work(finish_data=_data)
+    if json.loads(ret):
+      _ret['code'] = 200
+      _ret['result'] = True
+    else:
+      _ret['code'] = 200
+      _ret['result'] = False
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while pause work.")
+    _ret['code'] = 500
+    _ret['result'] = False
+    return json.dumps(_ret)
+
 
 @blueprint.route('/activity/get/list', methods=["GET"])
 @util.require_login
