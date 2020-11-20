@@ -870,7 +870,7 @@ def get_pause_history_list_by_work():
 
 @blueprint.route('/work/start', methods=["POST"])
 @util.require_login
-def start_work(_data=None):
+def start_work(start_data=None):
   """
   <Manually Start >
     data = {'id': str, 'category': int, 'typ': int, 'blast_id': str}
@@ -880,8 +880,8 @@ def start_work(_data=None):
     data = {'id': str, 'category': int, 'typ': int, 'blast_id': str,
             'start_time': timestamp}
   """
-  if _data:
-    data = _data
+  if start_data:
+    data = start_data
   else:
     data = request.get_json()
   try:
@@ -969,12 +969,17 @@ def start_work(_data=None):
 
 @blueprint.route('/work/stop', methods=["POST"])
 @util.require_login
-def stop_work():
+def stop_work(stop_data=None):
   """
-  data = {'id': str, 'category': int, 'typ': int, 'blast_id': str}
+  data = {'id': str, 'category': int, 'typ': int, 'blast_id': str, 'message': str}
   -> work_data
+  message : Reason of pause, Message object text
   """
-  data = request.get_json()
+  data = None
+  if stop_data:
+    data = stop_data
+  else:
+    data = request.get_json()
   try:
     ret = False
     history_data = {
@@ -1124,15 +1129,15 @@ def stop_completed_work():
 
 @blueprint.route('/work/finish', methods=["POST"])
 @util.require_login
-def finish_work(_data=None):
+def finish_work(finish_data=None):
   """
   data = {'id': str, 'category': int, 'typ': int, 'blast_id': str}
   -> work_data
   """
   auto_finish = None
-  if _data:
+  if finish_data:
     auto_finish = True
-    data = _data
+    data = finish_data
   else:
     data = request.get_json()
     his_list = work_apis.get_work_history_list_by_work(data['id'])
@@ -1917,7 +1922,7 @@ def route_reg_team_create():
 
 
 @blueprint.route('/reg/team/edit/<tid>', methods=['GET', 'POST'])
-# @util.require_login
+@util.require_login
 def route_reg_team_edit(tid):
   if request.method == "GET":
     team_data = work_apis.get_team(tid)

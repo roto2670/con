@@ -571,7 +571,7 @@ def update_work_history(data, sched=None):
   if not sched:
     _data.last_updated_user = current_user.email
   db.session.commit()
-  return data
+  return _data
 
 
 def remove_work_history(_id):
