@@ -255,8 +255,6 @@
                   <th></th>
                   <th></th>
                   <th></th>
-                  <th></th>
-                  <th></th>
                   <th>
                     <button type="button" class="btn btn-default btn-xs"
                         onclick="exportCsv('{{ data.tunnel_id }}', '{{data.tunnel}}', '{{data.activity}}', '{{ data.datetime }}' )"
@@ -274,8 +272,6 @@
                   <th>Finish T</th>
                   <th>Working T</th>
                   <th>Pause T</th>
-                  <th>Actual L</th>
-                  <th>Total T</th>
                   <th>Typ</th>
                 </tr>
               </thead>
@@ -299,8 +295,6 @@
                     {% endif %}
                     <td>{{ work.accum_time|secondToTimeFormat }}</td>
                     <td>{{ work.p_accum_time|secondToTimeFormat }}</td>
-                    <td>{{ work.blast.blast_info_list[0].blasting_length }}</td>
-                    <td>{{ work.blast.accum_time|secondToTimeFormat }}</td>
                     {% if work.typ in activity_list %}
                       <td>{{ activity_list[work.typ] }}</td>
                     {% else %}
@@ -319,11 +313,9 @@
                   {% endif %}
                   <td></td>
                   <td></td>
-                  <td></td>
                   <td style="text-align:right;vertical-align:middle;">
                     {% if work_list.has_next %} {{ work_list.page * 100 }} {% else %} {{ work_list.total }} {% endif %} / {{ work_list.total }}
                   </td>
-                  <td></td>
                   <td></td>
                   <td></td>
                   <td></td>
