@@ -576,11 +576,10 @@ def get_blast_info_list():
 
 @blueprint.route('/work/add', methods=["POST"])
 @util.require_login
-def add_work(_data=None):
-  auto_add = None
-  if _data:
-    auto_add = True
-    data = _data
+def add_work(work_data=None, is_auto=False):
+  auto_add = is_auto
+  if work_data:
+    data = work_data
   else:
     data = request.get_json()
   try:
@@ -855,11 +854,16 @@ def get_pause_history_list():
 
 @blueprint.route('/pausehistory/get/list/work', methods=["POST"])
 @util.require_login
-def get_pause_history_list_by_work():
-  data = request.get_json()
+def get_pause_history_list_by_work(work_id=None):
+  _work_id = None
+  if work_id:
+    _work_id = work_id
+  else:
+    data = request.get_json()
+    _work_id = data['work_id']
   ret_list = []
   try:
-    datas = work_apis.get_pause_history_list_by_work(data['work_id'])
+    datas = work_apis.get_pause_history_list_by_work(_work_id)
     for data in datas:
       ret_list.append(_convert_dict_by_pause_history(data))
     return json.dumps(ret_list)
@@ -1256,7 +1260,7 @@ def finish_work(finish_data=None):
           'p_accum_time': 0,
           'blast_id': data['blast_id']
       }
-      add_work(auto_add_data)
+      add_work(work_data=auto_add_data, is_auto=True)
     return json.dumps(ret)
   except:
     logging.exception("Failed to stop work. Data : %s", data)
@@ -1589,7 +1593,6 @@ def route_default():
 @blueprint.route('/search/work', methods=["GET", "POST"])
 @util.require_login
 def get_work_search_page():
-
   if request.method == "GET":
     activity_list = {}
     activity_list[10000] = "ALL"

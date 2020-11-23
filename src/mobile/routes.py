@@ -15,6 +15,7 @@ import logging
 from flask import request
 
 import util
+import work_apis
 import work.routes
 from mobile import blueprint
 
@@ -23,6 +24,24 @@ from mobile import blueprint
 @util.require_login
 def m_get_beacon_list():
   return json.dumps("WIP")
+
+
+@blueprint.route('/tunnel/get/<tunnel_id>', methods=["GET"])
+@util.require_login
+def m_get_tunnel(tunnel_id):
+  _ret = {}
+  try:
+    _data = work.routes.get_tunnel_list(is_exclude=True)
+    _data = work_apis.get_tunnel(tunnel_id)
+    _ret_data = work.routes._convert_dict_by_tunnel(_data, is_exclude=True)
+    _ret['code'] = 200
+    _ret['result'] = json.loads(_ret_data)
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while get tunnel list.")
+    _ret['code'] = 500
+    _ret['result'] = []
+    return json.dumps(_ret)
 
 
 @blueprint.route('/tunnel/get/list', methods=["GET"])
@@ -45,6 +64,23 @@ def m_get_tunnel_list():
 @util.require_login
 def m_get_tunnel_by_beacon(uuid, major, minor):
   return json.dumps("WIP")
+
+
+@blueprint.route('/blast/get/<blast_id>', methods=["GET"])
+@util.require_login
+def m_get_blast(blast_id):
+  _ret = {}
+  try:
+    _data = work_apis.get_blast(blast_id)
+    _ret_data = work.routes._convert_dict_by_blast(_data, is_exclude=True)
+    _ret['code'] = 200
+    _ret['result'] = json.loads(_ret_data)
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while get blast list.")
+    _ret['code'] = 500
+    _ret['result'] = []
+    return json.dumps(_ret)
 
 
 @blueprint.route('/blast/get/list', methods=["GET"])
@@ -80,6 +116,23 @@ def m_get_blast_list_by_tunnel(tunnel_id):
     return json.dumps(_ret)
 
 
+@blueprint.route('/blastinfo/get/<blast_info_id>', methods=["GET"])
+@util.require_login
+def m_get_blast_info(blast_info_id):
+  _ret = {}
+  try:
+    _data = work_apis.get_blast_info(blast_info_id)
+    _ret_data = work.routes._convert_dict_by_blast_info(_data)
+    _ret['code'] = 200
+    _ret['result'] = json.loads(_ret_data)
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while get blast info list.")
+    _ret['code'] = 500
+    _ret['result'] = []
+    return json.dumps(_ret)
+
+
 @blueprint.route('/blastinfo/get/list', methods=["GET"])
 @util.require_login
 def m_get_blast_info_list():
@@ -107,6 +160,23 @@ def m_get_blast_info_by_blast(blast_id):
     return json.dumps(_ret)
   except:
     logging.exception("Raise error while get blast info by blast.")
+    _ret['code'] = 500
+    _ret['result'] = []
+    return json.dumps(_ret)
+
+
+@blueprint.route('/work/get/<work_id>', methods=["GET"])
+@util.require_login
+def m_get_work(work_id):
+  _ret = {}
+  try:
+    _data = work_apis.get_work(work_id)
+    _ret_data = work.routes._convert_dict_by_work(_data, is_exclude=True)
+    _ret['code'] = 200
+    _ret['result'] = json.loads(_ret_data)
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while get work.")
     _ret['code'] = 500
     _ret['result'] = []
     return json.dumps(_ret)
@@ -145,6 +215,62 @@ def m_get_work_list_by_blast(blast_id):
     return json.dumps(_ret)
 
 
+@blueprint.route('/work/add', methods=["POST"])
+@util.require_login
+def m_work_add():
+  """{'id': str, 'category': int, 'typ': int, 'blast_id': str}
+  """
+  _ret = {}
+  _work_data = {
+    "state": 0,
+    "accum_time": 0,
+    "p_accum_time": 0
+  }
+  _data = request.get_json()
+  _work_data.update(_data)
+  try:
+    ret = work.routes.add_work(work_data=_work_data)
+    if json.loads(ret):
+      work_data = work_apis.get_work(_work_data['id'])
+      _ret['code'] = 200
+      _ret['result'] = work.routes._convert_dict_by_work(work_data,
+                                                         is_exclude=False)
+    else:
+      _ret['code'] = 200
+      _ret['result'] = False
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while start work.")
+    _ret['code'] = 500
+    _ret['result'] = False
+    return json.dumps(_ret)
+
+
+@blueprint.route('/work/update', methods=["POST"])
+@util.require_login
+def m_work_update():
+  """{'id': str, 'category': int, 'typ': int, 'blast_id': str}
+  """
+  _ret = {}
+  _data = request.get_json()
+  try:
+    ret = work.routes.update_work()
+    if json.loads(ret):
+      work_data = work_apis.get_work(_data['id'])
+      _ret['code'] = 200
+      _ret['result'] = work.routes._convert_dict_by_work(work_data,
+                                                         is_exclude=False)
+    else:
+      _ret['code'] = 200
+      _ret['result'] = False
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while start work.")
+    _ret['code'] = 500
+    _ret['result'] = False
+    return json.dumps(_ret)
+
+
 @blueprint.route('/work/action/start', methods=["POST"])
 @util.require_login
 def m_work_start():
@@ -155,8 +281,10 @@ def m_work_start():
   try:
     ret = work.routes.start_work(start_data=_data)
     if json.loads(ret):
+      _data = work_apis.get_work(_data['id'])
+      _ret_data = work.routes._convert_dict_by_work(_data, is_exclude=True)
       _ret['code'] = 200
-      _ret['result'] = True
+      _ret['result'] = _ret_data
     else:
       _ret['code'] = 200
       _ret['result'] = False
@@ -178,8 +306,10 @@ def m_work_pause():
   try:
     ret = work.routes.stop_work(stop_data=_data)
     if json.loads(ret):
+      _data = work_apis.get_work(_data['id'])
+      _ret_data = work.routes._convert_dict_by_work(_data, is_exclude=True)
       _ret['code'] = 200
-      _ret['result'] = True
+      _ret['result'] = _ret_data
     else:
       _ret['code'] = 200
       _ret['result'] = False
@@ -201,8 +331,10 @@ def m_work_finish():
   try:
     ret = work.routes.finish_work(finish_data=_data)
     if json.loads(ret):
+      _data = work_apis.get_work(_data['id'])
+      _ret_data = work.routes._convert_dict_by_work(_data, is_exclude=True)
       _ret['code'] = 200
-      _ret['result'] = True
+      _ret['result'] = _ret_data
     else:
       _ret['code'] = 200
       _ret['result'] = False
@@ -211,6 +343,22 @@ def m_work_finish():
     logging.exception("Raise error while pause work.")
     _ret['code'] = 500
     _ret['result'] = False
+    return json.dumps(_ret)
+
+
+@blueprint.route('/pausehistory/get/list/work/<work_id>', methods=["GET"])
+@util.require_login
+def m_get_pause_history_list_by_work(work_id):
+  _ret = {}
+  try:
+    _data = work.routes.get_pause_history_list_by_work(work_id)
+    _ret['code'] = 200
+    _ret['result'] = json.loads(_data)
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while get pause history list by work.")
+    _ret['code'] = 500
+    _ret['result'] = []
     return json.dumps(_ret)
 
 
