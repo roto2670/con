@@ -31,8 +31,12 @@
             <div id="campAB" class="count-container-message">0</div>
         </div>
         <div class="count-container">
-            <div class="count-container-title">Camp C/D</div>
-            <div id="campCD" class="count-container-message">0</div>
+            <div class="count-container-title">Camp C</div>
+            <div id="campC" class="count-container-message">0</div>
+        </div>
+        <div class="count-container">
+            <div class="count-container-title">Camp D</div>
+            <div id="campD" class="count-container-message">0</div>
         </div>
     </div>
     <div class="sub-title-container status-container none-border">
@@ -100,11 +104,12 @@
             <div class="user-filter-bottom-container">
                 <div class="user-searchbox-container">
                     <select id="location" name="location" class="user-serach-box hidden-selectfield">
-                        <option id="0" value="0" selected>ALL</option>
+                        <option id="100" value="100" selected>ALL</option>
                         <option id="1" value="1">AT1</option>
                         <option id="2" value="2">AT2</option>
                         <option id="30" value="30">CAMP A/B</option>
-                        <option id="31" value="31">CAMP C/D</option>
+                        <option id="31" value="31">CAMP C</option>
+                        <option id="32" value="32">CAMP D</option>
                     </select>
                 </div>
             </div>
@@ -133,7 +138,7 @@
                 <div class="user-searchbox-container">
                       <div id="reportrange_right" class="pull-left" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
                         <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
-                        <span>December 30, 2014 - January 28, 2015</span> <b class="caret"></b>
+                        <span>December 30, 2019 - January 28, 2020</span> <b class="caret"></b>
                       </div>
                       <input type="hidden" id="datetime" name="datetime" value="[]"
                           class="form-control col-md-6 col-xs-6" >
@@ -186,7 +191,8 @@
             const TUNNEL_1 = "1",
                   TUNNEL_2 = "2",
                   CAMP_AB = "30",
-                  CAMP_CD = "31";
+                  CAMP_C = "31",
+                  CAMP_D = "32";
             const INOUT = {
                 1: 'IN',
                 2: 'OUT'
@@ -195,7 +201,8 @@
                 1: "AT1",
                 2: "AT2",
                 30: "CAMP A/B",
-                31: "CAMP C/D"
+                31: "CAMP C",
+                32: "CAMP D"
             };
             const VIOLATION = {
                 0: "Normal",
@@ -209,7 +216,8 @@
             let _db = firebase.firestore();
             let tunnelCount = 0,
                 campABCount = 0,
-                campCDCount = 0;
+                campCCount = 0,
+                campDCount = 0;
 
             start();
 
@@ -328,12 +336,13 @@
             }
 
             function initHandlers() {
-                let keysQuery = "?count=1,2,30,31"
+                let keysQuery = "?count=1,2,30,31,32"
                 jQuery.get("/dashboard/count/covid/counting/each" + keysQuery).done(function(data){
                     let jsonData = JSON.parse(data);
                     setTunnelIn(jsonData[TUNNEL_1] + jsonData[TUNNEL_2]);
                     setCampAB(jsonData[CAMP_AB]);
-                    setCampCD(jsonData[CAMP_CD]);
+                    setCampC(jsonData[CAMP_C]);
+                    setCampD(jsonData[CAMP_D]);
                     updateOutsideCount();
                 });
                 $('.search-btn').click(function() {
@@ -371,7 +380,7 @@
             function updateOutsideCount() {
                 loadHeadCount(function(headCount) {
                     // TODO:
-                    let _totalCount = headCount - (tunnelCount + campABCount + campCDCount);
+                    let _totalCount = headCount - (tunnelCount + campABCount + campCCount + campDCount);
                     $('.count-container-message#tunnelOut').text(_totalCount || '-');
                 });
             }
@@ -398,13 +407,18 @@
                     updateOutsideCount();
                 });
                 _sock.on('worker_ab', function(msg){
-                    console.log("campab : " +msg);
+                    console.log("camp ab : " +msg);
                     setCampAB(msg);
                     updateOutsideCount();
                 });
-                _sock.on('worker_cd', function(msg){
-                    console.log("campcd : " +msg);
-                    setCampCD(msg);
+                _sock.on('worker_c', function(msg){
+                    console.log("camp c : " +msg);
+                    setCampC(msg);
+                    updateOutsideCount();
+                });
+                _sock.on('worker_d', function(msg){
+                    console.log("camp d : " +msg);
+                    setCampD(msg);
                     updateOutsideCount();
                 });
             }
@@ -419,9 +433,14 @@
                 campABCount = count;
             }
 
-            function setCampCD(count) {
-                document.getElementById("campCD").innerText = count;
-                campCDCount = count;
+            function setCampC(count) {
+                document.getElementById("campC").innerText = count;
+                campCCount = count;
+            }
+
+            function setCampD(count) {
+                document.getElementById("campD").innerText = count;
+                campDCount = count;
             }
 
             function displayLogs(filters, users, callback, clean) {
