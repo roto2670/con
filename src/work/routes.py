@@ -2061,14 +2061,26 @@ def csv_str_formatting(work_log_list, tunnel_id):
     for log in work_log_list:
       if log.blast.tunnel.id == _blast.tunnel.id and log.blast.id == _blast.id:
         if log.state == constants.WORK_STATE_FINISH:
-          if log.typ in MAIN_TYPES:
+          if log.category == 0:
             main_work_times[CSV_INDEX[log.typ]] += log.accum_time
             main_total_times += log.accum_time
-          elif log.typ in SUPPORTING_TYPES:
-            support_times[CSV_INDEX[log.typ]] += log.accum_time
+          elif log.category == 1:
+            if log.typ in SUPPORTING_TYPES:
+              support_times[CSV_INDEX[log.typ]] += log.accum_time
+            else:
+              last_typ = SUPPORTING_TYPES[-1]
+              index_gap = log.typ - last_typ
+              log_index = SUPPORTING_TYPES.index(last_typ) + index_gap
+              support_times[log_index] += log.accum_time
             support_total_times += log.accum_time
-          elif log.typ in IDLE_TYPES:
-            idle_times[CSV_INDEX[log.typ]] += log.accum_time
+          elif log.category == 2:
+            if log.typ in IDLE_TYPES:
+              idle_times[CSV_INDEX[log.typ]] += log.accum_time
+            else:
+              last_typ = IDLE_TYPES[-1]
+              index_gap = log.typ - last_typ
+              log_index = IDLE_TYPES.index(last_typ) + index_gap
+              idle_times[log_index] += log.accum_time
             idle_total_times += log.accum_time
         log_data_list.append(log)
 
