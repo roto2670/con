@@ -238,7 +238,7 @@
             function loadHeadCount(callback) {
                 let _callback = callback || _.noop;
                 if (_.isNumber(_headCount)) {
-                    _callback(headcount);
+                    _callback(_headCount);
                 } else {
                     _db.collection('covid19_stats')
                         .orderBy('ts', 'desc')
