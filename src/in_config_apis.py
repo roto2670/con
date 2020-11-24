@@ -13,7 +13,7 @@ import datetime
 
 import pytz
 from flask_login import current_user  # noqa : pylint: disable=import-error
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 
 from base import db
 from constants import ORG_ID
@@ -198,7 +198,14 @@ def search_worker_log(_id, worker_name, datetime_list, ap, inout, violation,
     filter_list.append(EnterenceWorkerLog.worker_id == _id)
   if worker_name:
     filter_list.append(EnterenceWorkerLog.worker_name.like("%" + worker_name + "%"))
-  if ap != 0:
+  if ap == 0:
+    # Entrance Search Log Type -> All -> AT1, AT2
+    filter_list.append(or_(EnterenceWorkerLog.access_point == 1,
+                           EnterenceWorkerLog.access_point == 2))
+  elif ap == 100:
+    # Covid Access Log Type -> All
+    pass
+  else:
     filter_list.append(EnterenceWorkerLog.access_point == ap)
   if inout != 0:
     filter_list.append(EnterenceWorkerLog.inout == inout)
@@ -225,7 +232,14 @@ def csv_worker_log(_id, worker_name, datetime_list, ap, inout, violation,
     filter_list.append(EnterenceWorkerLog.worker_id == _id)
   if worker_name:
     filter_list.append(EnterenceWorkerLog.worker_name.like("%" + worker_name + "%"))
-  if ap != 0:
+  if ap == 0:
+    # Entrance Search Log Type -> All -> AT1, AT2
+    filter_list.append(or_(EnterenceWorkerLog.access_point == 1,
+                           EnterenceWorkerLog.access_point == 2))
+  elif ap == 100:
+    # Covid Access Log Type -> All
+    pass
+  else:
     filter_list.append(EnterenceWorkerLog.access_point == ap)
   if inout != 0:
     filter_list.append(EnterenceWorkerLog.inout == inout)
@@ -237,7 +251,6 @@ def csv_worker_log(_id, worker_name, datetime_list, ap, inout, violation,
       filter(*filter_list).\
       order_by(desc(EnterenceWorkerLog.created_time)).all()
   return log_list
-
 
 
 def search_equip_log(equip_name, kind, datetime_list, ap, inout, next_num=None):

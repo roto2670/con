@@ -164,9 +164,9 @@ def get_total_worker_count():
 def get_covid_count():
   """
   Request
-    ex) /count/covid/counting/each?count=1,2,3,4
+    ex) /count/covid/counting/each?count=1,2,30,31,32
   Response
-    ex) {"1": 10, "2": 5, "3": 20, "4": 50}
+    ex) {"1": 10, "2": 5, "30": 20, "31": 50, "32": 20}
   """
   req_args = request.args
   count_key = req_args.get("count", "")

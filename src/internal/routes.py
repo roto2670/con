@@ -84,13 +84,15 @@ def set_worker_count():
     at1_count = dashboard.count.get_worker_count(1)
     at2_count = dashboard.count.get_worker_count(2)
     camp_ab_count = dashboard.count.get_worker_count(30)
-    camp_cd_count = dashboard.count.get_worker_count(31)
+    camp_c_count = dashboard.count.get_worker_count(31)
+    camp_d_count = dashboard.count.get_worker_count(32)
     total_count = at1_count + at2_count
     emit('worker', total_count, namespace="/ws/count", broadcast=True)
     emit('worker_at1', at1_count, namespace="/ws/count", broadcast=True)
     emit('worker_at2', at2_count, namespace="/ws/count", broadcast=True)
     emit('camp_ab', camp_ab_count, namespace="/ws/count", broadcast=True)
-    emit('camp_cd', camp_cd_count, namespace="/ws/count", broadcast=True)
+    emit('camp_c', camp_c_count, namespace="/ws/count", broadcast=True)
+    emit('camp_d', camp_d_count, namespace="/ws/count", broadcast=True)
     return json.dumps(True)
   except:
     logging.exception("Raise error while set worker count.")

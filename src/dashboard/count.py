@@ -70,7 +70,8 @@ BUS_WORKSHOP_ID = 3
 BUS_ACCESS_1_ID = 4
 BUS_ACCESS_2_ID = 5
 CAMP_A_B_ID = 30
-CAMP_C_D_ID = 31
+CAMP_C_ID = 31
+CAMP_D_ID = 32
 
 
 BUS_USER_GROUP_ID = '''1013'''
@@ -90,7 +91,8 @@ ACCESS_POINT = {
   BUS_ACCESS_1_ID: "BUS AT 1",
   BUS_ACCESS_2_ID: "BUS AT 2",
   CAMP_A_B_ID: "CAMP A/B",
-  CAMP_C_D_ID: "CAMP C/D",
+  CAMP_C_ID: "CAMP C",
+  CAMP_D_ID: "CAMP D",
   0: "None"
 }
 REVERSE_ACCESS_POINT = {
@@ -113,7 +115,8 @@ AT_1_DEVICE_LIST = set([])
 AT_2_DEVICE_LIST = set([])
 MUCK_DEVICE_LIST = set([])
 CAMP_A_B_DEVICE_LIST = set([])
-CAMP_C_D_DEVICE_LIST = set([])
+CAMP_C_DEVICE_LIST = set([])
+CAMP_D_DEVICE_LIST = set([])
 
 # user_id == bus_id
 BUS_CHECKING_LIST = {}  # {device_id: user_id, ..}  # in checking start, not in checking end
@@ -210,7 +213,8 @@ def test_count():
   a['AT_2_DEVICE_LIST'] = list(AT_2_DEVICE_LIST)
   a['MUCK_DEVICE_LIST'] = list(MUCK_DEVICE_LIST)
   a['CAMP_A_B_LIST'] = list(CAMP_A_B_DEVICE_LIST)
-  a['CAMP_C_D_LIST'] = list(CAMP_C_D_DEVICE_LIST)
+  a['CAMP_C_D_LIST'] = list(CAMP_C_DEVICE_LIST)
+  a['CAMP_D_LIST'] = list(CAMP_D_DEVICE_LIST)
   a['S_CHECKING_DEVICE_LIST'] = list(S_CHECKING_DEVICE_LIST)
   a['S_AT_1_DEVICE_LIST'] = list(S_AT_1_DEVICE_LIST)
   a['S_AT_2_DEVICE_LIST'] = list(S_AT_2_DEVICE_LIST)
@@ -467,9 +471,12 @@ def __fs_set_access_point(ap, device_id):
   elif ap == CAMP_A_B_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     CAMP_A_B_DEVICE_LIST.add(device_id)
-  elif ap == CAMP_C_D_ID:
+  elif ap == CAMP_C_ID:
     CHECKING_DEVICE_LIST.add(device_id)
-    CAMP_C_D_DEVICE_LIST.add(device_id)
+    CAMP_C_DEVICE_LIST.add(device_id)
+  elif ap == CAMP_D_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    CAMP_D_DEVICE_LIST.add(device_id)
   elif ap == BUS_WORKSHOP_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     BUS_WORKSHOP_DEVICE_LIST.add(device_id)
@@ -496,10 +503,14 @@ def __fs_set_access_point(ap, device_id):
       CAMP_A_B_DEVICE_LIST.remove(device_id)
       if not CAMP_A_B_DEVICE_LIST:
         clear_keys(CAMP_A_B_ID)
-    elif device_id in CAMP_C_D_DEVICE_LIST:
-      CAMP_C_D_DEVICE_LIST.remove(device_id)
-      if not CAMP_C_D_DEVICE_LIST:
-        clear_keys(CAMP_C_D_ID)
+    elif device_id in CAMP_C_DEVICE_LIST:
+      CAMP_C_DEVICE_LIST.remove(device_id)
+      if not CAMP_C_DEVICE_LIST:
+        clear_keys(CAMP_C_ID)
+    elif device_id in CAMP_D_DEVICE_LIST:
+      CAMP_D_DEVICE_LIST.remove(device_id)
+      if not CAMP_D_DEVICE_LIST:
+        clear_keys(CAMP_D_ID)
     elif device_id in BUS_WORKSHOP_DEVICE_LIST:
       # TODO: clear keys?
       BUS_WORKSHOP_DEVICE_LIST.remove(device_id)
@@ -564,8 +575,10 @@ def _delete_device_of_facestation(device_id):
     MUCK_DEVICE_LIST.remove(device_id)
   if device_id in CAMP_A_B_DEVICE_LIST:
     CAMP_A_B_DEVICE_LIST.remove(device_id)
-  if device_id in CAMP_C_D_DEVICE_LIST:
-    CAMP_C_D_DEVICE_LIST.remove(device_id)
+  if device_id in CAMP_C_DEVICE_LIST:
+    CAMP_C_DEVICE_LIST.remove(device_id)
+  if device_id in CAMP_D_DEVICE_LIST:
+    CAMP_D_DEVICE_LIST.remove(device_id)
   if device_id in BUS_WORKSHOP_DEVICE_LIST:
     BUS_WORKSHOP_DEVICE_LIST.remove(device_id)
   if device_id in BUS_AT_1_DEVICE_LIST:
@@ -752,8 +765,11 @@ def set_worker_count(org_id, user_id, name, event_data):
       elif device_id in CAMP_A_B_DEVICE_LIST:
         _set_worker_count(device_id, CAMP_A_B_ID, user_id, name, event_data,
                           org_id)
-      elif device_id in CAMP_C_D_DEVICE_LIST:
-        _set_worker_count(device_id, CAMP_C_D_ID, user_id, name, event_data,
+      elif device_id in CAMP_C_DEVICE_LIST:
+        _set_worker_count(device_id, CAMP_C_ID, user_id, name, event_data,
+                          org_id)
+      elif device_id in CAMP_D_DEVICE_LIST:
+        _set_worker_count(device_id, CAMP_D_ID, user_id, name, event_data,
                           org_id)
       elif device_id in BUS_WORKSHOP_DEVICE_LIST:
         if user_group_id == BUS_USER_GROUP_ID:
@@ -1029,9 +1045,12 @@ def _set_access_point(access_point, device_id):
   elif access_point == CAMP_A_B_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     CAMP_A_B_DEVICE_LIST.add(device_id)
-  elif access_point == CAMP_C_D_ID:
+  elif access_point == CAMP_C_ID:
     CHECKING_DEVICE_LIST.add(device_id)
-    CAMP_C_D_DEVICE_LIST.add(device_id)
+    CAMP_C_DEVICE_LIST.add(device_id)
+  elif access_point == CAMP_D_ID:
+    CHECKING_DEVICE_LIST.add(device_id)
+    CAMP_D_DEVICE_LIST.add(device_id)
   elif access_point == BUS_WORKSHOP_ID:
     CHECKING_DEVICE_LIST.add(device_id)
     BUS_WORKSHOP_DEVICE_LIST.add(device_id)
