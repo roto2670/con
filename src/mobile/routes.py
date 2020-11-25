@@ -38,7 +38,7 @@ def m_get_tunnel(tunnel_id):
     _ret['result'] = json.loads(_ret_data)
     return json.dumps(_ret)
   except:
-    logging.exception("Raise error while get tunnel list.")
+    logging.exception("Raise error while get tunnel. ID : %s", tunnel_id)
     _ret['code'] = 500
     _ret['result'] = []
     return json.dumps(_ret)
@@ -77,7 +77,7 @@ def m_get_blast(blast_id):
     _ret['result'] = json.loads(_ret_data)
     return json.dumps(_ret)
   except:
-    logging.exception("Raise error while get blast list.")
+    logging.exception("Raise error while get blast. ID : %s", blast_id)
     _ret['code'] = 500
     _ret['result'] = []
     return json.dumps(_ret)
@@ -110,7 +110,8 @@ def m_get_blast_list_by_tunnel(tunnel_id):
     _ret['result'] = json.loads(_data)
     return json.dumps(_ret)
   except:
-    logging.exception("Raise error while get blast list by tunnel.")
+    logging.exception("Raise error while get blast list by tunnel. ID : %s",
+                      tunnel_id)
     _ret['code'] = 500
     _ret['result'] = []
     return json.dumps(_ret)
@@ -127,7 +128,8 @@ def m_get_blast_info(blast_info_id):
     _ret['result'] = json.loads(_ret_data)
     return json.dumps(_ret)
   except:
-    logging.exception("Raise error while get blast info list.")
+    logging.exception("Raise error while get blast info list. ID : %s",
+                      blast_info_id)
     _ret['code'] = 500
     _ret['result'] = []
     return json.dumps(_ret)
@@ -159,7 +161,8 @@ def m_get_blast_info_by_blast(blast_id):
     _ret['result'] = json.loads(_data)
     return json.dumps(_ret)
   except:
-    logging.exception("Raise error while get blast info by blast.")
+    logging.exception("Raise error while get blast info by blast. ID : %s",
+                      blast_id)
     _ret['code'] = 500
     _ret['result'] = []
     return json.dumps(_ret)
@@ -176,7 +179,8 @@ def m_get_work(work_id):
     _ret['result'] = json.loads(_ret_data)
     return json.dumps(_ret)
   except:
-    logging.exception("Raise error while get work.")
+    logging.exception("Raise error while get work. ID : %s",
+                      work_id)
     _ret['code'] = 500
     _ret['result'] = []
     return json.dumps(_ret)
@@ -209,7 +213,8 @@ def m_get_work_list_by_blast(blast_id):
     _ret['result'] = json.loads(_data)
     return json.dumps(_ret)
   except:
-    logging.exception("Raise error while get work list by blast.")
+    logging.exception("Raise error while get work list by blast. ID : %s",
+                      blast_id)
     _ret['code'] = 500
     _ret['result'] = []
     return json.dumps(_ret)
@@ -228,6 +233,7 @@ def m_work_add():
   }
   _data = request.get_json()
   _work_data.update(_data)
+  logging.info("Request Work ADD data : %s", _data)
   try:
     ret = work.routes.add_work(work_data=_work_data)
     if json.loads(ret):
@@ -253,6 +259,7 @@ def m_work_update():
   """
   _ret = {}
   _data = request.get_json()
+  logging.info("Request Work UPDATE data : %s", _data)
   try:
     ret = work.routes.update_work()
     if json.loads(ret):
@@ -277,6 +284,7 @@ def m_work_start():
   """{'id': str, 'category': int, 'typ': int, 'blast_id': str}
   """
   _data = request.get_json()
+  logging.info("Request Work START data : %s", _data)
   _ret = {}
   try:
     ret = work.routes.start_work(start_data=_data)
@@ -302,6 +310,7 @@ def m_work_pause():
   """{'id': str, 'category': int, 'typ': int, 'blast_id': str, 'message': str}
   """
   _data = request.get_json()
+  logging.info("Request Work PAUSE data : %s", _data)
   _ret = {}
   try:
     ret = work.routes.stop_work(stop_data=_data)
@@ -327,6 +336,7 @@ def m_work_finish():
   """{'id': str, 'category': int, 'typ': int, 'blast_id': str}
   """
   _data = request.get_json()
+  logging.info("Request Work FINISH data : %s", _data)
   _ret = {}
   try:
     ret = work.routes.finish_work(finish_data=_data)
@@ -356,7 +366,8 @@ def m_get_pause_history_list_by_work(work_id):
     _ret['result'] = json.loads(_data)
     return json.dumps(_ret)
   except:
-    logging.exception("Raise error while get pause history list by work.")
+    logging.exception("Raise error while get pause history list by work. ID :% s",
+                      work_id)
     _ret['code'] = 500
     _ret['result'] = []
     return json.dumps(_ret)
