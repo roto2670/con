@@ -2220,6 +2220,9 @@ def activity_init():
   for activity_id, name in ACTIVITY_NAME.items():
     activity_data = work_apis.get_activity_by_activity_id(activity_id)
     if not activity_data:
+      logging.debug("#### data : %s", activity_data)
+      category = None
+      file_path = None
       if int(activity_id / 100) == 1:
         category = 0
         file_path = MAIN[activity_id]
@@ -2229,6 +2232,10 @@ def activity_init():
       elif int(activity_id / 100) == 3:
         category = 2
         file_path = IDLE[activity_id]
+      else:
+        logging.warning("%s(%s) is invalid data. It is unabled to save.",
+                        activity_id, name)
+        continue
       data = {
           'name': name,
           'category': category,
@@ -2236,7 +2243,7 @@ def activity_init():
           'file_path': file_path
       }
       work_apis.create_activity(data)
-      logging.warning("Activity data saved successfully. %s, %s", activity_id,
-                      name)
+      logging.info("Activity data saved successfully. %s, %s", activity_id,
+                   name)
     else:
-      logging.warning("The data already exists. %s, %s", activity_id, name)
+      logging.debug("The data already exists. %s, %s", activity_id, name)
