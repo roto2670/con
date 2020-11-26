@@ -35,7 +35,7 @@ def m_get_tunnel(tunnel_id):
     _data = work_apis.get_tunnel(tunnel_id)
     _ret_data = work.routes._convert_dict_by_tunnel(_data, is_exclude=True)
     _ret['code'] = 200
-    _ret['result'] = json.loads(_ret_data)
+    _ret['result'] = _ret_data
     return json.dumps(_ret)
   except:
     logging.exception("Raise error while get tunnel. ID : %s", tunnel_id)
@@ -74,7 +74,7 @@ def m_get_blast(blast_id):
     _data = work_apis.get_blast(blast_id)
     _ret_data = work.routes._convert_dict_by_blast(_data, is_exclude=True)
     _ret['code'] = 200
-    _ret['result'] = json.loads(_ret_data)
+    _ret['result'] = _ret_data
     return json.dumps(_ret)
   except:
     logging.exception("Raise error while get blast. ID : %s", blast_id)
@@ -125,7 +125,7 @@ def m_get_blast_info(blast_info_id):
     _data = work_apis.get_blast_info(blast_info_id)
     _ret_data = work.routes._convert_dict_by_blast_info(_data)
     _ret['code'] = 200
-    _ret['result'] = json.loads(_ret_data)
+    _ret['result'] = _ret_data
     return json.dumps(_ret)
   except:
     logging.exception("Raise error while get blast info list. ID : %s",
@@ -176,7 +176,7 @@ def m_get_work(work_id):
     _data = work_apis.get_work(work_id)
     _ret_data = work.routes._convert_dict_by_work(_data, is_exclude=True)
     _ret['code'] = 200
-    _ret['result'] = json.loads(_ret_data)
+    _ret['result'] = _ret_data
     return json.dumps(_ret)
   except:
     logging.exception("Raise error while get work. ID : %s",
