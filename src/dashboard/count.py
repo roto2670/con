@@ -688,7 +688,7 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
                                                          NORMAL_CHECK, org_id)
         _set_expire_cache(user_id, user_name)
         _send_worker_log(log)
-      elif WORKER_COUNT.has_data(REVERSE_ACCESS_POINT[key], user_id):
+      elif key in REVERSE_ACCESS_POINT and WORKER_COUNT.has_data(REVERSE_ACCESS_POINT[key], user_id):
         reverse_key = REVERSE_ACCESS_POINT[key]
         ret = WORKER_COUNT.delete_data(reverse_key, user_id)
         ret = WORKER_COUNT.delete_data(org_id, user_id)
@@ -699,6 +699,10 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id):
                                                          NORMAL_CHECK, org_id)
         _set_expire_cache(user_id, user_name)
         _send_worker_log(log)
+      else:
+        # TODO:
+        logging.info("%s(%s) belong anywhere. key :%s, device_id : %s",
+                     user_name, user_id, key, device_id)
     elif device_id in BUS_AT_1_DEVICE_LIST and device_id in BUS_CHECKING_LIST:
       bus_id = BUS_CHECKING_LIST[device_id]
       WORKER_COUNT.set_data(bus_id, user_id, event_data)
@@ -905,7 +909,7 @@ def _set_equip_count(key, org_id, gid, hid):
             _set_expire_cache(user_id, user_name)
             _send_worker_log(log)
             WORKER_COUNT.hdel(bus_id, user_id)
-    elif BEACONS_COUNT.has_data(REVERSE_ACCESS_POINT[key], gid):
+    elif key in REVERSE_ACCESS_POINT and BEACONS_COUNT.has_data(REVERSE_ACCESS_POINT[key], gid):
       reverse_key = REVERSE_ACCESS_POINT[key]
       ret = BEACONS_COUNT.delete_data(reverse_key, gid)
       ret = BEACONS_COUNT.delete_data(org_id, gid)
