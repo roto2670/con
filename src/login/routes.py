@@ -89,13 +89,16 @@ def _sign_in_progress(email, password):
   if user and user.password and checkpw(password.encode('utf-8'), user.password):
     in_apis.update_user_by_ip(user.id, util.get_ip_addr())
     login_user(user, remember=False)
+    logging.info("Login user : %s", email)
     return user
   else:
+    logging.warning("Failed to login : %s", email)
     return False
 
 
 @blueprint.route('/sign-out')
 def sign_out():
+  logging.info("Logout user : %s", current_user.email)
   logout_user()
   return redirect(url_for('login_blueprint.login'))
 
