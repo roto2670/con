@@ -155,6 +155,7 @@ GADGET_INFO = {
     "19": "Concrete Mixer Truck",
     "20": "Shuttle",
     "21": "Worker"
+    # "90": "Tunnel"
 }
 SHOT_GADGET_INFO = {
     "1": "Jumbo Drill 2B",
@@ -172,6 +173,7 @@ SHOT_GADGET_INFO = {
     "6": "Excavator(Wheel)",
     "7": "Excavator(Crawler)",
     "100": "Miscellaneous"
+    # "90": "Tunnel"
 }
 
 SCANNER_LOCATION = {
@@ -389,7 +391,19 @@ def beacon_list():
   raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
   data_list = []
   for raw_data in raw_datas.values():
-    if raw_data['kind'] in ['mibsskec', KIND_NEW_BEACON] :
+    if raw_data['kind'] in ['mibsskec', KIND_NEW_BEACON] \
+        and raw_data['tags'] and raw_data['tags'][0] != 90: # 90 is tunnel beacon
+      data_list.append(raw_data)
+  return data_list
+
+
+def tunnel_beacon_list():
+  # TODO:
+  raw_datas = BEACONS_COUNT.get_all(DEVICE_DATA_KEY)
+  data_list = []
+  for raw_data in raw_datas.values():
+    if raw_data['kind'] in ['mibsskec', KIND_NEW_BEACON] \
+        and raw_data['tags'] and raw_data['tags'][0] == 90: # 90 is tunnel beacon
       data_list.append(raw_data)
   return data_list
 

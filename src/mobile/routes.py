@@ -17,13 +17,25 @@ from flask import request
 import util
 import work_apis
 import work.routes
+import dashboard.count
 from mobile import blueprint
 
 
 @blueprint.route('/beacon/get/list', methods=["GET"])
 @util.require_login
 def m_get_beacon_list():
-  return json.dumps("WIP")
+  _ret = {}
+  try:
+    _data_list = dashboard.count.tunnel_beacon_list()
+    _ret['code'] = 200
+    _ret['result'] = _data_list
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while get beacon list.")
+    _ret['code'] = 500
+    _ret['result'] = []
+    return json.dumps(_ret)
+
 
 
 @blueprint.route('/tunnel/get/<tunnel_id>', methods=["GET"])
@@ -63,7 +75,27 @@ def m_get_tunnel_list():
 @blueprint.route('/tunnel/get/beacon/<uuid>/<major>/<minor>', methods=["GET"])
 @util.require_login
 def m_get_tunnel_by_beacon(uuid, major, minor):
-  return json.dumps("WIP")
+  # TODO: Improve
+  logging.info("Request get tunnel by beacon. uuid : %s, major, %s, minor : %s",
+               uuid, major, minor)
+  _ret = {}
+  try:
+    _data = work.routes.get_tunnel_list(is_exclude=True)
+    _ret_beacon = {}
+    for _beacon in _data:
+      if _beacon['beacon_spec']['uuid'] == uuid and \
+          int(_beacon['beacon_spec']['major']) == int(major) and \
+          int(_beacon['beacon_spec']['minor']) == int(minor):
+        _ret_beacon = _beacon
+    _ret['code'] = 200
+    _ret['result'] = json.loads(_ret_beacon)
+    logging.info("Response data : %s", _ret)
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while get tunnel by beacon.")
+    _ret['code'] = 500
+    _ret['result'] = []
+    return json.dumps(_ret)
 
 
 @blueprint.route('/blast/get/<blast_id>', methods=["GET"])

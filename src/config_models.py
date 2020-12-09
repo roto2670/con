@@ -38,6 +38,7 @@ GADGET_INFO = {
     "19": "Concrete Mixer Truck",
     "20": "Shuttle",
     "21": "Worker",
+    # "90": "Tunnel"
     "100": "Miscellaneous"
 }
 

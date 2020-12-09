@@ -13,19 +13,23 @@ import os
 import json
 import time
 import uuid
+import hashlib
 import logging
 import requests
 import datetime
 from flask import request, render_template, redirect
 from flask import make_response
 
+import apis
 import util
 import constants
 import work_apis
+import local_apis
 import in_config_apis
 import dashboard.count
 from work import blueprint
-from constants import API_SERVER
+from constants import REG_HUB_ID, KIND_NEW_BEACON
+from constants import API_SERVER, REG_ACCOUNT_ID, WHITE_LIST
 from constants import WORK_STATE_STOP, WORK_STATE_IN_PROGRESS
 from constants import WORK_STATE_FINISH
 from apscheduler.schedulers.gevent import GeventScheduler
@@ -2047,7 +2051,6 @@ def get_work_search_page():
     elif page == "2":
       page_num = next_num
 
-    logging.info("## tid : %s, t : %s, d : %s", tunnel_id, tunnel, activity)
     work_list = work_apis.search(tunnel_id, int(tunnel), int(activity),
                                  datetime_list,
                                  page_num)
@@ -2419,6 +2422,84 @@ def route_reg_message_create():
     return redirect("/work/reg/message")
 
 
+@blueprint.route('/reg/beacon')
+@util.require_login
+def route_beacon():
+  # TODO: add sidebar menu
+  beacon_list = []
+  return render_template("t_beacon_list.html", beacon_list=beacon_list,
+                         category=TUNNEL_CATEGORY, direction=TUNNEL_DIRECTION)
+
+
+@blueprint.route('/reg/beacon/create', methods=['GET', 'POST'])
+@util.require_login
+def route_reg_beacon():
+  if request.method == "GET":
+    beacon_info = apis.get_new_beacon_info(REG_ACCOUNT_ID)
+    tunnel_list = work_apis.get_all_tunnel_by_sort()
+    _tunnel_list = []
+    for tunnel in tunnel_list:
+      _tunnel_list.append(_convert_dict_by_tunnel(tunnel, is_exclude=True))
+    # KIND_NEW_BEACON = mibs00001 -> KIND_NEW_BEACON[:4] = mibs
+    return render_template("register_t_beacon.html", beacon_info=beacon_info,
+                           tunnel_list=_tunnel_list, new_name=KIND_NEW_BEACON[:4])
+  else:
+    device_id = request.form.get('deviceId')
+    tunnel = request.form.get('tunnel')
+    name = request.form.get('name')
+    _uuid = request.form.get('uuid')
+    _major = request.form.get('major')
+    _minor = request.form.get('minor')
+
+    mac_hash = hashlib.md5()
+    mac_hash.update(device_id.encode('utf-8'))
+    mac_addr = mac_hash.hexdigest()[:12]
+    new_id_hash = hashlib.md5()
+    new_id_hash.update(mac_addr.encode('utf-8'))
+    new_id = new_id_hash.hexdigest()
+    security = uuid.uuid4().hex[:24]
+    logging.info("Tunnel Beacon name : %s, uuid : %s, major : %s, minor : %s",
+                 name, _uuid, _major, _minor)
+    value = {
+      "id": new_id,
+      "mac": mac_addr,
+      "name": name,
+      "kind": KIND_NEW_BEACON,
+      "protocol": 0,
+      "firmware_version": "1.0.0",
+      "model_number": 0,
+      "model_name": "SKEC New Beacon",
+      "sdk_version": "0.1",
+      "beacon": REG_ACCOUNT_ID,
+      "security": security,
+      "hub_id": REG_HUB_ID,
+      "account_id": REG_ACCOUNT_ID,
+      "status": 0,
+      "locale": "US",
+      "rssi": 0,
+      "battery": 0,
+      "progress": 0,
+      "latest_version": "0.0.0",
+      "is_depr": 0,
+      "custom": {
+          "tunnel_id": tunnel
+      },
+      "tags": ["90"],  # tunnel beacon
+      "beacon_spec": {
+          "uuid": _uuid,
+          "major": int(_major),
+          "minor": int(_minor),
+          "interval": 700,
+          "during_second": 0
+      },
+      "img_url": ""
+    }
+    ret = local_apis.register_new_beacon(value)
+    logging.info("Register tunnel beacon resp : %s", ret)
+    local_apis.update_new_beacon_info(value, WHITE_LIST)
+    return redirect("/work/reg/beacon")
+
+
 @blueprint.route('/search/worklog/download', methods=["POST"])
 @util.require_login
 def download_work_log():
@@ -2651,7 +2732,6 @@ def activity_init():
   for activity_id, name in ACTIVITY_NAME.items():
     activity_data = work_apis.get_activity_by_activity_id(activity_id)
     if not activity_data:
-      logging.debug("#### data : %s", activity_data)
       category = None
       file_path = None
       if int(activity_id / 100) == 1:
