@@ -287,13 +287,14 @@ def m_work_add():
 @blueprint.route('/work/update', methods=["POST"])
 @util.require_login
 def m_work_update():
-  """{'id': str, 'category': int, 'typ': int, 'blast_id': str}
+  """{'id': str, 'category': int, 'typ': int, 'blast_id': str,
+      'statr_time': datetime, 'finish_time': datetime, 'state': int}
   """
   _ret = {}
   _data = request.get_json()
   logging.info("Request Work UPDATE data : %s", _data)
   try:
-    ret = work.routes.update_work()
+    ret = work.routes.update_work(_data)
     if json.loads(ret):
       work_data = work_apis.get_work(_data['id'])
       _ret['code'] = 200

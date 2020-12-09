@@ -517,12 +517,19 @@ def update_work(data):
   _work_history_list = get_work_history_list_by_work(_id)
   _blast_data = get_blast(data['blast_id'])
   original_accum_time = 0
+  start_history = None
+  finish_history = None
   for _work_history in _work_history_list:
     if _work_history.state == 1:
       start_history = _work_history
     elif _work_history.state == 2:
       finish_history = _work_history
       original_accum_time = finish_history.accum_time
+
+  if not start_history or not finish_history:
+    logging.warning("Can not find start or finish history. id : %s", _id)
+    return False
+
   if 'start_time' in data:
     start_time = datetime.datetime.fromtimestamp(data['start_time'])
     start_history.timestamp = start_time

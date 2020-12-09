@@ -1025,11 +1025,16 @@ def _create_finish_work_log(data):
 
 @blueprint.route('/work/update', methods=["POST"])
 @util.require_login
-def update_work():
-  data = request.get_json()
+def update_work(work_data=None):
+  if work_data:
+    data = work_data
+  else:
+    data = request.get_json()
   try:
     # TODO:
     ret = work_apis.update_work(data)
+    if not ret:
+      return json.dumps(False)
     work_resp_data = _convert_dict_by_work(ret)
     blast_data = work_apis.get_blast(ret.blast_id)
     _blast_data = _convert_dict_by_blast(blast_data)
