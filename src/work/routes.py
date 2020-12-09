@@ -1604,10 +1604,10 @@ def finish_work(finish_data=None):
         # Finish work history
         history_data['state'] = WORK_STATE_FINISH
         history_data['timestamp'] = work_apis.get_servertime().replace(second=0)
-        history_data['accum_time'] = finish_data.accum_time
+        history_data['accum_time'] = _data.accum_time
         _data = work_apis.create_work_history(history_data)
         send_request(WORK_HISTORY_ADD,
-                     [_convert_dict_by_work_history(finish_data)])
+                     [_convert_dict_by_work_history(_data)])
         # Handle pause data
         pause_time = 0
         if latest_work.pause_history_list:
