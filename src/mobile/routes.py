@@ -138,7 +138,7 @@ def m_get_blast_list_by_tunnel(tunnel_id):
   limit = request.args.get('limit', None)
   try:
     if limit:
-      _data = work_apis.get_recent_blast_list_by_tunnel(tunnel_id, limit=3)  # 3 is default
+      _data = work_apis.get_recent_blast_list_by_tunnel(tunnel_id, limit=limit)
       _data_list = []
       for b in _data:
         _data_list.append(work.routes._convert_dict_by_blast(b, is_exclude=True))
