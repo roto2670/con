@@ -416,6 +416,12 @@ def get_blast_list_by_tunnel(tunnel_id):
   return data_list
 
 
+def get_recent_blast_list_by_tunnel(tunnel_id, limit=3):
+  data_list = Blast.query.filter_by(tunnel_id=tunnel_id).\
+      order_by(desc(Blast.created_time)).limit(limit).all()
+  return data_list
+
+
 def get_all_blast():
   data_list = Blast.query.order_by(desc(Blast.created_time)).all()
   return data_list
