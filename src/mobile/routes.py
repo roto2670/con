@@ -135,35 +135,24 @@ def m_get_blast_list():
 @util.require_login
 def m_get_blast_list_by_tunnel(tunnel_id):
   _ret = {}
+  limit = request.args.get('limit', None)
   try:
-    _data = work.routes.get_blast_list_by_tunnel(tunnel_id=tunnel_id,
-                                                 is_exclude=True)
-    _ret['code'] = 200
-    _ret['result'] = json.loads(_data)
-    return json.dumps(_ret)
+    if limit:
+      _data = work_apis.get_recent_blast_list_by_tunnel(tunnel_id, limit=3)  # 3 is default
+      _data_list = []
+      for b in _data:
+        _data_list.append(work.routes._convert_dict_by_blast(b, is_exclude=True))
+      _ret['code'] = 200
+      _ret['result'] = json.loads(_data_list)
+      return json.dumps(_ret)
+    else:
+      _data = work.routes.get_blast_list_by_tunnel(tunnel_id=tunnel_id,
+                                                   is_exclude=True)
+      _ret['code'] = 200
+      _ret['result'] = json.loads(_data)
+      return json.dumps(_ret)
   except:
     logging.exception("Raise error while get blast list by tunnel. ID : %s",
-                      tunnel_id)
-    _ret['code'] = 500
-    _ret['result'] = []
-    return json.dumps(_ret)
-
-
-@blueprint.route('/blast/get/list/tunnel/<tunnel_id>', methods=["GET"])
-@util.require_login
-def m_get_blast_list_by_tunnel(tunnel_id):
-  _ret = {}
-  limit = request.args.get('limit', 3)  # default limit 3
-  try:
-    _data = work_apis.get_recent_blast_list_by_tunnel(tunnel_id, limit=limit)
-    _data_list = []
-    for b in _data:
-      _data_list.append(work.routes._convert_dict_by_blast(b, is_exclude=True))
-    _ret['code'] = 200
-    _ret['result'] = json.loads(_data_list)
-    return json.dumps(_ret)
-  except:
-    logging.exception("Raise error while get recent blast list by tunnel. ID : %s",
                       tunnel_id)
     _ret['code'] = 500
     _ret['result'] = []
