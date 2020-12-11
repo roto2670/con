@@ -392,7 +392,7 @@ def beacon_list():
   data_list = []
   for raw_data in raw_datas.values():
     if raw_data['kind'] in ['mibsskec', KIND_NEW_BEACON] \
-        and raw_data['tags'] and raw_data['tags'][0] != 90: # 90 is tunnel beacon
+        and raw_data['tags'] and raw_data['tags'][0] != '90': # 90 is tunnel beacon
       data_list.append(raw_data)
   return data_list
 
@@ -403,7 +403,7 @@ def tunnel_beacon_list():
   data_list = []
   for raw_data in raw_datas.values():
     if raw_data['kind'] in ['mibsskec', KIND_NEW_BEACON] \
-        and raw_data['tags'] and raw_data['tags'][0] == 90: # 90 is tunnel beacon
+        and raw_data['tags'] and raw_data['tags'][0] == '90': # 90 is tunnel beacon
       data_list.append(raw_data)
   return data_list
 

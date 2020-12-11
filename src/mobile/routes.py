@@ -80,15 +80,19 @@ def m_get_tunnel_by_beacon(uuid, major, minor):
                uuid, major, minor)
   _ret = {}
   try:
-    _data = work.routes.get_tunnel_list(is_exclude=True)
+    _data = dashboard.count.tunnel_beacon_list()
     _ret_beacon = {}
+    _ret_tunnel = {}
     for _beacon in _data:
       if _beacon['beacon_spec']['uuid'] == uuid and \
           int(_beacon['beacon_spec']['major']) == int(major) and \
           int(_beacon['beacon_spec']['minor']) == int(minor):
         _ret_beacon = _beacon
+    if _ret_beacon:
+      _tunnel = work_apis.get_tunnel(_ret_beacon['custom']['tunnel_id'])
+      _ret_tunnel = work.routes._convert_dict_by_tunnel(_tunnel, is_exclude=True)
     _ret['code'] = 200
-    _ret['result'] = json.loads(_ret_beacon)
+    _ret['result'] = _ret_tunnel
     logging.info("Response data : %s", _ret)
     return json.dumps(_ret)
   except:
@@ -143,7 +147,7 @@ def m_get_blast_list_by_tunnel(tunnel_id):
       for b in _data:
         _data_list.append(work.routes._convert_dict_by_blast(b, is_exclude=True))
       _ret['code'] = 200
-      _ret['result'] = json.loads(_data_list)
+      _ret['result'] = _data_list
       return json.dumps(_ret)
     else:
       _data = work.routes.get_blast_list_by_tunnel(tunnel_id=tunnel_id,
@@ -288,7 +292,7 @@ def m_work_add():
       _ret['result'] = False
     return json.dumps(_ret)
   except:
-    logging.exception("Raise error while start work.")
+    logging.exception("Raise error while add work.")
     _ret['code'] = 500
     _ret['result'] = False
     return json.dumps(_ret)
@@ -315,7 +319,7 @@ def m_work_update():
       _ret['result'] = False
     return json.dumps(_ret)
   except:
-    logging.exception("Raise error while start work.")
+    logging.exception("Raise error while update work.")
     _ret['code'] = 500
     _ret['result'] = False
     return json.dumps(_ret)

@@ -2431,7 +2431,7 @@ def route_reg_message_create():
 @util.require_login
 def route_beacon():
   # TODO: add sidebar menu
-  beacon_list = []
+  beacon_list = dashboard.count.tunnel_beacon_list()
   return render_template("t_beacon_list.html", beacon_list=beacon_list,
                          category=TUNNEL_CATEGORY, direction=TUNNEL_DIRECTION)
 
