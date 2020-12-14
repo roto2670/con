@@ -1936,43 +1936,6 @@ ACTIVITY_CATEGORY = {
     1: "Supporting Work",
     2: "Idling Activity"
 }
-CSV_INDEX = {
-    101: 4,
-    102: 5,
-    103: 6,
-    104: 7,
-    105: 8,
-    106: 9,
-    107: 10,
-    108: 11,
-    109: 12,
-    110: 13,
-    111: 14,
-    112: 1,
-    113: 2,
-    114: 3,
-    115: 15,
-    200: 1,
-    201: 2,
-    202: 3,
-    203: 4,
-    204: 5,
-    205: 6,
-    206: 7,
-    207: 8,
-    208: 9,
-    300: 1,
-    301: 2,
-    302: 3,
-    303: 4,
-    304: 9,
-    305: 5,
-    306: 6,
-    307: 7,
-    308: 8,
-    309: 10,
-    310: 11,
-}
 MAIN_TYPES = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,
               114, 115]
 SUPPORTING_TYPES = [200, 201, 202, 203, 204, 205, 206, 207, 208]
@@ -2528,30 +2491,49 @@ def csv_str_formatting(work_log_list, tunnel_id):
              "Overall A=(1-2),Excvt.T,SV&MK,CG,Blst,VT,MU,Mc.SC,Mn.SC,MU-2,MP,"\
              "WS,SCT,PH,B.CL,F.DR,U.BK"
 
-  activity_list = work_apis.get_all_activity()
-  sup_list = []
-  idle_list = []
-  for activity in activity_list:
-    if activity.category == 1:
-      sup_list.append(activity)
-    elif activity.category == 2:
-      idle_list.append(activity)
+  main_index = {
+    101: 4,
+    102: 5,
+    103: 6,
+    104: 7,
+    105: 8,
+    106: 9,
+    107: 10,
+    108: 11,
+    109: 12,
+    110: 13,
+    111: 14,
+    112: 1,
+    113: 2,
+    114: 3,
+    115: 15
+  }
+  sup_index = {}
+  idle_index = {}
+  main_act_list = work_apis.get_all_main_activity()
+  sup_act_list = work_apis.get_all_support_activity()
+  idle_act_list = work_apis.get_all_idle_activity()
+
+  for support_act in sup_act_list:
+    sup_index[int(support_act.activity_id)] = sup_act_list.index(support_act) + 1
+  for idle_act in idle_act_list:
+    idle_index[int(idle_act.activity_id)] = idle_act_list.index(idle_act) + 1
 
   supporting_form = [0 for index in range(len(SUPPORTING_TYPES))]
   idle_form = [0 for index in range(len(IDLE_TYPES))]
   supporting_form.insert(0, "Supporting")
   idle_form.insert(0, "Idle")
 
-  for sup_activity in sup_list:
+  for sup_activity in sup_act_list:
     if int(sup_activity.activity_id) in ACTIVITY_NAME:
       supporting_form[
-        CSV_INDEX[int(sup_activity.activity_id)]] = sup_activity.name
+        sup_index[int(sup_activity.activity_id)]] = sup_activity.name
     else:
       supporting_form.append(sup_activity.name)
 
-  for idle_activity in idle_list:
+  for idle_activity in idle_act_list:
     if int(idle_activity.activity_id) in ACTIVITY_NAME:
-      idle_form[CSV_INDEX[int(idle_activity.activity_id)]] = idle_activity.name
+      idle_form[idle_index[int(idle_activity.activity_id)]] = idle_activity.name
     else:
       idle_form.append(idle_activity.name)
   supporting_form = ",".join(supporting_form)
@@ -2566,9 +2548,10 @@ def csv_str_formatting(work_log_list, tunnel_id):
     blast_list = _blast.tunnel.blast_list
     blast_index = blast_list.index(_blast)
     blast_info = _blast.blast_info_list[0]
-    main_work_times = [0 for index in range(16)]
-    support_times = [0 for index in range(len(sup_list) + 1)]
-    idle_times = [0 for index in range(len(idle_list) + 1)]
+    # main_work_times length = 16 (unknown activity u.bk in csv main category)
+    main_work_times = [0 for index in range(len(main_act_list) + 2)]
+    support_times = [0 for index in range(len(sup_act_list) + 1)]
+    idle_times = [0 for index in range(len(idle_act_list) + 1)]
     log_data_list = []
     total_data_list = []
     main_total_times = 0
@@ -2579,25 +2562,13 @@ def csv_str_formatting(work_log_list, tunnel_id):
       if log.blast.tunnel.id == _blast.tunnel.id and log.blast.id == _blast.id:
         if log.state == constants.WORK_STATE_FINISH:
           if log.category == 0:
-            main_work_times[CSV_INDEX[log.typ]] += log.accum_time
+            main_work_times[main_index[log.typ]] += log.accum_time
             main_total_times += log.accum_time
           elif log.category == 1:
-            if log.typ in SUPPORTING_TYPES:
-              support_times[CSV_INDEX[log.typ]] += log.accum_time
-            else:
-              last_typ = SUPPORTING_TYPES[-1]
-              index_gap = log.typ - last_typ
-              log_index = SUPPORTING_TYPES.index(last_typ) + index_gap
-              support_times[log_index] += log.accum_time
+            support_times[sup_index[log.typ]] += log.accum_time
             support_total_times += log.accum_time
           elif log.category == 2:
-            if log.typ in IDLE_TYPES:
-              idle_times[CSV_INDEX[log.typ]] += log.accum_time
-            else:
-              last_typ = IDLE_TYPES[-1]
-              index_gap = log.typ - last_typ
-              log_index = IDLE_TYPES.index(last_typ) + index_gap
-              idle_times[log_index] += log.accum_time
+            idle_times[idle_index[log.typ]] += log.accum_time
             idle_total_times += log.accum_time
         log_data_list.append(log)
 
