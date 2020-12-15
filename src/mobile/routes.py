@@ -325,6 +325,27 @@ def m_work_update():
     return json.dumps(_ret)
 
 
+@blueprint.route('/work/remove/<work_id>', methods=["DELETE"])
+# @util.require_login
+def m_work_remove(work_id):
+  logging.info("Request Work Delete. id : %s", work_id)
+  _ret = {}
+  try:
+    ret = work.routes.remote_work(work_id=work_id)
+    if json.loads(ret):
+      _ret['code'] = 200
+      _ret['result'] = True
+    else:
+      _ret['code'] = 200
+      _ret['result'] = False
+    return json.dumps(_ret)
+  except:
+    logging.exception("Raise error while remove work.")
+    _ret['code'] = 500
+    _ret['result'] = False
+    return json.dumps(_ret)
+
+
 @blueprint.route('/work/action/start', methods=["POST"])
 @util.require_login
 def m_work_start():

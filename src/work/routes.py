@@ -1110,18 +1110,23 @@ def update_work(work_data=None):
 
 @blueprint.route('/work/remove', methods=["POST"])
 @util.require_login
-def remove_work():
-  data = request.get_json()
+def remove_work(work_id=None):
+  _work_id = None
+  if work_id:
+    _work_id = work_id
+  else:
+    data = request.get_json()
+    _work_id = data['id']
   try:
-    blast_id = work_apis.get_work(data['id']).blast_id
-    work_apis.remove_work(data['id'])
-    send_request(WORK_REMOVE, [data['id']])
+    blast_id = work_apis.get_work(_work_id).blast_id
+    work_apis.remove_work(_work_id)
+    send_request(WORK_REMOVE, [_work_id])
     blast_data = work_apis.get_blast(blast_id)
     _blast_data = _convert_dict_by_blast(blast_data)
     send_request(BLAST_UPDATE, [_blast_data])
     return json.dumps(True)
   except:
-    logging.exception("Fail to remove work. id : %s", data['id'])
+    logging.exception("Fail to remove work. id : %s", _work_id)
     return json.dumps(False)
 
 
