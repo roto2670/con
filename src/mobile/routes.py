@@ -326,7 +326,7 @@ def m_work_update():
 
 
 @blueprint.route('/work/remove/<work_id>', methods=["DELETE"])
-# @util.require_login
+@util.require_login
 def m_work_remove(work_id):
   logging.info("Request Work Delete. id : %s", work_id)
   _ret = {}
