@@ -2490,7 +2490,7 @@ def csv_str_formatting(work_log_list, tunnel_id):
              "Detonator Qty,Drilling Depth,Start,Finish,Actual L(m),Date,Time,"\
              "Overall A=(1-2),Excvt.T,SV&MK,CG,Blst,VT,MU,Mc.SC,Mn.SC,MU-2,MP,"\
              "WS,SCT,PH,B.CL,F.DR,U.BK"
-
+  # Sequence according to the specified csv form, not the activity_id order
   main_index = {
     101: 4,
     102: 5,
