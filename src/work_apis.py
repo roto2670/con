@@ -867,6 +867,24 @@ def get_all_activity():
   return data_list
 
 
+def get_all_main_activity():
+  data_list = Activity.query.filter_by(category=0).\
+      order_by(Activity.activity_id).all()
+  return data_list
+
+
+def get_all_support_activity():
+  data_list = Activity.query.filter_by(category=1).\
+      order_by(Activity.activity_id).all()
+  return data_list
+
+
+def get_all_idle_activity():
+  data_list = Activity.query.filter_by(category=2).\
+      order_by(Activity.activity_id).all()
+  return data_list
+
+
 def update_activity(data):
   cur_time = get_servertime()
   _data = get_activity(data['id'])
