@@ -18,7 +18,7 @@ from flask import abort, render_template, request, redirect, url_for  # noqa : p
 from flask_login import current_user  # noqa : pylint: disable=import-error
 from flask_socketio import emit
 
-import users
+#import users
 import constants
 import local_apis
 import in_config_apis
@@ -701,31 +701,35 @@ def _send_worker_log(log):
 
 
 def _check_out_user(key, user_id, device_id, device_name):
-  try:
-    # Write user location to the firebase
-    if key in LOCATION_IN_TUNNEL_LIST or key in LOCATION_IN_CAMP_LIST:
-      users.set_user_location(user_id, LOCATION_OUTSIDE)
-    else:
-      users.set_user_location(user_id, LOCATION_UNKNOWN)
-      logging.warning("%s user checkout unknown location. key : %s, did : %s, dname : %s",
-                      user_id, key, device_id, device_name)
-  except:
-    logging.exception("Raise while check out set_user_location")
+  pass
+  # TODO
+  # try:
+  #   # Write user location to the firebase
+  #   if key in LOCATION_IN_TUNNEL_LIST or key in LOCATION_IN_CAMP_LIST:
+  #     users.set_user_location(user_id, LOCATION_OUTSIDE)
+  #   else:
+  #     users.set_user_location(user_id, LOCATION_UNKNOWN)
+  #     logging.warning("%s user checkout unknown location. key : %s, did : %s, dname : %s",
+  #                     user_id, key, device_id, device_name)
+  # except:
+  #   logging.exception("Raise while check out set_user_location")
 
 
 def _check_in_user(key, user_id, device_id, device_name):
-  try:
-    # Write user location to the firebase
-    if key in LOCATION_IN_TUNNEL_LIST:
-      users.set_user_location(user_id, LOCATION_IN_TUNNEL)
-    elif key in LOCATION_IN_CAMP_LIST:
-      users.set_user_location(user_id, LOCATION_IN_CAMP)
-    else:
-      users.set_user_location(user_id, LOCATION_UNKNOWN)
-      logging.warning("%s user check in unknown location. key : %s, did : %s, dname : %s",
-                      user_id, key, device_id, device_name)
-  except:
-    logging.exception("Raise while check in set_user_location")
+  pass
+  # TODO:
+  # try:
+  #   # Write user location to the firebase
+  #   if key in LOCATION_IN_TUNNEL_LIST:
+  #     users.set_user_location(user_id, LOCATION_IN_TUNNEL)
+  #   elif key in LOCATION_IN_CAMP_LIST:
+  #     users.set_user_location(user_id, LOCATION_IN_CAMP)
+  #   else:
+  #     users.set_user_location(user_id, LOCATION_UNKNOWN)
+  #     logging.warning("%s user check in unknown location. key : %s, did : %s, dname : %s",
+  #                     user_id, key, device_id, device_name)
+  # except:
+  #   logging.exception("Raise while check in set_user_location")
 
 
 def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, device_name):
@@ -741,7 +745,8 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, de
                                                          event_data, text,
                                                          NORMAL_CHECK, org_id)
         _set_expire_cache(user_id, user_name)
-        _send_worker_log(log)
+        if key in LOCATION_IN_TUNNEL:
+          _send_worker_log(log)
         _check_out_user(key, user_id, device_id)
       elif key in REVERSE_ACCESS_POINT and WORKER_COUNT.has_data(REVERSE_ACCESS_POINT[key], user_id):
         reverse_key = REVERSE_ACCESS_POINT[key]
@@ -753,7 +758,8 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, de
                                                          event_data, text,
                                                          NORMAL_CHECK, org_id)
         _set_expire_cache(user_id, user_name)
-        _send_worker_log(log)
+        if key in LOCATION_IN_TUNNEL:
+          _send_worker_log(log)
         _check_out_user(key, user_id, device_id)
       else:
         # TODO:
@@ -788,7 +794,8 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, de
       log = in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
                                                        text, NORMAL_CHECK, org_id)
       _set_expire_cache(user_id, user_name)
-      _send_worker_log(log)
+      if key in LOCATION_IN_TUNNEL:
+        _send_worker_log(log)
       _check_in_user(key, user_id, device_id, device_name)
     elif device_id in BUS_WORKSHOP_DEVICE_LIST and device_id in BUS_CHECKING_LIST:
       # BUS_CACHE input, and later, beacon detected then count up
@@ -853,8 +860,8 @@ def set_worker_count(org_id, user_id, name, event_data):
     else:
       has_checking = device_id in CHECKING_DEVICE_LIST
       has_expire = EXPIRE_CACHE.exists(user_id)
-      logging.debug("Checking Device : %s, Expire Cache : %s, Device : %s, name : %s",
-                    has_checking, has_expire, device_id, name)
+      logging.info("Checking Device : %s, Expire Cache : %s, Device : %s, name : %s, dname : %s",
+                   has_checking, has_expire, device_id, name, device_name)
 
 
 def _check_start_end_count(user_id, device_id, device_name):
