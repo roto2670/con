@@ -21,3 +21,9 @@ bcrypt==3.1.7
 flask-socketio==4.1.0
 gevent-websocket==0.10.1
 
+firebase-admin
+pytz
+authlib
+qrcode[pil]
+python-dateutil
+
