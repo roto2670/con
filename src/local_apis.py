@@ -109,7 +109,6 @@ def update_new_beacon_info(gadget_info, white_list_id):
     return None
 
 
-
 def update_beacon_information(gid, hid, name, kind, moi, ipcam_id):
   url = "{base}gadgets/{gid}".format(base=BASE_URL, gid=gid)
   headers = {
@@ -146,6 +145,31 @@ def update_beacon_information(gid, hid, name, kind, moi, ipcam_id):
       return False
   except:
     logging.exception("Raise error while update beacon information. Body : %s",
+                      body)
+    return None
+
+
+def update_new_beacon_information(gid, hid, body):
+  logging.info("Update new beacon, gid : %s, hid : %s, body : %s",
+               gid, hid, body)
+  url = "{base}gadgets/{gid}".format(base=BASE_URL, gid=gid)
+  headers = {
+    "Content-Type": "application/json",
+    "Src": "{hid}.".format(hid=hid)
+  }
+
+  try:
+    resp = requests.post(url, headers=headers, data=json.dumps(body), verify=False)
+    if resp.ok:
+      logging.info("update new beacon information successful. Code : %s, Text : %s",
+                   resp.status_code, resp.text)
+      return True
+    else:
+      logging.warning("Failed update new beacon information. Code : %s, Text : %s",
+                      resp.status_code, resp.text)
+      return False
+  except:
+    logging.exception("Raise error while update new beacon information. Body : %s",
                       body)
     return None
 
