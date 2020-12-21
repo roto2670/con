@@ -2397,8 +2397,7 @@ def route_reg_message_create():
 
 @blueprint.route('/reg/beacon')
 @util.require_login
-def route_beacon():
-  # TODO: add sidebar menu
+def route_tunnel_beacon():
   beacon_list = dashboard.count.tunnel_beacon_list()
   return render_template("t_beacon_list.html", beacon_list=beacon_list,
                          category=TUNNEL_CATEGORY, direction=TUNNEL_DIRECTION)
@@ -2406,7 +2405,7 @@ def route_beacon():
 
 @blueprint.route('/reg/beacon/create', methods=['GET', 'POST'])
 @util.require_login
-def route_reg_beacon():
+def route_reg_tunnel_beacon():
   if request.method == "GET":
     beacon_info = apis.get_new_beacon_info(REG_ACCOUNT_ID)
     tunnel_list = work_apis.get_all_tunnel_by_sort()
@@ -2471,6 +2470,35 @@ def route_reg_beacon():
     logging.info("Register tunnel beacon resp : %s", ret)
     local_apis.update_new_beacon_info(value, WHITE_LIST)
     return redirect("/work/reg/beacon")
+
+
+@blueprint.route('/reg/beacon/<beacon_id>/delete', methods=['GET'])
+@util.require_login
+def tunnel_beacon_delete_route(beacon_id):
+  local_apis.remove_new_beacon(beacon_id)
+  return redirect("/reg/beacon")
+
+
+@blueprint.route('/beacon/<beacon_id>/update', methods=['GET', 'POST'])
+@util.require_login
+def tunnel_beacon_update_route(beacon_id):
+  if request.method == "GET":
+    beacon = dashboard.count.get_beacon(beacon_id)
+    tunnel_list = work_apis.get_all_tunnel_by_sort()
+    return render_template("update_t_beacon.html", beacon=beacon,
+                           tunnel_list=tunnel_list)
+  else:
+    name = request.form.get('name')
+    tunnel = request.form.get('tunnel')
+    hid = request.form.get('hid')
+    body = {
+        "name": name,
+        "custom": {
+            "tunnel_id": tunnel
+        }
+    }
+    local_apis.update_new_beacon_information(beacon_id, hid, body)
+    return redirect("/reg/beacon")
 
 
 @blueprint.route('/search/worklog/download', methods=["POST"])
