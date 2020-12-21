@@ -2479,7 +2479,7 @@ def tunnel_beacon_delete_route(beacon_id):
   return redirect("/reg/beacon")
 
 
-@blueprint.route('/beacon/<beacon_id>/update', methods=['GET', 'POST'])
+@blueprint.route('/reg/beacon/<beacon_id>/update', methods=['GET', 'POST'])
 @util.require_login
 def tunnel_beacon_update_route(beacon_id):
   if request.method == "GET":
