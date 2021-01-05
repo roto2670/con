@@ -19,10 +19,11 @@
 {% block content %}
   <div id="scroll-style-hidden" class="right_col" role="main">
 
-      <div class="row">  <!-- Start row --> <!-- FaceStation -->
+      {% for server_name, device_list in device_list_info.items() %}
+        <div class="row">  <!-- Start row --> <!-- FaceStation -->
           <div class="x_panel tile">
             <div class="x_title">
-              <h3>FaceStation</h3>
+              <h3>FaceStation {{server_name}}</h3>
               <div class="clearfix"></div>
             </div>
 
@@ -105,7 +106,8 @@
               </div>
             </div><!-- End x_content -->
           </div><!-- End x_panel-->
-      </div>  <!-- End row-->
+        </div>  <!-- End row-->
+      {% endfor %}
 
       <div class="row">  <!-- Start row --> <!-- Beacon Scanner -->
           <div class="x_panel tile">

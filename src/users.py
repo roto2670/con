@@ -976,8 +976,11 @@ def generate_clinic_reports(today=None, tz=pytz.timezone('Asia/Dubai')):
     query = fs.collection(u'clinic_history').where(u'ts', '>', start_at.astimezone(pytz.utc)).where(u'ts', '<', end_at.astimezone(pytz.utc)).order_by(u'ts', direction=firestore.Query.ASCENDING)
     cc_counter = 0
     ss_counter = 0
+    all_data = []
     for doc in query.stream():
         data = doc.to_dict()
+        all_data.append((doc.id, data))
+    for doc_id, data in all_data:
         action_type = data['action']
         if action_type > 4 or action_type < 3:
             continue # Skip OP actions
@@ -1001,11 +1004,15 @@ def generate_clinic_reports(today=None, tz=pytz.timezone('Asia/Dubai')):
         else:
             reporter_doc = data['user'].get()
             if reporter_doc.exists:
+                try:
+                    phone_number = reporter_doc.get('phone_number')
+                except:
+                    phone_number = ''
                 reporter = {
                     'Reporter-1': reporter_doc.get('employer'),
                     'Reporter-2': reporter_company_id,
                     'Reporter-3': reporter_doc.get('fullname'),
-                    'Reporter-4': reporter_doc.get('phone_number')
+                    'Reporter-4': phone_number
                 }
                 reporters[reporter_company_id] = reporter
             else:
@@ -1016,7 +1023,7 @@ def generate_clinic_reports(today=None, tz=pytz.timezone('Asia/Dubai')):
         item = ''
         sa = data['sa']
         if not sa or sa['score'] < 10:
-            print(f"Warning! No self-assessment found for {doc.id}")
+            print(f"Warning! No self-assessment found for {doc_id}")
             continue # Skip no-risk cases
         elif sa['score'] == 10:
             # Close contacts
@@ -1031,7 +1038,7 @@ def generate_clinic_reports(today=None, tz=pytz.timezone('Asia/Dubai')):
             counter = ss_counter
             item = 'Suspected Symptom'
 
-        reports[doc.id] = {
+        reports[doc_id] = {
             'No-1': counter,
             'Item-1': item,
             'Remarks-1': '',
@@ -1039,8 +1046,8 @@ def generate_clinic_reports(today=None, tz=pytz.timezone('Asia/Dubai')):
             'Action taken-1': action_type == 4 and data['ts'].astimezone(tz) or '',
             'Action taken-2': action_type == 3 and data['ts'].astimezone(tz) or ''
         }
-        reports[doc.id].update(reporter)
-        reports[doc.id].update(resolver)
+        reports[doc_id].update(reporter)
+        reports[doc_id].update(resolver)
 
     csv_filename = tempfile.mktemp()
     with open(csv_filename, 'w', newline='') as csvfile:
@@ -1175,9 +1182,19 @@ def run_access_controller():
     disabl_url = base_url + '/users/access/disabled'
     extend_url = base_url + '/users/access/extend'
 
-    def update_access(uid, access):
+    def get_user_info(uid):
+        url = f"{base_url}/users/{uid}/server/ALL"
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        results = response.json()
+        if not results:
+            return None
+        return results
+
+    def update_access(uid, servers, access):
         params = {
-            'user_id': uid
+            'user_id': uid,
+            'server_list': servers
         }
         if access:
             params['extend_hour'] = ACCESS_VALID_FOR
@@ -1185,18 +1202,27 @@ def run_access_controller():
         else:
             response = requests.post(disabl_url, json=params, timeout=10)
         response.raise_for_status()
-        if not response.json()['result']:
+        results = response.json()
+        if not results
             raise Exception("Request failed")
+        for result in results:
+            if not result['result']:
+                raise Exception("Request failed")
 
-    def extend_access(uid, hours):
+    def extend_access(uid, servers, hours):
         params = {
             'user_id': uid,
-            'extend_hour': hours
+            'extend_hour': hours,
+            'server_list': servers
         }
         response = requests.post(extend_url, json=params, timeout=10)
         response.raise_for_status()
-        if not response.json()['result']:
+        results = response.json()
+        if not results
             raise Exception("Request failed")
+        for result in results:
+            if not result['result']:
+                raise Exception("Request failed")
 
     def listner(event):
         if event.data:
@@ -1214,9 +1240,14 @@ def run_access_controller():
             # NOTE: uid refers to the ID used in the Access Control System (Biostar)
             for uid, access in access_data.items():
                 try:
-                    enable = str(access) == '1'
-                    update_access(uid, enable)
-                    print(f"Updated access for the user {uid} to {enable}")
+                    user_info = get_user_info(uid)
+                    if user_info:
+                        servers = [ui['server_name'] for ui in user_info]
+                        enable = str(access) == '1'
+                        update_access(uid, servers, enable)
+                        print(f"Updated access for the user {uid} to {enable}")
+                    else:
+                        print(f"User {uid} does not exist. Ignoring the enable/disable request.")
                     # Delete the data
                     db.reference(f"/access/{uid}").delete()
                 except:
@@ -1224,13 +1255,18 @@ def run_access_controller():
 
             for uid, hours in sa_data.items():
                 try:
-                    try:
-                        hours = int(hours)
-                        if hours <= 0 or hours > ACCESS_VALID_FOR:
+                    user_info = get_user_info(uid)
+                    if user_info:
+                        servers = [ui['server_name'] for ui in user_info]
+                        try:
+                            hours = int(hours)
+                            if hours <= 0 or hours > ACCESS_VALID_FOR:
+                                hours = ACCESS_VALID_FOR
+                        except:
                             hours = ACCESS_VALID_FOR
-                    except:
-                        hours = ACCESS_VALID_FOR
-                    extend_access(uid, hours)
+                        extend_access(uid, servers, hours)
+                    else:
+                        print(f"User {uid} does not exist. Ignoring the SA request.")
                     # Delete the data
                     db.reference(f"/sa/{uid}").delete()
                 except:
@@ -1315,6 +1351,6 @@ if __name__ == '__main__':
     #generate_qr_codes()
     #log_and_run("test.log", generate_qr_codes, userlist=['999-0000-0000000-1', '784-0000-0000000-2'])
     #log_and_run("test.log", mark_users_with_no_app_no_assessment)
-    run_access_controller()
-    #pass
+    #run_access_controller()
+    pass
 

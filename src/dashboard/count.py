@@ -140,7 +140,7 @@ BUS_AT_2_DEVICE_LIST = set([])
 BUS_SETTING_DATA = {}  # {beacon_id: user_id(facestation, bus), ..}
 
 # FaceSTation
-DEVICE_LIST = {}   # {org_id : [list]}  # FaceStation Device List
+DEVICE_LIST = {}   # {org_id : {server_name : [], ..}}  # FaceStation Device List
 DEVICE_LIST_TIME = {}  # {org_id : time}  # FaceStation Device refresh time
 INTERVAL_TIME = 600  # 10m
 
@@ -313,9 +313,11 @@ def get_all_gadget_count_equips():
 
 def _get_device_list(org_id):
   resp = local_apis.get_suprema_device_list()
-  device_list = []
+  # resp -> {server_name : [.., ..]}
+  # ex) {"BS1" : [{"id": "", "name": "", ..}, ..]}
+  device_list = {}
   if resp:
-    device_list = resp['DeviceCollection']['rows']
+    device_list = resp
     DEVICE_LIST[org_id] = device_list
     DEVICE_LIST_TIME[org_id] = time.time()
   return device_list
@@ -350,7 +352,7 @@ def device_list():
   _org_id = current_user.organization_id
 
   # Facestation
-  device_list = []  # facestation
+  device_list = {}  # facestation
   fs_setting_id_list = []
   fs_settings_dict = {}
   fs_settings = in_config_apis.get_count_device_setting(FACE_STATION_TYPE)
@@ -385,7 +387,7 @@ def device_list():
                          equip_kind_settings=equip_kind_settings,
                          bus_list=bus_list,
                          bus_setting_list=bus_setting_list,
-                         device_list=device_list,
+                         device_list_info=device_list,
                          fs_setting_id_list=fs_setting_id_list,
                          fs_settings_dict=fs_settings_dict)
 
