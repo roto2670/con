@@ -149,6 +149,7 @@
         <!-- filter item -->
         <div class="user-item-header-container">
             <div class="user-item-header-label">Name</div>
+            <div class="user-item-header-label">Location</div>
             <div class="user-item-header-label">Status</div>
             <div class="user-item-header-label">Gender</div>
             <div class="user-item-header-label">Nationality</div>
@@ -157,7 +158,7 @@
             <div class="user-item-header-label">Room</div>
             <div class="user-item-header-label">Phone Number</div>
             <div class="user-item-header-label">Department</div>
-            <div class="user-item-header-label">Location</div>
+            <div class="user-item-header-label">PV Area</div>
             <div class="user-item-header-label">Job</div>
             <div class="user-item-header-label">App Installed</div>
             <div class="user-item-header-label">Commands</div>
@@ -256,10 +257,12 @@
 
             let _db = firebase.firestore();
             let _lastUserSnapShot,
+                _snapshotUnsubscriber = null,
                 _lastTestResultDoc,
                 _loadingUsers = false,
                 _selectedFilters = null,
                 _currentUser;
+            let _userData = {};
 
             start();
 
@@ -281,7 +284,15 @@
             }
 
             function stop() {
+                _userData = {};
+            }
 
+            function updateUserItem(model) {
+                let data = _userData[model.documentId];
+                if (!!data) {
+                    data.model = model;
+                    data.viewItem.update(model);
+                }
             }
 
             function initHandlers() {
@@ -905,6 +916,13 @@
                                     }
                                 });
                                 container.append(userItem.render());
+
+                                // Store in cache.
+                                _userData[user.documentId] = {
+                                    model: user,
+                                    viewItem: userItem
+                                };
+
                                 callback();
                             } else {
                                 container.append('<div class="user-item-container-empty">No users</div>');
@@ -949,6 +967,12 @@
                                     }
                                 });
                                 container.append(userItem.render());
+
+                                // Store in cache.
+                                _userData[user.documentId] = {
+                                    model: user,
+                                    viewItem: userItem
+                                };
                             });
                         } else if (container.children().length <= 0) {
                             container.append('<div class="user-item-container-empty">No users</div>');
@@ -976,6 +1000,24 @@
                     } else {
                         callback();
                     }
+                });
+                if (_.isFunction(_snapshotUnsubscriber)) {
+                    _snapshotUnsubscriber();
+                }
+                _snapshotUnsubscriber = _db.collection('users').doc(userId).onSnapshot(function(snapshot) {
+                    snapshot.docChanges().forEach(function(change) {
+                        // handle only changed user
+                        if (change.type === 'modified' && !!!snapshot.empty) {
+                            snapshot.forEach(function(doc) {
+                                var user = doc.data();
+                                user.documentId = doc.id;
+
+                                updateUserItem(user);
+                            });
+                        }
+                    });
+                }, function(error) {
+                    console.warn("Received new user data, but there was an error.", error);
                 });
             }
 
@@ -1033,6 +1075,24 @@
                     console.warn('Failed to load users from server.', error);
                     callback();
                 });
+                if (_.isFunction(_snapshotUnsubscriber)) {
+                    _snapshotUnsubscriber();
+                }
+                _snapshotUnsubscriber = query.onSnapshot(function(snapshot) {
+                    snapshot.docChanges().forEach(function(change) {
+                        // handle only changed user
+                        if (change.type === 'modified' && !!!snapshot.empty) {
+                            snapshot.forEach(function(doc) {
+                                var user = doc.data();
+                                user.documentId = doc.id;
+
+                                updateUserItem(user);
+                            });
+                        }
+                    });
+                }, function(error) {
+                    console.warn("Received new user data, but there was an error.", error);
+                })
             }
 
             function getSelectedFilters() {
@@ -1125,8 +1185,12 @@
                     let profile = $('<div class="user-item-avatar">');
                     let nameCell = $('<div class="user-item-cell name">'),
                         nameContainer = $('<div class="user-item-content-container name">'),
-                        nameLabel = $('<div class="user-item-name-label">');
+                        nameLabel = $('<div class="user-item-name-label">'),
                         idLabel = $('<div class="user-item-id-label">');
+                    let locationCell = $('<div class="user-item-cell location">'),
+                        campIcon = $('<div class="user-item-loc-icn camp">'),
+                        transitIcon = $('<div class="user-item-loc-icn transit">'),
+                        tunnelIcon = $('<div class="user-item-loc-icn tunnel">');
                     let statusCell = $('<div class="user-item-cell status">'),
                         statusLabel = $('<div class="user-item-label status">'),
                         genderLabel = $('<div class="user-item-label gender">'),
@@ -1139,7 +1203,7 @@
                         jobContainer = $('<div class="user-item-cell job">'),
                         jobCat1Label = $('<div class="user-item-label jobcat1">'),
                         jobCat2Label = $('<div class="user-item-label jobcat2">'),
-                        locateLabel = $('<div class="user-item-label locate">'),
+                        pvAreaLabel = $('<div class="user-item-label pv-area">'),
                         timeagoLabel = $('<div class="user-item-label timeago">');
                         appInstalledLabel = $('<div class="user-item-label app-installed">');
                     let commandsCell = $('<div class="user-item-cell commands">'),
@@ -1147,11 +1211,13 @@
                         selfReportsButton = $('<div class="user-item-btn self-reports">'),
                         preMedButton = $('<div class="user-item-btn pre-med" data-placement="left"">');
                     
-                    container.append(nameCell, statusCell, genderLabel, nationalLabel,
-                        employerLabel, campLabel, roomLabel, phoneLabel, departmentLabel, locateLabel, jobContainer,
+                    container.append(nameCell, locationCell, statusCell, genderLabel, nationalLabel,
+                        employerLabel, campLabel, roomLabel, phoneLabel, departmentLabel, pvAreaLabel, jobContainer,
                         appInstalledLabel, commandsCell);
                     nameCell.append(checkbox, profile, nameContainer);
                     nameContainer.append(nameLabel, idLabel);
+                    locationCell.append(campIcon, $('<div class="user-item-loc-arrow-icn">'), transitIcon,
+                        $('<div class="user-item-loc-arrow-icn">'), tunnelIcon);
                     statusCell.append(statusLabel);
                     jobContainer.append(jobCat1Label, jobCat2Label);
                     commandsCell.append(historyButton, selfReportsButton, preMedButton);
@@ -1177,6 +1243,9 @@
                         profile: profile,
                         nameLabel: nameLabel,
                         idLabel: idLabel,
+                        campIcon: campIcon,
+                        transitIcon: transitIcon,
+                        tunnelIcon: tunnelIcon,
                         preMedButton: preMedButton,
                         statusLabel: statusLabel,
                         genderLabel: genderLabel,
@@ -1186,7 +1255,7 @@
                         roomLabel: roomLabel,
                         phoneLabel: phoneLabel,
                         departmentLabel: departmentLabel,
-                        locationLabel: locateLabel,
+                        pvAreaLabel: pvAreaLabel,
                         jobCat1Label: jobCat1Label,
                         jobCat2Label: jobCat2Label,
                         timeagoLabel: timeagoLabel,
@@ -1240,6 +1309,23 @@
                         _views.preMedButton.attr('data-original-title', '');
                     }
 
+                    // handle location 
+                    _.each([_views.campIcon, _views.transitIcon, _views.tunnelIcon], function(element) {
+                        element.removeClass('active');
+                    });
+                    let activeIcon = null;
+                    if (model.location == 1) {
+                        // outside
+                        activeIcon = _views.transitIcon;
+                    } else if (model.location == 100) {
+                        // in a camp
+                        activeIcon = _views.campIcon;
+                    } else if (model.location == 1000) {
+                        // in the tunnel
+                        activeIcon = _views.tunnelIcon;
+                    }
+                    activeIcon && activeIcon.addClass('active');
+
                     _views.container.attr('title', (model.fullname || '-') + '(' + (model.documentId || '-') + ')');
                     _views.nameLabel.text(model.fullname || '-');
                     _views.idLabel.text('(' + (model.documentId || '-') + ')');
@@ -1251,7 +1337,7 @@
                     _views.roomLabel.text(model.room || '-');
                     _views.phoneLabel.text(model.phone_number || '-');
                     _views.departmentLabel.text(model.department || '-');
-                    _views.locationLabel.text(model.pv_area || '-');
+                    _views.pvAreaLabel.text(model.pv_area || '-');
                     _views.jobCat1Label.text(model.job_cat1 || '-');
                     _views.jobCat2Label.text(model.job_cat2 || '-');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
@@ -1259,7 +1345,8 @@
                 }
 
                 return {
-                    render: render
+                    render: render,
+                    update: update
                 }
             }
 
