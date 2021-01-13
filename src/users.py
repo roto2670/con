@@ -1203,7 +1203,7 @@ def run_access_controller():
             response = requests.post(disabl_url, json=params, timeout=10)
         response.raise_for_status()
         results = response.json()
-        if not results
+        if not results:
             raise Exception("Request failed")
         for result in results:
             if not result['result']:
@@ -1218,7 +1218,7 @@ def run_access_controller():
         response = requests.post(extend_url, json=params, timeout=10)
         response.raise_for_status()
         results = response.json()
-        if not results
+        if not results:
             raise Exception("Request failed")
         for result in results:
             if not result['result']:
