@@ -18,7 +18,7 @@ from flask import abort, render_template, request, redirect, url_for  # noqa : p
 from flask_login import current_user  # noqa : pylint: disable=import-error
 from flask_socketio import emit
 
-#import users
+import users
 import constants
 import local_apis
 import in_config_apis
@@ -703,35 +703,33 @@ def _send_worker_log(log):
 
 
 def _check_out_user(key, user_id, device_id, device_name):
-  pass
-  # TODO
-  # try:
-  #   # Write user location to the firebase
-  #   if key in LOCATION_IN_TUNNEL_LIST or key in LOCATION_IN_CAMP_LIST:
-  #     users.set_user_location(user_id, LOCATION_OUTSIDE)
-  #   else:
-  #     users.set_user_location(user_id, LOCATION_UNKNOWN)
-  #     logging.warning("%s user checkout unknown location. key : %s, did : %s, dname : %s",
-  #                     user_id, key, device_id, device_name)
-  # except:
-  #   logging.exception("Raise while check out set_user_location")
+  try:
+    # Write user location to the firebase
+    if key in LOCATION_IN_TUNNEL_LIST or key in LOCATION_IN_CAMP_LIST:
+      users.set_user_location(user_id, LOCATION_OUTSIDE)
+    else:
+      users.set_user_location(user_id, LOCATION_UNKNOWN)
+      logging.warning("%s user checkout unknown location. key: %s, did: %s, dname: %s",
+                      user_id, key, device_id, device_name)
+  except:
+    logging.exception("Raise error while check out user_location. uid: %s, key: %s, device: %s, %s",
+                      user_id, key, device_id, device_name)
 
 
 def _check_in_user(key, user_id, device_id, device_name):
-  pass
-  # TODO:
-  # try:
-  #   # Write user location to the firebase
-  #   if key in LOCATION_IN_TUNNEL_LIST:
-  #     users.set_user_location(user_id, LOCATION_IN_TUNNEL)
-  #   elif key in LOCATION_IN_CAMP_LIST:
-  #     users.set_user_location(user_id, LOCATION_IN_CAMP)
-  #   else:
-  #     users.set_user_location(user_id, LOCATION_UNKNOWN)
-  #     logging.warning("%s user check in unknown location. key : %s, did : %s, dname : %s",
-  #                     user_id, key, device_id, device_name)
-  # except:
-  #   logging.exception("Raise while check in set_user_location")
+  try:
+    # Write user location to the firebase
+    if key in LOCATION_IN_TUNNEL_LIST:
+      users.set_user_location(user_id, LOCATION_IN_TUNNEL)
+    elif key in LOCATION_IN_CAMP_LIST:
+      users.set_user_location(user_id, LOCATION_IN_CAMP)
+    else:
+      users.set_user_location(user_id, LOCATION_UNKNOWN)
+      logging.warning("%s user check in unknown location. key: %s, did: %s, dname: %s",
+                      user_id, key, device_id, device_name)
+  except:
+    logging.exception("Raise error while check in user_location. uid: %s, key: %s, device: %s, %s",
+                      user_id, key, device_id, device_name)
 
 
 def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, device_name):
