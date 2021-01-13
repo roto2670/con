@@ -745,7 +745,7 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, de
                                                          event_data, text,
                                                          NORMAL_CHECK, org_id)
         _set_expire_cache(user_id, user_name)
-        if key in LOCATION_IN_TUNNEL:
+        if key in LOCATION_IN_TUNNEL_LIST:
           _send_worker_log(log)
         _check_out_user(key, user_id, device_id)
       elif key in REVERSE_ACCESS_POINT and WORKER_COUNT.has_data(REVERSE_ACCESS_POINT[key], user_id):
@@ -758,7 +758,7 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, de
                                                          event_data, text,
                                                          NORMAL_CHECK, org_id)
         _set_expire_cache(user_id, user_name)
-        if key in LOCATION_IN_TUNNEL:
+        if key in LOCATION_IN_TUNNEL_LIST:
           _send_worker_log(log)
         _check_out_user(key, user_id, device_id)
       else:
@@ -794,7 +794,7 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, de
       log = in_config_apis.create_enterence_worker_log(IN_SETTING_ID, key, event_data,
                                                        text, NORMAL_CHECK, org_id)
       _set_expire_cache(user_id, user_name)
-      if key in LOCATION_IN_TUNNEL:
+      if key in LOCATION_IN_TUNNEL_LIST:
         _send_worker_log(log)
       _check_in_user(key, user_id, device_id, device_name)
     elif device_id in BUS_WORKSHOP_DEVICE_LIST and device_id in BUS_CHECKING_LIST:
