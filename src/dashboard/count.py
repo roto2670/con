@@ -18,7 +18,7 @@ from flask import abort, render_template, request, redirect, url_for  # noqa : p
 from flask_login import current_user  # noqa : pylint: disable=import-error
 from flask_socketio import emit
 
-#import users
+import users
 import constants
 import local_apis
 import in_config_apis
@@ -140,7 +140,7 @@ BUS_AT_2_DEVICE_LIST = set([])
 BUS_SETTING_DATA = {}  # {beacon_id: user_id(facestation, bus), ..}
 
 # FaceSTation
-DEVICE_LIST = {}   # {org_id : [list]}  # FaceStation Device List
+DEVICE_LIST = {}   # {org_id : {server_name : [], ..}}  # FaceStation Device List
 DEVICE_LIST_TIME = {}  # {org_id : time}  # FaceStation Device refresh time
 INTERVAL_TIME = 600  # 10m
 
@@ -313,9 +313,11 @@ def get_all_gadget_count_equips():
 
 def _get_device_list(org_id):
   resp = local_apis.get_suprema_device_list()
-  device_list = []
+  # resp -> {server_name : [.., ..]}
+  # ex) {"BS1" : [{"id": "", "name": "", ..}, ..]}
+  device_list = {}
   if resp:
-    device_list = resp['DeviceCollection']['rows']
+    device_list = resp
     DEVICE_LIST[org_id] = device_list
     DEVICE_LIST_TIME[org_id] = time.time()
   return device_list
@@ -350,7 +352,7 @@ def device_list():
   _org_id = current_user.organization_id
 
   # Facestation
-  device_list = []  # facestation
+  device_list = {}  # facestation
   fs_setting_id_list = []
   fs_settings_dict = {}
   fs_settings = in_config_apis.get_count_device_setting(FACE_STATION_TYPE)
@@ -385,7 +387,7 @@ def device_list():
                          equip_kind_settings=equip_kind_settings,
                          bus_list=bus_list,
                          bus_setting_list=bus_setting_list,
-                         device_list=device_list,
+                         device_list_info=device_list,
                          fs_setting_id_list=fs_setting_id_list,
                          fs_settings_dict=fs_settings_dict)
 
@@ -701,35 +703,33 @@ def _send_worker_log(log):
 
 
 def _check_out_user(key, user_id, device_id, device_name):
-  pass
-  # TODO
-  # try:
-  #   # Write user location to the firebase
-  #   if key in LOCATION_IN_TUNNEL_LIST or key in LOCATION_IN_CAMP_LIST:
-  #     users.set_user_location(user_id, LOCATION_OUTSIDE)
-  #   else:
-  #     users.set_user_location(user_id, LOCATION_UNKNOWN)
-  #     logging.warning("%s user checkout unknown location. key : %s, did : %s, dname : %s",
-  #                     user_id, key, device_id, device_name)
-  # except:
-  #   logging.exception("Raise while check out set_user_location")
+  try:
+    # Write user location to the firebase
+    if key in LOCATION_IN_TUNNEL_LIST or key in LOCATION_IN_CAMP_LIST:
+      users.set_user_location(user_id, LOCATION_OUTSIDE)
+    else:
+      users.set_user_location(user_id, LOCATION_UNKNOWN)
+      logging.warning("%s user checkout unknown location. key: %s, did: %s, dname: %s",
+                      user_id, key, device_id, device_name)
+  except:
+    logging.exception("Raise error while check out user_location. uid: %s, key: %s, device: %s, %s",
+                      user_id, key, device_id, device_name)
 
 
 def _check_in_user(key, user_id, device_id, device_name):
-  pass
-  # TODO:
-  # try:
-  #   # Write user location to the firebase
-  #   if key in LOCATION_IN_TUNNEL_LIST:
-  #     users.set_user_location(user_id, LOCATION_IN_TUNNEL)
-  #   elif key in LOCATION_IN_CAMP_LIST:
-  #     users.set_user_location(user_id, LOCATION_IN_CAMP)
-  #   else:
-  #     users.set_user_location(user_id, LOCATION_UNKNOWN)
-  #     logging.warning("%s user check in unknown location. key : %s, did : %s, dname : %s",
-  #                     user_id, key, device_id, device_name)
-  # except:
-  #   logging.exception("Raise while check in set_user_location")
+  try:
+    # Write user location to the firebase
+    if key in LOCATION_IN_TUNNEL_LIST:
+      users.set_user_location(user_id, LOCATION_IN_TUNNEL)
+    elif key in LOCATION_IN_CAMP_LIST:
+      users.set_user_location(user_id, LOCATION_IN_CAMP)
+    else:
+      users.set_user_location(user_id, LOCATION_UNKNOWN)
+      logging.warning("%s user check in unknown location. key: %s, did: %s, dname: %s",
+                      user_id, key, device_id, device_name)
+  except:
+    logging.exception("Raise error while check in user_location. uid: %s, key: %s, device: %s, %s",
+                      user_id, key, device_id, device_name)
 
 
 def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, device_name):
