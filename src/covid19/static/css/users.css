@@ -213,33 +213,37 @@
     margin-left: 0;
 }
 .user-item-header-label:nth-child(2) {
+    /* location */
+    width: 13em;
+}
+.user-item-header-label:nth-child(3) {
     /* status */
     width: 8em;
 }
-.user-item-header-label:nth-child(3) {
+.user-item-header-label:nth-child(4) {
     /* gender */
     width: 4em;
-}
-.user-item-header-label:nth-child(4) {
 }
 .user-item-header-label:nth-child(5) {
 }
 .user-item-header-label:nth-child(6) {
-    /* camp */
 }
 .user-item-header-label:nth-child(7) {
+    /* camp */
+}
+.user-item-header-label:nth-child(8) {
     /* room */
     width: 3em;
 }
-.user-item-header-label:nth-child(8) {
+.user-item-header-label:nth-child(11) {
     /* phone */
     width: 7em;
 }
-.user-item-header-label:nth-child(11) {
+.user-item-header-label:nth-child(12) {
     /* job */
     width: 7em;
 }
-.user-item-header-label:nth-child(12) {
+.user-item-header-label:nth-child(13) {
     /* app installed */
     width: 4em;
 }
@@ -334,6 +338,9 @@
 .user-item-cell.name {
     width: 16em;
 }
+.user-item-cell.location {
+    width: 13em;
+}
 .user-item-cell.status {
     width: 8em;
     flex-wrap: nowrap;
@@ -402,6 +409,40 @@
     margin: auto;
     word-break: break-word;
     text-align: center;
+}
+.user-item-loc-arrow-icn {
+    width: 1.5em;
+    height: 1.5em;
+    margin: 0 0.2em;
+    background-image: url(../img/icn_lr_arrow.svg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.user-item-loc-icn {
+    width: 3em;
+    height: 2.4em;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.user-item-loc-icn.camp {
+    background-image: url(../img/icn_camp.svg);
+}
+.user-item-loc-icn.camp.active {
+    background-image: url(../img/icn_camp_active.svg);
+}
+.user-item-loc-icn.transit {
+    background-image: url(../img/icn_transit.svg);
+}
+.user-item-loc-icn.transit.active {
+    background-image: url(../img/icn_transit_active.svg);
+}
+.user-item-loc-icn.tunnel {
+    background-image: url(../img/icn_tunnel.svg);
+}
+.user-item-loc-icn.tunnel.active {
+    background-image: url(../img/icn_tunnel_active.svg);
 }
 
 .user-item-cell.job {
