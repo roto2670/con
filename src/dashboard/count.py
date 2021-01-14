@@ -14,15 +14,16 @@ import time
 import json
 import logging
 
+import requests
 from flask import abort, render_template, request, redirect, url_for  # noqa : pylint: disable=import-error
 from flask_login import current_user  # noqa : pylint: disable=import-error
 from flask_socketio import emit
 
-import users
 import constants
 import local_apis
 import in_config_apis
 from util import RedisStore
+from constants import SUPREMA_ADDR
 from constants import KIND_IPCAM, KIND_SPEAKER, KIND_ROUTER, KIND_NEW_BEACON
 from config_models import FACE_STATION_TYPE
 from config_models import SCANNER_TYPE
@@ -703,12 +704,27 @@ def _send_worker_log(log):
 
 
 def _check_out_user(key, user_id, device_id, device_name):
+  # TODO: Must be modified to use users.py
   try:
     # Write user location to the firebase
     if key in LOCATION_IN_TUNNEL_LIST or key in LOCATION_IN_CAMP_LIST:
-      users.set_user_location(user_id, LOCATION_OUTSIDE)
+      url = "{}/users/location".format(SUPREMA_ADDR)
+      headers = {"Content-Type": 'application/json'}
+      data = {"user_id": user_id, "location": LOCATION_OUTSIDE}
+      _ret = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
+      ret = _ret.json()['result']
+      if not ret:
+        logging.warning("%s user not set location in %s",
+                        user_id, LOCATION_OUTSIDE)
     else:
-      users.set_user_location(user_id, LOCATION_UNKNOWN)
+      url = "{}/users/location".format(SUPREMA_ADDR)
+      headers = {"Content-Type": 'application/json'}
+      data = {"user_id": user_id, "location": LOCATION_UNKNOWN}
+      _ret = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
+      ret = _ret.json()['result']
+      if not ret:
+        logging.warning("%s user not set location in %s",
+                        user_id, LOCATION_UNKNOWN)
       logging.warning("%s user checkout unknown location. key: %s, did: %s, dname: %s",
                       user_id, key, device_id, device_name)
   except:
@@ -717,14 +733,36 @@ def _check_out_user(key, user_id, device_id, device_name):
 
 
 def _check_in_user(key, user_id, device_id, device_name):
+  # TODO: Must be modified to use users.py
   try:
     # Write user location to the firebase
     if key in LOCATION_IN_TUNNEL_LIST:
-      users.set_user_location(user_id, LOCATION_IN_TUNNEL)
+      url = "{}/users/location".format(SUPREMA_ADDR)
+      headers = {"Content-Type": 'application/json'}
+      data = {"user_id": user_id, "location": LOCATION_IN_TUNNEL}
+      _ret = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
+      ret = _ret.json()['result']
+      if not ret:
+        logging.warning("%s user not set location in %s",
+                        user_id, LOCATION_IN_TUNNEL)
     elif key in LOCATION_IN_CAMP_LIST:
-      users.set_user_location(user_id, LOCATION_IN_CAMP)
+      url = "{}/users/location".format(SUPREMA_ADDR)
+      headers = {"Content-Type": 'application/json'}
+      data = {"user_id": user_id, "location": LOCATION_IN_CAMP}
+      _ret = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
+      ret = _ret.json()['result']
+      if not ret:
+        logging.warning("%s user not set location in %s",
+                        user_id, LOCATION_IN_CAMP)
     else:
-      users.set_user_location(user_id, LOCATION_UNKNOWN)
+      url = "{}/users/location".format(SUPREMA_ADDR)
+      headers = {"Content-Type": 'application/json'}
+      data = {"user_id": user_id, "location": LOCATION_UNKNOWN}
+      _ret = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
+      ret = _ret.json()['result']
+      if not ret:
+        logging.warning("%s user not set location in %s",
+                        user_id, LOCATION_UNKNOWN)
       logging.warning("%s user check in unknown location. key: %s, did: %s, dname: %s",
                       user_id, key, device_id, device_name)
   except:
@@ -733,7 +771,7 @@ def _check_in_user(key, user_id, device_id, device_name):
 
 
 def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, device_name):
-  event_data['event_time'] = in_config_apis.get_server_time()
+  event_data['event_time'] = str(in_config_apis.get_servertime())
   if WORKER_COUNT.has_data(org_id, user_id):
     # User exit
     if device_id in OUT_LIST:
@@ -747,7 +785,7 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, de
         _set_expire_cache(user_id, user_name)
         if key in LOCATION_IN_TUNNEL_LIST:
           _send_worker_log(log)
-        _check_out_user(key, user_id, device_id)
+        _check_out_user(key, user_id, device_id, device_name)
       elif key in REVERSE_ACCESS_POINT and WORKER_COUNT.has_data(REVERSE_ACCESS_POINT[key], user_id):
         reverse_key = REVERSE_ACCESS_POINT[key]
         ret = WORKER_COUNT.delete_data(reverse_key, user_id)
@@ -760,7 +798,7 @@ def _set_worker_count(device_id, key, user_id, user_name, event_data, org_id, de
         _set_expire_cache(user_id, user_name)
         if key in LOCATION_IN_TUNNEL_LIST:
           _send_worker_log(log)
-        _check_out_user(key, user_id, device_id)
+        _check_out_user(key, user_id, device_id, device_name)
       else:
         # TODO:
         logging.info("%s(%s) check out. key :%s, device_id : %s, device_name : %s",
