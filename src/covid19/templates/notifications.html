@@ -585,7 +585,11 @@
                     let contentContainer = $('<div class="noty-item-content-container">'),
                         titleLabel = $('<div class="noty-item-title-label">'),
                         descLabel = $('<div class="noty-item-desc-label">');
-                    let locateContainer = $('<div class="noty-item-locate-container">'),
+                    let bottomContainer = $('<div class="noty-item-bottom-container">'),
+                        locationContainer = $('<div class="noty-item-location-container">'),
+                        campIcon = $('<div class="noty-item-loc-icn camp">'),
+                        transitIcon = $('<div class="noty-item-loc-icn transit">'),
+                        tunnelIcon = $('<div class="noty-item-loc-icn tunnel">'),
                         nameLabel = $('<div class="noty-item-name-label">'),
                         timeagoLabel = $('<div class="noty-item-timeago-label">');
                     let messageButton = $('<div class="noty-item-msg-btn">'),
@@ -593,8 +597,10 @@
                     let closeButton = $('<div class="noty-item-close-btn">');
 
                     container.append(profile, contentContainer, messageButton, replyButton, timeagoLabel, closeButton);
-                    contentContainer.append(titleLabel, descLabel, locateContainer);
-                    locateContainer.append(nameLabel);
+                    contentContainer.append(titleLabel, descLabel, bottomContainer);
+                    bottomContainer.append(locationContainer, nameLabel);
+                    locationContainer.append(campIcon, $('<div class="noty-item-loc-arrow-icn">'), transitIcon,
+                        $('<div class="noty-item-loc-arrow-icn">'), tunnelIcon);
 
                     // init handlers
                     messageButton.click(function() {
@@ -644,6 +650,9 @@
                     _views.profile = profile;
                     _views.titleLabel = titleLabel;
                     _views.descLabel = descLabel;
+                    _views.campIcon = campIcon,
+                    _views.transitIcon = transitIcon,
+                    _views.tunnelIcon = tunnelIcon,
                     _views.nameLabel = nameLabel;
                     _views.messageButton = messageButton;
                     _views.replyButton = replyButton;
@@ -662,13 +671,37 @@
                     _views.descLabel.text(model.message || '-');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-')
 
-                    let profileUserId = model.from_user;
+                    let userId = model.from_user;
                     if (model.from_user == '1' || model.from_user == '2') {
                         _views.nameLabel.text(model.to_name || '');
-                        profileUserId = model.to_user;
+                        userId = model.to_user;
                     } else {
                         _views.nameLabel.text(model.from_name || '');
                     }
+
+                    // get user for location
+                    _db.collection('users').doc(userId).get().then(function(doc) {
+                        if (!!doc) {
+                            let user = doc.data();
+
+                            // draw location
+                            _.each([_views.campIcon, _views.transitIcon, _views.tunnelIcon], function(element) {
+                                element.removeClass('active');
+                            });
+                            let activeIcon = null;
+                            if (user.location == 1) {
+                                // outside
+                                activeIcon = _views.transitIcon;
+                            } else if (user.location == 100) {
+                                // in a camp
+                                activeIcon = _views.campIcon;
+                            } else if (user.location == 1000) {
+                                // in the tunnel
+                                activeIcon = _views.tunnelIcon;
+                            }
+                            activeIcon && activeIcon.addClass('active');
+                        }
+                    });
 
                     // Only show message button for clinic
                     if (model.to_user == 2) {
@@ -687,7 +720,7 @@
                     // load profile image
                     let profileUrl = DOWNLOAD_URL_BUILDER({
                         type: 'image',
-                        id: profileUserId
+                        id: userId
                     });
                     $('<img/>')
                         .load(function() {
@@ -739,7 +772,11 @@
                         locationLabel = $('<div class="noty-item-location-label">'),
                         titleLabel = $('<div class="noty-item-title-label">'),
                         descLabel = $('<div class="noty-item-desc-label">');
-                    let locateContainer = $('<div class="noty-item-locate-container">'),
+                    let bottomContainer = $('<div class="noty-item-bottom-container">'),
+                        locationContainer = $('<div class="noty-item-location-container">'),
+                        campIcon = $('<div class="noty-item-loc-icn camp">'),
+                        transitIcon = $('<div class="noty-item-loc-icn transit">'),
+                        tunnelIcon = $('<div class="noty-item-loc-icn tunnel">'),
                         nameLabel = $('<div class="noty-item-name-label">'),
                         timeagoLabel = $('<div class="noty-item-timeago-label">'),
                         attachmentContainer = $('<div class="noty-item-attchmentContainer">');
@@ -749,9 +786,11 @@
 
                     container.append(profile, contentContainer, messageButton, resolveButton,
                         timeagoLabel, closeButton);
-                    contentContainer.append(titleContainer, descLabel, locateContainer);
+                    contentContainer.append(titleContainer, descLabel, bottomContainer);
                     titleContainer.append(locationLabel, titleLabel);
-                    locateContainer.append(nameLabel, attachmentContainer);
+                    bottomContainer.append(locationContainer, nameLabel, attachmentContainer);
+                    locationContainer.append(campIcon, $('<div class="noty-item-loc-arrow-icn">'), transitIcon,
+                        $('<div class="noty-item-loc-arrow-icn">'), tunnelIcon);
 
                     // init handlers
                     messageButton.click(function() {
@@ -786,6 +825,9 @@
                     _views.titleLabel = titleLabel;
                     _views.descLabel = descLabel;
                     _views.nameLabel = nameLabel;
+                    _views.campIcon = campIcon,
+                    _views.transitIcon = transitIcon,
+                    _views.tunnelIcon = tunnelIcon,
                     _views.messageButton = messageButton;
                     _views.resolveButton = resolveButton;
                     _views.closeButton = closeButton;
@@ -852,6 +894,23 @@
                                         _views.profile.css('background-image', 'url(' + profileUrl + ')');
                                     })
                                     .attr('src', profileUrl);
+
+                                // draw location
+                                _.each([_views.campIcon, _views.transitIcon, _views.tunnelIcon], function(element) {
+                                    element.removeClass('active');
+                                });
+                                let activeIcon = null;
+                                if (_reporter.location == 1) {
+                                    // outside
+                                    activeIcon = _views.transitIcon;
+                                } else if (_reporter.location == 100) {
+                                    // in a camp
+                                    activeIcon = _views.campIcon;
+                                } else if (_reporter.location == 1000) {
+                                    // in the tunnel
+                                    activeIcon = _views.tunnelIcon;
+                                }
+                                activeIcon && activeIcon.addClass('active');
                             }
                         });
                     }

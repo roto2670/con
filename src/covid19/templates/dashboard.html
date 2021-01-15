@@ -665,15 +665,21 @@
                     let contentContainer = $('<div class="alert-item-content-container">'),
                         titleLabel = $('<div class="alert-item-title-label">'),
                         descLabel = $('<div class="alert-item-desc-label">');
-                    let locateContainer = $('<div class="alert-item-locate-container">'),
+                    let bottomContainer = $('<div class="alert-item-bottom-container">'),
+                        locationContainer = $('<div class="alert-item-location-container">'),
+                        campIcon = $('<div class="alert-item-loc-icn camp">'),
+                        transitIcon = $('<div class="alert-item-loc-icn transit">'),
+                        tunnelIcon = $('<div class="alert-item-loc-icn tunnel">'),
                         nameLabel = $('<div class="alert-item-name-label">'),
                         timeagoLabel = $('<div class="alert-item-timeago-label">');
                     let messageButton = $('<div class="alert-item-msg-btn">')
                     let closeButton = $('<div class="alert-item-close-btn">')
 
                     container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
-                    contentContainer.append(titleLabel, descLabel, locateContainer);
-                    locateContainer.append(nameLabel);
+                    contentContainer.append(titleLabel, descLabel, bottomContainer);
+                    bottomContainer.append(locationContainer, nameLabel);
+                    locationContainer.append(campIcon, $('<div class="alert-item-loc-arrow-icn">'), transitIcon,
+                        $('<div class="alert-item-loc-arrow-icn">'), tunnelIcon);
 
                     // init handlers
                     profile.click(function() {
@@ -688,6 +694,9 @@
                     _views.profile = profile;
                     _views.titleLabel = titleLabel;
                     _views.descLabel = descLabel;
+                    _views.campIcon = campIcon,
+                    _views.transitIcon = transitIcon,
+                    _views.tunnelIcon = tunnelIcon,
                     _views.nameLabel = nameLabel;
                     _views.messageButton = messageButton;
                     _views.closeButton = closeButton;
@@ -715,6 +724,30 @@
                             _views.profile.css('background-image', 'url(' + profileUrl + ')');
                         })
                         .attr('src', profileUrl);
+
+                    // get user for location
+                    _db.collection('users').doc(model.from_user).get().then(function(doc) {
+                        if (!!doc) {
+                            let user = doc.data();
+
+                            // draw location
+                            _.each([_views.campIcon, _views.transitIcon, _views.tunnelIcon], function(element) {
+                                element.removeClass('active');
+                            });
+                            let activeIcon = null;
+                            if (user.location == 1) {
+                                // outside
+                                activeIcon = _views.transitIcon;
+                            } else if (user.location == 100) {
+                                // in a camp
+                                activeIcon = _views.campIcon;
+                            } else if (user.location == 1000) {
+                                // in the tunnel
+                                activeIcon = _views.tunnelIcon;
+                            }
+                            activeIcon && activeIcon.addClass('active');
+                        }
+                    });
                 }
 
                 return {
