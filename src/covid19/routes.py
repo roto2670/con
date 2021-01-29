@@ -36,7 +36,8 @@ def is_internal(request):
 @util.require_login
 def route_default():
   if current_user.level in [models.SK_ADMIN, models.SK_NORMAL,
-                            models.COVID19_ADMIN, models.COVID19_TEAMDOCTOR]:
+                            models.COVID19_ADMIN, models.COVID19_TEAMDOCTOR,
+                            models.COVID19_DBA]:
     return render_template("dashboard.html", is_internal=is_internal(request))
   else:
     return redirect('/')

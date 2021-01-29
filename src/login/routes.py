@@ -25,6 +25,8 @@ from login import blueprint
 
 
 SK_LOGO_URI = '''/static/images/logo-login_page.png'''
+COVID_LIST = [models.COVID19_ADMIN, models.COVID19_TEAMDOCTOR,
+              models.COVID19_DBA]
 
 
 @blueprint.route('/login', methods={'GET'})
@@ -45,8 +47,7 @@ def login():
       else:
         if current_user.level == models.MOI:
           return redirect(url_for('moi_blueprint.route_default'))
-        elif current_user.level == models.COVID19_ADMIN or \
-            current_user.level == models.COVID19_TEAMDOCTOR:
+        elif current_user.level in COVID_LIST:
           return redirect(url_for('covid19_blueprint.route_default'))
         else:
           return redirect(url_for('dashboard_blueprint.default_route'))
@@ -65,7 +66,7 @@ def sign_in_progress():
       # TODO:
       #return redirect(url_for('moi_blueprint.route_default'))
       return "<script>window.location.href = '/moi/'; </script>"
-    elif user.level in [models.COVID19_ADMIN, models.COVID19_TEAMDOCTOR]:
+    elif user.level in COVID_LIST:
       # return redirect(url_for('covid19_blueprint.route_default'))
       return "<script>window.location.href = '/covid19/'; </script>"
     elif user.level in [models.MOBILE_SURVEYOR, models.MOBILE_JP]:
