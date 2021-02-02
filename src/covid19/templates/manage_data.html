@@ -37,19 +37,37 @@
         <div class="title-icon tests"></div>
         <div class="title-label">Master File</div>
     </div>
-    <div class="content-container tests">
-        <!-- Upload box -->
-        <div class="upload-container">
-            <div class="upload-icon"></div>
-            <div class="desc-label">Drag & Drop a file containing data to upload</div>
-            <div class="or-label">or</div>
-            <input type="file" class="browse-button btn" accept=".csv"><div>Only (.csv) file</div>
+    <div class="content-container upload">
+        <div class="upload-content-container">
+            <!-- step 1: download master file -->
+            <div class="upload-container">
+                <div class="uc-title-label">1. Download the latest Master file</div>
+                <div class="uc-content-container">
+                    <div class="upload-icon excel"></div>
+                    <div class="download-button btn">Download</div>
+                    <div class="uc-mf-date-label">N/A</div>
+                </div>
+            </div>
+            <div class="upload-r-arrow-icon"></div>
+            <!-- step 2: updates the master file -->
+            <div class="upload-container small">
+                <div class="uc-title-label">2. Update the Mster file</div>
+                <div class="uc-content-container">
+                    <div class="upload-icon update-mf"></div>
+                    <div class="uc-bottom-label">Apply your changes</div>
+                </div>
+            </div>
+            <div class="upload-r-arrow-icon"></div>
+            <!-- step 3: updates the master file -->
+            <div class='upload-container uploader'>
+                <div class='uc-title-label'>3. Upload the new Master file</div>
+                <div class="upload-icon uploader"></div>
+                <div class="uc-bottom-label">Drag & Drop a file</div>
+                <div class="or-label">or</div>
+                <input type="file" class="browse-button btn" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+            </div>
         </div>
-        <div class="buttons-container">
-            <div class="submit-button btn">Submit</div>
-            <div class="submit-button-loader loader hide"></div>
-            <div class="users-download-btn"></div>
-        </div>
+
         <div class="log-panel users hide">
             <div class="log-panel-title">
                 <i class="fa fa-angle-right users-log" aria-hidden="true"></i>
@@ -107,26 +125,37 @@
     <script>
         (function() {
             const IS_INTERNAL = {{is_internal|tojson}};
+            const IS_DEV = false;
             const UPLOAD_URL_BUILDERS = {
                 INTERNAL: _.template('//172.16.5.8:10443/api/upload/<%= type %>?id=<%= id %>'),
-                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>')
+                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>'),
+                DEV: _.template('//skfksxpzm.mib.io:10443/api/upload/<%= type %>?id=<%= id %>')
             },
             DOWNLOAD_URL_BUILDERS = {
                 INTERNAL: _.template('//172.16.5.8:10443/api/download/<%= type %>/<%= id %>'),
-                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
+                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>'),
+                DEV: _.template('//skfksxpzm.mib.io:10443/api/download/<%= type %>/<%= id %>')
             },
             TIME_URL_BUILDERS = {
                 INTERNAL: _.template('//172.16.5.8:10443/api/upload/time?id=<%= id %>'),
-                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/upload/time?id=<%= id %>')
+                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/upload/time?id=<%= id %>'),
+                DEV: _.template('//skfksxpzm.mib.io:10443/api/upload/time?id=<%= id %>')
             },
             SCRIPT_URL_BUILDERS = {
                 INTERNAL: _.template('//172.16.5.8:10443/api/upload/run?id=<%= id %>'),
-                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/upload/run?id=<%= id %>')
+                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/upload/run?id=<%= id %>'),
+                DEV: _.template('//skfksxpzm.mib.io:10443/api/upload/run?id=<%= id %>')
             },
-            UPLOAD_URL_BUILDER = IS_INTERNAL ? UPLOAD_URL_BUILDERS.INTERNAL : UPLOAD_URL_BUILDERS.EXTERNAL,
-            DOWNLOAD_URL_BUILDER = IS_INTERNAL ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL,
-            TIME_URL_BUILDER = IS_INTERNAL ? TIME_URL_BUILDERS.INTERNAL : TIME_URL_BUILDERS.EXTERNAL,
-            SCRIPT_URL_BUILDER = IS_INTERNAL ? SCRIPT_URL_BUILDERS.INTERNAL : SCRIPT_URL_BUILDERS.EXTERNAL;
+            UPLOAD_AVAILABLE_URL_BUILDERS = {
+                INTERNAL: _.template('//172.16.5.8:10443/api/upload/available/csv'),
+                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/upload/available/csv'),
+                DEV: _.template('//skfksxpzm.mib.io:10443/api/upload/available/csv')
+            };
+            UPLOAD_URL_BUILDER = IS_DEV ? UPLOAD_URL_BUILDERS.DEV : IS_INTERNAL ? UPLOAD_URL_BUILDERS.INTERNAL : UPLOAD_URL_BUILDERS.EXTERNAL,
+            DOWNLOAD_URL_BUILDER = IS_DEV ? DOWNLOAD_URL_BUILDERS.DEV : IS_INTERNAL ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL,
+            TIME_URL_BUILDER = IS_DEV ? TIME_URL_BUILDERS.DEV : IS_INTERNAL ? TIME_URL_BUILDERS.INTERNAL : TIME_URL_BUILDERS.EXTERNAL,
+            SCRIPT_URL_BUILDER = IS_DEV ? SCRIPT_URL_BUILDERS.DEV : IS_INTERNAL ? SCRIPT_URL_BUILDERS.INTERNAL : SCRIPT_URL_BUILDERS.EXTERNAL,
+            UPLOAD_AVAILABLE_URL_BUILDER = IS_DEV ? UPLOAD_AVAILABLE_URL_BUILDERS.DEV : IS_INTERNAL ? UPLOAD_AVAILABLE_URL_BUILDERS.INTERNAL : UPLOAD_AVAILABLE_URL_BUILDERS.EXTERNAL;
 
             const MANUAL_STATS_KEY_LIST = ["confirmed", "deaths", "recovered", "active_positives",
                 "quarantined", "isolated", "hospitalized", "close_contacts", "symptomatics", "country_total_cases",
@@ -152,10 +181,14 @@
             const USERS_UPLOAD_ERROR_MESSAGE = {
                 '-1': 'Failed to apply master file. It\'s an unknown error.',
                 0: 'Failed to apply master file. The master file seems to invalid. See logs.',
-                1: 'An error occurred while applying the master file. See logs.'
+                1: 'An error occurred while applying the master file. See logs.',
+                2: 'Server Error. Please refer to the logs.',
+                102: 'The uploaded master file has a low revision. Please download the latest version of the master file again and retry.',
+                103: 'Invalid master file. Please check if it is the correct master file.',
+                104: 'Mutax error. Another master file is applying. Please try again later.'
             };
             const DONWLOAD_FILENAME = {
-                    master: 'master_file.csv',
+                    master: 'master_file.xlsx',
                     app_usage: 'daily_app_usage_report.csv',
                     observation: 'observation_report.csv',
                     qr_codes: 'qrcodes.zip',
@@ -167,6 +200,16 @@
                     observation: 'Observation report',
                     qr_codes: 'All QR codes',
                     clinic_reports: 'Clinic Reports'
+                },
+                UPLOAD_RESULT_STATUS = {
+                    success: 0,
+                    fail: 1,
+                    server_error: 2,
+                    conflict: 100,
+                    processing: 101,
+                    revision: 102,
+                    invalid_master_file: 103,
+                    mutex_error: 104
                 },
                 SCRIPT_ID = {
                     app_usage: 2,
@@ -199,7 +242,6 @@
                 _statsDate;
             let _downloadFilesTime = {};
             let _statViewItems = {};
-
 
             // init
             initialize();
@@ -380,110 +422,48 @@
                     }
                 });
 
-                // for upload csv
+                // for upload
                 $('.browse-button').change(function() {
                     let file = _.first($(this).prop('files'));
+                    prepareUpload(file);
                 });
-                $('.submit-button').click(function() {
-                    if (!window.confirm('Are you sure you want to upload the master file?')) {
-                        return;
-                    }
-                    let localTime = moment().tz(TIMEZONE);
-                    if (localTime.hour() == 0) {
-                        new PNotify({
-                            type: 'notice',
-                            text: 'Master file cannot be applied from 0:00 AM to 1:00 AM. Please try again later. '
-                        });
-                        return;
-                    }
-
-                    let file = _.first($('.browse-button').prop('files'));
-
-                    // check extenstion.
-                    if (file) {
-                        // clear file
-                        $('.browse-button').val('');
-
-                        // check file extention
-                        if (_.first((/[.]/.exec(file.name)) ? /[^.]+$/.exec(file.name) : null) == 'csv' || file.type != 'text/csv') {
-                            // do upload
-                            $('.submit-button-loader').removeClass('hide');
-                            $('.submit-button').addClass('hide');
-
-                            uploadFile(file, UPLOAD_URL_BUILDER({
-                                type: 'csv',
-                                id: 'master_file.csv'
-                            }), {
-                                progress: function() {
-                                },
-                                success: function() {
-                                    $('.submit-button-loader').addClass('hide');
-                                    $('.submit-button').removeClass('hide');
-                                    new PNotify({
-                                        type: 'success',
-                                        text: 'The file has been uploaded. The stats will be updated soon.'
-                                    });
-
-                                    loadUsersLog();
-                                    loadFileTime();
-                                },
-                                error: function(reason) {
-                                    $('.submit-button-loader').addClass('hide');
-                                    $('.submit-button').removeClass('hide');
-                                    
-                                    new PNotify({
-                                        type: 'error',
-                                        text: USERS_UPLOAD_ERROR_MESSAGE[reason]
-                                    });
-
-                                    loadUsersLog();
-                                }
-                            });
-                        } else {
-                            new PNotify({
-                                type: 'notice',
-                                text: 'Please upload the csv file.'
-                            });
-                        }
-                    } else {
-                        new PNotify({
-                            type: 'notice',
-                            text: 'Please select a file to upload(.csv)'
-                        });
-                    }
+                $('.upload-container.uploader>.upload-icon').click(function() {
+                    $('.browse-button').click();
                 });
-                $('.upload-container').on('dragenter', function(event) {
+                $('.upload-container.uploader').on('dragenter', function(event) {
                     event.preventDefault();
                     $(this).addClass('hover');
                 });
-                $('.upload-container').on('dragleave', function(event) {
+                $('.upload-container.uploader').on('dragleave', function(event) {
                     event.preventDefault();
                     $(this).removeClass('hover');
                 });
-                $('.upload-container').on('dragover', function(event) {
+                $('.upload-container.uploader').on('dragover', function(event) {
                     event.preventDefault();
-                    console.log(event.originalEvent.dataTransfer.files);
                 });
-                $('.upload-container').on('drop', function(event) {
+                $('.upload-container.uploader').on('drop', function(event) {
                     event.preventDefault();
                     $(this).removeClass('hover');
 
                     let file = _.first(event.originalEvent.dataTransfer.files);
-                    if (_.first((/[.]/.exec(file.name)) ? /[^.]+$/.exec(file.name) : null) != 'csv' && file.type != 'text/csv') {
-                        new PNotify({
-                            type: 'notice',
-                            text: 'Please upload the csv file.'
-                        });
+                    if (_.first((/[.]/.exec(file.name)) ? /[^.]+$/.exec(file.name) : null) != 'xlsx' &&
+                        (file.type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                        file.type != 'application/vnd.ms-excel')) {
+                            new PNotify({
+                                type: 'notice',
+                                text: 'Please upload the excel file.'
+                            });
                     } else {
                         $('.browse-button').prop('files', event.originalEvent.dataTransfer.files);
+                        prepareUpload(file);
                     }
                 });
 
-                // download csv
-                $('.users-download-btn').click(function() {
+                // download master file
+                $('.download-button').click(function() {
                     downloadURI(DOWNLOAD_URL_BUILDER({
                         type: 'csv',
-                        id: 'master_file.csv'
+                        id: DONWLOAD_FILENAME.master
                     }));
                 });
 
@@ -577,6 +557,95 @@
                 }); 
             }
 
+            function prepareUpload(file) {
+                if (!window.confirm('Are you sure you want to upload the master file?')) {
+                    return;
+                }
+                let localTime = moment().tz(TIMEZONE);
+                if (localTime.hour() == 0) {
+                    new PNotify({
+                        type: 'notice',
+                        text: 'Master file cannot be applied from 0:00 AM to 1:00 AM. Please try again later. '
+                    });
+                    return;
+                }
+
+                // check extenstion.
+                if (file) {
+                    // clear file
+                    $('.browse-button').val('');
+
+                    // check file extention
+                    if (_.first((/[.]/.exec(file.name)) ? /[^.]+$/.exec(file.name) : null) == 'xlsx' ||
+                        file.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+                        file.type == 'application/vnd.ms-excel') {
+                            upload(file);
+                    } else {
+                        new PNotify({
+                            type: 'notice',
+                            text: 'Please upload the exel file.'
+                        });
+                    }
+                } else {
+                    new PNotify({
+                        type: 'notice',
+                        text: 'Please select a file to upload(.xlsx)'
+                    });
+                }
+            }
+
+            function upload(file) {
+                // show progress dialog first.
+                let dialog = UploadDialog(),
+                    progressWidget = UploadProgressDialogWidget();
+                dialog.show($('.right_col'));
+                dialog.setWidget(progressWidget.render());
+
+                // upload file
+                uploadFile(file, UPLOAD_URL_BUILDER({
+                    type: 'csv',
+                    id: DONWLOAD_FILENAME.master
+                }), {
+                    progress: function(progress) {
+                        progressWidget && progressWidget.setProgress(progress);
+
+                        if (progress >= 100) {
+                            // show script log viewer.
+                            let logWidget = UploadLogWidget();
+                            dialog.setWidget(logWidget.render());
+                        }
+                    },
+                    success: function(result) {
+                        let resultWidget = UploadResultWidget(); 
+                        dialog.setWidget(resultWidget.render('success'));
+                        dialog.setCloseButtonVisible(true);
+
+                        loadUsersLog();
+                        loadFileTime();
+                    },
+                    error: function(reason) {
+                        let resultWidget = UploadResultWidget(); 
+                        dialog.setCloseButtonVisible(true);
+                        if (reason == UPLOAD_RESULT_STATUS.conflict) {
+                            dialog.setWidget(resultWidget.render('conflict'));
+                        } else if (reason == UPLOAD_RESULT_STATUS.processing) {
+                            dialog.setWidget(resultWidget.render('processing'));
+                        } else if (reason == UPLOAD_RESULT_STATUS.revision) {
+                            dialog.setWidget(resultWidget.render('conflict'));
+                        } else {
+                            let reasonMessage = USERS_UPLOAD_ERROR_MESSAGE[reason] || 'Unknow error. Please try again later.';
+                            new PNotify({
+                                type: 'error',
+                                text: reasonMessage
+                            });
+                            
+                            dialog.hide();
+                        }
+                        loadUsersLog();
+                    }
+                });
+            }
+
             function loadUsersLog() {
                 // Load users logs.
                 let requestUrl = DOWNLOAD_URL_BUILDER({
@@ -603,7 +672,6 @@
                         $('.log-panel.' + type).text('Logs(N/A)');
                     }
                 });
-
             }
 
             function runScript(type) {
@@ -647,11 +715,11 @@
             function loadFileTime() {
                 // make download link for users.csv if has
                 let requestUrl = TIME_URL_BUILDER({
-                    id: 'master_file.csv'
+                    id: DONWLOAD_FILENAME.master
                 });
                 $.getJSON(requestUrl, function(data) {
                     if (data && data.time) {
-                        $('.users-download-btn').text('Last upload: ' + new Date(data.time * 1000).toLocaleString());
+                        $('.uc-mf-date-label').text(new Date(data.time * 1000).toLocaleString());
                     }
                 });
             }
@@ -695,6 +763,7 @@
                     _loadFileTime('master');
                     _loadFileTime('app_usage');
                     _loadFileTime('observation');
+                    _loadFileTime('clinic_reports');
                     _loadFileTime('qr_codes');
                 }
             }
@@ -732,7 +801,7 @@
                                 console.warn('Failed to parse upload result', error);
                             }
                             
-                            if (resultCode == 0) {
+                            if (resultCode == UPLOAD_RESULT_STATUS.success) {
                                 _callbacks.success(resultCode);
                             } else {
                                 _callbacks.error(resultCode);
@@ -827,6 +896,225 @@
                     update: update,
                     getValue: getValue,
                     isChanged: isChanged
+                }
+            }
+
+            function UploadDialog() {
+                let _view = null;
+
+                function show(parent) {
+                    let container = $('<div class="upload-dialog c-modal-dialog">'),
+                        closeButton = $('<div class="upload-dialog-close-btn c-modal-dialog-close-btn">').hide(),
+                        contentContainer = $('<div class="ud-content-container c-modal-dialog-content">'),
+                        widgetContainer = $('<div class="ud-widget-container">');
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, widgetContainer);
+                    
+                    parent.append(container);
+                    closeButton.click(function() {
+                        hide();
+                    });
+
+                    _view = {
+                        container: container,
+                        widgetContainer: widgetContainer,
+                        closeButton: closeButton
+                    }
+                }
+
+                function hide() {
+                    _view.container.detach().remove();
+                }
+
+                function setWidget(widget) {
+                    _view.widgetContainer.empty().append(widget);
+                }
+
+                function setCloseButtonVisible(visible) {
+                    if (visible) {
+                        _view.closeButton.show();
+                    } else {
+                        _view.closeButton.hide();
+                    }
+                }
+
+                return {
+                    show: show,
+                    hide: hide,
+                    setWidget: setWidget,
+                    setCloseButtonVisible: setCloseButtonVisible
+                }
+            }
+
+            function UploadProgressDialogWidget() {
+                let _view = null;
+
+                function render() {
+                    let container = $('<div class="ud-progress-widget">'),
+                        titleLabel = $('<div class="ud-title-label">Please wait while the Master File is being processed.</div>'),
+                        progressBarContainer = $('<div class="ud-progress-container">'),
+                        progressBar = $('<div class="ud-progress-bar">'),
+                        descLabel = $('<div class="ud-desc-label">When the upload is complete, update it to the server. Please don\'t close the window and wait.</div>');
+
+                    container.append(titleLabel, progressBarContainer, descLabel);
+                    progressBarContainer.append(progressBar);
+
+                    _view = {
+                        container: container,
+                        progressBar: progressBar
+                    }
+
+                    return container;
+                }
+
+                function setProgress(progress) {
+                    if (_.isNumber(progress)) {
+                        if (progress >= 100) {
+                            progress = 100;
+                        }
+
+                        _view.progressBar.css('width', progress + '%');
+                    }
+                }
+
+                return {
+                    render: render,
+                    setProgress: setProgress
+                }
+            }
+
+            function UploadLogWidget() {
+                const LOG_INTERVAL_TIME = 1000 * 10;
+                let _view = null;
+
+                function render() {
+                    let container = $('<div class="ud-log-container">'),
+                        titleLabel = $('<div class="ud-title-label">Appying the Master file. Please wait...</div>'),
+                        logPanel = $('<div class="ud-log-panel">Fetching...</div>');
+
+                    container.append(titleLabel, logPanel);
+
+                    _view = {
+                        container: container,
+                        logPanel: logPanel
+                    };
+
+                    watchUploadStatus();
+
+                    return container;
+                }
+
+                function isShowing() {
+                    return _view && _view.container.parents('html').length > 0;
+                }
+
+                function watchUploadStatus() {
+                    let requestUrl = DOWNLOAD_URL_BUILDER({
+                        type: 'res',
+                        id: 'users.log'
+                    });
+                    
+                    // Load logs
+                    _.delay(function() {
+                        $.get(requestUrl, function(text) {
+                            if (!_.isEmpty(text)) {
+                                _view.logPanel.text(text);
+                                _view.logPanel.scrollTop(_view.logPanel[0].scrollHeight);
+                            }
+                        }).fail(function() {
+                            titleLabel.text('Logs(N/A)');
+                            // TODO:
+                        }).always(function() {
+                            if (isShowing()) {
+                                watchUploadStatus();
+                            } else {
+                                console.warn('Failed to display log, seems to viwer is not attached');
+                            }
+                        });
+                    }, LOG_INTERVAL_TIME);
+                }
+
+                return {
+                    render: render
+                }
+            }
+
+            function UploadResultWidget() {
+                const DOWNLOAD_AVAILABLE_CHECK_TIME = 1000 * 3;
+                let _view = null;
+
+                function render(type) {
+                    let container = $('<div class="ud-result-widget">'),
+                        titleContainer = $('<div class="ud-result-w-title-container">'),
+                        titleIcon = $('<div class="ud-title-icon">'),
+                        titleLabel = $('<div class="ud-title-label rw">'),
+                        descLabel = $('<div class="ud-title-label rwd">'),
+                        fileIcon = $('<div class="ud-file-icon">'),
+                        downloadButton = $('<div class="ud-download-button btn">Download</div>'),
+                        dateLabel = $('<div class="ud-desc-label date">Please wait...</div>');
+                    container.append(titleContainer, descLabel, fileIcon, downloadButton, dateLabel);
+                    titleContainer.append(titleIcon, titleLabel);
+
+                    let titleText = 'Master File Sucessful!',
+                        descText = 'Don\’t forget to download the latest Master File before you make any changes.';
+                    if (type == 'conflict') {
+                        titleText = 'Failed to apply your Master File!';
+                        descText = 'Your Master File is too old. Please download the latest Master File and make the changes.';
+                        titleIcon.addClass('error');
+                    } else if (type == 'processing') {
+                        titleText = 'Another Master File is being processed!';
+                        descText = 'Please wait until the current process is finished. Make sure to download the latest when it becomes available.';
+                        titleIcon.addClass('error');
+                        downloadButton.addClass('disabled');
+
+                        checkDownloadAvailable();
+                    }
+                    titleLabel.text(titleText);
+                    descLabel.text(descText);
+
+                    if (type != 'processing') {
+                        let requestUrl = TIME_URL_BUILDER({
+                            id: DONWLOAD_FILENAME.master
+                        });
+                        $.getJSON(requestUrl, function(data) {
+                            if (data && data.time) {
+                                _view.dateLabel.text(new Date(data.time * 1000).toLocaleString());
+                            }
+                        });
+                    }
+
+                    downloadButton.click(function() {
+                        if (!$(this).hasClass('disabled')) {
+                            downloadURI(DOWNLOAD_URL_BUILDER({
+                                type: 'csv',
+                                id: DONWLOAD_FILENAME.master
+                            }));
+                        }
+                    });
+
+                    _view = {
+                        container: container,
+                        downloadButton: downloadButton,
+                        dateLabel: dateLabel
+                    }
+
+                    return container;
+                }
+
+                function checkDownloadAvailable() {
+                    _.delay(function() {
+                        let requestUrl = UPLOAD_AVAILABLE_URL_BUILDER();
+                        $.getJSON(requestUrl, function(data) {
+                            if (data && data.available) {
+                                _view.dateLabel.text(new Date(data.lastUploadedTime * 1000).toLocaleString());
+                                _view.downloadButton.removeClass('disabled');
+                            }
+                        });
+                    }, DOWNLOAD_AVAILABLE_CHECK_TIME);
+                }
+
+                return {
+                    render: render
                 }
             }
         })();
