@@ -26,7 +26,7 @@ from login import blueprint
 
 SK_LOGO_URI = '''/static/images/logo-login_page.png'''
 COVID_LIST = [models.COVID19_ADMIN, models.COVID19_TEAMDOCTOR,
-              models.COVID19_DBA]
+              models.COVID19_MANAGER]
 
 
 @blueprint.route('/login', methods={'GET'})

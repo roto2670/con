@@ -43,7 +43,7 @@ USER_LEVEL = {
     models.MOI: "MOI",
     models.COVID19_ADMIN: "COVID19 OP",
     models.COVID19_TEAMDOCTOR: "COVID19 Clinic",
-    models.COVID19_DBA: "COVID19 Database Admin",
+    models.COVID19_MANAGER: "COVID19 Manager",
     models.MOBILE_SURVEYOR: "Surveyor",
     models.MOBILE_JP: "JP"
 }
