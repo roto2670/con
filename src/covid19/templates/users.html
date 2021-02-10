@@ -132,6 +132,8 @@
             </div>
         </div>
         {% endif %}
+        {% if current_user.level != 9 %}
+        <div class="user-filter-container admin-command">
         <div class="user-filter-container command">
             <div class="user-filter-top-container">
                 <div class="user-filter-title-icn"></div>
@@ -144,6 +146,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
     </div>
     <div class="content-container">
         <div id="user-table" class="user-table"></div>
