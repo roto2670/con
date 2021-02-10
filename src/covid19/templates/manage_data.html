@@ -16,6 +16,7 @@
 
 {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
+    {% if current_user.level != 9 %}
     <div class="title-container">
         <div class="title-icon stats"></div>
         <div class="title-label">Data Management</div>
@@ -33,6 +34,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
     <div class="title-container">
         <div class="title-icon tests"></div>
         <div class="title-label">Master File</div>
