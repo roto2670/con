@@ -24,7 +24,7 @@
         // output(`Scanning... ${major}:${minor}`);
         const beaconUuidBytes = Uint8Array.of(0xd5,0x26,0xb4,0x6a,0x85,0x4d,0x01,0x8d,0x35,0x5b,0x90,0xee,0x25,0x27,0xfd,0x4e);
         // Let's scan and configure!
-        const device = await startScanning(beaconUuidBytes, major, minor, name);
+        const device = await startScanning(beaconUuidBytes, major, minor, name, false);
         if (device.id) {
           document.getElementById("deviceId").value = device.id;
           document.getElementById("registerButton").disabled = false;
@@ -39,9 +39,10 @@
       // Scan for a beacon and wait for a selection.
       //   uuidBytes: Uint8Array
       //   major: uint (no larger than 65535)
-      //   minor uint (no larger than 65535)
+      //   minor: uint (no larger than 65535)
+      //   edit: uint (no larger than 65535)
       // Return: Bluetooth Device
-      async function startScanning(uuidBytes, major, minor, name) {
+      async function startScanning(uuidBytes, major, minor, name, edit) {
         if (major >= 0xFFFF || minor >= 0xFFFF) {
           throw "Major Minor cannot be larger than 65535";
         }
@@ -55,13 +56,29 @@
         const majorCharId = 0xFF02;
         const minorCharId = 0xFF03;
         const pwCharId = 0xFF06;
+        const advIntCharId = 0xFF07;
         const idCharId = 0xFF08;
 
+        const advInt = 7;  // unit: 100ms. Advertise Interval == 700ms
         let filters = [
           {namePrefix: 'S'}, // Beacon names start with "S0"
           {namePrefix: 'MkiBeacon_'},
           {namePrefix: 'mibs'}
         ];
+
+        let filters;
+        if (edit) {
+          // If it's editing the existing beacon, only scan the beacon with the same name.
+          filters = [
+            {name: name}
+          ];
+        } else {
+          filters = [
+            {namePrefix: 'S'}, // Beacon names start with "S0"
+            {namePrefix: 'MkiBeacon_'},
+            {namePrefix: 'mibs'}
+          ];
+        }
         let options = {
           filters: filters,
           optionalServices: [serviceId]
@@ -85,6 +102,8 @@
           await nameCharacteristic.writeValueWithResponse(Uint8Array.from(Array.from(name).map(x => x.charCodeAt(0))));
           const idCharacteristic = await service.getCharacteristic(idCharId);
           await idCharacteristic.writeValueWithResponse(Uint8Array.from(Array.from('00001').map(x => x.charCodeAt(0))));
+          const advIntCharacteristic = await service.getCharacteristic(advIntCharId);
+          await advIntCharacteristic.writeValueWithResponse(Uint8Array.of((advInt >> 8) & 0xFF, advInt & 0xFF));
           console.log('Successfully configured.');
           await device.gatt.disconnect();
           // All done!

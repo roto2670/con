@@ -8,6 +8,115 @@
 
 {% block title %} Update Beacon {% endblock title %}
 
+{% block javascripts %}
+  {{ super() }}
+  <script>
+// Button click handler to start scanning and configuring
+      async function scanAndConfigure(uuid, majorNumber, minorNumber, name) {
+        document.getElementById("updateButton").disabled = true;
+        document.getElementById("removeButton").disabled = true;
+        let major = majorNumber;
+        let minor = minorNumber;
+        if (!major || !minor) {
+          window.alert("Major or Minor is empty. Please refresh and try again.");
+        }
+
+        document.getElementById("scanButton").disabled = true;
+        // output(`Scanning... ${major}:${minor}`);
+        const beaconUuidBytes = Uint8Array.of(0xd5,0x26,0xb4,0x6a,0x85,0x4d,0x01,0x8d,0x35,0x5b,0x90,0xee,0x25,0x27,0xfd,0x4e);
+        // Let's scan and configure!
+        const device = await startScanning(beaconUuidBytes, major, minor, name, true);
+        if (device.id) {
+          document.getElementById("deviceId").value = device.id;
+          document.getElementById("updateButton").disabled = false;
+          document.getElementById("removeButton").disabled = false;
+        } else {
+          document.getElementById("deviceId").value = "";
+          window.alert("Beacon is not set. Please try again.");
+          document.getElementById("scanButton").disabled = false;
+        }
+      }
+
+      // **API**
+      // Scan for a beacon and wait for a selection.
+      //   uuidBytes: Uint8Array
+      //   major: uint (no larger than 65535)
+      //   minor: uint (no larger than 65535)
+      //   edit: uint (no larger than 65535)
+      // Return: Bluetooth Device
+      async function startScanning(uuidBytes, major, minor, name, edit) {
+        if (major >= 0xFFFF || minor >= 0xFFFF) {
+          throw "Major Minor cannot be larger than 65535";
+        }
+        if (!navigator.bluetooth) {
+          throw "Web Bluetooth API must be enabled.";
+        }
+
+        const serviceId = 0xFF00;
+        const uuidCharId = 0xFF01;
+        const nameCharId = 0xFF09;
+        const majorCharId = 0xFF02;
+        const minorCharId = 0xFF03;
+        const pwCharId = 0xFF06;
+        const advIntCharId = 0xFF07;
+        const idCharId = 0xFF08;
+
+        const advInt = 7;  // unit: 100ms. Advertise Interval == 700ms
+
+        let filters;
+        if (edit) {
+          // If it's editing the existing beacon, only scan the beacon with the same name.
+          filters = [
+            {name: name}
+          ];
+        } else {
+          filters = [
+            {namePrefix: 'S'}, // Beacon names start with "S0"
+            {namePrefix: 'MkiBeacon_'},
+            {namePrefix: 'mibs'}
+          ];
+        }
+        let options = {
+          filters: filters,
+          optionalServices: [serviceId]
+        };
+
+        try {
+          // Start scanning. Wait for the user to select a beacon to configure.
+          const device = await navigator.bluetooth.requestDevice(options);
+          // A Beacon is selected. See how it looks like.
+          const server = await device.gatt.connect();
+          const service = await server.getPrimaryService(serviceId);
+          const pwCharacteristic = await service.getCharacteristic(pwCharId);
+          await pwCharacteristic.writeValueWithResponse(Uint8Array.from([77, 111, 107, 111, 52, 51, 50, 49])); // Moko4321
+          const uuidCharacteristic = await service.getCharacteristic(uuidCharId);
+          await uuidCharacteristic.writeValueWithResponse(uuidBytes);
+          const majorCharacteristic = await service.getCharacteristic(majorCharId);
+          await majorCharacteristic.writeValueWithResponse(Uint8Array.of((major >> 8) & 0xFF, major & 0xFF));
+          const minorCharacteristic = await service.getCharacteristic(minorCharId);
+          await minorCharacteristic.writeValueWithResponse(Uint8Array.of((minor >> 8) & 0xFF, minor & 0xFF));
+          const nameCharacteristic = await service.getCharacteristic(nameCharId);
+          await nameCharacteristic.writeValueWithResponse(Uint8Array.from(Array.from(name).map(x => x.charCodeAt(0))));
+          const idCharacteristic = await service.getCharacteristic(idCharId);
+          await idCharacteristic.writeValueWithResponse(Uint8Array.from(Array.from('00001').map(x => x.charCodeAt(0))));
+          const advIntCharacteristic = await service.getCharacteristic(advIntCharId);
+          await advIntCharacteristic.writeValueWithResponse(Uint8Array.of((advInt >> 8) & 0xFF, advInt & 0xFF));
+          console.log('Successfully configured.');
+          await device.gatt.disconnect();
+          // All done!
+          return device;
+        } catch (e) {
+          return e;
+        }
+      }
+
+      function output(text) {
+          document.getElementById("output").innerHTML = text;
+      }
+  </script>
+{% endblock javascripts %}
+
+
 {% block content %}
   <div id="scroll-style-hidden" class="right_col" role="main">
     <div class="">
@@ -30,6 +139,18 @@
                 class="form-horizontal form-label-left" method="post">
                 <div class="col-md-9">
                   <br>
+                  {% if beacon.kind == "mibs00001" %}
+                    <div class="item form-group">
+                      <label class="control-label col-md-4" for="name">
+                        Beacon <span class="required">*</span>
+                      </label>
+                      <div class="col-md-8">
+                        <button id="scanButton" type="button" class="btn btn-default btn-xl"
+                            onclick="scanAndConfigure('{{beacon.beacon_spec.uuid}}', '{{beacon.beacon_spec.major}}', '{{beacon.beacon_spec.minor}}', '{{beacon.kind}}')"
+                            >Scan & Select</button>
+                      </div>
+                    </div>
+                  {% endif %}
                   <div class="item form-group">
                     <label class="control-label col-md-4" for="name">Name
                     </label>
@@ -96,13 +217,15 @@
                     </div>
                   </div>
                   <br>
+                  <input type="hidden" id="deviceId" name="deviceId" value=""
+                      class="form-control col-md-6 col-xs-6">
                   <input type="hidden" id="hid" name="hid" value="{{ beacon.hub_id }}"
                       class="form-control col-md-6 col-xs-6">
                   <div style="text-align: right">
-                    <button type="submit" class="btn btn-default">Update</button>
+                    <button id="updateButton" type="submit" class="btn btn-default">Update</button>
                     {% if beacon.kind == "mibs00001" %}
                       <a href="/registration/beacon/{{ beacon.id }}/delete">
-                        <button type="button" class="btn btn-danger">Remove</button>
+                        <button id="removeButton" type="button" class="btn btn-danger">Remove</button>
                       </a>
                     {% endif %}
                   </div>
