@@ -60,11 +60,6 @@
         const idCharId = 0xFF08;
 
         const advInt = 7;  // unit: 100ms. Advertise Interval == 700ms
-        let filters = [
-          {namePrefix: 'S'}, // Beacon names start with "S0"
-          {namePrefix: 'MkiBeacon_'},
-          {namePrefix: 'mibs'}
-        ];
 
         let filters;
         if (edit) {
