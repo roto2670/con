@@ -29,51 +29,6 @@
                 </div>
             </div>
         </div>
-        <div class="user-filter-container user">
-            <div class="user-filter-top-container">
-                <div class="user-filter-title-icn"></div>
-                <div class="user-filter-title-label">User Status</div>
-            </div>
-            <div class="user-filter-bottom-container">
-                <div class="user-filter-btn" id="quarantined">Quarantined</div>
-                <div class="user-filter-btn" id="isolated">Isolated</div>
-                <div class="user-filter-btn" id="hospitalized">Hospitalized</div>
-                <div class="user-filter-btn" id="hospitalized-icu">Hospitalized ICU</div>
-            </div>
-        </div>
-        <div class="user-filter-container clinic">
-            <div class="user-filter-top-container">
-                <div class="user-filter-title-icn"></div>
-                <div class="user-filter-title-label">Clinic Status</div>
-            </div>
-            <div class="user-filter-bottom-container">
-                <div class="user-filter-btn" id="close-contact">Close Contact</div>
-                <div class="user-filter-btn" id="symptom-suspected">Suspected Symptom</div>
-                <div class="user-filter-btn" id="quarantine-required">Quarantine Required</div>
-                <div class="user-filter-btn" id="isolation-required">Isolated Required</div>
-                <div class="user-filter-btn" id="test-referred">Test Referred</div>
-            </div>
-        </div>
-        <div class="user-filter-container op">
-            <div class="user-filter-top-container">
-                <div class="user-filter-title-icn"></div>
-                <div class="user-filter-title-label">OP Status</div>
-            </div>
-            <div class="user-filter-bottom-container">
-                <div class="user-filter-btn" id="quarantine-confirmed">Quarantine Confirmed</div>
-                <div class="user-filter-btn" id="isolation-confirmed">Isolation Confirmed</div>
-            </div>
-        </div>
-        <div class="user-filter-container staff">
-            <div class="user-filter-top-container">
-                <div class="user-filter-title-icn"></div>
-                <div class="user-filter-title-label">Staff</div>
-            </div>
-            <div class="user-filter-bottom-container">
-                <div class="user-filter-btn" id="admin">Admin</div>
-                <div class="user-filter-btn" id="clinic">Clinic</div>
-            </div>
-        </div>
         <div class="user-new-btn">
             <div class="user-new-btn-icn"></div>
             <div class="user-new-btn-label">New</div>
@@ -81,6 +36,146 @@
         <div class="discover-hotspot-btn">
             <div class="discover-hotspot-btn-icn"></div>
             <div class="discover-hotspot-btn-label">Discover Hotspot</div>
+        </div>
+    </div>
+
+    <div class="top-upper-container"> <!-- RTW Process-->
+        <div class="user-filter-container rtw">
+            <!-- TODO: style display is none-->
+            <div class="user-filter-top-container" style="display:none">
+                <div class="user-filter-title-icn"></div>
+                <div class="user-filter-title-label">RTW Process</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Work Status</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="workStatus" class="filter-dropdown">
+                            <option value="" selected>None</option>
+                            <option value="onduty">On Duty</option>
+                            <option value="quarantined">Quarantined</option>
+                            <option value="isolated">Isolation</option>
+                            <option value="hospitalized">Hospitalized</option>
+                            <option value="hospitalized-icu">Hospitalized ICU</option>
+                            <option value="terminated">Termination</option>
+                            <option value="resigned">Resigned</option>
+                            <option value="demobilization">Demobilization</option>
+                            <option value="vacation">Vacation</option>
+                            <option value="b-trip">Business Trip</option>
+                            <option value="others">Others</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Clinic Status</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="clinicStatus" class="filter-dropdown">
+                            <option value="">None</option>
+                            <option value="close-contact">Close Contact</option>
+                            <option value="symptom-suspected" selected>Symptom Suspected</option>
+                            <option value="quarantine-required">Quarantine Required</option>
+                            <option value="isolation-required">Isolation Required</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">OP Status</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="opStatus" class="filter-dropdown">
+                            <option value="" selected>None</option>
+                            <option value="quarantine-confirmed">Quarantine Confirmed</option>
+                            <option value="isolation-confirmed">Isolation Confirmed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Staff</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="staff" class="filter-dropdown">
+                            <option value="" selected>None</option>
+                            <option value="admin">Admin</option>
+                            <option value="clinic">Clinic</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Group</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="group" class="filter-dropdown">
+                            <option value="" selected>None</option>
+                            <option value="group-ag">A/G</option>
+                            <option value="group-ug">U/G</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Test Referred</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="testReferred" class="filter-dropdown">
+                            <option value="" selected>None</option>
+                            <option value="test-referred">Test Referred</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="top-upper-container"> <!-- Admin/HR Affairs-->
+        <div class="user-filter-container admin">
+            <!-- TODO: style display is none-->
+            <div class="user-filter-top-container" style="display: none">
+                <!-- TODO: style height-->
+                <div class="user-filter-title-icn" style="height: 1.7em"></div>
+                <div class="user-filter-title-label">Admin/HR Affairs</div>
+            </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">CICPA Pass</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="cicpaPass" class="filter-dropdown">
+                            <option value="" selected>None</option>
+                            <option value="good">Good</option>
+                            <option value="expiring-soon">Expiring Soon</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">VISA</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="visa" class="filter-dropdown">
+                            <option value="" selected>None</option>
+                            <option value="good">Good</option>
+                            <option value="expiring-soon">Expiring Soon</option>
+                            <option value="expired">Expired</option>>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="top-lower-container">
@@ -187,7 +282,7 @@
             '9': 'Vacation',
             '10': 'Business Trip',
             '11': 'Others'
-        }, 
+        },
         STATUS_VALUE = {
             'notregistered': 0,
             'onduty': 1,
@@ -209,15 +304,26 @@
             'quarantine-required': 4,
             'isolation-required': 5
         },
-        CLINIC_TEST_REFERRED = 'test-referred',
+        CLINIC_TEST_REFERRED = {
+            'test-referred': true
+        }
+        GROUP_STATUS_VALUE = {
+            "group-ag": "A/G",
+            "group-ug": "U/G"
+        },
+        EXPIRING_STATUS_VALUE = {
+            'expired': -1,
+            'expiring-soon': 0,
+            'good': 1
+        },
         OP_STATUS_VALUE = {
             'none': 1,
             'quarantine-confirmed': 2,
             'isolation-confirmed': 3
         },
         STAFF_STATUS_VALUE = {
-            admin: '_adm_',
-            clinic: '_cln_'
+            'admin': 1,
+            'clinic': 2
         },
         COMMAND_STATUS_VALUE = {
             REFER_TEST: '_rft_',
@@ -238,6 +344,27 @@
             ISOLATION_CONFIRMED: 6,
             OP_RELEASE: 7
         };
+        const FIRESTORE_KEY = {
+            'workStatus': 'status',
+            'clinicStatus': 'clinic_status',
+            'opStatus': 'op_status',
+            'staff': 'role',
+            'group': 'pv_area',
+            'testReferred': 'test_referred',
+            'cicpaPass': 'cicpa_no_status',
+            'visa': 'visa_status',
+            'passport': 'passport_status',
+        },
+        DROPDOWN_FILTER_VALUE = {
+            'workStatus': STATUS_VALUE,
+            'clinicStatus': CLINIC_STATUS_VALUE,
+            'opStatus': OP_STATUS_VALUE,
+            'staff': STAFF_STATUS_VALUE,
+            'group': GROUP_STATUS_VALUE,
+            'testReferred': CLINIC_TEST_REFERRED,
+            'cicpaPass': EXPIRING_STATUS_VALUE,
+            'visa': EXPIRING_STATUS_VALUE,
+        }
         const PRE_MED_DISPLAY = {
             diabetes: 'Diabetes',
             obesity: 'Obesity',
@@ -282,13 +409,13 @@
                 // TODO: use setSelectedFilter
                 $('#symptom-suspected').addClass('selected');
                 displayUsers({
-                    clinic: DEFAULT_FILTER
+                    clinic_status: DEFAULT_FILTER
                 }, true, function() {
                     $('.user-item-loader-btn').removeClass('loading');
                 });
             } else {
                 displayUser(userId);
-            } 
+            }
         }
 
         function stop() {
@@ -421,7 +548,7 @@
 
             // Do request
             let query = _db.collection('test_results').where('owner', '==', _userRef);
-            
+
             if (!!startAt) {
                 query = query.startAfter(startAt);
             }
@@ -453,7 +580,7 @@
                 let _query = _db.collection('self_reports')
                                 .where('score', '>', 0)
                                 .where('owner', '==', _userRef);
-                
+
                 // do query
                 _query.get().then(function(snapshot) {
                     let _reportList = [],
@@ -603,7 +730,7 @@
 
             let _log = firebase.app().functions('asia-east2').httpsCallable('logClinicAction'),
                 _staffId = staffId || firebase.auth().currentUser.uid,
-                _userId = userId; 
+                _userId = userId;
 
             // do request
             _log({
@@ -629,6 +756,19 @@
             }
         }
 
+        function _clearSelectedItem() {
+            // Clear dropdown filter
+            _.each($('.filter-dropdown'), function(item) {
+                item.value = '';
+            }) ;
+            _selectedFilters = null;
+        }
+
+        function _clearUserSearchBox() {
+            // Clear user searchbox
+            $('.user-serach-box').val('');
+        }
+
         function displayUser(userId, callback) {
             callback = callback || _.noop;
 
@@ -637,13 +777,15 @@
 
                 if (!_loadingUsers) {
                     _loadingUsers = true;
-                    
+
                     loadUser(userId, function(user) {
                         // render user.
+                        _clearSelectedItem();
                         if (_.isObject(user) && !_.isEmpty(user)) {
                             addUserItem(user);
                             callback();
                         } else {
+                            let container = $('.user-item-container');
                             container.append('<div class="user-item-container-empty">No users</div>');
                             console.warn('Failed to display user for ' + userId);
                         }
@@ -660,6 +802,9 @@
 
         function displayUsers(filters, clean, callback) {
             callback = callback || _.noop;
+
+            // Clear User search box
+            _clearUserSearchBox();
 
             let container = $('.user-item-container');
             if (!!clean) {
@@ -710,9 +855,10 @@
             _snapshotUnsubscriber = _db.collection('users').doc(userId).onSnapshot(function(doc) {
                 if (doc) {
                     var user = doc.data();
-                    user.documentId = doc.id;
-
-                    updateUserItem(user);
+                    if (user) {
+                        user.documentId = doc.id;
+                        updateUserItem(user);
+                    }
                 } else {
                     console.log('Received subscribe event but there is no user for id ', userId);
                 }
@@ -727,32 +873,14 @@
             if (!!startAt) {
                 // Paging
                 query = query.startAfter(startAt)
-            } 
+            }
             query = query.limit(USER_PAGE_SIZE);
 
             // Adds filter if has
             if (!!filters) {
-                if (_.isNumber(filters.user)) {
-                    query = query.where('status', '==', filters.user);
-                }
-                if (filters.clinic || _.isNumber(filters.clinic)) {
-                    if (filters.clinic === CLINIC_TEST_REFERRED) {
-                        query = query.where('test_referred', '==', true);
-                    } else {
-                        query = query.where('clinic_status', '==', filters.clinic);
-                    }
-                }
-                if (_.isNumber(filters.op)) {
-                    query = query.where('op_status', '==', filters.op);
-                }
-                if (filters.staff === STAFF_STATUS_VALUE['admin']) {
-                    query = query.where('role', '==', 1);
-                } else if (filters.staff === STAFF_STATUS_VALUE['clinic']) {
-                    query = query.where('role', '==', 2);
-                }
-                if (filters.userName) {
-                    query = query.where('fullname', 'array-contains', filter.userName);
-                }
+                _.each(filters, function(value, key) {
+                    query = query.where(key, '==', value);
+                });
             }
 
             // do query
@@ -795,29 +923,18 @@
             })
         }
 
+        // TODO: Deprecated(210303)
         function getSelectedFilters() {
             let _filters = {},
-                _userStatus = STATUS_VALUE[$('.user .user-filter-btn.selected').attr('id')],
-                _clinicStatus = CLINIC_STATUS_VALUE[$('.clinic .user-filter-btn.selected').attr('id')],
-                _opStatus = OP_STATUS_VALUE[$('.op .user-filter-btn.selected').attr('id')],
-                _staffStatus = STAFF_STATUS_VALUE[$('.staff .user-filter-btn.selected').attr('id')];
+                _groupStatus = GROUP_STATUS_VALUE[$('.group .group-filter-btn.selected').attr('id')],
+                _userStatus = STATUS_VALUE[$('.user .user-filter-btn.selected').attr('id')];
 
+            if (_groupStatus) {
+                _filters.group = _groupStatus;
+            }
             if (_.isNumber(_userStatus)) {
                 _filters.user = _userStatus;
             }
-            if (_.isNumber(_clinicStatus)) {
-                _filters.clinic = _clinicStatus;
-            }
-            if ($('.clinic .user-filter-btn.selected').attr('id') === CLINIC_TEST_REFERRED) {
-                _filters.clinic = CLINIC_TEST_REFERRED;
-            }
-            if (_.isNumber(_opStatus)) {
-                _filters.op = _opStatus;
-            }
-            if (_staffStatus) {
-                _filters.staff = _staffStatus;
-            }
-
             return _filters;
         }
 
@@ -839,10 +956,10 @@
                 sURLVariables = sPageURL.split('&'),
                 sParameterName,
                 i;
-        
+
             for (i = 0; i < sURLVariables.length; i++) {
                 sParameterName = sURLVariables[i].split('=');
-        
+
                 if (sParameterName[0] === sParam) {
                     return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
                 }
@@ -871,7 +988,7 @@
                 }
             });
             $('.searchbox-icon').click(function() {
-                let _value = $(this).val().trim();
+                let _value = $('.user-serach-box').val().trim();
                 if(_value) {
                     displayUser(_value);
                     return;
@@ -1090,9 +1207,62 @@
             // PNotify.prototype.options.addclass = 'stack-bottomright';
         }
 
-        // TODO: setSelectedFilter
+        function _getFilters(filterId, filterValue) {
+            let _filters = _selectedFilters || {},
+                _key = FIRESTORE_KEY[filterId];
+            if (_.isEmpty(filterValue)) {
+                delete _filters[_key];
+            } else {
+                if (filterId in DROPDOWN_FILTER_VALUE) {
+                    _filters[_key] = DROPDOWN_FILTER_VALUE[filterId][filterValue];
+                } else {
+                    console.log(filterId + " not in list.");
+                }
+            }
+
+            if (Object.keys(_filters).length == 0) {
+                return null;
+            } else {
+                return _filters;
+            }
+        }
+
+        function _handleCommandButton(filterValue) {
+            // handle command buttons
+            // TODO: Handle filtervalue when and filters?
+            if (filterValue === 'quarantine-required') {
+                $('.command-btn.confirm-quarantine').removeClass('disabled');
+            } else {
+                $('.command-btn.confirm-quarantine').addClass('disabled');
+            }
+
+            if (filterValue === 'isolation-required') {
+                $('.command-btn.confirm-isolation').removeClass('disabled');
+            } else {
+                $('.command-btn.confirm-isolation').addClass('disabled');
+            }
+
+            if (filterValue === 'quarantine-required' || filterValue === 'isolation-required') {
+                $('.command-btn.release-op').removeClass('disabled');
+            } else {
+                $('.command-btn.release-op').addClass('disabled');
+            }
+
+            if (filterValue === 'close-contact' || filterValue === 'symptom-suspected') {
+                $('.command-btn.release-clinic').removeClass('disabled');
+                $('.command-btn.quarantine').removeClass('disabled');
+                $('.command-btn.isolate').removeClass('disabled');
+            } else {
+                $('.command-btn.release-clinic').addClass('disabled');
+                $('.command-btn.quarantine').addClass('disabled');
+                $('.command-btn.isolate').addClass('disabled');
+            }
+        }
+
         function initFilterButton(type) {
             // $('.' + type + ' .user-filter-btn').click(function() {
+
+            // TODO: Deprecated(210303)
             $('.user-filter-btn').click(function() {
                 _lastUserSnapShot = null; // reset paging
 
@@ -1119,37 +1289,25 @@
                         $('.user-item-loader-btn').removeClass('loading');
                     });
                 }
-
-                // handle command buttons
-                let filterId = $(this).attr('id');
-                if (filterId === 'quarantine-required') {
-                    $('.command-btn.confirm-quarantine').removeClass('disabled');
-                } else {
-                    $('.command-btn.confirm-quarantine').addClass('disabled');
-                }
-
-                if (filterId === 'isolation-required') {
-                    $('.command-btn.confirm-isolation').removeClass('disabled');
-                } else {
-                    $('.command-btn.confirm-isolation').addClass('disabled');
-                }
-
-                if (filterId === 'quarantine-required' || filterId === 'isolation-required') {
-                    $('.command-btn.release-op').removeClass('disabled');
-                } else {
-                    $('.command-btn.release-op').addClass('disabled');
-                }
-
-                if (filterId === 'close-contact' || filterId === 'symptom-suspected') {
-                    $('.command-btn.release-clinic').removeClass('disabled');
-                    $('.command-btn.quarantine').removeClass('disabled');
-                    $('.command-btn.isolate').removeClass('disabled');
-                } else {
-                    $('.command-btn.release-clinic').addClass('disabled');
-                    $('.command-btn.quarantine').addClass('disabled');
-                    $('.command-btn.isolate').addClass('disabled');
-                }
             });
+
+            $('.filter-dropdown').change(function() {
+                let _filters = _getFilters(this.id, this.value);
+
+                // check all deselected
+                if (_.isEmpty(_filters)) {
+                    // display default user list.
+                    displayUsers(null, true, function() {
+                        $('.user-item-loader-btn').removeClass('loading');
+                    });
+                } else {
+                    displayUsers(_filters, true, function() {
+                        $('.user-item-loader-btn').removeClass('loading');
+                    });
+                }
+                _handleCommandButton(this.value);
+            });
+
         }
 
         function initTableView() {
@@ -1199,7 +1357,7 @@
                                 locationCell.append(campIcon, $('<div class="user-item-loc-arrow-icn">'), transitIcon,
                                     $('<div class="user-item-loc-arrow-icn">'), tunnelIcon);
 
-                            // handle location 
+                            // handle location
                             let activeIcon = null;
                             if (location == 1) {
                                 // outside
@@ -1233,7 +1391,7 @@
 
                             jobCat1Label.text(data.jobCat1);
                             jobCat2Label.text(data.jobCat2);
-                            
+
                             return jobContainer.prop('outerHTML');
                         }},
                         {title: 'App<br />Installed', field: 'appInstalled', resizable: false, width: 50, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: 'tickCross'},
@@ -1524,7 +1682,7 @@
                         upperContainer.append(scheduleDateLabel, testDateLabel, resultDateLabel, expiryDateLabel,
                             locationLabel, underlyingLabel, reasonForTestLabel, typeLabel, resultLabel,
                             remarksLabel, clearanceLabel, ownerNameLabel, reporterNameLabel, attachmentContainer);
-                    
+
                     // store views.
                     _views.container = container;
                     _views.scheduleDateLabel = scheduleDateLabel;
@@ -1638,7 +1796,7 @@
                     contentContainer = $('<div class="sr-content-container c-modal-dialog-content">'),
                     titleContainer = $('<div class="sr-title-container">'),
                     itemsContainer = $('<div class="sr-items-container">');
-                
+
                 container.append(contentContainer);
                 contentContainer.append(closeButton, titleContainer, itemsContainer);
                 titleContainer.append(
@@ -1714,7 +1872,7 @@
                         soarThroatLabel = $('<div class="r-value-label soar-throat">'),
                         bodyTempLabel = $('<div class="r-value-label bt">'),
                         timeLabel = $('<div class="r-value-label time">');
-                    
+
                     container.append(contactedLabel, coughLabel, feverLabel, headacheLabel, noSmellTasteLabel,
                         shortBreathLabel, soarThroatLabel, bodyTempLabel, etcLabel, ownerLabel, reporterLabel,
                         timeLabel);
