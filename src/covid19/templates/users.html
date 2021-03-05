@@ -1207,10 +1207,16 @@
             // PNotify.prototype.options.addclass = 'stack-bottomright';
         }
 
+        function _getKeyByValue(object, value) {
+            return Object.keys(object).find(key => object[key] === value);
+        }
+
         function _getFilters(filterId, filterValue) {
             let _filters = _selectedFilters || {},
-                _key = FIRESTORE_KEY[filterId];
+                _key = FIRESTORE_KEY[filterId],
+                _oldValue = null;
             if (_.isEmpty(filterValue)) {
+                _oldValue = _filters[_key];
                 delete _filters[_key];
             } else {
                 if (filterId in DROPDOWN_FILTER_VALUE) {
@@ -1221,6 +1227,10 @@
             }
 
             if (Object.keys(_filters).length == 0) {
+                // There muse be at least one filter item.
+                // Returns the last set filter when all filters change to None.
+                _filters[FIRESTORE_KEY[filterId]] = _oldValue;
+                $('#' + filterId)[0].value = _getKeyByValue(DROPDOWN_FILTER_VALUE[filterId], _oldValue);
                 return null;
             } else {
                 return _filters;
@@ -1296,16 +1306,14 @@
 
                 // check all deselected
                 if (_.isEmpty(_filters)) {
-                    // display default user list.
-                    displayUsers(null, true, function() {
-                        $('.user-item-loader-btn').removeClass('loading');
-                    });
+                    window.alert("Please set at least one filter.");
                 } else {
+                    _lastUserSnapShot = null; // reset paging
                     displayUsers(_filters, true, function() {
                         $('.user-item-loader-btn').removeClass('loading');
                     });
+                    _handleCommandButton(this.value);
                 }
-                _handleCommandButton(this.value);
             });
 
         }
@@ -1441,7 +1449,6 @@
                 });
             }
         }
-
 
         // Classes
         function CreateMessageDialog() {
