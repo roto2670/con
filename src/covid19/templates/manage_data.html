@@ -127,7 +127,7 @@
     <script>
         (function() {
             const IS_INTERNAL = {{is_internal|tojson}};
-            const IS_DEV = false;
+            const IS_DEV = true;
             const UPLOAD_URL_BUILDERS = {
                 INTERNAL: _.template('//172.16.5.8:10443/api/upload/<%= type %>?id=<%= id %>'),
                 EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>'),
@@ -240,12 +240,20 @@
                     }
                 },
                 OBSERVATION_VALID_DAY = 7;
+            // Websocket
+            const START_TYPE = "START",
+                  FILEINFO_TYPE = "FILEINFO",
+                  FINISH_TYPE = "FINISH",
+                  DATA_TYPE = "DATA",
+                  UPLOAD_FINISH_TYPE = "UPLOAD_FINISH",
+                  OPEN_TYPE = "OPEN";
 
             let _db = firebase.firestore(),
                 _stats,
                 _statsDate;
             let _downloadFilesTime = {};
             let _statViewItems = {};
+            let _ws = websocket();
 
             // init
             initialize();
@@ -270,8 +278,8 @@
                     let _container = $('.stat-items-container');
                     _.each(MANUAL_STATS_KEY_LIST, function(key) {
                         let _viewItem = StatItem(MANUAL_STATS_DISPLAY[key], stats[key]);
-                        _container.append(_viewItem.render());    
-                    
+                        _container.append(_viewItem.render());
+
                         _statViewItems[key] = _viewItem;
                     });
                 }
@@ -290,7 +298,7 @@
                             today.documentId = doc.id;
                         }
 
-                        _callback(today); 
+                        _callback(today);
                     });
             }
 
@@ -351,7 +359,7 @@
                 $('.si-update-btn').click(function() {
                     let _newStats = {},
                         _hasInvalidValue = false;
-                
+
                     _.each(_statViewItems, function(statsItem, key) {
                         if (statsItem.isChanged()) {
                             let _value = statsItem.getValue();
@@ -522,7 +530,7 @@
                         } else {
                             new PNotify({
                                 type: 'notice',
-                                text: 'Must be ' + OBSERVATION_VALID_DAY + 'days after the last run. ' + 
+                                text: 'Must be ' + OBSERVATION_VALID_DAY + 'days after the last run. ' +
                                     'Please try again in ' + ((OBSERVATION_VALID_DAY - diffDay) + 1) + 'day(s).'
                             });
                         }
@@ -543,7 +551,7 @@
                             text: 'Please wait...'
                         });
                     }
-                }); 
+                });
 
                 // add lisnter for generate qr codes
                 $('.log-download-run-btn#qr_codes').click(function() {
@@ -551,14 +559,14 @@
                         runScript('qr_codes');
                         $('.log-download-btn#qr_codes').text(DOWNLOAD_FILE_DISPLAY['qr_codes'] + '(Generating...)');
                     }
-                }); 
+                });
 
                 // add lisnter for clinic reports.
                 $('.log-download-run-btn#clinic_reports').click(function() {
                     if (window.confirm('Aure you sure?')) {
                         runScript('clinic_reports');
                     }
-                }); 
+                });
             }
 
             function prepareUpload(file) {
@@ -581,7 +589,7 @@
 
                     // check file extention
                     if (_.first((/[.]/.exec(file.name)) ? /[^.]+$/.exec(file.name) : null) == 'xlsx' ||
-                        file.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+                        file.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
                         file.type == 'application/vnd.ms-excel') {
                             upload(file);
                     } else {
@@ -620,7 +628,7 @@
                         }
                     },
                     success: function(result) {
-                        let resultWidget = UploadResultWidget(); 
+                        let resultWidget = UploadResultWidget();
                         dialog.setWidget(resultWidget.render('success'));
                         dialog.setCloseButtonVisible(true);
 
@@ -628,7 +636,7 @@
                         loadFileTime();
                     },
                     error: function(reason) {
-                        let resultWidget = UploadResultWidget(); 
+                        let resultWidget = UploadResultWidget();
                         dialog.setCloseButtonVisible(true);
                         if (reason == UPLOAD_RESULT_STATUS.conflict) {
                             dialog.setWidget(resultWidget.render('conflict'));
@@ -642,7 +650,7 @@
                                 type: 'error',
                                 text: reasonMessage
                             });
-                            
+
                             dialog.hide();
                         }
                         loadUsersLog();
@@ -683,7 +691,7 @@
                     _requestUrl = SCRIPT_URL_BUILDER({
                         id: SCRIPT_ID[type]
                     });
-                
+
                 // check running. TODO: flag
                 if (_button.hasClass('disabled')) {
                     return;
@@ -739,7 +747,7 @@
                             requestUrl = TIME_URL_BUILDER({
                                 id: DONWLOAD_FILENAME[type]
                             });
-                        
+
                         button.text(DOWNLOAD_FILE_DISPLAY[type] + '(Fetching creation date...)');
                         $.getJSON(requestUrl, function(data) {
                             if (data && data.time) {
@@ -772,6 +780,28 @@
                 }
             }
 
+            function websocket() {
+                let url = 'wss://skec-fujairah.loc8.dev:10443/api/upload/ws';
+                if (IS_INTERNAL) {
+                    url = 'wss://172.16.5.8:10443/api/upload/ws';
+                }
+                if (IS_DEV) {
+                    url = 'wss://skfksxpzm.mib.io:10443/api/upload/ws';
+                }
+                let ws = new WebSocket(url)
+                ws.onopen = function() {
+                    ws.send(JSON.stringify({'typ': OPEN_TYPE}));
+                    console.log("Connect");
+                }
+                ws.onmessage = function(e) {
+                    console.log("messge : ", e)
+                }
+                ws.onclose = function() {
+                    console.log("Disconnect");
+                }
+                return ws;
+            }
+
             function uploadFile(file, url, callbacks) {
                 let _callbacks = callbacks || {
                     progress: _.noop,
@@ -779,8 +809,50 @@
                     error: _.noop
                 };
                 if (file) {
+                    // websocket handle
+                    // TODO : cleanup
+                    let buffersize = 4194304, // Websocket Limit
+                        filesize = file.size,
+                        filename = file.name;
+
+                    let reader = new FileReader(),
+                        rawData = new ArrayBuffer(),
+                        pos = 0;
+
+                    reader.readAsArrayBuffer(file);
+                    reader.onload = function(e) {
+                        console.log("reader onload : ", e.target.result);
+                        rawData = e.target.result;
+                    }
+
+                    _ws.onmessage = function(e) {
+                        let data = JSON.parse(e.data);
+                        if (data.typ == FILEINFO_TYPE) {
+                            let dict = {"typ": FILEINFO_TYPE, "filename": filename, "filesize": filesize}
+                            _ws.send(JSON.stringify(dict));
+                        } else if (data.typ == DATA_TYPE) {
+                            // Binrary send
+                            _ws.send(file.slice(pos, pos+buffersize));
+                            pos += buffersize;
+                            _callbacks.progress(parseInt((pos / filesize) * 100));
+                            if (pos > filesize) {
+                                pos = filesize;
+                            }
+                        } else if (data.typ == UPLOAD_FINISH_TYPE) {
+                            _callbacks.progress(100);
+                        } else if (data.typ == FINISH_TYPE) {
+                            if (data.code == UPLOAD_RESULT_STATUS.success) {
+                                _callbacks.success(true);
+                            } else {
+                                _callbacks.error(data.code);
+                            }
+                        }
+                    }
+                    _ws.send(JSON.stringify({"typ": START_TYPE}));
+                } else if (false) {
+                    // Rest Api
                     let formData = new FormData();
-                    formData.append('file', file, file.name); 
+                    formData.append('file', file, file.name);
 
                     $.ajax({
                         url: url,
@@ -804,7 +876,7 @@
                             } catch(error) {
                                 console.warn('Failed to parse upload result', error);
                             }
-                            
+
                             if (resultCode == UPLOAD_RESULT_STATUS.success) {
                                 _callbacks.success(resultCode);
                             } else {
@@ -816,7 +888,7 @@
                     _callbacks.error();
                 }
             }
-            
+
             function downloadURI(uri, name) {
                 var link = document.createElement("a");
                 // If you don't know the name or want to use
@@ -913,7 +985,7 @@
                         widgetContainer = $('<div class="ud-widget-container">');
                     container.append(contentContainer);
                     contentContainer.append(closeButton, widgetContainer);
-                    
+
                     parent.append(container);
                     closeButton.click(function() {
                         hide();
@@ -1017,7 +1089,7 @@
                         type: 'res',
                         id: 'users.log'
                     });
-                    
+
                     // Load logs
                     _.delay(function() {
                         $.get(requestUrl, function(text) {
