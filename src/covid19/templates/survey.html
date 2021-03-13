@@ -8,6 +8,8 @@
 
 {% block stylesheets %}
     {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/ag-grid.min.css">
+    <link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/theme.min.css">
     <link type="text/css" rel="stylesheet" href="static/css/common.css">
     <link type="text/css" rel="stylesheet" href="static/css/survey.css">
 {% endblock stylesheets %}
@@ -35,6 +37,7 @@
 
 {% block javascripts %}
     {{ super() }}
+      <script src="static/js/vendor/grid/ag-grid-enterprise.min.js"></script>
       <script src="static/js/vendor/sortable/sortable.min.js"></script>
       <script src="static/js/vendor/sortable/jquery-sortable.js"></script>
     <script>
@@ -1364,8 +1367,10 @@
                     _surveyModel,
                     _defaultLang = "en";
                 let _surveyCache = {},  // {"0-0": {"text" : ViewObject, "per": ViewObject}, "0-1": .., ..}
-                    _questionKeyList = [];  // [0-0, 0-1, 0-2, ...]
-                    _totalProgressCache = {} //{"text": ViewObject, "per": ViewObject}
+                    _questionKeyList = [],  // [0-0, 0-1, 0-2, ...]
+                    _totalProgressCache = {}; //{"text": ViewObject, "per": ViewObject}
+                let _optionTableOptions = null,
+                    _combineOptionsTableOptions = null;
 
                 function show(parent, statsModel, surveyModel) {
                     //let _callbacks = callbacks || {
@@ -1384,15 +1389,23 @@
                         thumbnail = $('<div class="stats-thumbnail">');
                     let totalProgressContainer = $('<div class="stats-total-progress-container">'),
                         questionListContainer = $('<div class="stats-question-list-container">');
-
+                    let optionTableTitleLabel = $('<div class="stats-table-title-label options">General Type</div>'),
+                        optionTableContainer = $('<div class="stats-table-container options ag-theme-alpine">'),
+                        combineOptionsTableTitleLabel = $('<div class="stats-table-title-label combine">Condition Type</div>'),
+                        combineOptionsTableContainer = $('<div class="stats-table-container combine ag-theme-alpine">');
 
                     container.append(contentContainer);
                     contentContainer.append(topContainer,
                         titleLabel,
-                        totalProgressContainer,
                         descLabel,
                         thumbnail,
-                        questionListContainer);
+                        totalProgressContainer,
+                        questionListContainer,
+                        optionTableTitleLabel,
+                        optionTableContainer,
+                        combineOptionsTableTitleLabel,
+                        combineOptionsTableContainer
+                        );
 
                     topContainer.append(closeButton);
 
@@ -1416,16 +1429,19 @@
                         thumbnail.css('background-image', 'url("' + _surveyModel.image_url + '")')
                     }
 
-                    _.each(surveyModel.questions, function(value, index) {
-                        questionListContainer.append(renderQuestion(value, index));
-                    });
+                    // Render options(temporary commented out)
+                    // _.each(surveyModel.questions, function(value, index) {
+                    //     questionListContainer.append(renderQuestion(value, index));
+                    // });
 
                     // store views.
                     _views.container = container;
                     _views.totalProgressContainer = totalProgressContainer;
                     _views.totalProgressContentsContainer = totalProgressContentsContainer;
+                    _views.optionTableContainer = optionTableContainer;
+                    _views.combineOptionsTableContainer = combineOptionsTableContainer;
 
-                    update(statsModel);
+                    update(statsModel, _surveyModel);
 
                     parent.append(container);
                 }
@@ -1437,13 +1453,132 @@
                 function update(statsModel, surveyModel) {
                     _statsModel = statsModel;
                     setTotalProgress(statsModel);
-                    setProgress(statsModel);
+                    // Temporary commented out by no rendered option items.
+                    // setProgress(statsModel);
                     if (!_.isEmpty(surveyModel)) {
                         _surveyModel = surveyModel;
-                        let totalProgressContentsContainer = renderTotalProgress(_statsModel, _surveyModel);
-                        _views.totalProgressContentsContainer.remove();
-                        _views.totalProgressContainer.append(totalProgressContentsContainer);
-                        _views.totalProgressContentsContainer = totalProgressContentsContainer;
+                    }
+
+                    // Render tables
+                    renderOptionTable(statsModel, surveyModel);
+                    renderCombineOptionsTable(statsModel, surveyModel);
+                }
+
+                function renderOptionTable(statsModel, surveyModel) {
+                    if (!_optionTableOptions && statsModel && surveyModel) {
+                        // init tables?
+                        _optionTableOptions = {
+                            columnDefs: [
+                                { 
+                                    headerName: 'Name',
+                                    field: 'name',
+                                    flex: 2
+                                },
+                                { 
+                                    headerName: 'Choice',
+                                    field: 'choice'
+                                },
+                                {
+                                    headerName: 'Question',
+                                    field: 'question',
+                                    rowGroup: true,
+                                    hide: true
+                                }
+                            ],
+                            groupDefaultExpanded: -1,
+                            groupUseEntireRow: true,
+                            defaultColDef: {
+                                flex: 1,
+                                sortable: true,
+                                resizable: true,
+                            }
+                        };
+                        let rowData = [];
+
+                        // Make a row data for table
+                        _.each(surveyModel.questions, function(question, questionIndex) {
+                            _.each(question.choices[_defaultLang], function(value, optionIndex) {
+                                rowData.push({
+                                    name: value,
+                                    choice: statsModel[`${questionIndex}-${optionIndex}`] || 'Unknown',
+                                    question: question.q[_defaultLang]
+                                });
+                            })
+                        }); 
+                        _optionTableOptions.rowData = rowData;
+
+                        new agGrid.Grid(_views.optionTableContainer.get(0), _optionTableOptions);
+                    } else {
+                        // TODO: update
+                    }
+                }
+                
+                function renderCombineOptionsTable(statsModel, surveyModel) {
+                    if (!_combineOptionsTableOptions && statsModel && surveyModel) {
+                        _combineOptionsTableOptions = {
+                            groupMultiAutoColumn: true,
+                            showOpenedGroup: false,
+                            groupHideOpenParents: true,
+                            groupDefaultExpanded: -1,
+                            defaultColDef: {
+                                flex: 1,
+                                sortable: true,
+                                resizable: true,
+                            }
+                        };
+                        let columnDefList = [],
+                            rowDataList = [],
+                            rowSpanConditions = {};
+                        let filteredStatsModel = {};
+                        _.each(statsModel, function(value, key) {
+                            if (key.includes('+')) { // TOOD: regx
+                                filteredStatsModel[key] = value;
+                            }
+                        });
+
+                        let pollData = {};
+                        _.each(filteredStatsModel, function(value, mainKey) {
+                            // Make row data
+                            let rowData = {
+                                totalCount: value
+                            };
+                            // let keyFindIndex = [];
+                            _.each(mainKey.split('+'), function(optionKey, questionIndex) {
+                                rowData['q' + questionIndex] = surveyModel.questions[questionIndex].choices[_defaultLang][optionKey];
+                            });
+                            rowDataList.push(rowData);
+                        });
+
+                        // Make a row data for table
+                        _.each(surveyModel.questions, function(question, questionIndex) {
+                                // calc row span
+                                let rowSpanSize = _.reduce(_.rest(_.map(surveyModel.questions, function(question) {
+                                    return _.size(question.choices);
+                                }), questionIndex + 1));
+
+                                let fieldId = 'q' + questionIndex;
+                                // Define header
+                                columnDefList.push({
+                                    headerName: question.q[_defaultLang],
+                                    field: 'q' + questionIndex,
+                                    rowGroup: true,
+                                    hide: true
+                                });
+                        }); 
+
+                        // Adding total column
+                        columnDefList.push({
+                            headerName: 'Total',
+                            field: 'totalCount'
+                        });
+
+
+                        _combineOptionsTableOptions.columnDefs = columnDefList;
+                        _combineOptionsTableOptions.rowData = rowDataList;
+
+                        new agGrid.Grid(_views.combineOptionsTableContainer.get(0), _combineOptionsTableOptions);
+                    } else {
+                        // TODO: update
                     }
                 }
 
@@ -1462,6 +1597,7 @@
                     let topTitle = $('<div class="stats-total-top-title">Total Progress</div>'),
                         progressContainer = $('<div class="stats-total-progress-content-container">'),
                         bottomContainer = $('<div class="stats-total-bottom-container">'),
+                        dateLabel = $('<div class="stats-total-date-label">'),
                         buttonContainer = $('<div class="stats-button-container">');
                     let statsContainer = $('<div class="stats-container">'),
                         rightContainer = $('<div class="stats-number">'),
@@ -1471,11 +1607,12 @@
                     let finishButton = $('<div class="stats-finish-button dialog-btn">End now</div>');
                     let bottomText = "";
 
-                    wrapContainer.append(topTitle, progressContainer, bottomContainer, buttonContainer);
+                    wrapContainer.append(topTitle, progressContainer, bottomContainer);
+                    bottomContainer.append(dateLabel, buttonContainer);
 
                     progressContainer.append(statsContainer);
-                    statsContainer.append(statsProgressContainer, rightContainer);
-                    statsProgressContainer.append(optTitle, optPer);
+                    statsContainer.append(statsProgressContainer);
+                    statsProgressContainer.append(optPer, optTitle, rightContainer);
                     buttonContainer.append(finishButton);
                     if (!surveyModel.active) {
                         finishButton.hide();
@@ -1490,10 +1627,7 @@
                     } else {
                         bottomText += ", Finish Date : -";
                     }
-                    bottomContainer.html(bottomText);
-
-                    _totalProgressCache.text = rightContainer;
-                    _totalProgressCache.per = optPer
+                    dateLabel.text(bottomText);
 
                     finishButton.click(function() {
                         if (_surveyModel.active && _activatedDocNum == _surveyModel.documentId) {
@@ -1508,8 +1642,12 @@
                             }
                         }
                     });
+
                     // store views
                     _views.finishButton = finishButton;
+                    _totalProgressCache.text = rightContainer;
+                    _totalProgressCache.per = optPer;
+
                     return wrapContainer;
                 }
 
@@ -1526,7 +1664,7 @@
 
                 function setTotalProgress(statsModel) {
                     let per = parseInt((statsModel.count / _activeUsers) * 100);
-                    _totalProgressCache.text.html(statsModel.count + " (" + per + "%)");
+                    _totalProgressCache.text.text(statsModel.count + " (" + per + "%)");
                     _totalProgressCache.per.css('width', per + '%');
                 }
 
