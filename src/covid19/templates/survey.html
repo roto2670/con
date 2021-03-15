@@ -43,23 +43,44 @@
     <script>
         (function() {
             const IS_INTERNAL = {{is_internal|tojson}};
+            const IS_DEV = true;
             const PAGE_SIZE = 10,
-                UPLOAD_COUNT_LIMIT = 3,
-                UPLOAD_SIZE_LIMIT = 5; // 5mb
+                  UPLOAD_COUNT_LIMIT = 3,
+                  UPLOAD_SIZE_LIMIT = 5; // 5mb
             const UPLOAD_URL_BUILDERS = {
                 INTERNAL: _.template('https://172.16.5.8:10443/api/upload/<%= type %>?id=<%= id %>'),
-                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>')
+                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>'),
+                DEV: _.template('https://skfksxpzm.mib.io:10443/api/upload/<%= type %>?id=<%= id %>')
             },
             DOWNLOAD_URL_BUILDERS = {
                 INTERNAL: _.template('https://172.16.5.8:10443/api/download/<%= type %>/<%= id %>'),
-                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
+                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>'),
+                DEV: _.template('https://skfksxpzm.mib.io:10443/api/download/<%= type %>/<%= id %>')
             },
-            UPLOAD_URL_BUILDER = IS_INTERNAL ? UPLOAD_URL_BUILDERS.INTERNAL : UPLOAD_URL_BUILDERS.EXTERNAL,
-            DOWNLOAD_URL_BUILDER = IS_INTERNAL ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
+            UPLOAD_URL_BUILDER = IS_DEV ? UPLOAD_URL_BUILDERS.DEV : IS_INTERNAL ? UPLOAD_URL_BUILDERS.INTERNAL : UPLOAD_URL_BUILDERS.EXTERNAL,
+            DOWNLOAD_URL_BUILDER = IS_DEV ? DOWNLOAD_URL_BUILDERS.DEV : IS_INTERNAL ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
 
             const MAX_PIN_ORDER = 100,
-                PIN_ORDER_INCREMENT = 1;
-                UNPIN_ORDER_INCREMENT = 1000;
+                  PIN_ORDER_INCREMENT = 1;
+                  UNPIN_ORDER_INCREMENT = 1000;
+            // Websocket
+            const START_TYPE = "START",
+                  FILEINFO_TYPE = "FILEINFO",
+                  FINISH_TYPE = "FINISH",
+                  DATA_TYPE = "DATA",
+                  UPLOAD_FINISH_TYPE = "UPLOAD_FINISH",
+                  OPEN_TYPE = "OPEN";
+            const UPLOAD_RESULT_STATUS = {
+                    success: 0,
+                    fail: 1,
+                    server_error: 2,
+                    conflict: 100,
+                    processing: 101,
+                    revision: 102,
+                    invalid_master_file: 103,
+                    mutex_error: 104,
+                    invalid_user: 105
+            };
 
             let _db = firebase.firestore(),
                 _surveyItems = {}, // {view: '', model: ''}
@@ -69,6 +90,8 @@
                 _lastSnapshot = null,
                 _activatedDocNum = null,
                 _activeUsers = 0;
+            let _ws = websocket(),
+                _ws_buffersize = 1048576; // websocket limit (max 4194304)
 
             // init
             // remove hard-coded to change the order of news items by drag.
@@ -83,6 +106,27 @@
             })
             loadSurveyStats();
             initSnapshotHandler();
+
+            function websocket() {
+                let url = 'wss://skec-fujairah.loc8.dev:10443/api/upload/ws';
+                if (IS_DEV) {
+                    url = 'wss://skfksxpzm.mib.io:10443/api/upload/ws';
+                } else if (IS_INTERNAL) {
+                    url = 'wss://172.16.5.8:10443/api/upload/ws';
+                }
+                let ws = new WebSocket(url);
+                ws.onopen = function() {
+                    ws.send(JSON.stringify({'typ': OPEN_TYPE}));
+                    console.log("Connect");
+                }
+                ws.onmessage = function(e) {
+                    console.log("messge : ", e)
+                }
+                ws.onclose = function() {
+                    console.log("Disconnect");
+                }
+                return ws;
+            }
 
             function loadActiveUsers() {
                 let ref = _db.collection('covid19_stats'),
@@ -221,7 +265,7 @@
                             if (!uploading) {
                                 uploading = true;
                                 dialog.allLocking();
-                                imageQueue = makeFileUrls([image], true);
+                                imageQueue = makeFileUrls(model.documentId, image, true);
                                 uploadFiles(0, imageQueue, dialog, function(imageUrls) {
                                     uploading = false;
                                     data.image_url = imageUrls;
@@ -241,7 +285,7 @@
                             if (!uploading) {
                                 uploading = true;
                                 dialog.allLocking();
-                                imageQueue = makeFileUrls(image, true);
+                                imageQueue = makeFileUrls(model.documentId, image, true);
                                 uploadFiles(0, imageQueue, dialog, function(imageUrls) {
                                     uploading = false;
                                     data.image_url = imageUrls;
@@ -261,14 +305,20 @@
                 dialog.show($('.right_col'), statsModel, surveyModel);
             }
 
-            function makeFileUrls(files, image) {
+            function makeFileUrls(docId, files, image) {
                 let queue = [];
                 _.each(files, function(file) {
-                    let fileId = makeUUID();
+                    let fileId = makeUUID(),
+                        changeFileName = 'unnamed';
+                    if (file.name) {
+                        let tmpList = file.name.split(".");
+                        changeFileName = docId + "." + tmpList[tmpList.length - 1];
+                    }
                     queue.push({
-                        filename: file.name || 'unnamed',
-                        upload_url: makeUploadUrl(image, fileId),
-                        download_url: makeDownloadUrl(image, fileId, true),
+                        filename: changeFileName,
+                        upload_url: makeUploadUrl(image, changeFileName),
+                        //download_url: makeDownloadUrl(image, changeFileName, true),
+                        download_url: getImageUrl(changeFileName, true),
                         file: file
                     })
                 });
@@ -296,7 +346,7 @@
                         }
                     });
                 } else {
-                    _callback();
+                    _callback(files[currentIndex - 1].download_url);
                 }
             }
 
@@ -307,6 +357,46 @@
                     error: _.noop
                 };
                 if (file) {
+                    // websocket handle
+                    let _file = file.file,
+                        filesize = _file.size,
+                        filename = file.filename;
+
+                    let reader = new FileReader(),
+                        rawData = new ArrayBuffer(),
+                        pos = 0;
+
+                    reader.readAsArrayBuffer(_file);
+                    reader.onload = function(e) {
+                        console.log("reader onload : ", e.target.result);
+                        rawData = e.target.result;
+                    }
+
+                    _ws.onmessage = function(e) {
+                        let data = JSON.parse(e.data);
+                        if (data.typ == FILEINFO_TYPE) {
+                            let dict = {"typ": FILEINFO_TYPE, "filename": filename, "filesize": filesize}
+                            _ws.send(JSON.stringify(dict));
+                        } else if (data.typ == DATA_TYPE) {
+                            // Binrary send
+                            _ws.send(_file.slice(pos, pos+_ws_buffersize));
+                            pos += _ws_buffersize;
+                            _callbacks.progress(parseInt((pos / filesize) * 100));
+                            if (pos > filesize) {
+                                pos = filesize;
+                            }
+                        } else if (data.typ == UPLOAD_FINISH_TYPE) {
+                            _callbacks.progress(100);
+                        } else if (data.typ == FINISH_TYPE) {
+                            if (data.code == UPLOAD_RESULT_STATUS.success) {
+                                _callbacks.success(true);
+                            } else {
+                                _callbacks.error(data.code);
+                            }
+                        }
+                    }
+                    _ws.send(JSON.stringify({"typ": START_TYPE}))
+                } else if (false) {
                     let formData = new FormData();
                     formData.append('file', file.file, file.filename);
 
@@ -384,17 +474,6 @@
                         viewItem,
                         surveyItem = SurveyItem(survey, {
                             selectedRemove: function(documentId) {
-                                if (window.confirm('Are you sure?')) {
-                                    viewItem.detach().remove();
-
-                                    // do query.
-                                    if (documentId) {
-                                        _db.collection('polls').doc(documentId).delete();
-                                        if (survey.start_ts) {
-                                            _db.collection('poll_stats').doc(documentId).delete();
-                                        }
-                                    }
-                                }
                             },
                             selectedEdit: function(selectedModel) {
                                 showAddSurveyDialog(selectedModel);
@@ -598,6 +677,18 @@
                 return max + UNPIN_ORDER_INCREMENT;
             }
 
+            function getImageUrl(filename, external) {
+                let builder = DOWNLOAD_URL_BUILDER;
+                if (external) {
+                    builder = DOWNLOAD_URL_BUILDERS.EXTERNAL;
+                }
+
+                return builder({
+                    type: 'stats',
+                    id: filename
+                });
+            }
+
             function makeUploadUrl(image, fileId, external) {
                 let builder = UPLOAD_URL_BUILDER;
                 if (external) {
@@ -649,24 +740,19 @@
                         messageLabel = $('<div class="ni-message-label">');
                     let timeagoLabel = $('<div class="ni-timeago-label">');
                     let rightContainer = $('<div class="ni-right-container">'),
-                        removeButton = $('<div class="ni-remove-btn">'),
                         pinButton = $('<div class="ni-pin-btn">'),  // TODO: Remove? Use?
                         statisticsButton = $('<div class="ni-statistics-btn">');
 
                     container.append(upperContainer, lowerContainer);
-                    upperContainer.append(grabButton, thumbnail, contentContainer, timeagoLabel, rightContainer);
-                    contentContainer.append(titleLabel, messageLabel);
-                    rightContainer.append(removeButton);
+                    upperContainer.append(grabButton, thumbnail, contentContainer, rightContainer);
+                    contentContainer.append(titleLabel, messageLabel, timeagoLabel);
                     if (!_.isEmpty(_model.start_ts) || !_.isEmpty(_model.end_ts)) {
                         rightContainer.append(statisticsButton);
                     }
 
                     // Init handlers
                     thumbnail.click(function() {
-                        window.open(model.image_url);
-                    });
-                    removeButton.click(function() {
-                        _callbacks.selectedRemove(model.documentId);
+                        window.open(_model.image_url);
                     });
                     titleLabel.click(function() {
                         _callbacks.selectedEdit(_model);
@@ -685,7 +771,6 @@
                     _views.titleLabel = titleLabel;
                     _views.messageLabel = messageLabel;
                     _views.timeagoLabel = timeagoLabel;
-                    _views.removeButton = removeButton;
                     _views.pinButton = pinButton;
                     _views.statisticsButton = statisticsButton;
 
@@ -711,7 +796,7 @@
 
                     // set id and order using by jquery
                     _views.container.data('documentId', model.documentId);
-                    _views.thumbnail.css('background-image', 'url("' + model.image_url + '")')
+                    _views.thumbnail.css('background-image', 'url("' + _model.image_url + '")')
                     _views.titleLabel.text(title || '-');
                     _views.messageLabel.text(desc || '');
                     _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
@@ -789,12 +874,6 @@
                     lastQuestionNum += 1;
                 }
 
-                function decreaseQuestionNumber() {
-                    if (lastQuestionNum >= 1) {
-                        lastQuestionNum -= 1;
-                    }
-                }
-
                 function show(parent, model, callbacks) {
                     let _callbacks = callbacks || {
                         selectedAdd: _.noop,
@@ -822,9 +901,9 @@
                     let bottomContainer = $('<div class="and-bottom-container">'),
                         progress = $('<div class="and-progress">'),
                         addQuestionButton = $('<div class="and-add-btn dialog-btn">Add Question</div>'),
-                        removeQuestionButton = $('<div class="and-add-btn dialog-btn">Remove Question</div>'),
                         saveButton = $('<div class="and-add-btn dialog-btn">Save Survey</div>'),
-                        startButton = $('<div class="and-add-btn dialog-btn">Start Now</div>');
+                        startButton = $('<div class="and-add-btn dialog-btn">Start Now</div>'),
+                        removeButton = $('<div class="and-add-btn dialog-btn remove">Remove</div>');
 
                     container.append(modalContainer, contentContainer);
                     contentContainer.append(topContainer,
@@ -836,7 +915,7 @@
 
                     topContainer.append(langSelector, closeButton);
                     imageUploaderContainer.append(imageTitleLabel, thumbnail, selectImageButton);
-                    bottomContainer.append(progress, addQuestionButton, removeQuestionButton, saveButton, startButton);
+                    bottomContainer.append(progress, addQuestionButton, saveButton, startButton, removeButton);
                     // All block. Using file upload.
                     modalContainer.hide();
 
@@ -858,13 +937,14 @@
                     // Handle Start Survey Button
                     if (_.isEmpty(_model)) {
                         startButton.hide();
+                        removeButton.hide();
                     }
 
                     // init handlers
                     closeButton.click(function() {
                         hide();
                     });
-                    startButton.click(function(e) {
+                    startButton.click(function() {
                         if (_.isEmpty(_activatedDocNum)) {
                             // handle start
                             if (window.confirm('Do you want to start the survey?')) {
@@ -880,6 +960,24 @@
                             }
                         } else {
                             window.alert("Another survey is in progress. Please start after finishing another survey.");
+                        }
+                    });
+                    removeButton.click(function() {
+                        if (window.confirm('Are you sure you want to delete it?\n(You can\'t recover deleted surveys.)')) {
+                            let docId = _model.documentId,
+                                listViewItem = _surveyItems[docId].view;
+
+                            // do query.
+                            if (doctId) {
+                                hide();
+                                listViewItem.remove();
+                                if (_model.start_ts) {
+                                    _db.collection('poll_stats').doc(docId).delete();
+                                    delete _surveyStatsItems[docId];
+                                }
+                                _db.collection('polls').doc(docId).delete();
+                                delete _surveyItems[docId];
+                            }
                         }
                     });
                     $(document).keyup(function(e) {
@@ -939,16 +1037,18 @@
                     });
 
                     addQuestionButton.click(function(event) {
-                        if (lastQuestionNum >= MAX_QUESTION) {
+                        let qLength = questionListContainer[0].childNodes.length;
+                        if (qLength >= MAX_QUESTION) {
                             window.alert("You can create up to five questions.")
                             return
                         }
                         let qNumber = lastQuestionNum;
                         let _optionsNumber = 0;
                         let questionContainer = $('<div id="qc-' + qNumber + '" class="and-question-container">');
-                        let questionTitleLabel = $('<div class="and-title-label">Question #'+ (qNumber + 1) + '</div>'),
+                        let questionTitleLabel = $('<div id="qt-' + qNumber + '" class="and-title-label">Question #'+ (qLength + 1) + '</div>'),
                             inputQuestionTextbox = $('<input type="text" id="qt-' + qNumber + '" class="and-input-question-title-textbox dialog-textbox" placeholder="Question Title">'),
                             questionDescLabel = $('<div class="and-desc-label"></div>');
+                            questionRemoveButton = $('<div id="q-' + qNumber + '" class="and-options-remove-btn">');
                         let checkboxContainer = $('<div class="and-checkbox-container">'),
                             inputCheckbox = $('<input type="checkbox" id="qcb-' + qNumber + '" class="and-checkbox">'),
                             checkboxLabel = $('<div class="and-checkbox-label">Answer Required</div>');
@@ -961,7 +1061,7 @@
 
                         questionListContainer.append(questionContainer);
                         questionContainer.append(
-                            questionTitleLabel, inputQuestionTextbox, questionDescLabel,
+                            questionRemoveButton, questionTitleLabel, inputQuestionTextbox, questionDescLabel,
                             checkboxContainer,
                             optionsContainer);
                         checkboxContainer.append(inputCheckbox, checkboxLabel);
@@ -986,6 +1086,18 @@
                         inputCheckbox.change(function(e) {
                             let qid = $(this)[0].id.split("-")[1];
                             _questionsCache[qid][REQUIRED_KEY] = inputCheckbox.is(":checked");
+                        });
+
+                        questionRemoveButton.click(function(event) {
+                            let qid = $(this).attr("id").split("-")[1];
+                            if (qid) {
+                                delete _questionsCache[qid];
+                                $("#qc-" + qid).remove();
+                                _.each(_views.questionListContainer[0].childNodes, function(child, index) {
+                                    let oldNumber = child.id.split("-")[1];
+                                    $("#qt-" + oldNumber).html("Question #" + (index + 1));
+                                });
+                            }
                         });
 
                         optionsAddButton.click(function(event) {
@@ -1037,13 +1149,6 @@
                         });
 
                         increaseQuestionNumber();
-                    });
-                    removeQuestionButton.click(function(event) {
-                        if (lastQuestionNum > 0) {
-                            decreaseQuestionNumber();
-                            $("#qc-" + lastQuestionNum).remove();
-                            delete _questionsCache[lastQuestionNum];
-                        }
                     });
 
                     saveButton.click(function(event) {
@@ -1162,7 +1267,6 @@
                     _views.saveButton = saveButton;
                     _views.startButton = startButton;
                     _views.addQuestionButton = addQuestionButton;
-                    _views.removeQuestionButton = removeQuestionButton;
                     _views.titleTextbox = inputTitleTextbox;
                     _views.descTextArea = descTextArea;
                     _views.langSelector = langSelector;
@@ -1200,9 +1304,10 @@
                             let qNumber = index;
                             let _optionsNumber = 0;
                             let questionContainer = $('<div id="qc-' + qNumber + '" class="and-question-container">');
-                            let questionTitleLabel = $('<div class="and-title-label">Question #' + (qNumber + 1) + '</div>'),
+                            let questionTitleLabel = $('<div id="qt-' + qNumber + '" class="and-title-label">Question #' + (qNumber + 1) + '</div>'),
                                 inputQuestionTextbox = $('<input type="text" id="qt-' + qNumber + '" class="and-input-question-title-textbox dialog-textbox" placeholder="Question Title">'),
-                                questionDescLabel = $('<div class="and-desc-label"></div>');
+                                questionDescLabel = $('<div class="and-desc-label"></div>'),
+                                questionRemoveButton = $('<div id="q-' + qNumber + '" class="and-options-remove-btn">');
                             let checkboxContainer = $('<div class="and-checkbox-container">'),
                                 inputCheckbox = $('<input type="checkbox" id="qcb-' + qNumber + '" class="and-checkbox">'),
                                 checkboxLabel = $('<div class="and-checkbox-label">Answer Required</div>');
@@ -1215,7 +1320,7 @@
 
                             _views.questionListContainer.append(questionContainer);
                             questionContainer.append(
-                                questionTitleLabel, inputQuestionTextbox, questionDescLabel,
+                                questionRemoveButton, questionTitleLabel, inputQuestionTextbox, questionDescLabel,
                                 checkboxContainer,
                                 optionsContainer);
                             checkboxContainer.append(inputCheckbox, checkboxLabel);
@@ -1232,6 +1337,17 @@
                             inputCheckbox.change(function(e) {
                                 let qid = $(this)[0].id.split("-")[1];
                                 _questionsCache[qid][REQUIRED_KEY] = inputCheckbox.is(":checked");
+                            });
+                            questionRemoveButton.click(function(event) {
+                                let qid = $(this).attr("id").split("-")[1];
+                                if (qid) {
+                                    delete _questionsCache[qid];
+                                    $("#qc-" + qid).remove();
+                                    _.each(_views.questionListContainer[0].childNodes, function(child, index) {
+                                        let oldNumber = child.id.split("-")[1];
+                                        $("#qt-" + oldNumber).html("Question #" + (index + 1));
+                                    });
+                                }
                             });
 
                             optionsAddButton.click(function(event) {
@@ -1272,6 +1388,7 @@
                                 }
                             });
                             if (model.active) {
+                                questionRemoveButton.hide();
                                 optionsAddButton.hide();
                                 optionsRemoveButton.hide();
                                 inputCheckbox.attr('disabled', true);
@@ -1326,7 +1443,6 @@
                         if (model.active) {
                             _views.imageUploader.hide();
                             _views.addQuestionButton.hide();
-                            _views.removeQuestionButton.hide();
                             _views.saveButton.hide();
                             _views.startButton.hide();
 
@@ -1469,12 +1585,12 @@
                         // init tables?
                         _optionTableOptions = {
                             columnDefs: [
-                                { 
+                                {
                                     headerName: 'Name',
                                     field: 'name',
                                     flex: 2
                                 },
-                                { 
+                                {
                                     headerName: 'Choice',
                                     field: 'choice'
                                 },
@@ -1504,7 +1620,7 @@
                                     question: question.q[_defaultLang]
                                 });
                             })
-                        }); 
+                        });
                         _optionTableOptions.rowData = rowData;
 
                         new agGrid.Grid(_views.optionTableContainer.get(0), _optionTableOptions);
@@ -1512,7 +1628,7 @@
                         // TODO: update
                     }
                 }
-                
+
                 function renderCombineOptionsTable(statsModel, surveyModel) {
                     if (!_combineOptionsTableOptions && statsModel && surveyModel) {
                         _combineOptionsTableOptions = {
@@ -1564,7 +1680,7 @@
                                     rowGroup: true,
                                     hide: true
                                 });
-                        }); 
+                        });
 
                         // Adding total column
                         columnDefList.push({
@@ -1615,7 +1731,7 @@
                     statsProgressContainer.append(optPer, optTitle, rightContainer);
                     buttonContainer.append(finishButton);
                     if (!surveyModel.active) {
-                        finishButton.hide();
+                        finishButton.html("DOWNLOAD");
                     }
 
                     // Set start / end date
@@ -1639,7 +1755,32 @@
                                     end_ts: firebase.firestore.FieldValue.serverTimestamp()
                                 });
                                 _activatedDocNum = null;
+                                let url = UPLOAD_URL_BUILDER({
+                                        type: 'stats/generate',
+                                        id: ''
+                                    }),
+                                    data = {
+                                        'doc_id': _surveyModel.documentId
+                                    };
+                                $.ajax({
+                                    url: url,
+                                    type: 'post',
+                                    data: JSON.stringify(data),
+                                    datatype: 'json',
+                                    success: function(result) {
+                                        finishButton.html("DOWNLOAD");
+                                    },
+                                    error: function(result) {
+                                        // TODO: Handle error?
+                                    }
+                                })
                             }
+                        } else if (!_surveyModel.active && !_.isEmpty(surveyModel.end_ts)) {
+                            // Handle download
+                            downloadURI(DOWNLOAD_URL_BUILDER({
+                                type: 'stats',
+                                id: _surveyModel.documentId + ".xlsx"
+                            }));
                         }
                     });
 
@@ -1649,6 +1790,17 @@
                     _totalProgressCache.per = optPer;
 
                     return wrapContainer;
+                }
+
+                function downloadURI(uri, name) {
+                    var link = document.createElement("a");
+                    // If you don't know the name or want to use
+                    // the webserver default set name = ''
+                    link.setAttribute('download', name);
+                    link.href = uri;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
                 }
 
                 function updateSurvey(documentId, data) {

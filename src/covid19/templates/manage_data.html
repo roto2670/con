@@ -782,13 +782,12 @@
 
             function websocket() {
                 let url = 'wss://skec-fujairah.loc8.dev:10443/api/upload/ws';
-                if (IS_INTERNAL) {
-                    url = 'wss://172.16.5.8:10443/api/upload/ws';
-                }
                 if (IS_DEV) {
                     url = 'wss://skfksxpzm.mib.io:10443/api/upload/ws';
+                } else if (IS_INTERNAL) {
+                    url = 'wss://172.16.5.8:10443/api/upload/ws';
                 }
-                let ws = new WebSocket(url)
+                let ws = new WebSocket(url);
                 ws.onopen = function() {
                     ws.send(JSON.stringify({'typ': OPEN_TYPE}));
                     console.log("Connect");
