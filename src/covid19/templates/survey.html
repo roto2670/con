@@ -92,11 +92,13 @@
                 _activeUsers = 0;
             let _ws = websocket(),
                 _ws_buffersize = 1048576; // websocket limit (max 4194304)
+            let _agGridKey = "For_Trialing_ag-Grid_Only-Not_For_Real_Development_Or_Production_Projects-Valid_Until-15_May_2021_[v2]_MTYyMTAzMzIwMDAwMA==900dc7d0cef292aa92ae47777b3bbdf8" // expires 15th May 2021.
 
             // init
             // remove hard-coded to change the order of news items by drag.
             $('body').removeAttr('ondragstart');
 
+            initAgGrid();
             initHandlers();
             initSortableNewsItems(); // TODO: Unused?
 
@@ -106,6 +108,11 @@
             })
             loadSurveyStats();
             initSnapshotHandler();
+
+            function initAgGrid() {
+                // Set license key
+                agGrid.LicenseManager.setLicenseKey(_agGridKey);
+            }
 
             function websocket() {
                 let url = 'wss://skec-fujairah.loc8.dev:10443/api/upload/ws';
