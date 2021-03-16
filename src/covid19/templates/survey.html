@@ -1678,7 +1678,7 @@
                             rowSpanConditions = {};
                         let filteredStatsModel = {};
                         _.each(statsModel, function(value, key) {
-                            if (key.includes('+')) { // TOOD: regx
+                            if (key.includes('_')) { // TOOD: regx
                                 filteredStatsModel[key] = value;
                             }
                         });
@@ -1690,7 +1690,7 @@
                                 totalCount: value
                             };
                             // let keyFindIndex = [];
-                            _.each(mainKey.split('+'), function(optionKey, questionIndex) {
+                            _.each(mainKey.split('_'), function(optionKey, questionIndex) {
                                 rowData['q' + questionIndex] = surveyModel.questions[questionIndex].choices[_defaultLang][optionKey];
                             });
                             rowDataList.push(rowData);
