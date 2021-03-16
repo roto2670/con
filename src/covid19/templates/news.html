@@ -89,7 +89,7 @@
             UPLOAD_URL_BUILDER = IS_INTERNAL ? UPLOAD_URL_BUILDERS.INTERNAL : UPLOAD_URL_BUILDERS.EXTERNAL,
             DOWNLOAD_URL_BUILDER = IS_INTERNAL ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
 
-            const MAX_PIN_ORDER = 100,  
+            const MAX_PIN_ORDER = 100,
                 PIN_ORDER_INCREMENT = 1;
                 UNPIN_ORDER_INCREMENT = 1000;
 
@@ -211,7 +211,7 @@
                     selectedAdd: function(title, body, lang, link, files) {
                         if (!uploading) {
                             uploading = true;
-    
+
                             filesQueue = makeFileUrls(files, false);
                             // Upload attachments.
                             uploadFiles(0, filesQueue, dialog, function(files) {
@@ -227,7 +227,7 @@
                                             seconds: new Date().getTime() / 1000
                                         }
                                     };
-    
+
                                 if (!_.isEmpty(filesQueue)) {
                                     let files = [];
                                     _.each(filesQueue, function(file) {
@@ -235,9 +235,9 @@
                                     });
                                     queryData.files = files;
                                 }
-    
+
                                 addNews(queryData);
-                                dialog.hide();    
+                                dialog.hide();
                             });
                         } else {
                             // Already uploading.
@@ -303,7 +303,7 @@
                                     }
 
                                     addNews(queryData);
-                                    dialog.hide();    
+                                    dialog.hide();
                                 });
                             });
                         } else {
@@ -325,7 +325,7 @@
 
                         updateNews(model.documentId, queryData);
                         updateNewsItem(_.extend(model, queryData));
-                        dialog.hide();    
+                        dialog.hide();
                     }
                 });
             }
@@ -350,7 +350,7 @@
                     _callback = callback || _.noop;
                 if (currentIndex < _.size(files)) {
                     _file = files[currentIndex];
-                    
+
                     dialog.setFileName(_file.filename);
                     dialog.setFileCount(currentIndex + 1, _.size(files));
                     uploadFile(_file, {
@@ -375,7 +375,7 @@
                 };
                 if (file) {
                     let formData = new FormData();
-                    formData.append('file', file.file, file.filename); 
+                    formData.append('file', file.file, file.filename);
 
                     $.ajax({
                         url: file.upload_url,
@@ -471,7 +471,7 @@
                             selectedPin: function(pinned) {
                                 let _pinned = !pinned;
                                     _order = getNextPinOrder();
-                                
+
                                 if (!_pinned) {
                                     _order = getNextUnpinOrder();
                                 }
@@ -482,11 +482,11 @@
                                 rearrangeNewsItem(news.documentId, _order);
                             }
                         });
-                    
+
                     if (isPinNews(news)) {
                         container = $('.news-items-container.pin');
                     }
-                    
+
                     viewItem = newsItem.render();
                     if (prepend) {
                         container.prepend(viewItem);
@@ -507,7 +507,7 @@
             function updateOrder(documentId, newOrder) {
                 let _newsObj = _newsItems[documentId];
                 if (_newsObj && _.isNumber(newOrder)) {
-                    _newsObj.model.order = newOrder; 
+                    _newsObj.model.order = newOrder;
                     _newsObj.view.setOrder(newOrder);
 
                     // Updates the db
@@ -597,7 +597,7 @@
                 if (!!startAt) {
                     query = query.startAfter(startAt);
                 }
-                
+
                 query.get().then(function(snapshot) {
                     let newsList = [],
                         lastSnapshot;
@@ -790,7 +790,7 @@
                         let item = $('<div class="ni-attach-item">'),
                             icon = $('<div class="ni-attach-icn">');
                             nameLabel = $('<div class="ni-attach-name-label">');
-                        
+
                         item.append(icon, nameLabel);
                         nameLabel.text(file.filename);
                         _views.lowerContainer.append(item);
@@ -897,7 +897,7 @@
                             link = linkTextbox.val().trim(),
                             images = selectImageButton.prop('files'),
                             files = selectFilesButton.prop('files'),
-                            image = null; 
+                            image = null;
 
                         if (_.isEmpty(title)) {
                             window.alert('Please enter title.');
@@ -1060,7 +1060,7 @@
                             message = messageTextarea.val().trim(),
                             images = selectImageButton.prop('files'),
                             files = selectFilesButton.prop('files'),
-                            image = null; 
+                            image = null;
                         if (_.isEmpty(title)) {
                             window.alert('Please enter title.');
                             event.preventDefault();
@@ -1122,7 +1122,7 @@
                     _views.filesUploader = filesUploaderContainer;
 
                     update(model);
-                
+
                     parent.append(container);
                 }
 

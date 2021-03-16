@@ -83,3 +83,9 @@ def route_accesslogs():
 @util.require_login
 def route_settings():
   return render_template("csettings.html", is_internal=is_internal(request))
+
+
+@blueprint.route('/survey')
+@util.require_login
+def route_survey():
+  return render_template("survey.html", is_internal=is_internal(request))

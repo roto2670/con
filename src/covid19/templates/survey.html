@@ -1,0 +1,1873 @@
+{% extends "base_site.html" %}
+
+{% block sidebar %}
+    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+        {% include "site_template/sidebar_covid19.html" %}
+    </div>
+{% endblock sidebar %}
+
+{% block stylesheets %}
+    {{ super() }}
+    <link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/ag-grid.min.css">
+    <link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/theme.min.css">
+    <link type="text/css" rel="stylesheet" href="static/css/common.css">
+    <link type="text/css" rel="stylesheet" href="static/css/survey.css">
+{% endblock stylesheets %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="top-container">
+        <div class="add-survey-menu-container">
+            <div class="add-survey-btn"></div>
+        </div>
+    </div>
+    <div class="content-container">
+        <div class="survey-items-container pin"></div>
+        <div class="survey-items-container unpin"></div>
+    </div>
+
+    <div class="survey-item-loader-btn loading">
+        <div class="survey-item-loader-icon"></div>
+        <div class="survey-item-loader-label">Load more</div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+    {{ super() }}
+      <script src="static/js/vendor/grid/ag-grid-enterprise.min.js"></script>
+      <script src="static/js/vendor/sortable/sortable.min.js"></script>
+      <script src="static/js/vendor/sortable/jquery-sortable.js"></script>
+    <script>
+        (function() {
+            const IS_INTERNAL = {{is_internal|tojson}};
+            const IS_DEV = true;
+            const PAGE_SIZE = 10,
+                  UPLOAD_COUNT_LIMIT = 3,
+                  UPLOAD_SIZE_LIMIT = 5; // 5mb
+            const UPLOAD_URL_BUILDERS = {
+                INTERNAL: _.template('https://172.16.5.8:10443/api/upload/<%= type %>?id=<%= id %>'),
+                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/<%= type %>?id=<%= id %>'),
+                DEV: _.template('https://skfksxpzm.mib.io:10443/api/upload/<%= type %>?id=<%= id %>')
+            },
+            DOWNLOAD_URL_BUILDERS = {
+                INTERNAL: _.template('https://172.16.5.8:10443/api/download/<%= type %>/<%= id %>'),
+                EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>'),
+                DEV: _.template('https://skfksxpzm.mib.io:10443/api/download/<%= type %>/<%= id %>')
+            },
+            UPLOAD_URL_BUILDER = IS_DEV ? UPLOAD_URL_BUILDERS.DEV : IS_INTERNAL ? UPLOAD_URL_BUILDERS.INTERNAL : UPLOAD_URL_BUILDERS.EXTERNAL,
+            DOWNLOAD_URL_BUILDER = IS_DEV ? DOWNLOAD_URL_BUILDERS.DEV : IS_INTERNAL ? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
+
+            const MAX_PIN_ORDER = 100,
+                  PIN_ORDER_INCREMENT = 1;
+                  UNPIN_ORDER_INCREMENT = 1000;
+            // Websocket
+            const START_TYPE = "START",
+                  FILEINFO_TYPE = "FILEINFO",
+                  FINISH_TYPE = "FINISH",
+                  DATA_TYPE = "DATA",
+                  UPLOAD_FINISH_TYPE = "UPLOAD_FINISH",
+                  OPEN_TYPE = "OPEN";
+            const UPLOAD_RESULT_STATUS = {
+                    success: 0,
+                    fail: 1,
+                    server_error: 2,
+                    conflict: 100,
+                    processing: 101,
+                    revision: 102,
+                    invalid_master_file: 103,
+                    mutex_error: 104,
+                    invalid_user: 105
+            };
+
+            let _db = firebase.firestore(),
+                _surveyItems = {}, // {view: '', model: ''}
+                _surveyStatsItems = {}, // {view: '', model: ''}
+                _loadingSurvey = false,
+                _initializedSnapshotHandler = false,
+                _lastSnapshot = null,
+                _activatedDocNum = null,
+                _activeUsers = 0;
+            let _ws = websocket(),
+                _ws_buffersize = 1048576; // websocket limit (max 4194304)
+
+            // init
+            // remove hard-coded to change the order of news items by drag.
+            $('body').removeAttr('ondragstart');
+
+            initHandlers();
+            initSortableNewsItems(); // TODO: Unused?
+
+            loadActiveUsers();
+            displaySurvey(function() {
+                $('.survey-item-loader-btn').removeClass('loading');
+            })
+            loadSurveyStats();
+            initSnapshotHandler();
+
+            function websocket() {
+                let url = 'wss://skec-fujairah.loc8.dev:10443/api/upload/ws';
+                if (IS_DEV) {
+                    url = 'wss://skfksxpzm.mib.io:10443/api/upload/ws';
+                } else if (IS_INTERNAL) {
+                    url = 'wss://172.16.5.8:10443/api/upload/ws';
+                }
+                let ws = new WebSocket(url);
+                ws.onopen = function() {
+                    ws.send(JSON.stringify({'typ': OPEN_TYPE}));
+                    console.log("Connect");
+                }
+                ws.onmessage = function(e) {
+                    console.log("messge : ", e)
+                }
+                ws.onclose = function() {
+                    console.log("Disconnect");
+                }
+                return ws;
+            }
+
+            function loadActiveUsers() {
+                let ref = _db.collection('covid19_stats'),
+                    query;
+
+                query = ref.limit(1)
+                           .orderBy('ts', 'desc');
+                query.get().then(function(snapshot) {
+                    if (!!!snapshot.empty) {
+                        snapshot.forEach(function(doc) {
+                            let covid19Stats = doc.data();
+                            _activeUsers = covid19Stats.headcount;
+                        });
+                    } else {
+                        console.log("Covid19 Stats is empty.");
+                    }
+                });
+            }
+
+            function initHandlers() {
+                $('.add-survey-btn').click(function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    showAddSurveyDialog();
+                });
+
+                $('.survey-item-loader-btn').click(function() {
+                    let _this = $(this);
+                    displaySurvey();
+                });
+            }
+
+            function initSortableNewsItems() {
+                // init sortable items.
+                $('.survey-items-container.unpin').sortable({
+                    animation: 150,
+                    handle: '.ni-grab-btn',
+                    ghostClass: 'ni-survey-item-ghost',
+                    onSort: function(event) {
+                        let currentViewItem = $(event.item),
+                            prevViewItem = currentViewItem.prev(),
+                            nextViewItem = currentViewItem.next();
+
+                        let currentOrder = currentViewItem.data('order'),
+                            prevOrder = currentViewItem.prev().data('order') || 0,
+                            nextOrder = currentViewItem.next().data('order');
+
+                        if (_.isNumber(currentOrder)) {
+                            let newOrder = Math.round((prevOrder + nextOrder) / 2);
+                            if (!nextOrder) {
+                                // there is no next order
+                                newOrder = getNextUnpinOrder();
+                                nextOrder = newOrder + UNPIN_ORDER_INCREMENT;
+                            }
+
+                            if (prevOrder < newOrder && nextOrder > newOrder ) {
+                                updateOrder(currentViewItem.data('documentId'), newOrder);
+                            }
+                        }
+                    }
+                });
+            }
+
+            function initSnapshotHandler() {
+                // listen new news item.
+                // TODO: poll_stats???
+                _db.collection('polls')
+                    .orderBy('ts', 'desc')
+                    //.limit(1)  // TODO: Using this?
+                    .onSnapshot(function(snapshot) {
+                        if (!_initializedSnapshotHandler) {
+                            // FIXME: OnSnapshot first loads all the documents that match the query.
+                            _initializedSnapshotHandler = true;
+                            return;
+                        }
+                        snapshot.docChanges().forEach(function(change) {
+                            if (change.type === 'added') {
+                                let model = change.doc.data();
+                                    surveyObj = _surveyItems[change.doc.id];
+
+                                model.documentId = change.doc.id;
+                                if (snapshot.metadata.hasPendingWrites) {
+                                    // This has not yet been recorded on the server, so must manually set the time field.
+                                    model.ts = {
+                                        seconds: new Date().getTime() / 1000
+                                    };
+                                }
+                                if (!_.has(_surveyItems, change.doc.id)) {
+                                    addSurveyItem(model);
+                                } else {
+                                    updateSurveyItem(model);
+                                }
+                            } else if (change.type === 'modified') {
+                                if (!snapshot.metadata.hasPendingWrites) {
+                                    // TODO: Handle modified
+                                    let model = change.doc.data();
+                                        surveyObj = _surveyItems[change.doc.id];
+
+                                    model.documentId = change.doc.id;
+                                    if (snapshot.metadata.hasPendingWrites) {
+                                        // This has not yet been recorded on the server, so must manually set the time field.
+                                        model.ts = {
+                                            seconds: new Date().getTime() / 1000
+                                        };
+                                    }
+                                    if (!_.has(_surveyItems, change.doc.id)) {
+                                        addSurveyItem(model);
+                                    } else {
+                                        updateSurveyItem(model);
+                                    }
+                                }
+                            } else if (change.type === 'removed') {
+                                if (!snapshot.metadata.hasPendingWrites) {
+                                    let model = change.doc.data();
+                                        surveyObj = _surveyItems[change.doc.id];
+                                    surveyObj.view.remove();
+                                    delete _surveyItems[change.doc.id];
+                                }
+                            }
+                        });
+                    });
+            }
+
+            function showAddSurveyDialog(model) {
+                let dialog = AddSurveyDialog(),
+                    uploading = false,
+                    imageQueue = null;
+
+                dialog.show($('.right_col'), model, {
+                    selectedAdd: function(data, image) {
+                        if (_.isEmpty(image)) {
+                            addSurvey(data);
+                            dialog.hide();
+                        } else {
+                            if (!uploading) {
+                                uploading = true;
+                                dialog.allLocking();
+                                imageQueue = makeFileUrls(model.documentId, image, true);
+                                uploadFiles(0, imageQueue, dialog, function(imageUrls) {
+                                    uploading = false;
+                                    data.image_url = imageUrls;
+                                    addSurvey(data);
+                                    dialog.allUnlocking();
+                                    dialog.hide();
+                                });
+                            }
+                        }
+                    },
+                    selectedEdit: function(data, image) {
+                        // Updates to firestore.
+                        if (_.isEmpty(image)) {
+                            updateSurvey(model.documentId, data);
+                            dialog.hide();
+                        } else {
+                            if (!uploading) {
+                                uploading = true;
+                                dialog.allLocking();
+                                imageQueue = makeFileUrls(model.documentId, image, true);
+                                uploadFiles(0, imageQueue, dialog, function(imageUrls) {
+                                    uploading = false;
+                                    data.image_url = imageUrls;
+                                    updateSurvey(model.documentId, data);
+                                    dialog.allUnlocking();
+                                    dialog.hide();
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+
+            function showSurveyStatsDialog(statsModel, surveyModel) {
+                let dialog = SurveyStatsDialog();
+                _surveyStatsItems[statsModel.documentId].view = dialog;
+                dialog.show($('.right_col'), statsModel, surveyModel);
+            }
+
+            function makeFileUrls(docId, files, image) {
+                let queue = [];
+                _.each(files, function(file) {
+                    let fileId = makeUUID(),
+                        changeFileName = 'unnamed';
+                    if (file.name) {
+                        let tmpList = file.name.split(".");
+                        changeFileName = docId + "." + tmpList[tmpList.length - 1];
+                    }
+                    queue.push({
+                        filename: changeFileName,
+                        upload_url: makeUploadUrl(image, changeFileName),
+                        //download_url: makeDownloadUrl(image, changeFileName, true),
+                        download_url: getImageUrl(changeFileName, true),
+                        file: file
+                    })
+                });
+
+                return queue;
+            }
+
+            function uploadFiles(currentIndex, files, dialog, callback) {
+                let _file = null,
+                    _callback = callback || _.noop;
+                if (currentIndex < _.size(files)) {
+                    _file = files[currentIndex];
+
+                    uploadFile(_file, {
+                        progress: function(progress) {
+                            dialog.setProgress(progress);
+                        },
+                        success: function() {
+                            dialog.setProgress(100);
+                            uploadFiles(++currentIndex, files, dialog, _callback);
+                        },
+                        error: function() {
+                            dialog.setProgress(0);
+                            window.alert("Image upload failed.")
+                        }
+                    });
+                } else {
+                    _callback(files[currentIndex - 1].download_url);
+                }
+            }
+
+            function uploadFile(file, callbacks) {
+                let _callbacks = callbacks || {
+                    progress: _.noop,
+                    success: _.noop,
+                    error: _.noop
+                };
+                if (file) {
+                    // websocket handle
+                    let _file = file.file,
+                        filesize = _file.size,
+                        filename = file.filename;
+
+                    let reader = new FileReader(),
+                        rawData = new ArrayBuffer(),
+                        pos = 0;
+
+                    reader.readAsArrayBuffer(_file);
+                    reader.onload = function(e) {
+                        console.log("reader onload : ", e.target.result);
+                        rawData = e.target.result;
+                    }
+
+                    _ws.onmessage = function(e) {
+                        let data = JSON.parse(e.data);
+                        if (data.typ == FILEINFO_TYPE) {
+                            let dict = {"typ": FILEINFO_TYPE, "filename": filename, "filesize": filesize}
+                            _ws.send(JSON.stringify(dict));
+                        } else if (data.typ == DATA_TYPE) {
+                            // Binrary send
+                            _ws.send(_file.slice(pos, pos+_ws_buffersize));
+                            pos += _ws_buffersize;
+                            _callbacks.progress(parseInt((pos / filesize) * 100));
+                            if (pos > filesize) {
+                                pos = filesize;
+                            }
+                        } else if (data.typ == UPLOAD_FINISH_TYPE) {
+                            _callbacks.progress(100);
+                        } else if (data.typ == FINISH_TYPE) {
+                            if (data.code == UPLOAD_RESULT_STATUS.success) {
+                                _callbacks.success(true);
+                            } else {
+                                _callbacks.error(data.code);
+                            }
+                        }
+                    }
+                    _ws.send(JSON.stringify({"typ": START_TYPE}))
+                } else if (false) {
+                    let formData = new FormData();
+                    formData.append('file', file.file, file.filename);
+
+                    $.ajax({
+                        url: file.upload_url,
+                        data: formData,
+                        type: 'post',
+                        contentType: false,
+                        processData: false,
+                        xhr: function() {
+                            let xhr = $.ajaxSettings.xhr();
+                            xhr.upload.onprogress = function(event) {
+                                _callbacks.progress(event.loaded * 100 / event.total);
+                            }
+
+                            return xhr;
+                        },
+                        success: function() {
+                            _callbacks.success();
+                        },
+                        error: function() {
+                            _callbacks.error();
+                            return false;
+                        }
+                    });
+                } else {
+                    _callbacks.error();
+                }
+            }
+
+            function displaySurvey(callback) {
+                let _callback = callback || _.noop;
+                let loader = $('.survey-item-loader-btn');
+
+                loader.addClass('loading').removeClass('hide');
+                if (!!!_loadingSurvey) {
+                    _loadingSurvey = true;
+
+                    loadSurvey(_lastSnapshot, function(surveyList, lastSnapshot) {
+                        if (!!lastSnapshot) {
+                            _lastSnapshot = lastSnapshot;
+                        } else {
+                            // no more items.
+                            loader.addClass('hide');
+                        }
+
+                        // Add survey item
+                        _.each(surveyList, function(survey) {
+                            addSurveyItem(survey);
+                            if (survey.active) {
+                                _activatedDocNum = survey.documentId;
+                            }
+                        });
+
+                        if (_.size(surveyList) < PAGE_SIZE) {
+                            // no more items.
+                            loader.addClass('hide');
+                        }
+
+                        _loadingSurvey = false;
+                        loader.removeClass('loading');
+                        _callback();
+                    });
+                } else {
+                    console.warn('Already fetching survey from server.');
+                    loader.removeClass('loading');
+                    _callback();
+                }
+            }
+
+            function addSurveyItem(survey, prepend) {
+                // TODO: by order?
+                if (!!survey) {
+                    let container = $('.survey-items-container.unpin'),
+                        viewItem,
+                        surveyItem = SurveyItem(survey, {
+                            selectedRemove: function(documentId) {
+                            },
+                            selectedEdit: function(selectedModel) {
+                                showAddSurveyDialog(selectedModel);
+                            },
+                            selectedPin: function(pinned) {
+                                let _pinned = !pinned;
+                                    _order = getNextPinOrder();
+
+                                if (!_pinned) {
+                                    _order = getNextUnpinOrder();
+                                }
+
+                                updateSurvey(survey.documentId, {
+                                    order: _order
+                                });
+                                rearrangeNewsItem(survey.documentId, _order);
+                            }
+                        });
+
+                    if (isPinNews(survey)) {
+                        container = $('.survey-items-container.pin');
+                    }
+                    viewItem = surveyItem.render();
+                    if (prepend) {
+                        container.prepend(viewItem);
+                    } else {
+                        container.append(viewItem);
+                    }
+
+                    // store in cache
+                    _surveyItems[survey.documentId] = {
+                        model: survey,
+                        view: surveyItem
+                    }
+                } else {
+                    console.warn('Failed to draw new item by given model cannot be null.');
+                }
+            }
+
+            function updateOrder(documentId, newOrder) {
+                let _newsObj = _surveyItems[documentId];
+                if (_newsObj && _.isNumber(newOrder)) {
+                    _newsObj.model.order = newOrder;
+                    _newsObj.view.setOrder(newOrder);
+
+                    // Updates the db
+                    updateSurvey(documentId, {
+                        order: newOrder
+                    });
+                }
+            }
+
+            function updateSurveyItem(news) {
+                let viewObj = _surveyItems[news.documentId];
+                if (viewObj) {
+                    viewObj.view.update(news);
+                    viewObj.model = news;
+                } else {
+                    console.warn('Failed to update news view item, cannot find view item by given model.', news);
+                }
+            }
+
+            function rearrangeNewsItem(documentId, newOrder){
+                let viewObj = _surveyItems[documentId];
+
+                if (viewObj) {
+                    _view = viewObj.view,
+                    _container = $('.survey-items-container.pin');
+
+                    let oldPinned = isPinNews(viewObj.model),
+                        newPinned = isPinNews(null, newOrder);
+                    _view.setOrder(newOrder);
+
+                    if (oldPinned != newPinned) {
+                        let viewItem = _view.getView();
+                        viewItem.detach();
+
+                        if (!newPinned) {
+                            _container = $('.survey-items-container.unpin');
+                        } else {
+                            _container.append(viewItem);
+                        }
+                    }
+
+                    // update model
+                    viewObj.model.order = newOrder;
+                }
+            }
+
+            function addSurvey(data) {
+                if (_.isObject(data) && !_.isEmpty(data)) {
+                    let _data = _.extend(data, {
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    _db.collection('polls').doc().set(_data);
+                } else {
+                    console.warn('Failed to add survey to server, given data is wrong.', data);
+                }
+            }
+
+            function updateSurvey(documentId, data) {
+                if (documentId && _.isObject(data) && !_.isEmpty(data)) {
+                    let _data = _.extend(data, {
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    _db.collection('polls').doc(documentId).update(_data);
+                } else {
+                    console.warn('Failed to update survey to server, given data is wrong.', data);
+                }
+            }
+
+            function loadSurvey(startAt, callback) {
+                let _callback = callback || _.noop;
+
+                let ref = _db.collection('polls'),
+                    query;
+
+                query = ref.limit(PAGE_SIZE);
+                            //.orderBy('order'); // TODO:
+
+                if (!!startAt) {
+                    query = query.startAfter(startAt);
+                }
+
+                query.get().then(function(snapshot) {
+                    let surveyList = [],
+                        lastSnapshot;
+                    if (!!!snapshot.empty) {
+                        lastSnapshot = snapshot.docs[snapshot.docs.length - 1];
+                        snapshot.forEach(function(doc) {
+                            let survey = doc.data();
+                            survey.documentId = doc.id;
+                            surveyList.push(survey);
+                        });
+                    } else {
+                        console.log("Poll is empty.");
+                    }
+
+                    callback(surveyList, lastSnapshot);
+                });
+            }
+
+            function loadSurveyStats(startAt) {
+                let ref = _db.collection('poll_stats'),
+                    query;
+
+                query = ref.limit(PAGE_SIZE);
+                            //.orderBy('order'); // TODO:
+
+                if (!!startAt) {
+                    query = query.startAfter(startAt);
+                }
+
+                query.get().then(function(snapshot) {
+                    let surveyStatsList = [],
+                        lastSnapshot;
+                    if (!!!snapshot.empty) {
+                        lastSnapshot = snapshot.docs[snapshot.docs.length - 1];
+                        snapshot.forEach(function(doc) {
+                            let surveyStats = doc.data();
+                            surveyStats.documentId = doc.id;
+                            surveyStatsList.push(surveyStats);
+                            _surveyStatsItems[surveyStats.documentId] = {
+                                model: surveyStats,
+                                view: null
+                            }
+                        });
+                    } else {
+                        console.log("Poll stats is empty.");
+                    }
+                });
+            }
+
+            function isPinNews(news, order) {
+                return MAX_PIN_ORDER >= (order || news.order);
+            }
+
+            function getNextPinOrder() {
+                let max = 0,
+                    current = 0;
+                _.each(_surveyItems, function(newsObj) {
+                    current = newsObj.model.order + PIN_ORDER_INCREMENT;
+                    if (max < current && current <= MAX_PIN_ORDER)  {
+                        max = current;
+                    }
+                });
+
+                return max || 1;
+            }
+
+            function getNextUnpinOrder() {
+                let max = 0,
+                    current = 0;
+                _.each(_surveyItems, function(newsObj) {
+                    current = newsObj.model.order;
+                    if (max < current)  {
+                        max = current;
+                    }
+                });
+
+                return max + UNPIN_ORDER_INCREMENT;
+            }
+
+            function getImageUrl(filename, external) {
+                let builder = DOWNLOAD_URL_BUILDER;
+                if (external) {
+                    builder = DOWNLOAD_URL_BUILDERS.EXTERNAL;
+                }
+
+                return builder({
+                    type: 'stats',
+                    id: filename
+                });
+            }
+
+            function makeUploadUrl(image, fileId, external) {
+                let builder = UPLOAD_URL_BUILDER;
+                if (external) {
+                    builder = UPLOAD_URL_BUILDERS.EXTERNAL;
+                }
+
+                return builder({
+                    type: image ? 'image' : 'file',
+                    id: fileId || makeUUID()
+                });
+            }
+
+            function makeDownloadUrl(image, fileId, external) {
+                let builder = DOWNLOAD_URL_BUILDER;
+                if (external) {
+                    builder = DOWNLOAD_URL_BUILDERS.EXTERNAL;
+                }
+
+                return builder({
+                    type: image ? 'image' : 'file',
+                    id: fileId || makeUUID()
+                });
+            }
+
+            function makeUUID() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                  });
+            }
+
+            function SurveyItem(model, callbacks) {
+                let _views = {},
+                    _callbacks = callbacks || {
+                        selectedRemove: _.noop,
+                        selectedEdit: _.noop
+                    },
+                    _pinned = false,
+                    _model = model;
+
+                function render() {
+                    let container = $('<div class="survey-item">'),
+                        upperContainer = $('<div class="ni-upper-container">'),
+                        lowerContainer = $('<div class="ni-lower-container">');
+                    let grabButton = $('<div class="ni-grab-btn">'),
+                        thumbnail = $('<div class="ni-thumbnail">');
+                    let contentContainer = $('<div class="ni-content-container">'),
+                        titleLabel = $('<div class="ni-title-label">'),
+                        messageLabel = $('<div class="ni-message-label">');
+                    let timeagoLabel = $('<div class="ni-timeago-label">');
+                    let rightContainer = $('<div class="ni-right-container">'),
+                        pinButton = $('<div class="ni-pin-btn">'),  // TODO: Remove? Use?
+                        statisticsButton = $('<div class="ni-statistics-btn">');
+
+                    container.append(upperContainer, lowerContainer);
+                    upperContainer.append(grabButton, thumbnail, contentContainer, rightContainer);
+                    contentContainer.append(titleLabel, messageLabel, timeagoLabel);
+                    if (!_.isEmpty(_model.start_ts) || !_.isEmpty(_model.end_ts)) {
+                        rightContainer.append(statisticsButton);
+                    }
+
+                    // Init handlers
+                    thumbnail.click(function() {
+                        window.open(_model.image_url);
+                    });
+                    titleLabel.click(function() {
+                        _callbacks.selectedEdit(_model);
+                    });
+                    pinButton.click(function() {
+                        _callbacks.selectedPin(_pinned);
+                    });
+                    statisticsButton.click(function() {
+                        showSurveyStatsDialog(_surveyStatsItems[_model.documentId].model, _surveyItems[model.documentId].model);
+                    });
+
+                    _views.container = container;
+                    _views.lowerContainer = lowerContainer;
+                    _views.grabButton = grabButton;
+                    _views.thumbnail = thumbnail;
+                    _views.titleLabel = titleLabel;
+                    _views.messageLabel = messageLabel;
+                    _views.timeagoLabel = timeagoLabel;
+                    _views.pinButton = pinButton;
+                    _views.statisticsButton = statisticsButton;
+
+                    update(_model);
+
+                    return container;
+                }
+
+                function update(model) {
+                    _model = model;
+                    let title = "-",
+                        desc = _model.description.en;
+
+                    if (_model.active) {
+                        title = "(ACTIVE) " + _model.title.en;
+                    } else {
+                        if (_.isEmpty(_model.start_ts)) {
+                            title = "(READY) " + _model.title.en;
+                        } else {
+                            title = "(FINISH) " + _model.title.en;
+                        }
+                    }
+
+                    // set id and order using by jquery
+                    _views.container.data('documentId', model.documentId);
+                    _views.thumbnail.css('background-image', 'url("' + _model.image_url + '")')
+                    _views.titleLabel.text(title || '-');
+                    _views.messageLabel.text(desc || '');
+                    _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-');
+
+                    // draw attachments if has
+                    _views.lowerContainer.empty();
+                    setOrder(model.order);
+                }
+
+                function setOrder(order) {
+                    _pinned = order <= MAX_PIN_ORDER;
+                    _views.container.data('order', order);
+                    _views.container.attr('order', order);
+
+                    // check pinned
+                    if (_pinned) {
+                        _views.pinButton.addClass('pin');
+                    } else {
+                        _views.pinButton.removeClass('pin');
+                    }
+                }
+
+                function getView() {
+                    return _views.container;
+                }
+
+                function remove() {
+                    _views.container.remove();
+                }
+
+                return {
+                    render: render,
+                    update: update,
+                    setOrder: setOrder,
+                    getView: getView,
+                    remove: remove
+                }
+            }
+
+            function AddSurveyDialog() {
+                const REQUIRED_KEY = 'required',
+                      QUESTION_TITLE_KEY = 'q',
+                      CHOICES_KEY = 'choices';
+                const MAX_QUESTION = 5,
+                      MAX_OPTIONS = 10;
+                const DEFAULT_LANG = 'en';
+                const SUPPORTED_LANG = ['en', 'ko', 'en', 'zh', 'ar', 'hi', 'ur', 'ml'],
+                      LANG_VALUE = {
+                            "en": "English",
+                            "ko": "한국어",
+                            "zh": "中文",
+                            "ar": "العربية",
+                            "hi": "हिन्दी",
+                            "ur": "اردو",
+                            "ml": "മലയാളം"
+                      }
+                let _views = {},
+                    _model;
+                let selectedLang = "en",  // default : EN
+                    lastQuestionNum = 0;
+                let _titleCache = {},
+                    _descCache = {},
+                    _questionsCache = {};  // {0: {}, 1: {}, ..}
+
+                function prepare() {
+                    if (_.isEmpty(_model) || _.isEmpty(_model.start_ts)) {
+                        _.each(SUPPORTED_LANG, function(value) {
+                            _titleCache[value] = '';
+                            _descCache[value] = '';
+                        });
+                    }
+                }
+
+                function increaseQuestionNumber() {
+                    lastQuestionNum += 1;
+                }
+
+                function show(parent, model, callbacks) {
+                    let _callbacks = callbacks || {
+                        selectedAdd: _.noop,
+                        selectedEdit: _.noop
+                    };
+                    _model = model;
+
+                    prepare();
+
+                    let container = $('<div class="add-survey-dialog c-modal-dialog">'),
+                        modalContainer = $('<div class="add-all-modal"></div>'),
+                        contentContainer = $('<div class="and-content-container c-modal-dialog-content">'),
+                        topContainer = $('<div class="and-top-container">');
+                    let closeButton = $('<div class="and-close-btn c-modal-dialog-close-btn">');
+                    let titleLabel = $('<div class="and-title-label">Title</div>'),
+                        inputTitleTextbox = $('<input type="text" class="and-input-title-textbox dialog-textbox" placeholder="Survey title">');
+                    let descLabel = $('<div class="and-title-label">Description</div>'),
+                        descTextArea = $('<textarea class="and-message-textarea dialog-message-textarea" placeholder="Survey description">');
+                    let imageUploaderContainer = $('<div class="and-image-container">'),
+                        imageTitleLabel = $('<div class="and-subtitle-label">Image(optional)</div>'),
+                        selectImageButton = $('<input type="file" class="and-upload-btn" accept="image/*">'),
+                        thumbnail = $('<div class="and-thumbnail">');
+                    let langSelector = $('<select name="lang" class="and-lang-selector">');
+                    let questionListContainer = $('<div class="and-questions-list-continaer">');
+                    let bottomContainer = $('<div class="and-bottom-container">'),
+                        progress = $('<div class="and-progress">'),
+                        addQuestionButton = $('<div class="and-add-btn dialog-btn">Add Question</div>'),
+                        saveButton = $('<div class="and-add-btn dialog-btn">Save Survey</div>'),
+                        startButton = $('<div class="and-add-btn dialog-btn">Start Now</div>'),
+                        removeButton = $('<div class="and-add-btn dialog-btn remove">Remove</div>');
+
+                    container.append(modalContainer, contentContainer);
+                    contentContainer.append(topContainer,
+                        titleLabel, inputTitleTextbox,
+                        descLabel, descTextArea,
+                        imageUploaderContainer,
+                        questionListContainer,
+                        bottomContainer);
+
+                    topContainer.append(langSelector, closeButton);
+                    imageUploaderContainer.append(imageTitleLabel, thumbnail, selectImageButton);
+                    bottomContainer.append(progress, addQuestionButton, saveButton, startButton, removeButton);
+                    // All block. Using file upload.
+                    modalContainer.hide();
+
+                    if (!_.isEmpty(_model) && !_.isEmpty(_model.image_url)) {
+                        thumbnail.css('background-image', 'url("' + _model.image_url + '")')
+                    } else {
+                        thumbnail.hide();
+                    }
+
+                    langSelector.append($('<option value="en" selected="selected">English</option>'));
+                    if (_.isEmpty(_model)) {
+                        _.each(SUPPORTED_LANG, function(value) {
+                            if (value !== DEFAULT_LANG) {  // en is default. Already added
+                                langSelector.append($('<option value="' + value + '">' + LANG_VALUE[value] + '</option>'));
+                            }
+                        });
+                    }
+
+                    // Handle Start Survey Button
+                    if (_.isEmpty(_model)) {
+                        startButton.hide();
+                        removeButton.hide();
+                    }
+
+                    // init handlers
+                    closeButton.click(function() {
+                        hide();
+                    });
+                    startButton.click(function() {
+                        if (_.isEmpty(_activatedDocNum)) {
+                            // handle start
+                            if (window.confirm('Do you want to start the survey?')) {
+                                // do query.
+                                if (_model.documentId) {
+                                    // TODO: created_by
+                                    updateSurvey(_model.documentId, {
+                                        active: true,
+                                        start_ts: firebase.firestore.FieldValue.serverTimestamp()
+                                    });
+                                    _activatedDocNum = _model.documentId;
+                                }
+                            }
+                        } else {
+                            window.alert("Another survey is in progress. Please start after finishing another survey.");
+                        }
+                    });
+                    removeButton.click(function() {
+                        if (window.confirm('Are you sure you want to delete it?\n(You can\'t recover deleted surveys.)')) {
+                            let docId = _model.documentId,
+                                listViewItem = _surveyItems[docId].view;
+
+                            // do query.
+                            if (doctId) {
+                                hide();
+                                listViewItem.remove();
+                                if (_model.start_ts) {
+                                    _db.collection('poll_stats').doc(docId).delete();
+                                    delete _surveyStatsItems[docId];
+                                }
+                                _db.collection('polls').doc(docId).delete();
+                                delete _surveyItems[docId];
+                            }
+                        }
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
+
+                    // Handle Input value change event
+                    inputTitleTextbox.change(function(e) {
+                        let value = inputTitleTextbox.val();
+                        if (selectedLang == DEFAULT_LANG) {
+                            let oldDefaultValue = _titleCache[DEFAULT_LANG];
+                            _.each(SUPPORTED_LANG, function(lang) {
+                                if (_.isEmpty(_titleCache[lang]) || (_titleCache[lang] == oldDefaultValue)) {
+                                    _titleCache[lang] = value;
+                                }
+                            });
+                        } else {
+                            _titleCache[selectedLang] = value;
+                        }
+                    });
+                    descTextArea.change(function(e) {
+                        let value = descTextArea.val();
+                        if (selectedLang == DEFAULT_LANG) {
+                            let oldDefaultValue = _descCache[DEFAULT_LANG];
+                            _.each(SUPPORTED_LANG, function(lang) {
+                                if (_.isEmpty(_descCache[lang]) || (_descCache[lang] == oldDefaultValue)) {
+                                    _descCache[lang] = value;
+                                }
+                            });
+                        } else {
+                            _descCache[selectedLang] = value;
+                        }
+                    })
+
+                    langSelector.change(function(e) {
+                        let oldLang = selectedLang;
+                        selectedLang = langSelector.val();
+                        inputTitleTextbox.val(_titleCache[selectedLang]);
+                        descTextArea.val(_descCache[selectedLang]);
+                        _.each(_questionsCache, function(value, key) {
+                            // Question Title
+                            $('#qt-' + key).val(value.q[selectedLang]);
+                            // Question Checkbox
+                            $('#qcb-' + key).attr("checked", value.required);
+                            if (!(selectedLang in value.choices) || Object.keys(value.choices[selectedLang]).length == 0) {
+                                _.each(value.choices[oldLang], function(subValue, subKey) {
+                                    $('#q-' + key + '-choices-' + subKey).val("");
+                                });
+                            } else {
+                                _.each(value.choices[selectedLang], function(subValue, subKey) {
+                                    $('#q-' + key + '-choices-' + subKey).val(subValue);
+                                });
+                            }
+                        });
+                    });
+
+                    addQuestionButton.click(function(event) {
+                        let qLength = questionListContainer[0].childNodes.length;
+                        if (qLength >= MAX_QUESTION) {
+                            window.alert("You can create up to five questions.")
+                            return
+                        }
+                        let qNumber = lastQuestionNum;
+                        let _optionsNumber = 0;
+                        let questionContainer = $('<div id="qc-' + qNumber + '" class="and-question-container">');
+                        let questionTitleLabel = $('<div id="qt-' + qNumber + '" class="and-title-label">Question #'+ (qLength + 1) + '</div>'),
+                            inputQuestionTextbox = $('<input type="text" id="qt-' + qNumber + '" class="and-input-question-title-textbox dialog-textbox" placeholder="Question Title">'),
+                            questionDescLabel = $('<div class="and-desc-label"></div>');
+                            questionRemoveButton = $('<div id="q-' + qNumber + '" class="and-options-remove-btn">');
+                        let checkboxContainer = $('<div class="and-checkbox-container">'),
+                            inputCheckbox = $('<input type="checkbox" id="qcb-' + qNumber + '" class="and-checkbox">'),
+                            checkboxLabel = $('<div class="and-checkbox-label">Answer Required</div>');
+                        let optionsContainer = $('<div class="and-options-container">'),
+                            optionsTopContainer = $('<div class="and-options-top-container">'),
+                            optionsContentContainer = $('<div class="and-options-content-container">'),
+                            optionsTitleLabel = $('<div class="and-options-title-label">Options</div>'),
+                            optionsAddButton = $('<div id="q-' + qNumber + '" class="and-options-add-btn">'),
+                            optionsRemoveButton = $('<div id="q-' + qNumber + '" class="and-options-remove-btn">');
+
+                        questionListContainer.append(questionContainer);
+                        questionContainer.append(
+                            questionRemoveButton, questionTitleLabel, inputQuestionTextbox, questionDescLabel,
+                            checkboxContainer,
+                            optionsContainer);
+                        checkboxContainer.append(inputCheckbox, checkboxLabel);
+                        optionsContainer.append(optionsTopContainer, optionsContentContainer);
+                        optionsTopContainer.append(optionsTitleLabel, optionsRemoveButton, optionsAddButton);
+
+                        inputQuestionTextbox.change(function(e) {
+                            let qid = $(this)[0].id.split("-")[1],
+                                value = inputQuestionTextbox.val();
+
+                            if (selectedLang == DEFAULT_LANG) {
+                                let oldDefaultValue = _questionsCache[qid][QUESTION_TITLE_KEY][DEFAULT_LANG];
+                                _.each(SUPPORTED_LANG, function(lang) {
+                                    if (_.isEmpty(_questionsCache[qid][QUESTION_TITLE_KEY][lang]) || (_questionsCache[qid][QUESTION_TITLE_KEY][lang] == oldDefaultValue)) {
+                                        _questionsCache[qid][QUESTION_TITLE_KEY][lang] = value;
+                                    }
+                                });
+                            } else {
+                                _questionsCache[qid][QUESTION_TITLE_KEY][selectedLang] = value;
+                            }
+                        });
+                        inputCheckbox.change(function(e) {
+                            let qid = $(this)[0].id.split("-")[1];
+                            _questionsCache[qid][REQUIRED_KEY] = inputCheckbox.is(":checked");
+                        });
+
+                        questionRemoveButton.click(function(event) {
+                            let qid = $(this).attr("id").split("-")[1];
+                            if (qid) {
+                                delete _questionsCache[qid];
+                                $("#qc-" + qid).remove();
+                                _.each(_views.questionListContainer[0].childNodes, function(child, index) {
+                                    let oldNumber = child.id.split("-")[1];
+                                    $("#qt-" + oldNumber).html("Question #" + (index + 1));
+                                });
+                            }
+                        });
+
+                        optionsAddButton.click(function(event) {
+                            if (_optionsNumber < MAX_OPTIONS) {
+                                _optionsNumber += 1;
+                                let opt = $('<input type="text" id="' + $(this)[0].id + '-choices-' + _optionsNumber + '" class="and-input-options-textbox dialog-textbox" placeholder="Options Title">');
+                                optionsContentContainer.append(opt);
+                                opt.change(function(e) {
+                                    let _qid = opt[0].id.split('-')[1],
+                                        _choicesId = opt[0].id.split('-')[3],
+                                        value = opt.val();
+                                    if (selectedLang == DEFAULT_LANG) {
+                                        let oldDefaultValue = _questionsCache[_qid][CHOICES_KEY][DEFAULT_LANG][_choicesId];
+                                        _.each(Object.keys(_questionsCache[_qid][CHOICES_KEY]), function(lang) {
+                                            if (_.isEmpty(_questionsCache[_qid][CHOICES_KEY][lang][_choicesId]) ||
+                                                    (_questionsCache[_qid][CHOICES_KEY][lang][_choicesId] == oldDefaultValue)) {
+                                                _questionsCache[_qid][CHOICES_KEY][lang][_choicesId] = value;
+                                            }
+                                        });
+                                    } else {
+                                        _questionsCache[_qid][CHOICES_KEY][selectedLang][_choicesId] = value;
+                                    }
+                                });
+                            } else {
+                                window.alert("You can create up to ten options.");
+                            }
+                        });
+                        optionsRemoveButton.click(function(event){
+                            if (_optionsNumber > 0) {
+                                let opt = $('#' + $(this)[0].id + '-choices-' + _optionsNumber),
+                                    _qid = opt[0].id.split('-')[1],
+                                    _choicesId = opt[0].id.split('-')[3];
+                                _.each(Object.keys(_questionsCache[_qid][CHOICES_KEY]), function(langKey) {
+                                    delete _questionsCache[_qid][CHOICES_KEY][langKey][_choicesId];
+                                });
+                                opt.remove();
+                                _optionsNumber -= 1;
+                            }
+                        });
+
+                        // Init Question Cache
+                        _questionsCache[qNumber] = {};
+                        _questionsCache[qNumber][QUESTION_TITLE_KEY] = {};
+                        _questionsCache[qNumber][CHOICES_KEY] = {};
+                        _questionsCache[qNumber][REQUIRED_KEY] = false;
+                        _.each(SUPPORTED_LANG, function(value) {
+                            _questionsCache[qNumber][QUESTION_TITLE_KEY][value] = '';
+                            _questionsCache[qNumber][CHOICES_KEY][value] = {};
+                        });
+
+                        increaseQuestionNumber();
+                    });
+
+                    saveButton.click(function(event) {
+                        let submitData = {
+                            "active": false,
+                            "description": {
+                            },
+                            "title": {
+                            },
+                            "questions": [
+                            ],
+                            "ts": null,
+                            "end_ts": null,
+                            "start_ts": null,
+                            "image_url": ""
+                        }
+                        let images = selectImageButton.prop('files'),
+                            image = null;
+                        let isValid = true,
+                            errorMessages = [];
+
+                        // Check Title
+                        _.each(_titleCache, function(value, key) {
+                            if (_.isEmpty(value)) {
+                                isValid = false;
+                            }
+                        });
+                        if (!isValid) {
+                            window.alert("There are blank entries in the title. Please check the title of each language.");
+                            event.preventDefault();
+                            return;
+                        }
+
+                        // Check Description
+                        _.each(_descCache, function(value, key) {
+                            if (_.isEmpty(value)) {
+                                isValid = false;
+                            }
+                        });
+                        if (!isValid) {
+                            window.alert("There are blank entries in the description. Please check the description of each language.");
+                            event.preventDefault();
+                            return;
+                        }
+
+                        // check image
+                        if (!_.isEmpty(images)) {
+                            image = images[0];
+                            if (UPLOAD_SIZE_LIMIT < (image.size / 1024 / 1024).toFixed(4)) {
+                                isValid = false;
+                                window.alert('You can\'t upload image that over 5mb.');
+                                event.preventDefault();
+                                return;
+                            }
+                        }
+
+                        // check questions and options
+                        if (_.isEmpty(_questionsCache)) {
+                            window.alert("Please create at least one question.");
+                            event.preventDefault();
+                            return;
+                        }
+                        _.each(_questionsCache, function(qValue, qKey) {
+                            _.each(qValue[QUESTION_TITLE_KEY], function(value, key) {
+                                if (_.isEmpty(value)) {
+                                    isValid = false;
+                                }
+                            });
+                            _.each(qValue[CHOICES_KEY], function(cValue, cKey) {
+                                if (_.isEmpty(cValue)) {
+                                    isValid = false;
+                                }
+                                _.each(cValue, function(value, key) {
+                                    if (_.isEmpty(value)) {
+                                        isValid = false;
+                                    }
+                                });
+                            });
+                        });
+                        if (!isValid) {
+                            window.alert("There are blank entries in the question title or option. Please check the question title or option of each language.");
+                            event.preventDefault();
+                            return;
+                        }
+                        if (isValid) {
+                            // finish check
+                            submitData.title = _titleCache;
+                            submitData.description = _descCache;
+                            _.each(_questionsCache, function(value, key) {
+                                let qData = {
+                                    "required": value.required,
+                                    "q": value.q,
+                                    "choices": {}
+                                }
+                                _.each(value.choices, function(value, key) {
+                                    qData.choices[key] = Object.values(value);
+                                });
+                                submitData.questions.push(qData);
+                            });
+
+                            if (model) {
+                                _callbacks.selectedEdit(submitData, images);
+                            } else {
+                                _callbacks.selectedAdd(submitData, images);
+                            }
+                        } else {
+                            console.log("No! please check")
+                        }
+                    });
+
+                    // store views.
+                    _views.container = container;
+                    _views.modalContainer = modalContainer;
+                    _views.questionListContainer = questionListContainer;
+                    _views.progress = progress;
+                    _views.saveButton = saveButton;
+                    _views.startButton = startButton;
+                    _views.addQuestionButton = addQuestionButton;
+                    _views.titleTextbox = inputTitleTextbox;
+                    _views.descTextArea = descTextArea;
+                    _views.langSelector = langSelector;
+                    _views.imageUploadButton = selectImageButton;
+                    _views.imageUploader = imageUploaderContainer;
+
+                    update(model);
+
+                    parent.append(container);
+                }
+
+                function hide() {
+                    _views.container.detach().remove();
+                }
+
+                function update(model) {
+                    _model = model;
+                    if (_.isObject(model)) {
+                        // Survey Title
+                        _.each(model.title, function(value, key) {
+                            _titleCache[key] = value;
+                        });
+                        // Survey Description
+                        _.each(model.description, function(value, key) {
+                            _descCache[key] = value;
+                        }),
+                        // Survey Questions
+                        _.each(model.questions, function(question, index) {
+                            _questionsCache[index] = {};
+                            _questionsCache[index][REQUIRED_KEY] = question.required;
+                            _questionsCache[index][QUESTION_TITLE_KEY] = question.q;
+                            _questionsCache[index][CHOICES_KEY] = {};
+
+                            // Add Question
+                            let qNumber = index;
+                            let _optionsNumber = 0;
+                            let questionContainer = $('<div id="qc-' + qNumber + '" class="and-question-container">');
+                            let questionTitleLabel = $('<div id="qt-' + qNumber + '" class="and-title-label">Question #' + (qNumber + 1) + '</div>'),
+                                inputQuestionTextbox = $('<input type="text" id="qt-' + qNumber + '" class="and-input-question-title-textbox dialog-textbox" placeholder="Question Title">'),
+                                questionDescLabel = $('<div class="and-desc-label"></div>'),
+                                questionRemoveButton = $('<div id="q-' + qNumber + '" class="and-options-remove-btn">');
+                            let checkboxContainer = $('<div class="and-checkbox-container">'),
+                                inputCheckbox = $('<input type="checkbox" id="qcb-' + qNumber + '" class="and-checkbox">'),
+                                checkboxLabel = $('<div class="and-checkbox-label">Answer Required</div>');
+                            let optionsContainer = $('<div class="and-options-container">'),
+                                optionsTopContainer = $('<div class="and-options-top-container">'),
+                                optionsContentContainer = $('<div class="and-options-content-container">'),
+                                optionsTitleLabel = $('<div class="and-options-title-label">Options</div>'),
+                                optionsAddButton = $('<div id="q-' + qNumber + '" class="and-options-add-btn">'),
+                                optionsRemoveButton = $('<div id="q-' + qNumber + '" class="and-options-remove-btn">');
+
+                            _views.questionListContainer.append(questionContainer);
+                            questionContainer.append(
+                                questionRemoveButton, questionTitleLabel, inputQuestionTextbox, questionDescLabel,
+                                checkboxContainer,
+                                optionsContainer);
+                            checkboxContainer.append(inputCheckbox, checkboxLabel);
+                            optionsContainer.append(optionsTopContainer, optionsContentContainer);
+                            optionsTopContainer.append(optionsTitleLabel, optionsRemoveButton, optionsAddButton);
+
+                            inputQuestionTextbox.val(question.q[selectedLang]);
+                            inputQuestionTextbox.change(function(e) {
+                                let qid = $(this)[0].id.split("-")[1];
+                                _questionsCache[qid][QUESTION_TITLE_KEY][selectedLang] = inputQuestionTextbox.val();
+                            });
+
+                            inputCheckbox.attr("checked", question.required);
+                            inputCheckbox.change(function(e) {
+                                let qid = $(this)[0].id.split("-")[1];
+                                _questionsCache[qid][REQUIRED_KEY] = inputCheckbox.is(":checked");
+                            });
+                            questionRemoveButton.click(function(event) {
+                                let qid = $(this).attr("id").split("-")[1];
+                                if (qid) {
+                                    delete _questionsCache[qid];
+                                    $("#qc-" + qid).remove();
+                                    _.each(_views.questionListContainer[0].childNodes, function(child, index) {
+                                        let oldNumber = child.id.split("-")[1];
+                                        $("#qt-" + oldNumber).html("Question #" + (index + 1));
+                                    });
+                                }
+                            });
+
+                            optionsAddButton.click(function(event) {
+                                if (_optionsNumber < MAX_OPTIONS) {
+                                    _optionsNumber += 1;
+                                    let opt = $('<input type="text" id="' + $(this)[0].id + '-choices-' + _optionsNumber + '" class="and-input-options-textbox dialog-textbox" placeholder="Options Title">');
+                                    optionsContentContainer.append(opt);
+                                    opt.change(function(e) {
+                                        let _qid = opt[0].id.split('-')[1],
+                                            _choicesId = opt[0].id.split('-')[3],
+                                            value = opt.val();
+                                        if (selectedLang == DEFAULT_LANG) {
+                                            let oldDefaultValue = _questionsCache[_qid][CHOICES_KEY][DEFAULT_LANG][_choicesId];
+                                            _.each(Object.keys(_questionsCache[_qid][CHOICES_KEY]), function(lang) {
+                                                if (_.isEmpty(_questionsCache[_qid][CHOICES_KEY][lang][_choicesId]) ||
+                                                        (_questionsCache[_qid][CHOICES_KEY][lang][_choicesId] == oldDefaultValue)) {
+                                                    _questionsCache[_qid][CHOICES_KEY][lang][_choicesId] = value;
+                                                }
+                                            });
+                                        } else {
+                                            _questionsCache[_qid][CHOICES_KEY][selectedLang][_choicesId] = value;
+                                        }
+                                    });
+                                } else {
+                                    window.alert("You can create up to ten options.");
+                                }
+                            });
+                            optionsRemoveButton.click(function(event){
+                                if (_optionsNumber > 0) {
+                                    let opt = $('#' + $(this)[0].id + '-choices-' + _optionsNumber),
+                                        _qid = opt[0].id.split('-')[1],
+                                        _choicesId = opt[0].id.split('-')[3];
+                                    _.each(Object.keys(_questionsCache[_qid][CHOICES_KEY]), function(langKey) {
+                                        delete _questionsCache[_qid][CHOICES_KEY][langKey][_choicesId];
+                                    });
+                                    opt.remove();
+                                    _optionsNumber -= 1;
+                                }
+                            });
+                            if (model.active) {
+                                questionRemoveButton.hide();
+                                optionsAddButton.hide();
+                                optionsRemoveButton.hide();
+                                inputCheckbox.attr('disabled', true);
+                            }
+
+                            _.each(question.choices, function(value, key) {
+                                let _tCache = {}
+                                _questionsCache[index][CHOICES_KEY][key] = {};
+                                _.each(value, function(optValue, index) {
+                                    _tCache[index] = optValue;
+                                    if (key == selectedLang) {
+                                        let opt = $('<input type="text" id="q-' + qNumber + '-choices-' + index + '" class="and-input-options-textbox dialog-textbox" placeholder="Options Title">');
+                                        opt.val(optValue);
+                                        optionsContentContainer.append(opt);
+                                        opt.change(function(e) {
+                                            let _qid = opt[0].id.split('-')[1],
+                                                _choicesId = opt[0].id.split('-')[3],
+                                                value = opt.val();
+                                            if (selectedLang == DEFAULT_LANG) {
+                                                let oldDefaultValue = _questionsCache[_qid][CHOICES_KEY][DEFAULT_LANG][_choicesId];
+                                                _.each(Object.keys(_questionsCache[_qid][CHOICES_KEY]), function(lang) {
+                                                    if (_.isEmpty(_questionsCache[_qid][CHOICES_KEY][lang][_choicesId]) ||
+                                                            (_questionsCache[_qid][CHOICES_KEY][lang][_choicesId] == oldDefaultValue)) {
+                                                        _questionsCache[_qid][CHOICES_KEY][lang][_choicesId] = value;
+                                                    }
+                                                });
+                                            } else {
+                                                _questionsCache[_qid][CHOICES_KEY][selectedLang][_choicesId] = value;
+                                            }
+                                        });
+                                        if (model.active) {
+                                            opt.attr('readonly', true);
+                                        }
+                                    }
+                                    _optionsNumber = index + 1;
+                                });
+                                _questionsCache[index][CHOICES_KEY][key] = _tCache;
+                            });
+
+                            increaseQuestionNumber();
+                        });
+                        // Survey Language
+                        _.each(Object.keys(model.title), function(value) {
+                            if (value !== DEFAULT_LANG) {  // en is default. Already added
+                                _views.langSelector.append($('<option value="' + value + '">' + LANG_VALUE[value] + '</option>'));
+                            }
+                        })
+
+                        _views.titleTextbox.val(model.title[selectedLang]);
+                        _views.descTextArea.val(model.description[selectedLang]);
+
+                        if (model.active) {
+                            _views.imageUploader.hide();
+                            _views.addQuestionButton.hide();
+                            _views.saveButton.hide();
+                            _views.startButton.hide();
+
+                            _views.titleTextbox.attr('readonly', true);
+                            _views.descTextArea.attr('readonly', true);
+                        } else {
+                            _views.saveButton.text('Update Survey');
+                        }
+                    }
+                }
+
+                function setProgress(progress) {
+                    if (_.isNumber(progress)) {
+                        _views.progress.css('width', progress + '%');
+                    }
+                }
+
+                function allLocking() {
+                    _views.modalContainer.show();
+                }
+
+                function allUnlocking() {
+                    _views.modalContainer.hide();
+                }
+
+                return {
+                    show: show,
+                    hide: hide,
+                    setProgress: setProgress,
+                    allLocking: allLocking,
+                    allUnlocking: allUnlocking
+                }
+            }
+
+            function SurveyStatsDialog() {
+                let _views = {},
+                    _statsModel,
+                    _surveyModel,
+                    _defaultLang = "en";
+                let _surveyCache = {},  // {"0-0": {"text" : ViewObject, "per": ViewObject}, "0-1": .., ..}
+                    _questionKeyList = [],  // [0-0, 0-1, 0-2, ...]
+                    _totalProgressCache = {}; //{"text": ViewObject, "per": ViewObject}
+                let _optionTableOptions = null,
+                    _combineOptionsTableOptions = null;
+
+                function show(parent, statsModel, surveyModel) {
+                    //let _callbacks = callbacks || {
+                    //    selectedAdd: _.noop,
+                    //    selectedEdit: _.noop
+                    //};
+                    _statsModel = statsModel;
+                    _surveyModel = surveyModel;
+
+                    let container = $('<div class="survey-stats-dialog c-modal-dialog">'),
+                        contentContainer = $('<div class="stats-content-container c-modal-dialog-content">'),
+                        topContainer = $('<div class="stats-top-container">');
+                    let closeButton = $('<div class="stats-close-btn c-modal-dialog-close-btn">');
+                    let titleLabel = $('<div class="stats-title-label">Title</div>'),
+                        descLabel = $('<div class="stats-desc-label">Description</div>'),
+                        thumbnail = $('<div class="stats-thumbnail">');
+                    let totalProgressContainer = $('<div class="stats-total-progress-container">'),
+                        questionListContainer = $('<div class="stats-question-list-container">');
+                    let optionTableTitleLabel = $('<div class="stats-table-title-label options">General Type</div>'),
+                        optionTableContainer = $('<div class="stats-table-container options ag-theme-alpine">'),
+                        combineOptionsTableTitleLabel = $('<div class="stats-table-title-label combine">Condition Type</div>'),
+                        combineOptionsTableContainer = $('<div class="stats-table-container combine ag-theme-alpine">');
+
+                    container.append(contentContainer);
+                    contentContainer.append(topContainer,
+                        titleLabel,
+                        descLabel,
+                        thumbnail,
+                        totalProgressContainer,
+                        questionListContainer,
+                        optionTableTitleLabel,
+                        optionTableContainer,
+                        combineOptionsTableTitleLabel,
+                        combineOptionsTableContainer
+                        );
+
+                    topContainer.append(closeButton);
+
+                    // init handlers
+                    closeButton.click(function() {
+                        hide();
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                       }
+                    });
+
+                    titleLabel.text(_surveyModel['title'][_defaultLang]);
+                    descLabel.text(_surveyModel['description'][_defaultLang]);
+
+                    let totalProgressContentsContainer = renderTotalProgress(_statsModel, _surveyModel);
+                    totalProgressContainer.append(totalProgressContentsContainer);
+
+                    if (!_.isEmpty(_surveyModel.image_url)) {
+                        thumbnail.css('background-image', 'url("' + _surveyModel.image_url + '")')
+                    }
+
+                    // Render options(temporary commented out)
+                    // _.each(surveyModel.questions, function(value, index) {
+                    //     questionListContainer.append(renderQuestion(value, index));
+                    // });
+
+                    // store views.
+                    _views.container = container;
+                    _views.totalProgressContainer = totalProgressContainer;
+                    _views.totalProgressContentsContainer = totalProgressContentsContainer;
+                    _views.optionTableContainer = optionTableContainer;
+                    _views.combineOptionsTableContainer = combineOptionsTableContainer;
+
+                    update(statsModel, _surveyModel);
+
+                    parent.append(container);
+                }
+
+                function hide() {
+                    _views.container.detach().remove();
+                }
+
+                function update(statsModel, surveyModel) {
+                    _statsModel = statsModel;
+                    setTotalProgress(statsModel);
+                    // Temporary commented out by no rendered option items.
+                    // setProgress(statsModel);
+                    if (!_.isEmpty(surveyModel)) {
+                        _surveyModel = surveyModel;
+                    }
+
+                    // Render tables
+                    renderOptionTable(statsModel, surveyModel);
+                    renderCombineOptionsTable(statsModel, surveyModel);
+                }
+
+                function renderOptionTable(statsModel, surveyModel) {
+                    if (!_optionTableOptions && statsModel && surveyModel) {
+                        // init tables?
+                        _optionTableOptions = {
+                            columnDefs: [
+                                {
+                                    headerName: 'Name',
+                                    field: 'name',
+                                    flex: 2
+                                },
+                                {
+                                    headerName: 'Choice',
+                                    field: 'choice'
+                                },
+                                {
+                                    headerName: 'Question',
+                                    field: 'question',
+                                    rowGroup: true,
+                                    hide: true
+                                }
+                            ],
+                            groupDefaultExpanded: -1,
+                            groupUseEntireRow: true,
+                            defaultColDef: {
+                                flex: 1,
+                                sortable: true,
+                                resizable: true,
+                            }
+                        };
+                        let rowData = [];
+
+                        // Make a row data for table
+                        _.each(surveyModel.questions, function(question, questionIndex) {
+                            _.each(question.choices[_defaultLang], function(value, optionIndex) {
+                                rowData.push({
+                                    name: value,
+                                    choice: statsModel[`${questionIndex}-${optionIndex}`] || 'Unknown',
+                                    question: question.q[_defaultLang]
+                                });
+                            })
+                        });
+                        _optionTableOptions.rowData = rowData;
+
+                        new agGrid.Grid(_views.optionTableContainer.get(0), _optionTableOptions);
+                    } else {
+                        // TODO: update
+                    }
+                }
+
+                function renderCombineOptionsTable(statsModel, surveyModel) {
+                    if (!_combineOptionsTableOptions && statsModel && surveyModel) {
+                        _combineOptionsTableOptions = {
+                            groupMultiAutoColumn: true,
+                            showOpenedGroup: false,
+                            groupHideOpenParents: true,
+                            groupDefaultExpanded: -1,
+                            defaultColDef: {
+                                flex: 1,
+                                sortable: true,
+                                resizable: true,
+                            }
+                        };
+                        let columnDefList = [],
+                            rowDataList = [],
+                            rowSpanConditions = {};
+                        let filteredStatsModel = {};
+                        _.each(statsModel, function(value, key) {
+                            if (key.includes('+')) { // TOOD: regx
+                                filteredStatsModel[key] = value;
+                            }
+                        });
+
+                        let pollData = {};
+                        _.each(filteredStatsModel, function(value, mainKey) {
+                            // Make row data
+                            let rowData = {
+                                totalCount: value
+                            };
+                            // let keyFindIndex = [];
+                            _.each(mainKey.split('+'), function(optionKey, questionIndex) {
+                                rowData['q' + questionIndex] = surveyModel.questions[questionIndex].choices[_defaultLang][optionKey];
+                            });
+                            rowDataList.push(rowData);
+                        });
+
+                        // Make a row data for table
+                        _.each(surveyModel.questions, function(question, questionIndex) {
+                                // calc row span
+                                let rowSpanSize = _.reduce(_.rest(_.map(surveyModel.questions, function(question) {
+                                    return _.size(question.choices);
+                                }), questionIndex + 1));
+
+                                let fieldId = 'q' + questionIndex;
+                                // Define header
+                                columnDefList.push({
+                                    headerName: question.q[_defaultLang],
+                                    field: 'q' + questionIndex,
+                                    rowGroup: true,
+                                    hide: true
+                                });
+                        });
+
+                        // Adding total column
+                        columnDefList.push({
+                            headerName: 'Total',
+                            field: 'totalCount'
+                        });
+
+
+                        _combineOptionsTableOptions.columnDefs = columnDefList;
+                        _combineOptionsTableOptions.rowData = rowDataList;
+
+                        new agGrid.Grid(_views.combineOptionsTableContainer.get(0), _combineOptionsTableOptions);
+                    } else {
+                        // TODO: update
+                    }
+                }
+
+                function getDateTimeFormat(date) {
+                    // dd/mm/yyyy
+                    let year = date.getFullYear(),
+                        month = (1 + date.getMonth()),
+                        day = date.getDate();
+                    month = month >=10 ? month : '0' + month;
+                    day = day >= 10 ? day : '0' + day;
+                    return day + "/" + month + "/" + year;
+                }
+
+                function renderTotalProgress(statsModel, surveyModel) {
+                    let wrapContainer = $('<div class="stats-wrap-container">');
+                    let topTitle = $('<div class="stats-total-top-title">Total Progress</div>'),
+                        progressContainer = $('<div class="stats-total-progress-content-container">'),
+                        bottomContainer = $('<div class="stats-total-bottom-container">'),
+                        dateLabel = $('<div class="stats-total-date-label">'),
+                        buttonContainer = $('<div class="stats-button-container">');
+                    let statsContainer = $('<div class="stats-container">'),
+                        rightContainer = $('<div class="stats-number">'),
+                        statsProgressContainer = $('<div class="stats-progress-container">'),
+                        optTitle = $('<div class="stats-total-per-title">Sumbitted</div>'),
+                        optPer = $('<div class="stats-total-per">');
+                    let finishButton = $('<div class="stats-finish-button dialog-btn">End now</div>');
+                    let bottomText = "";
+
+                    wrapContainer.append(topTitle, progressContainer, bottomContainer);
+                    bottomContainer.append(dateLabel, buttonContainer);
+
+                    progressContainer.append(statsContainer);
+                    statsContainer.append(statsProgressContainer);
+                    statsProgressContainer.append(optPer, optTitle, rightContainer);
+                    buttonContainer.append(finishButton);
+                    if (!surveyModel.active) {
+                        finishButton.html("DOWNLOAD");
+                    }
+
+                    // Set start / end date
+                    if (!_.isEmpty(surveyModel.start_ts)) {
+                        bottomText += "Start Date : " + getDateTimeFormat(new Date(surveyModel.start_ts.seconds * 1000));
+                    }
+                    if (!_.isEmpty(surveyModel.end_ts)) {
+                        bottomText += ", Finish Date : " + getDateTimeFormat(new Date(surveyModel.end_ts.seconds * 1000));
+                    } else {
+                        bottomText += ", Finish Date : -";
+                    }
+                    dateLabel.text(bottomText);
+
+                    finishButton.click(function() {
+                        if (_surveyModel.active && _activatedDocNum == _surveyModel.documentId) {
+                            // handle finish
+                            if (window.confirm('Are you sure you want to close the survey?')) {
+                                // TODO: ended_by
+                                updateSurvey(_surveyModel.documentId, {
+                                    active: false,
+                                    end_ts: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                                _activatedDocNum = null;
+                                let url = UPLOAD_URL_BUILDER({
+                                        type: 'stats/generate',
+                                        id: ''
+                                    }),
+                                    data = {
+                                        'doc_id': _surveyModel.documentId
+                                    };
+                                $.ajax({
+                                    url: url,
+                                    type: 'post',
+                                    data: JSON.stringify(data),
+                                    datatype: 'json',
+                                    success: function(result) {
+                                        finishButton.html("DOWNLOAD");
+                                    },
+                                    error: function(result) {
+                                        // TODO: Handle error?
+                                    }
+                                })
+                            }
+                        } else if (!_surveyModel.active && !_.isEmpty(surveyModel.end_ts)) {
+                            // Handle download
+                            downloadURI(DOWNLOAD_URL_BUILDER({
+                                type: 'stats',
+                                id: _surveyModel.documentId + ".xlsx"
+                            }));
+                        }
+                    });
+
+                    // store views
+                    _views.finishButton = finishButton;
+                    _totalProgressCache.text = rightContainer;
+                    _totalProgressCache.per = optPer;
+
+                    return wrapContainer;
+                }
+
+                function downloadURI(uri, name) {
+                    var link = document.createElement("a");
+                    // If you don't know the name or want to use
+                    // the webserver default set name = ''
+                    link.setAttribute('download', name);
+                    link.href = uri;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                }
+
+                function updateSurvey(documentId, data) {
+                    if (documentId && _.isObject(data) && !_.isEmpty(data)) {
+                        let _data = _.extend(data, {
+                            ts: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        _db.collection('polls').doc(documentId).update(_data);
+                    } else {
+                        console.warn('Failed to update survey to server, given data is wrong.', data);
+                    }
+                }
+
+                function setTotalProgress(statsModel) {
+                    let per = parseInt((statsModel.count / _activeUsers) * 100);
+                    _totalProgressCache.text.text(statsModel.count + " (" + per + "%)");
+                    _totalProgressCache.per.css('width', per + '%');
+                }
+
+                function renderQuestion(question, index) {
+                    let qid = "q-" + index;
+                    let questionContainer = $('<div class="stats-question-container">'),
+                        questionTitle = $('<div class="stats-q-title-label">' + question.q[_defaultLang] + '</div>'),
+                        optionsContainer = $('<div class="stats-options-container">');
+
+                    questionContainer.append(questionTitle, optionsContainer);
+
+                    _.each(question.choices[_defaultLang], function(value, optIndex) {
+                        let statsContainer = $('<div class="stats-container">'),
+                            rightContainer = $('<div id="t-' + (qid + '-opt-' + optIndex) + '" class="stats-number">');
+                            // t-q-1-opt-1 -> text percentage
+                        let statsProgressContainer = $('<div class="stats-progress-container">'),
+                            optTitle = $('<div class="stats-opt-title">'),
+                            optPer = $('<div id="p-' + (qid + '-opt-' + optIndex)+ '" class="stats-opt-per">');
+                            // p-q-1-opt-1 -> progressbar percentage
+
+                        optionsContainer.append(statsContainer);
+                        statsContainer.append(statsProgressContainer, rightContainer);
+                        statsProgressContainer.append(optTitle, optPer);
+                        optTitle.html(value);
+
+                        let questionKey = index + "-" + optIndex;  // 0-0, 0-1, 1-1, ...
+                        _surveyCache[questionKey] = {};
+                        _surveyCache[questionKey].text = rightContainer;
+                        _surveyCache[questionKey].per = optPer;
+                        _questionKeyList.push(questionKey);
+                    });
+
+                    return questionContainer;
+                }
+
+                function setProgress(statsModel) {
+                    _.each(_questionKeyList, function(value) {
+                        let optValue = statsModel[value],
+                            per = parseInt((optValue / statsModel.count) * 100);
+                        _surveyCache[value].text.html(optValue + " (" + per + "%)");
+                        _surveyCache[value].per.css('width', per + '%');
+                    });
+                }
+
+                return {
+                    show: show,
+                    hide: hide,
+                    update: update
+                }
+            }
+
+        })();
+    </script>
+{% endblock javascripts %}
