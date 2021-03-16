@@ -245,6 +245,7 @@
                                         surveyObj = _surveyItems[change.doc.id];
                                     surveyObj.view.remove();
                                     delete _surveyItems[change.doc.id];
+                                    delete _surveyStatsItems[change.doc.id];
                                 }
                             }
                         });
@@ -258,18 +259,24 @@
 
                 dialog.show($('.right_col'), model, {
                     selectedAdd: function(data, image) {
+                        let docId = '';
+                        if (!_.isEmpty(model) && !_.isEmpty(model.documentId)) {
+                            docId = model.documentId;
+                        } else {
+                            docId = getRandomId(20);
+                        }
                         if (_.isEmpty(image)) {
-                            addSurvey(data);
+                            addSurvey(data, docId);
                             dialog.hide();
                         } else {
                             if (!uploading) {
                                 uploading = true;
                                 dialog.allLocking();
-                                imageQueue = makeFileUrls(model.documentId, image, true);
+                                imageQueue = makeFileUrls(docId, image, true);
                                 uploadFiles(0, imageQueue, dialog, function(imageUrls) {
                                     uploading = false;
                                     data.image_url = imageUrls;
-                                    addSurvey(data);
+                                    addSurvey(data, docId);
                                     dialog.allUnlocking();
                                     dialog.hide();
                                 });
@@ -526,13 +533,13 @@
                 }
             }
 
-            function updateSurveyItem(news) {
-                let viewObj = _surveyItems[news.documentId];
+            function updateSurveyItem(model) {
+                let viewObj = _surveyItems[model.documentId];
                 if (viewObj) {
-                    viewObj.view.update(news);
-                    viewObj.model = news;
+                    viewObj.view.update(model);
+                    viewObj.model = model;
                 } else {
-                    console.warn('Failed to update news view item, cannot find view item by given model.', news);
+                    console.warn('Failed to update survey view item, cannot find view item by given model.', model);
                 }
             }
 
@@ -563,12 +570,16 @@
                 }
             }
 
-            function addSurvey(data) {
+            function addSurvey(data, docId) {
                 if (_.isObject(data) && !_.isEmpty(data)) {
                     let _data = _.extend(data, {
                         ts: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    _db.collection('polls').doc().set(_data);
+                    if (!_.isEmpty(docId)) {
+                        _db.collection('polls').doc(docId).set(_data);
+                    } else {
+                        _db.collection('polls').doc().set(_data);
+                    }
                 } else {
                     console.warn('Failed to add survey to server, given data is wrong.', data);
                 }
@@ -677,6 +688,16 @@
                 return max + UNPIN_ORDER_INCREMENT;
             }
 
+            function getRandomId(size) {
+                let chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz",
+                    randomString = '';
+                for (let i=0; i<size; i++) {
+                    let rnum = Math.floor(Math.random() * chars.length);
+                    randomString += chars.substring(rnum, rnum+1);
+                }
+                return randomString;
+            }
+
             function getImageUrl(filename, external) {
                 let builder = DOWNLOAD_URL_BUILDER;
                 if (external) {
@@ -746,8 +767,9 @@
                     container.append(upperContainer, lowerContainer);
                     upperContainer.append(grabButton, thumbnail, contentContainer, rightContainer);
                     contentContainer.append(titleLabel, messageLabel, timeagoLabel);
-                    if (!_.isEmpty(_model.start_ts) || !_.isEmpty(_model.end_ts)) {
-                        rightContainer.append(statisticsButton);
+                    rightContainer.append(statisticsButton);
+                    if (!_model.active && _.isEmpty(_model.start_ts)) {
+                        statisticsButton.hide();
                     }
 
                     // Init handlers
@@ -786,11 +808,13 @@
 
                     if (_model.active) {
                         title = "(ACTIVE) " + _model.title.en;
+                        _views.statisticsButton.show();
                     } else {
                         if (_.isEmpty(_model.start_ts)) {
                             title = "(READY) " + _model.title.en;
                         } else {
                             title = "(FINISH) " + _model.title.en;
+                            _views.statisticsButton.show();
                         }
                     }
 
@@ -957,6 +981,7 @@
                                     });
                                     _activatedDocNum = _model.documentId;
                                 }
+                                hide();
                             }
                         } else {
                             window.alert("Another survey is in progress. Please start after finishing another survey.");
@@ -968,15 +993,13 @@
                                 listViewItem = _surveyItems[docId].view;
 
                             // do query.
-                            if (doctId) {
+                            if (docId) {
                                 hide();
-                                listViewItem.remove();
                                 if (_model.start_ts) {
                                     _db.collection('poll_stats').doc(docId).delete();
                                     delete _surveyStatsItems[docId];
                                 }
                                 _db.collection('polls').doc(docId).delete();
-                                delete _surveyItems[docId];
                             }
                         }
                     });
@@ -1387,7 +1410,8 @@
                                     _optionsNumber -= 1;
                                 }
                             });
-                            if (model.active) {
+                            if (model.active || !_.isEmpty(model.end_ts)) {
+                                inputQuestionTextbox.attr('readonly', true);
                                 questionRemoveButton.hide();
                                 optionsAddButton.hide();
                                 optionsRemoveButton.hide();
@@ -1419,7 +1443,7 @@
                                                 _questionsCache[_qid][CHOICES_KEY][selectedLang][_choicesId] = value;
                                             }
                                         });
-                                        if (model.active) {
+                                        if (model.active || !_.isEmpty(model.end_ts)) {
                                             opt.attr('readonly', true);
                                         }
                                     }
@@ -1440,7 +1464,7 @@
                         _views.titleTextbox.val(model.title[selectedLang]);
                         _views.descTextArea.val(model.description[selectedLang]);
 
-                        if (model.active) {
+                        if (model.active || !_.isEmpty(model.end_ts)) {
                             _views.imageUploader.hide();
                             _views.addQuestionButton.hide();
                             _views.saveButton.hide();
@@ -1616,7 +1640,7 @@
                             _.each(question.choices[_defaultLang], function(value, optionIndex) {
                                 rowData.push({
                                     name: value,
-                                    choice: statsModel[`${questionIndex}-${optionIndex}`] || 'Unknown',
+                                    choice: statsModel[`${questionIndex}-${optionIndex}`],
                                     question: question.q[_defaultLang]
                                 });
                             })
@@ -1769,6 +1793,10 @@
                                     datatype: 'json',
                                     success: function(result) {
                                         finishButton.html("DOWNLOAD");
+                                        downloadURI(DOWNLOAD_URL_BUILDER({
+                                            type: 'stats',
+                                            id: _surveyModel.documentId + ".xlsx"
+                                        }));
                                     },
                                     error: function(result) {
                                         // TODO: Handle error?
