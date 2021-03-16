@@ -1800,10 +1800,7 @@
                                     datatype: 'json',
                                     success: function(result) {
                                         finishButton.html("DOWNLOAD");
-                                        downloadURI(DOWNLOAD_URL_BUILDER({
-                                            type: 'stats',
-                                            id: _surveyModel.documentId + ".xlsx"
-                                        }));
+                                        hide();
                                     },
                                     error: function(result) {
                                         // TODO: Handle error?
