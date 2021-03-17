@@ -820,7 +820,7 @@
                         if (_.isEmpty(_model.start_ts)) {
                             title = "(READY) " + _model.title.en;
                         } else {
-                            title = "(FINISH) " + _model.title.en;
+                            title = "(FINISHED) " + _model.title.en;
                             _views.statisticsButton.show();
                         }
                     }
@@ -955,6 +955,17 @@
                     } else {
                         thumbnail.hide();
                     }
+
+                    selectImageButton.change(function() {
+                        if (this.files && this.files[0]) {
+                            let reader = new FileReader();
+                            reader.onload = function(e) {
+                                thumbnail.css('background-image', 'url("' + e.target.result + '")');
+                                thumbnail.show();
+                            }
+                            reader.readAsDataURL(this.files[0]);
+                        }
+                    });
 
                     langSelector.append($('<option value="en" selected="selected">English</option>'));
                     if (_.isEmpty(_model)) {
@@ -1472,7 +1483,7 @@
                         _views.descTextArea.val(model.description[selectedLang]);
 
                         if (model.active || !_.isEmpty(model.end_ts)) {
-                            _views.imageUploader.hide();
+                            _views.imageUploadButton.hide();
                             _views.addQuestionButton.hide();
                             _views.saveButton.hide();
                             _views.startButton.hide();
@@ -1617,19 +1628,19 @@
                         _optionTableOptions = {
                             columnDefs: [
                                 {
-                                    headerName: 'Name',
-                                    field: 'name',
-                                    flex: 2
-                                },
-                                {
-                                    headerName: 'Choice',
-                                    field: 'choice'
-                                },
-                                {
                                     headerName: 'Question',
                                     field: 'question',
                                     rowGroup: true,
                                     hide: true
+                                },
+                                {
+                                    headerName: 'Choice',
+                                    field: 'name',
+                                    flex: 2
+                                },
+                                {
+                                    headerName: '# Responses',
+                                    field: 'choice'
                                 }
                             ],
                             groupDefaultExpanded: -1,
@@ -1715,15 +1726,16 @@
 
                         // Adding total column
                         columnDefList.push({
-                            headerName: 'Total',
-                            field: 'totalCount'
+                            headerName: '# Responses',
+                            field: 'totalCount',
+                            width: 96
                         });
-
 
                         _combineOptionsTableOptions.columnDefs = columnDefList;
                         _combineOptionsTableOptions.rowData = rowDataList;
 
                         new agGrid.Grid(_views.combineOptionsTableContainer.get(0), _combineOptionsTableOptions);
+                        _combineOptionsTableOptions.api.sizeColumnsToFit();
                     } else {
                         // TODO: update
                     }
@@ -1770,9 +1782,9 @@
                         bottomText += "Start Date : " + getDateTimeFormat(new Date(surveyModel.start_ts.seconds * 1000));
                     }
                     if (!_.isEmpty(surveyModel.end_ts)) {
-                        bottomText += ", Finish Date : " + getDateTimeFormat(new Date(surveyModel.end_ts.seconds * 1000));
+                        bottomText += ", End Date : " + getDateTimeFormat(new Date(surveyModel.end_ts.seconds * 1000));
                     } else {
-                        bottomText += ", Finish Date : -";
+                        bottomText += ", End Date : -";
                     }
                     dateLabel.text(bottomText);
 

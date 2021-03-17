@@ -323,6 +323,7 @@
 }
 .and-thumbnail {
     height: 20em;
+    margin-top: 0.4em;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
