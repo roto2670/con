@@ -57,10 +57,12 @@
         const nameCharId = 0xFF09;
         const majorCharId = 0xFF02;
         const minorCharId = 0xFF03;
+        const txCharId = 0xFF05;
         const pwCharId = 0xFF06;
         const advIntCharId = 0xFF07;
         const idCharId = 0xFF08;
 
+        const txInt = 0;  // grade 0 == +4dBm, grade 1 == 0dBm, grade 2 == -4dBm, ...
         const advInt = 7;  // unit: 100ms. Advertise Interval == 700ms
 
         let filters;
@@ -101,6 +103,8 @@
           await idCharacteristic.writeValueWithResponse(Uint8Array.from(Array.from('00001').map(x => x.charCodeAt(0))));
           const advIntCharacteristic = await service.getCharacteristic(advIntCharId);
           await advIntCharacteristic.writeValueWithResponse(Uint8Array.of((advInt >> 8) & 0xFF, advInt & 0xFF));
+          const txCharacteristic = await service.getCharacteristic(txCharId);
+          await txCharacteristic.writeValueWithResponse(Uint8Array.of((txInt >> 8) & 0xFF, txInt & 0xFF));
           console.log('Successfully configured.');
           await device.gatt.disconnect();
           // All done!
