@@ -78,7 +78,7 @@
 
         <!--Code Items -->
         <div class="code-item-container"></div>
-        
+
         <div class="loader-btn loading">
             <div class="loader-icon"></div>
             <div class="loader-label">Load more</div>
@@ -160,7 +160,7 @@
                 if (!!startAt) {
                     // Paging
                     query = query.startAfter(startAt)
-                } 
+                }
                 query = query.limit(PAGE_SIZE);
 
                 // Adds filter if has
@@ -190,31 +190,33 @@
                 });
             }
 
-            function addKiosk(name, location, allowSA) {
+            function addKiosk(name, location, allowSA, allowSurvey) {
                 if (_.isString(name) && !_.isEmpty(name)) {
                     let _data = {
                         name: name,
                         location: location || '',
                         enable_sa: allowSA || false,
+                        enable_kiosk: allowSurvey || false,
                         ts: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     _db.collection('kiosks').doc().set(_data);
                 } else {
-                    console.warn('Failed to create new kisok, name cannot be empty or null.'); 
+                    console.warn('Failed to create new kisok, name cannot be empty or null.');
                 }
             }
 
-            function updateKiosk(documentId, name, location, allowSA) {
+            function updateKiosk(documentId, name, location, allowSA, allowSurvey) {
                 if (_.isString(documentId) && !_.isEmpty(documentId) && _.isString(name) && !_.isEmpty(name)) {
                     let _data = {
                         name: name,
                         location: location || '',
                         enable_sa: allowSA || false,
+                        enable_kiosk: allowSurvey || false,
                         ts: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     _db.collection('kiosks').doc(documentId).update(_data);
                 } else {
-                    console.warn('Failed to create new kisok, name and document id cannot be empty or null.'); 
+                    console.warn('Failed to create new kisok, name and document id cannot be empty or null.');
                 }
             }
 
@@ -240,11 +242,11 @@
                                 showKioskDialog(model);
                             },
                             checkboxChanged: function(checked) {
-                                onKioskSelectChanged(); 
+                                onKioskSelectChanged();
                             }
                         }),
                     container = parent || $('.code-item-container');
-                    
+
                     // Appends the view.
                     container.append(viewItem.render());
 
@@ -284,15 +286,16 @@
 
             function showKioskDialog(model) {
                 let dialog = KioskDialog();
-                dialog.show($('.right_col'), model, function(name, location, allowSA) {
+                dialog.show($('.right_col'), model, function(name, location, allowSA, allowSurvey) {
                     if (!model) {
-                        addKiosk(name, location, allowSA);
+                        addKiosk(name, location, allowSA, allowSurvey);
                     } else {
-                        updateKiosk(model.documentId, name, location, allowSA);
+                        updateKiosk(model.documentId, name, location, allowSA, allowSurvey);
                         updateKioskItem(_.extend(model, {
                             name: name,
                             location: location,
-                            enable_sa: allowSA
+                            enable_sa: allowSA,
+                            enable_kiosk: allowSurvey
                         }));
                     }
                     dialog.hide();
@@ -339,7 +342,7 @@
 
             function getSelectedKiosks() {
                 let idList = [];
-                
+
                 _.each(_kioskItems, function(pair) {
                     if (pair.viewItem.isChecked()) {
                         idList.push(pair.viewItem.getId());
@@ -447,18 +450,20 @@
                     let createdLabel = $('<div class="kiosk-item-label created">');
                     let featuresCell = $('<div class="kiosk-item-cell features">'),
                         selfAssessmentIcon = $('<div class="kiosk-item-feature"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M17.5 15.833V14.1663H6.66667V15.833H17.5ZM17.5 10.833V9.16634H6.66667V10.833H17.5ZM6.66667 5.83301H17.5V4.16634H6.66667V5.83301ZM3.33333 4.16634V5.83301H5V4.16634H3.33333ZM2.5 4.16634C2.5 3.94533 2.5878 3.73337 2.74408 3.57709C2.90036 3.42081 3.11232 3.33301 3.33333 3.33301H5C5.22101 3.33301 5.43298 3.42081 5.58926 3.57709C5.74554 3.73337 5.83333 3.94533 5.83333 4.16634V5.83301C5.83333 6.05402 5.74554 6.26598 5.58926 6.42226C5.43298 6.57854 5.22101 6.66634 5 6.66634H3.33333C3.11232 6.66634 2.90036 6.57854 2.74408 6.42226C2.5878 6.26598 2.5 6.05402 2.5 5.83301V4.16634ZM3.33333 9.16634V10.833H5V9.16634H3.33333ZM2.5 9.16634C2.5 8.94533 2.5878 8.73337 2.74408 8.57709C2.90036 8.4208 3.11232 8.33301 3.33333 8.33301H5C5.22101 8.33301 5.43298 8.4208 5.58926 8.57709C5.74554 8.73337 5.83333 8.94533 5.83333 9.16634V10.833C5.83333 11.054 5.74554 11.266 5.58926 11.4223C5.43298 11.5785 5.22101 11.6663 5 11.6663H3.33333C3.11232 11.6663 2.90036 11.5785 2.74408 11.4223C2.5878 11.266 2.5 11.054 2.5 10.833V9.16634ZM3.33333 14.1663V15.833H5V14.1663H3.33333ZM2.5 14.1663C2.5 13.9453 2.5878 13.7334 2.74408 13.5771C2.90036 13.4208 3.11232 13.333 3.33333 13.333H5C5.22101 13.333 5.43298 13.4208 5.58926 13.5771C5.74554 13.7334 5.83333 13.9453 5.83333 14.1663V15.833C5.83333 16.054 5.74554 16.266 5.58926 16.4223C5.43298 16.5785 5.22101 16.6663 5 16.6663H3.33333C3.11232 16.6663 2.90036 16.5785 2.74408 16.4223C2.5878 16.266 2.5 16.054 2.5 15.833V14.1663Z" fill="#999999"></svg></div>'),
-                        thermometerIcon = $('<div class="kiosk-item-feature"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M7.5 13.3333C7.51683 13.9852 7.78761 14.6047 8.25462 15.0598C8.72162 15.5149 9.34792 15.7696 10 15.7696C10.6521 15.7696 11.2784 15.5149 11.7454 15.0598C12.2124 14.6047 12.4832 13.9852 12.5 13.3333C12.5 13.0392 12.44 12.7617 12.3467 12.5H7.65333C7.55457 12.7669 7.5027 13.0488 7.5 13.3333Z" fill="#999999"/> <path d="M15 5.00033V3.33366H12.3458C12.1747 2.8477 11.8573 2.42662 11.4373 2.12821C11.0173 1.82981 10.5152 1.66869 10 1.66699C8.62167 1.66699 7.5 2.78866 7.5 4.16699V9.00033C6.74096 9.44118 6.11072 10.0733 5.67207 10.8336C5.23343 11.5939 5.00171 12.4559 5 13.3337C5 16.0912 7.2425 18.3337 10 18.3337C12.7575 18.3337 15 16.0912 15 13.3337C14.9983 12.4559 14.7666 11.5939 14.3279 10.8336C13.8893 10.0733 13.259 9.44118 12.5 9.00033V8.33366H15V6.66699H12.5V5.00033H15ZM11.3292 10.2703C11.9236 10.5326 12.4292 10.9615 12.7849 11.5052C13.1406 12.0489 13.3311 12.684 13.3333 13.3337C13.3333 15.172 11.8383 16.667 10 16.667C8.16167 16.667 6.66667 15.172 6.66667 13.3337C6.66667 12.0128 7.45333 10.8112 8.67083 10.2703L9.16667 10.0512V4.16699C9.16667 3.94598 9.25446 3.73402 9.41074 3.57774C9.56702 3.42146 9.77899 3.33366 10 3.33366C10.221 3.33366 10.433 3.42146 10.5893 3.57774C10.7455 3.73402 10.8333 3.94598 10.8333 4.16699V10.0512L11.3292 10.2703Z" fill="#999999"/> </svg></div>');
+                        thermometerIcon = $('<div class="kiosk-item-feature"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M7.5 13.3333C7.51683 13.9852 7.78761 14.6047 8.25462 15.0598C8.72162 15.5149 9.34792 15.7696 10 15.7696C10.6521 15.7696 11.2784 15.5149 11.7454 15.0598C12.2124 14.6047 12.4832 13.9852 12.5 13.3333C12.5 13.0392 12.44 12.7617 12.3467 12.5H7.65333C7.55457 12.7669 7.5027 13.0488 7.5 13.3333Z" fill="#999999"/> <path d="M15 5.00033V3.33366H12.3458C12.1747 2.8477 11.8573 2.42662 11.4373 2.12821C11.0173 1.82981 10.5152 1.66869 10 1.66699C8.62167 1.66699 7.5 2.78866 7.5 4.16699V9.00033C6.74096 9.44118 6.11072 10.0733 5.67207 10.8336C5.23343 11.5939 5.00171 12.4559 5 13.3337C5 16.0912 7.2425 18.3337 10 18.3337C12.7575 18.3337 15 16.0912 15 13.3337C14.9983 12.4559 14.7666 11.5939 14.3279 10.8336C13.8893 10.0733 13.259 9.44118 12.5 9.00033V8.33366H15V6.66699H12.5V5.00033H15ZM11.3292 10.2703C11.9236 10.5326 12.4292 10.9615 12.7849 11.5052C13.1406 12.0489 13.3311 12.684 13.3333 13.3337C13.3333 15.172 11.8383 16.667 10 16.667C8.16167 16.667 6.66667 15.172 6.66667 13.3337C6.66667 12.0128 7.45333 10.8112 8.67083 10.2703L9.16667 10.0512V4.16699C9.16667 3.94598 9.25446 3.73402 9.41074 3.57774C9.56702 3.42146 9.77899 3.33366 10 3.33366C10.221 3.33366 10.433 3.42146 10.5893 3.57774C10.7455 3.73402 10.8333 3.94598 10.8333 4.16699V10.0512L11.3292 10.2703Z" fill="#999999"/> </svg></div>'),
+                        surveyIcon = $('<div class="kiosk-item-feature"><svg width="20" height="20" viewBox="-1 -1 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.66985 0.000765045C4.48374 0.0312685 4.31612 0.11747 4.19661 0.244144C4.0771 0.370818 4.01339 0.529813 4.01673 0.693043V1.38532H1.1295C0.48683 1.38532 0 1.80484 0 2.35866V16.9616C0 17.5846 0.48683 18 1.1295 18H14.8619C15.5045 18 15.9914 17.5805 15.9914 17.0266V2.35866C16.0717 1.80484 15.5801 1.38532 14.9374 1.38532H12.0502V0.693043C12.0502 0.50944 11.9655 0.333356 11.8149 0.203529C11.6642 0.0737013 11.4599 0.000765045 11.2469 0.000765045H4.82007C4.79492 -0.000255015 4.76972 -0.000255015 4.74456 0.000765045C4.71941 -0.000255015 4.69421 -0.000255015 4.66905 0.000765045H4.66985ZM5.62342 1.38532H10.4435V2.76988H5.62342V1.38532ZM1.60669 2.76988H4.01673V3.46216C4.01673 3.64576 4.10137 3.82185 4.25202 3.95167C4.40268 4.0815 4.60702 4.15443 4.82007 4.15443H11.2469C11.4599 4.15443 11.6642 4.0815 11.8149 3.95167C11.9655 3.82185 12.0502 3.64576 12.0502 3.46216V2.76988H14.4602V16.6155H1.60669V2.76988ZM3.21338 6.23127V9.00038H6.42676V6.23127H3.21338ZM4.01673 6.92355H5.62342V8.30812H4.01673V6.92355ZM8.03345 6.92355V8.30812H12.8535V6.92355H8.03345ZM3.21338 10.3849V13.1541H6.42676V10.3849H3.21338ZM8.03345 11.0772V12.4618H12.8535V11.0772H8.03345Z" fill="#999999"/></svg></div>');
+
                     let versionLabel = $('<div class="kiosk-item-label version">');
                     let commandsCell = $('<div class="kiosk-item-cell commands">'),
                         qrCodeButton = $('<div class="kiosk-item-btn qr">'),
                         editButton = $('<div class="kiosk-item-btn edit">');
-                    
+
                     container.append(nameCell, locationLabel, statusCell, createdLabel, versionLabel, featuresCell,
                         commandsCell);
                     nameCell.append(checkbox, nameContainer);
                     nameContainer.append(nameLabel, idLabel);
                     statusCell.append(statusIcon, statusLabel);
-                    featuresCell.append(selfAssessmentIcon, thermometerIcon);
+                    featuresCell.append(selfAssessmentIcon, thermometerIcon, surveyIcon);
                     commandsCell.append(qrCodeButton, editButton);
 
                     // Store id.
@@ -488,6 +493,7 @@
                         createdLabel: createdLabel,
                         selfAssessmentIcon: selfAssessmentIcon,
                         thermometerIcon: thermometerIcon,
+                        surveyIcon: surveyIcon,
                         versionLabel: versionLabel
                     }
 
@@ -515,6 +521,11 @@
                     } else {
                         _views.thermometerIcon.removeClass('enabled');
                     }
+                    if (model.enable_kiosk) {
+                        _views.surveyIcon.addClass('enabled');
+                    } else {
+                        _views.surveyIcon.removeClass('enabled');
+                    }
 
                     // handle Status
                     updateStatus();
@@ -530,7 +541,7 @@
                             _views.statusLabel.removeClass('hide');
                             _views.statusLabel.text('Not configured');
                         }  else if (_model.last_ping) {
-                            let pongDate = moment(_model.last_ping.seconds * 1000),    
+                            let pongDate = moment(_model.last_ping.seconds * 1000),
                                 todayDate = moment(),
                                 diffMin = todayDate.diff(pongDate, 'minutes'),
                                 offline = false;
@@ -674,12 +685,17 @@
                         saTitleLabel = $('<div class="dialog-title-label">Self-Assessment</div>'),
                         saCheckbox = $('<input type="checkbox" id="sa-checkbox" checked>'),
                         saLabel = $('<label class="kiosk-sa-desc-label" for="sa-checkbox">Check to support the self-assessment on the kiosk.</label>');
+                    let surveyContainer = $('<div class="kiosk-sa-container">'),
+                        surveyTitleLabel = $('<div class="dialog-title-label">Survey</div>'),
+                        surveyCheckbox = $('<input type="checkbox" id="sa-checkbox" checked>'),
+                        surveyLabel = $('<label class="kiosk-sa-desc-label" for="sa-checkbox">Check to enable the Winvid Survey feature.</label>');
                     let registerButton = $('<div class="dialog-btn">Register</div>');
 
                     container.append(contentContainer);
-                    contentContainer.append(closeButton, bodyContainer, registerButton, saTitleLabel, saContainer);
+                    contentContainer.append(closeButton, bodyContainer, registerButton, saTitleLabel, saContainer, surveyTitleLabel, surveyContainer);
                     bodyContainer.append(nameTitleLabel, nameTextBox, locationTitleLabel, locationTextBox);
                     saContainer.append(saCheckbox, saLabel);
+                    surveyContainer.append(surveyCheckbox, surveyLabel);
 
                     // init handlers
                     $(document).keyup(function(e) {
@@ -703,7 +719,7 @@
                             return;
                         }
 
-                        _callback(name, location, saCheckbox.is(':checked'));
+                        _callback(name, location, saCheckbox.is(':checked'), surveyCheckbox.is(':checked'));
                     });
 
                     // Updates the value if has model
@@ -711,6 +727,7 @@
                         nameTextBox.val(model.name || '');
                         locationTextBox.val(model.location || '');
                         saCheckbox.prop('checked', model.enable_sa);
+                        surveyCheckbox.prop('checked', model.enable_kiosk || false);
                         registerButton.text('Update');
                     }
 
