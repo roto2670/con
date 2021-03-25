@@ -27,7 +27,7 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
     box-sizing: border-box;
-    margin-left: auto; 
+    margin-left: auto;
 }
 
 .filter-container {
@@ -317,14 +317,17 @@
 }
 
 .kiosk-dialog .c-modal-dialog-content {
-    width: 27em;    
+    width: 27em;
 }
 
 .kiosk-sa-container {
     display: inline-flex;
     flex-wrap: nowrap;
+    margin-bottom: 0.4em;
 }
-
+.kiosk-sa-title {
+    margin-top: 0.4em;
+}
 .kiosk-sa-desc-label {
     font-weight: normal;
     margin-left: 0.4em;

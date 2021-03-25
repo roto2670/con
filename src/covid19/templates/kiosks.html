@@ -196,7 +196,7 @@
                         name: name,
                         location: location || '',
                         enable_sa: allowSA || false,
-                        enable_kiosk: allowSurvey || false,
+                        enable_survey: allowSurvey || false,
                         ts: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     _db.collection('kiosks').doc().set(_data);
@@ -211,7 +211,7 @@
                         name: name,
                         location: location || '',
                         enable_sa: allowSA || false,
-                        enable_kiosk: allowSurvey || false,
+                        enable_survey: allowSurvey || false,
                         ts: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     _db.collection('kiosks').doc(documentId).update(_data);
@@ -295,7 +295,7 @@
                             name: name,
                             location: location,
                             enable_sa: allowSA,
-                            enable_kiosk: allowSurvey
+                            enable_survey: allowSurvey
                         }));
                     }
                     dialog.hide();
@@ -521,7 +521,7 @@
                     } else {
                         _views.thermometerIcon.removeClass('enabled');
                     }
-                    if (model.enable_kiosk) {
+                    if (model.enable_survey) {
                         _views.surveyIcon.addClass('enabled');
                     } else {
                         _views.surveyIcon.removeClass('enabled');
@@ -682,17 +682,17 @@
                         locationTitleLabel = $('<div class="dialog-title-label">Location</div>'),
                         locationTextBox = $('<input type="text" class="dialog-textbox" placeholder="Place where the kiosk is installed"></div>');
                     let saContainer = $('<div class="kiosk-sa-container">'),
-                        saTitleLabel = $('<div class="dialog-title-label">Self-Assessment</div>'),
+                        saTitleLabel = $('<div class="dialog-title-label kiosk-sa-title">Self-Assessment</div>'),
                         saCheckbox = $('<input type="checkbox" id="sa-checkbox" checked>'),
                         saLabel = $('<label class="kiosk-sa-desc-label" for="sa-checkbox">Check to support the self-assessment on the kiosk.</label>');
                     let surveyContainer = $('<div class="kiosk-sa-container">'),
-                        surveyTitleLabel = $('<div class="dialog-title-label">Survey</div>'),
+                        surveyTitleLabel = $('<div class="dialog-title-label kiosk-sa-title">Survey</div>'),
                         surveyCheckbox = $('<input type="checkbox" id="sa-checkbox" checked>'),
                         surveyLabel = $('<label class="kiosk-sa-desc-label" for="sa-checkbox">Check to enable the Winvid Survey feature.</label>');
                     let registerButton = $('<div class="dialog-btn">Register</div>');
 
                     container.append(contentContainer);
-                    contentContainer.append(closeButton, bodyContainer, registerButton, saTitleLabel, saContainer, surveyTitleLabel, surveyContainer);
+                    contentContainer.append(closeButton, bodyContainer, saTitleLabel, saContainer, surveyTitleLabel, surveyContainer, registerButton);
                     bodyContainer.append(nameTitleLabel, nameTextBox, locationTitleLabel, locationTextBox);
                     saContainer.append(saCheckbox, saLabel);
                     surveyContainer.append(surveyCheckbox, surveyLabel);
@@ -727,7 +727,7 @@
                         nameTextBox.val(model.name || '');
                         locationTextBox.val(model.location || '');
                         saCheckbox.prop('checked', model.enable_sa);
-                        surveyCheckbox.prop('checked', model.enable_kiosk || false);
+                        surveyCheckbox.prop('checked', model.enable_survey || false);
                         registerButton.text('Update');
                     }
 
