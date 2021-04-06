@@ -95,6 +95,11 @@
     <script>
         (function() {
             const IS_INTERNAL = {{is_internal|tojson}};
+            const UPLOAD_URL_BUILDERS = {
+                    INTERNAL: _.template('https://172.16.5.8:10443/api/upload/<%= type %>'),
+                    EXTERNAL: _.template('https://skec-fujairah.loc8.dev:10443/api/upload/<%= type %>')
+                },
+                UPLOAD_URL_BUILDER = IS_INTERNAL ? UPLOAD_URL_BUILDERS.INTERNAL : UPLOAD_URL_BUILDERS.EXTERNAL;
             const THE_KEY = 'CopeWithCOVID-19',
                 PAGE_SIZE = 10;
             const KIOSK_OFFLINE_MIN_DIFF = 65;
@@ -289,6 +294,7 @@
                 dialog.show($('.right_col'), model, function(name, location, allowSA, allowSurvey) {
                     if (!model) {
                         addKiosk(name, location, allowSA, allowSurvey);
+                        dialog.hide();
                     } else {
                         updateKiosk(model.documentId, name, location, allowSA, allowSurvey);
                         updateKioskItem(_.extend(model, {
@@ -297,8 +303,29 @@
                             enable_sa: allowSA,
                             enable_survey: allowSurvey
                         }));
+                        if (window.confirm("Do you want to restart the Kiosk now? Otherwise, the settings will be applied in the next 12 hours.")) {
+                            let url = UPLOAD_URL_BUILDER({
+                                    type: 'kiosk/refresh'
+                                }),
+                                data = {
+                                    'kiosk_id': model.documentId
+                                };
+                            $.ajax({
+                                url: url,
+                                type: 'post',
+                                data: JSON.stringify(data),
+                                datatype: 'json',
+                                success: function(result) {
+                                    console.log("Success refresh.", result);
+                                    dialog.hide();
+                                },
+                                error: function(result) {
+                                    console.log("Refresh Error.", result);
+                                    dialog.hide();
+                                }
+                            })
+                        }
                     }
-                    dialog.hide();
                 });
             }
 
