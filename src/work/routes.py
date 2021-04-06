@@ -22,6 +22,7 @@ from flask import make_response
 
 import apis
 import util
+import fsapis
 import constants
 import work_apis
 import local_apis
@@ -107,7 +108,7 @@ def _convert_dict_by_tunnel(data, is_exclude=False):
       "length": data.length,
       "tunnel_id": data.tunnel_id,
       "b_accum_length": data.b_accum_length,
-      "initial_b_time": str(data.initial_b_time).replace(' ', 'T'),
+      "initial_b_time": str(data.initial_b_time).replace(' ', 'T') if data.initial_b_time else data.initial_b_time,
       "left_x_loc": data.left_x_loc,
       "right_x_loc": data.right_x_loc,
       "y_loc": data.y_loc,
@@ -920,6 +921,7 @@ def add_work(work_data=None, is_auto=False):
     #  work_apis.create_work(data)
     work_apis.create_work(data)
     send_request(WORK_ADD, [data])
+    fsapis.add_work_firestore(data)  # TODO: Update firestore
     blast_data = work_apis.get_blast(data['blast_id'])
     _blast_data = _convert_dict_by_blast(blast_data)
     send_request(BLAST_UPDATE, [_blast_data])
@@ -947,6 +949,7 @@ def add_completed_work():
     send_request(WORK_ADD, [data])
     _create_start_work_log(data)
     _create_finish_work_log(data)
+    fsapis.add_work_firestore(data, is_finish=True)  # TODO: Update firestore
     return json.dumps(True)
   except:
     logging.exception("Fail to add work.")
@@ -1035,6 +1038,7 @@ def update_work(work_data=None):
     ret = work_apis.update_work(data)
     if not ret:
       return json.dumps(False)
+    fsapis.update_work_firestore(data)  # TODO: update firestore
     work_resp_data = _convert_dict_by_work(ret)
     blast_data = work_apis.get_blast(ret.blast_id)
     _blast_data = _convert_dict_by_blast(blast_data)
@@ -1121,6 +1125,7 @@ def remove_work(work_id=None):
     blast_id = work_apis.get_work(_work_id).blast_id
     work_apis.remove_work(_work_id)
     send_request(WORK_REMOVE, [_work_id])
+    fsapis.remove_work_firestore(_work_id)  # TODO: Update firestore
     blast_data = work_apis.get_blast(blast_id)
     _blast_data = _convert_dict_by_blast(blast_data)
     send_request(BLAST_UPDATE, [_blast_data])
@@ -1328,6 +1333,7 @@ def start_work(start_data=None):
                                                      history_data['accum_time'],
                                                      pause_time)
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
+        fsapis.resume_work_firestore(work_data)  # TODO: update firestore
         ret = True
     else:
       # Init data
@@ -1363,6 +1369,7 @@ def start_work(start_data=None):
                                                      history_data['timestamp'],
                                                      None)
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
+        fsapis.start_work_firestore(work_data)  # TODO: update firestore
         ret = True
     return json.dumps(ret)
   except:
@@ -1415,6 +1422,8 @@ def stop_work(stop_data=None):
         _data = work_apis.create_pause_history(pause_data)
         send_request(PAUSE_HISTORY_ADD,
                      [_convert_dict_by_pause_history(_data)])
+        fsapis.pause_work_firestore(data['id'], pause_data['start_time'],
+                                    _data.created_time)
 
         # TODO: handle work data
         pause_time += latest_work.p_accum_time
@@ -1592,6 +1601,7 @@ def finish_work(finish_data=None):
                                                      None,
                                                      history_data['timestamp'])
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
+        fsapis.finish_work_firestore(work_data)  # TODO: update firestore
         if data['typ'] == 114:  # finish work
           blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
                                                               history_data['accum_time'],
@@ -1634,6 +1644,7 @@ def finish_work(finish_data=None):
                                                      None,
                                                      history_data['timestamp'])
         send_request(WORK_UPDATE, [_convert_dict_by_work(work_data)])
+        fsapis.finish_work_firestore(work_data)  # TODO: update firestore
         # TODO: handle blast data
         if data['typ'] == 114:  # finish work
           blast_data = work_apis.update_blast_state_and_accum(data['blast_id'], 2,
