@@ -921,10 +921,12 @@
                     let closeButton = $('<div class="and-close-btn c-modal-dialog-close-btn">');
                     let titleLabel = $('<div class="and-title-label">Title</div>'),
                         inputTitleTextbox = $('<input type="text" class="and-input-title-textbox dialog-textbox" placeholder="Survey title">');
+                    let serialLabel = $('<div class="and-serial-label">Serial Number (optional)</div>'),
+                        inputSerialTextbox = $('<input type="text" class="and-input-serial-textbox dialog-textbox" placeholder="Serial number">');
                     let descLabel = $('<div class="and-title-label">Description</div>'),
                         descTextArea = $('<textarea class="and-message-textarea dialog-message-textarea" placeholder="Survey description">');
                     let imageUploaderContainer = $('<div class="and-image-container">'),
-                        imageTitleLabel = $('<div class="and-subtitle-label">Image(optional)</div>'),
+                        imageTitleLabel = $('<div class="and-subtitle-label">Image (optional)</div>'),
                         selectImageButton = $('<input type="file" class="and-upload-btn" accept="image/*">'),
                         thumbnail = $('<div class="and-thumbnail">');
                     let langSelector = $('<select name="lang" class="and-lang-selector">');
@@ -939,6 +941,7 @@
                     container.append(modalContainer, contentContainer);
                     contentContainer.append(topContainer,
                         titleLabel, inputTitleTextbox,
+                        serialLabel, inputSerialTextbox,
                         descLabel, descTextArea,
                         imageUploaderContainer,
                         questionListContainer,
@@ -1203,10 +1206,12 @@
                             ],
                             "ts": null,
                             "end_ts": null,
-                            "start_ts": null
+                            "start_ts": null,
+                            "survey_id": ""
                         }
                         let images = selectImageButton.prop('files'),
                             image = null;
+                        let serialNumber = '';
                         let isValid = true,
                             errorMessages = [];
 
@@ -1218,6 +1223,15 @@
                         });
                         if (!isValid) {
                             window.alert("There are blank entries in the title. Please check the title of each language.");
+                            event.preventDefault();
+                            return;
+                        }
+
+                        // Check serial number
+                        serialNumber = inputSerialTextbox.val();
+                        if (serialNumber.length !== 0 && serialNumber.length < 8) {
+                            isValid = false;
+                            window.alert("Serial Number must be at least 8 characters long.");
                             event.preventDefault();
                             return;
                         }
@@ -1276,6 +1290,7 @@
                         if (isValid) {
                             // finish check
                             submitData.title = _titleCache;
+                            submitData.survey_id = serialNumber;
                             submitData.description = _descCache;
                             _.each(_questionsCache, function(value, key) {
                                 let qData = {
@@ -1308,13 +1323,13 @@
                     _views.startButton = startButton;
                     _views.addQuestionButton = addQuestionButton;
                     _views.titleTextbox = inputTitleTextbox;
+                    _views.serialTextbox = inputSerialTextbox;
                     _views.descTextArea = descTextArea;
                     _views.langSelector = langSelector;
                     _views.imageUploadButton = selectImageButton;
                     _views.imageUploader = imageUploaderContainer;
 
                     update(model);
-
                     parent.append(container);
                 }
 
@@ -1479,6 +1494,7 @@
                         })
 
                         _views.titleTextbox.val(model.title[selectedLang]);
+                        _views.serialTextbox.val(model.survey_id);
                         _views.descTextArea.val(model.description[selectedLang]);
 
                         if (model.active || !_.isEmpty(model.end_ts)) {
@@ -1486,8 +1502,9 @@
                             _views.addQuestionButton.hide();
                             _views.saveButton.hide();
                             _views.startButton.hide();
-
                             _views.titleTextbox.attr('readonly', true);
+                            _views.serialTextbox.attr('readonly', true);
+                            _views.serialTextbox.attr('placeholder', '');
                             _views.descTextArea.attr('readonly', true);
                         } else {
                             _views.saveButton.text('Update Survey');
