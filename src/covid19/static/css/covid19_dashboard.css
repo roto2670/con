@@ -1,0 +1,73 @@
+.cd-row-container {
+    width: 100%;
+    margin-bottom: 2.6em;
+
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+
+    box-sizing: border-box;
+}
+.cd-sub-contents-container {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    background-color: #fdfdfd;
+    padding: 0.2em 0.4em;
+    box-sizing: border-box;
+    border: 1px solid #e2e2e2;
+    border-radius: 0.2em;
+}
+.cd-sub-title-label {
+    font-size: 1.4em;
+    color: #4e4e4e;
+    margin-bottom: 0.4em;
+}
+
+.cd-overall-title-label {
+    text-align: center;
+    font-weight: 500;
+    font-size: 2em;
+    color: #969696;
+}
+.cd-overall-value-label {
+    text-align: center;
+    font-size: 3em;
+}
+.cd-col.overall {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+}
+
+.cd-col {
+    height: 100%;
+    margin: 0.3em;
+    box-sizing: border-box;
+}
+.cd-col-2 {
+    width: 16.7%;
+}
+.cd-col-10 {
+    width: 83.3%;
+}
+.cd-col-12 {
+    width: 100%;
+}
+
+.cd-grid {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+.cd-grid.manpower {
+    height: 13em;
+}
+.cd-grid.pass {
+    height: 21em;
+}
+
+.cell-number-negative-label {
+    color: #ff2020;
+    font-weight: 500;
+}

@@ -1,20 +1,11 @@
-{% extends "base_site.html" %}
-
-{% block sidebar %}
-    <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
-        {% include "site_template/sidebar_covid19.html" %}
-    </div>
-{% endblock sidebar %}
-
-{% block stylesheets %}
-    {{ super() }}
-    <link type="text/css" rel="stylesheet" href="static/css/common.css">
-    <link type="text/css" rel="stylesheet" href="static/css/users.css">
-{% endblock stylesheets %}
-
-{% block title %}{% endblock title %}
-
-{% block content %}
+{% extends "base_site.html" %} {% block sidebar %}
+<div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_covid19.html" %}
+</div>
+{% endblock sidebar %} {% block stylesheets %} {{ super() }}
+<link type="text/css" rel="stylesheet" href="static/css/common.css" />
+<link type="text/css" rel="stylesheet" href="static/css/users.css" />
+{% endblock stylesheets %} {% block title %}{% endblock title %} {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
     <div class="top-upper-container">
         <div class="user-filter-container search">
@@ -24,7 +15,7 @@
             </div>
             <div class="user-filter-bottom-container">
                 <div class="user-searchbox-container">
-                    <input type="text" class="user-serach-box hidden-textfield" placeholder="ID">
+                    <input type="text" class="user-serach-box hidden-textfield" placeholder="ID" />
                     <div class="searchbox-icon"></div>
                 </div>
             </div>
@@ -39,13 +30,25 @@
         </div>
     </div>
 
-    <div class="top-upper-container"> <!-- RTW Process-->
+    <div class="top-upper-container">
+        <!-- RTW Process-->
         <div class="user-filter-container rtw">
             <!-- TODO: style display is none-->
-            <div class="user-filter-top-container" style="display:none">
+            <!-- <div class="user-filter-top-container">
                 <div class="user-filter-title-icn"></div>
                 <div class="user-filter-title-label">RTW Process</div>
+                <div class="user-folder-icn"></div>
+                <div class="user-folder-title-label">Filter Function</div>
             </div>
+            <div class="user-filter-bottom-container">
+                <div class="user-filter-left-container"></div>
+                <div class="user-filter-right-container">
+                    <div class="user-filter-title-label"></div>
+                    <div class="user-filter-button-container">
+                        <div class="user-filter-button"></div>
+                    </div>
+                </div>
+            </div> -->
             <div class="user-filter-bottom-container">
                 <div class="user-dropdown-container">
                     <div class="user-dropdown-top-container">
@@ -138,7 +141,8 @@
             </div>
         </div>
     </div>
-    <div class="top-upper-container"> <!-- Admin/HR Affairs-->
+    <div class="top-upper-container">
+        <!-- Admin/HR Affairs-->
         <div class="user-filter-container admin">
             <!-- TODO: style display is none-->
             <div class="user-filter-top-container" style="display: none">
@@ -171,7 +175,8 @@
                             <option value="" selected>None</option>
                             <option value="good">Good</option>
                             <option value="expiring-soon">Expiring Soon</option>
-                            <option value="expired">Expired</option>>
+                            <option value="expired">Expired</option>
+                            >
                         </select>
                     </div>
                 </div>
@@ -204,8 +209,7 @@
                 </div>
             </div>
         </div>
-        {% endif %}
-        {% if current_user.level in [0, 7] %}
+        {% endif %} {% if current_user.level in [0, 7] %}
         <div class="user-filter-container admin-command">
             <div class="user-filter-top-container">
                 <div class="user-filter-title-icn"></div>
@@ -226,210 +230,231 @@
                 </div>
             </div>
         </div>
-        {% endif %}
-        {% if current_user.level != 9 %}
+        {% endif %} {% if current_user.level != 9 %}
         <div class="user-filter-container admin-command">
-        <div class="user-filter-container command">
-            <div class="user-filter-top-container">
-                <div class="user-filter-title-icn"></div>
-                <div class="user-filter-title-label">Commands</div>
-            </div>
-            <div class="user-filter-bottom-container">
-                <div class="command-btn message">
-                    <div class="command-btn-icn hide"></div>
-                    <div class="command-btn-label">Create a Message</div>
+            <div class="user-filter-container command">
+                <div class="user-filter-top-container">
+                    <div class="user-filter-title-icn"></div>
+                    <div class="user-filter-title-label">Commands</div>
+                </div>
+                <div class="user-filter-bottom-container">
+                    <div class="command-btn message">
+                        <div class="command-btn-icn hide"></div>
+                        <div class="command-btn-label">Create a Message</div>
+                    </div>
                 </div>
             </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
-    <div class="content-container">
-        <div id="user-table" class="user-table"></div>
-        <div class="user-item-loader-btn loading">
-            <div class="user-item-loader-icon"></div>
-            <div class="user-item-loader-label">Load more</div>
+        <div class="content-container">
+            <div id="user-table" class="user-table"></div>
+            <div class="user-item-loader-btn loading">
+                <div class="user-item-loader-icon"></div>
+                <div class="user-item-loader-label">Load more</div>
+            </div>
         </div>
     </div>
-</div>
-{% endblock content %}
+    {% endblock content %} {% block javascripts %} {{ super() }}
+    <!-- Load table module -->
+    <link href="static/js/vendor/table/tabulator.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="static/js/vendor/table/tabulator.min.js"></script>
+    <script type="text/javascript" src="static/js/vendor/table/jquery_wrapper.min.js"></script>
 
-{% block javascripts %}
-{{ super() }}
-<!-- Load table module -->
-<link href="static/js/vendor/table/tabulator.min.css" rel="stylesheet">
-<script type="text/javascript" src="static/js/vendor/table/tabulator.min.js"></script>
-<script type="text/javascript" src="static/js/vendor/table/jquery_wrapper.min.js"></script>
+    <script>
+        (function() {
+            const IS_INTERNAL = {{is_internal|tojson}};
+            const DOWNLOAD_URL_BUILDERS = {
+                    INTERNAL: _.template('//172.16.5.8:10443/api/download/<%= type %>/<%= id %>'),
+                    EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
+                },
+                DOWNLOAD_URL_BUILDER = IS_INTERNAL? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
 
-<script>
-    (function() {
-        const IS_INTERNAL = {{is_internal|tojson}};
-        const DOWNLOAD_URL_BUILDERS = {
-                INTERNAL: _.template('//172.16.5.8:10443/api/download/<%= type %>/<%= id %>'),
-                EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
+            const STATUS_DISPLAY = {
+                '0': 'Not Registered',
+                '1': 'On Duty',
+                '2': 'Quarantine',
+                '3': 'Isolation',
+                '4': 'Hospitalized',
+                '5': 'Hospitalized ICU',
+                '6': 'Termination',
+                '7': 'Resigned',
+                '8': 'Demobilization',
+                '9': 'Vacation',
+                '10': 'Business Trip',
+                '11': 'Others'
             },
-            DOWNLOAD_URL_BUILDER = IS_INTERNAL? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
-
-        const STATUS_DISPLAY = {
-            '0': 'Not Registered',
-            '1': 'On Duty',
-            '2': 'Quarantine',
-            '3': 'Isolation',
-            '4': 'Hospitalized',
-            '5': 'Hospitalized ICU',
-            '6': 'Termination',
-            '7': 'Resigned',
-            '8': 'Demobilization',
-            '9': 'Vacation',
-            '10': 'Business Trip',
-            '11': 'Others'
-        },
-        STATUS_VALUE = {
-            'notregistered': 0,
-            'onduty': 1,
-            'quarantined': 2,
-            'isolated': 3,
-            'hospitalized': 4,
-            'hospitalized-icu': 5,
-            'terminated': 6,
-            'resigned': 7,
-            'demobilization': 8,
-            'vacation': 9,
-            'b-trip': 10,
-            'others': 11
-        },
-        CLINIC_STATUS_VALUE = {
-            'none': 1,
-            'close-contact': 2,
-            'symptom-suspected': 3,
-            'quarantine-required': 4,
-            'isolation-required': 5
-        },
-        CLINIC_TEST_REFERRED = {
-            'test-referred': true
-        }
-        GROUP_STATUS_VALUE = {
-            "group-ag": "A/G",
-            "group-ug": "U/G"
-        },
-        EXPIRING_STATUS_VALUE = {
-            'expired': -1,
-            'expiring-soon': 0,
-            'good': 1
-        },
-        OP_STATUS_VALUE = {
-            'none': 1,
-            'quarantine-confirmed': 2,
-            'isolation-confirmed': 3
-        },
-        STAFF_STATUS_VALUE = {
-            'admin': 1,
-            'clinic': 2
-        },
-        COMMAND_STATUS_VALUE = {
-            REFER_TEST: '_rft_',
-            RELEASE: '_rlse_'
-        }
-        STATUS_TYPE = {
-            USER: '_usr_',
-            CLINIC: '_cnc_',
-            OP: '_op_',
-            COMMAND: '_cmd_'
-        },
-        CLINIC_ACTION = {
-            QUARANTINE_ORDERED: 1,
-            ISOLATION_ORDERED: 2,
-            REFER_TEST: 3,
-            CLINIC_RELEASE: 4,
-            QUARANTINE_CONFIRMED: 5,
-            ISOLATION_CONFIRMED: 6,
-            OP_RELEASE: 7
-        };
-        const FIRESTORE_KEY = {
-            'workStatus': 'status',
-            'clinicStatus': 'clinic_status',
-            'opStatus': 'op_status',
-            'staff': 'role',
-            'group': 'pv_area',
-            'testReferred': 'test_referred',
-            'cicpaPass': 'cicpa_no_status',
-            'visa': 'visa_status',
-            'passport': 'passport_status',
-        },
-        DROPDOWN_FILTER_VALUE = {
-            'workStatus': STATUS_VALUE,
-            'clinicStatus': CLINIC_STATUS_VALUE,
-            'opStatus': OP_STATUS_VALUE,
-            'staff': STAFF_STATUS_VALUE,
-            'group': GROUP_STATUS_VALUE,
-            'testReferred': CLINIC_TEST_REFERRED,
-            'cicpaPass': EXPIRING_STATUS_VALUE,
-            'visa': EXPIRING_STATUS_VALUE,
-        }
-        const PRE_MED_DISPLAY = {
-            diabetes: 'Diabetes',
-            obesity: 'Obesity',
-            hypertension: 'Hypertension',
-            respiratory: 'Respiratory problems',
-            allergic: 'Allergic Rhinitis',
-            asthma: 'Bronchial Asthma',
-            epilepsy: 'Epilepsy',
-            sinusitis: 'Sinusitis',
-            psychiatric: 'Psychiatric Illness',
-            hepatitis: 'Hepatitis',
-            hiv: 'HIV',
-            tuberculosis: 'Tuberculosis',
-            arthritis: 'Arthritis',
-            heart_failure: 'Heart Failure',
-            chronic_liver: 'Chronic Liver Disease',
-            ischemic_heart: 'Ischemic Heart Disease',
-            active_cancer: 'Active Cancer Patient',
-            chronic_renal: 'Chronic Renal Disease'
-        };
-        const DEFAULT_FILTER = CLINIC_STATUS_VALUE['symptom-suspected'];
-        let USER_PAGE_SIZE = 10,
-            TEST_RESULT_PAGE_SIZE = 10;
-
-        let _db = firebase.firestore(),
-            _table = null;
-        let _lastUserSnapShot,
-            _snapshotUnsubscriber = null,
-            _lastTestResultDoc,
-            _loadingUsers = false,
-            _selectedFilters = null,
-            _currentUser;
-
-        start();
-
-
-        function start() {
-            initHandlers();
-            initTableView();
-            let userId = getUrlParameter('id');
-            if (!!!userId) {
-                // TODO: use setSelectedFilter
-                $('#symptom-suspected').addClass('selected');
-                displayUsers({
-                    clinic_status: DEFAULT_FILTER
-                }, true, function() {
-                    $('.user-item-loader-btn').removeClass('loading');
-                });
-            } else {
-                displayUser(userId);
+            STATUS_VALUE = {
+                'notregistered': 0,
+                'onduty': 1,
+                'quarantined': 2,
+                'isolated': 3,
+                'hospitalized': 4,
+                'hospitalized-icu': 5,
+                'terminated': 6,
+                'resigned': 7,
+                'demobilization': 8,
+                'vacation': 9,
+                'b-trip': 10,
+                'others': 11
+            },
+            CLINIC_STATUS_VALUE = {
+                'none': 1,
+                'close-contact': 2,
+                'symptom-suspected': 3,
+                'quarantine-required': 4,
+                'isolation-required': 5
+            },
+            CLINIC_TEST_REFERRED = {
+                'test-referred': true
             }
-        }
+            GROUP_STATUS_VALUE = {
+                "group-ag": "A/G",
+                "group-ug": "U/G"
+            },
+            EXPIRING_STATUS_VALUE = {
+                'expired': -1,
+                'expiring-soon': 0,
+                'good': 1
+            },
+            OP_STATUS_VALUE = {
+                'none': 1,
+                'quarantine-confirmed': 2,
+                'isolation-confirmed': 3
+            },
+            STAFF_STATUS_VALUE = {
+                'admin': 1,
+                'clinic': 2
+            },
+            COMMAND_STATUS_VALUE = {
+                REFER_TEST: '_rft_',
+                RELEASE: '_rlse_'
+            }
+            STATUS_TYPE = {
+                USER: '_usr_',
+                CLINIC: '_cnc_',
+                OP: '_op_',
+                COMMAND: '_cmd_'
+            },
+            CLINIC_ACTION = {
+                QUARANTINE_ORDERED: 1,
+                ISOLATION_ORDERED: 2,
+                REFER_TEST: 3,
+                CLINIC_RELEASE: 4,
+                QUARANTINE_CONFIRMED: 5,
+                ISOLATION_CONFIRMED: 6,
+                OP_RELEASE: 7
+            };
+            const FIRESTORE_KEY = {
+                'workStatus': 'status',
+                'clinicStatus': 'clinic_status',
+                'opStatus': 'op_status',
+                'staff': 'role',
+                'group': 'pv_area',
+                'testReferred': 'test_referred',
+                'cicpaPass': 'cicpa_no_status',
+                'visa': 'visa_status',
+                'passport': 'passport_status',
+            },
+            DROPDOWN_FILTER_VALUE = {
+                'workStatus': STATUS_VALUE,
+                'clinicStatus': CLINIC_STATUS_VALUE,
+                'opStatus': OP_STATUS_VALUE,
+                'staff': STAFF_STATUS_VALUE,
+                'group': GROUP_STATUS_VALUE,
+                'testReferred': CLINIC_TEST_REFERRED,
+                'cicpaPass': EXPIRING_STATUS_VALUE,
+                'visa': EXPIRING_STATUS_VALUE,
+            }
+            const PRE_MED_DISPLAY = {
+                diabetes: 'Diabetes',
+                obesity: 'Obesity',
+                hypertension: 'Hypertension',
+                respiratory: 'Respiratory problems',
+                allergic: 'Allergic Rhinitis',
+                asthma: 'Bronchial Asthma',
+                epilepsy: 'Epilepsy',
+                sinusitis: 'Sinusitis',
+                psychiatric: 'Psychiatric Illness',
+                hepatitis: 'Hepatitis',
+                hiv: 'HIV',
+                tuberculosis: 'Tuberculosis',
+                arthritis: 'Arthritis',
+                heart_failure: 'Heart Failure',
+                chronic_liver: 'Chronic Liver Disease',
+                ischemic_heart: 'Ischemic Heart Disease',
+                active_cancer: 'Active Cancer Patient',
+                chronic_renal: 'Chronic Renal Disease'
+            };
+            const DEFAULT_FILTER = CLINIC_STATUS_VALUE['symptom-suspected'];
+            let USER_PAGE_SIZE = 10,
+                TEST_RESULT_PAGE_SIZE = 10;
 
-        function stop() {
-        }
+            let _db = firebase.firestore(),
+                _table = null;
+            let _lastUserSnapShot,
+                _snapshotUnsubscriber = null,
+                _lastTestResultDoc,
+                _loadingUsers = false,
+                _selectedFilters = null,
+                _currentUser;
 
-        function addUserItems(userList) {
-            _.each(userList, function(user) {
-                addUserItem(user);
-            });
-        }
+            start();
 
-        function addUserItem(user) {
-            if (user) {
-                _table.addData({
+
+            function start() {
+                initHandlers();
+                initTableView();
+                let userId = getUrlParameter('id');
+                if (!!!userId) {
+                    // TODO: use setSelectedFilter
+                    $('#symptom-suspected').addClass('selected');
+                    displayUsers({
+                        clinic_status: DEFAULT_FILTER
+                    }, true, function() {
+                        $('.user-item-loader-btn').removeClass('loading');
+                    });
+                } else {
+                    displayUser(userId);
+                }
+            }
+
+            function stop() {
+            }
+
+            function addUserItems(userList) {
+                _.each(userList, function(user) {
+                    addUserItem(user);
+                });
+            }
+
+            function addUserItem(user) {
+                if (user) {
+                    _table.addData({
+                        name: user.fullname || '-',
+                        id: user.documentId || '-',
+                        location: user.location,
+                        status: STATUS_DISPLAY[user.status] || '-',
+                        gender: user.gender || '-',
+                        nationality: user.nationality || '-',
+                        employer: user.employer || '-',
+                        camp: user.camp || '-',
+                        room: user.room || '-',
+                        phone: user.phone_number || '-',
+                        department: user.department || '-',
+                        pvArea: user.pv_area || '-',
+                        jobCat1: user.job_cat1 || '-',
+                        jobCat2: user.job_cat2 || '-',
+                        timeago: $.timeago(user.ts.seconds * 1000) || '-',
+                        appInstalled: !_.isEmpty(user.f_token),
+                        hasPreMeds: !_.isEmpty(user.pre_med_conds),
+                        preMeds: user.pre_med_conds
+                    });
+                    // TODO: adds in cache
+                }
+            }
+
+            function updateUserItem(user) {
+                _table.updateData([{
                     name: user.fullname || '-',
                     id: user.documentId || '-',
                     location: user.location,
@@ -448,1516 +473,1492 @@
                     appInstalled: !_.isEmpty(user.f_token),
                     hasPreMeds: !_.isEmpty(user.pre_med_conds),
                     preMeds: user.pre_med_conds
-                });
-                // TODO: adds in cache
+                }]);
             }
-        }
 
-        function updateUserItem(user) {
-            _table.updateData([{
-                name: user.fullname || '-',
-                id: user.documentId || '-',
-                location: user.location,
-                status: STATUS_DISPLAY[user.status] || '-',
-                gender: user.gender || '-',
-                nationality: user.nationality || '-',
-                employer: user.employer || '-',
-                camp: user.camp || '-',
-                room: user.room || '-',
-                phone: user.phone_number || '-',
-                department: user.department || '-',
-                pvArea: user.pv_area || '-',
-                jobCat1: user.job_cat1 || '-',
-                jobCat2: user.job_cat2 || '-',
-                timeago: $.timeago(user.ts.seconds * 1000) || '-',
-                appInstalled: !_.isEmpty(user.f_token),
-                hasPreMeds: !_.isEmpty(user.pre_med_conds),
-                preMeds: user.pre_med_conds
-            }]);
-        }
-
-        function showMessageWithDialog(userIds) {
-            let dialog = CreateMessageDialog();
-            dialog.show($('.right_col'), function(texts) {
-                dialog.hide();
-                // Do query
-                createMesages(userIds, texts.title, texts.message);
-            });
-        }
-
-        function showHistoryDialog(userId) {
-            _lastTestResultDoc = null; // refresh for paging
-
-            if (!!userId) {
-                // TODO: show loading for request
-                loadTestResults(userId, _lastTestResultDoc, function(testList, lastDoc) {
-                    if (!!lastDoc) {
-                        _lastTestResultDoc = lastDoc;
-                    }
-
-                    if (!_.isEmpty(testList)) {
-                        let dialog = TestHistoryDialog();
-                        dialog.show($('.right_col'), testList, {
-                            selectedLoadMore: function() {
-                                dialog.doLoading(true);
-                                loadTestResults(userId, _lastTestResultDoc, function(testList, lastDoc) {
-                                    if (!!lastDoc) {
-                                        _lastTestResultDoc = lastDoc;
-                                    }
-
-                                    dialog.addHistories(testList);
-                                    dialog.doLoading(_.size(testList) <= 0);
-                                });
-                            }
-                        });
-                        dialog.doLoading(_.size(testList) <= 0);
-                    } else {
-                        new PNotify({
-                            type: 'info',
-                            text: 'No test results reported.'
-                        });
-                    }
-                });
-            } else {
-                console.warn('Failed to display history dialog by given user id cannot be null.');
-            }
-        }
-
-        function showSelfReportsDialog(userId) {
-            if (userId) {
-                _lastSelfReportDoc = null; // refresh.
-                loadSelfReports(userId, function(reportList, lastDocument) {
-                    if (!_.isEmpty(reportList)) {
-                        let _dialog = SelfReportDialog();
-                        _dialog.show($('.right_col'), reportList);
-                    } else {
-                        new PNotify({
-                            type: 'info',
-                            text: 'No self reports found.'
-                        });
-                    }
-                });
-            } else {
-                console.warn('Failed to show self report dialog given user id is null.');
-            }
-        }
-
-        function loadTestResults(userId, startAt, callback) {
-            let _callback = callback || _.noop,
-                _userRef = _db.collection('users').doc(userId);
-
-            // Do request
-            let query = _db.collection('test_results').where('owner', '==', _userRef);
-
-            if (!!startAt) {
-                query = query.startAfter(startAt);
-            }
-            query = query.orderBy('result_date', 'desc');
-            query.limit(TEST_RESULT_PAGE_SIZE)
-                .get().then(function(snapshot) {
-                    let testList = [],
-                        lastDoc;
-                    if (!!!snapshot.empty) {
-                        lastDoc = snapshot.docs[snapshot.docs.length - 1];
-                        snapshot.forEach(function(doc) {
-                            let history = doc.data();
-                            testList.push(history);
-                        });
-                    } else {
-                        // no items
-                    }
-
-                    _callback(testList, lastDoc);
-                });
-                // TODO: if error
-        }
-
-        function loadSelfReports(userId, callback) {
-            if (userId) {
-                let _callback = callback || _.noop,
-                _userRef = _db.collection('users').doc(userId);
-
-                let _query = _db.collection('self_reports')
-                                .where('score', '>', 0)
-                                .where('owner', '==', _userRef);
-
-                // do query
-                _query.get().then(function(snapshot) {
-                    let _reportList = [],
-                        _lastDoc;
-
-                    if (!snapshot.empty) {
-                        _lastDoc = _.last(snapshot.docs);
-                        snapshot.forEach(function(doc) {
-                            let _report = doc.data();
-                            _reportList.push(_report);
-                        });
-
-                        // Sorting is not possible on the firestore.
-                        _reportList = _.sortBy(_reportList, function(report) {
-                            return -report.ts.seconds
-                        });
-                    } else {
-                        // there is no reports.
-                    }
-
-                    _callback(_reportList, _lastDoc);
-                });
-            } else {
-                console.warn('Failed to load self reports by ginve id is null.');
-            }
-        }
-
-        function getSelectedUsers() {
-            return _.map(_table.getSelectedData(), function(data) {
-                return _.pick(data, 'id', 'name');
-            });
-        }
-
-        function loadCurrentUser(callback) {
-            let _callback = callback || _.noop;
-            if (!_currentUser) {
-                _db.collection('users').doc(firebase.auth().currentUser.uid).get().then(function(doc) {
-                    if (doc) {
-                        _currentUser = doc.data();
-                        _currentUser.documentId = doc.id;
-                    }
-
-                    _callback(_currentUser);
-                });
-            } else {
-                _callback(_currentUser);
-            }
-        }
-
-        function createMesage(userId, title, message) {
-            if (!!userId && !!message) {
-                loadCurrentUser(function(currentUser) {
-                    doCreateMessage([userId], currentUser.documentId, currentUser.fullname, title, message);
-                });
-            } else {
-                console.warn('Failed to send message, given params cannot be null.');
-            }
-        }
-
-        function createMesages(userIds, title, message) {
-            if (!!userIds && !!message) {
-                loadCurrentUser(function(currentUser) {
-                    doCreateMessage(userIds, currentUser.documentId, currentUser.fullname, title, message);
-                });
-            } else {
-                console.warn('Failed to send messages, given params cannot be null.');
-            }
-        }
-
-        function doCreateMessage(userIds, fromId, fromName, title, message) {
-            let data = userIds.shift();
-            if (!!data) {
-                let newData = {
-                    from_user: fromId,
-                    to_user: data.id,
-                    to_name: data.name,
-                    action: 4,
-                    title: title,
-                    message: message,
-                    ts: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                if (fromName) {
-                    newData.from_name = fromName;
-                }
-                _db.collection('messages').doc().set(newData).then(function() {
-                    doCreateMessage(userIds, fromId, title, message);
-                }).catch(function() {
-                    doCreateMessage(userIds, fromId, title, message);
+            function showMessageWithDialog(userIds) {
+                let dialog = CreateMessageDialog();
+                dialog.show($('.right_col'), function(texts) {
+                    dialog.hide();
+                    // Do query
+                    createMesages(userIds, texts.title, texts.message);
                 });
             }
-        }
 
-        function doUpdateStatus(userIds, type, status, callback, data) {
-            // TODO: multiple status
-            let _userData = userIds.shift(),
-                _callback = callback || _.noop,
-                _data = _.extend({}, data),
-                _pass = false;
-            if (_userData) {
-                if (type === STATUS_TYPE.CLINIC) {
-                    _data.clinic_status = status;
-                } else if (type === STATUS_TYPE.OP) {
-                    _data.op_status = status;
-                } else if (type === STATUS_TYPE.COMMAND) {
-                    if (status === COMMAND_STATUS_VALUE.REFER_TEST) {
-                        _data.test_referred = true;
-                        _data.clinic_status = CLINIC_STATUS_VALUE['quarantine-required'];
-                    } else if (status == OP_STATUS_VALUE['quarantine-confirmed']) {
-                        _data.op_status = status;
-                        _data.clinic_status = CLINIC_STATUS_VALUE['none'];
-                    }
-                } else {
-                    _pass = true;
-                }
+            function showHistoryDialog(userId) {
+                _lastTestResultDoc = null; // refresh for paging
 
-                if (!_pass) {
-                    _db.collection('users').doc(_userData.id).set(_data, {
-                        merge: true
-                    }).then(function() {
-                        doUpdateStatus(userIds, type, status, callback, data);
-                    }).catch(function() {
-                        doUpdateStatus(userIds, type, status, callback, data);
+                if (!!userId) {
+                    // TODO: show loading for request
+                    loadTestResults(userId, _lastTestResultDoc, function(testList, lastDoc) {
+                        if (!!lastDoc) {
+                            _lastTestResultDoc = lastDoc;
+                        }
+
+                        if (!_.isEmpty(testList)) {
+                            let dialog = TestHistoryDialog();
+                            dialog.show($('.right_col'), testList, {
+                                selectedLoadMore: function() {
+                                    dialog.doLoading(true);
+                                    loadTestResults(userId, _lastTestResultDoc, function(testList, lastDoc) {
+                                        if (!!lastDoc) {
+                                            _lastTestResultDoc = lastDoc;
+                                        }
+
+                                        dialog.addHistories(testList);
+                                        dialog.doLoading(_.size(testList) <= 0);
+                                    });
+                                }
+                            });
+                            dialog.doLoading(_.size(testList) <= 0);
+                        } else {
+                            new PNotify({
+                                type: 'info',
+                                text: 'No test results reported.'
+                            });
+                        }
                     });
                 } else {
-                    doUpdateStatus(userIds, type, status, callback, data);
+                    console.warn('Failed to display history dialog by given user id cannot be null.');
                 }
-            } else {
-                _callback();
-            }
-        }
-
-        function logClinicAction(userId, staffId, action, callback) {
-            let _callback = callback || _.noop;
-            if (!_.isString(userId) || _.isEmpty(userId)) {
-                console.warn('Failed to log clinic action by given user id is null.');
-                _callback();
-                return;
-            }
-            if (_.isEmpty(staffId)) {
-                console.log('Staff id is null, try use logged user.');
-            }
-            if (!_.isNumber(action)) {
-                console.warn('Failed to log clinic action, action should be number.');
-                _callback();
-                return;
             }
 
-            let _log = firebase.app().functions('asia-east2').httpsCallable('logClinicAction'),
-                _staffId = staffId || firebase.auth().currentUser.uid,
-                _userId = userId;
-
-            // do request
-            _log({
-                userId: _userId,
-                staffId: _staffId,
-                action: action
-            }).then(function(result) {
-                _callback();
-            });
-        }
-
-        function logClinicActions(userIds, staffId, action) {
-            if (!_.isArray(userIds)) {
-                console.warn('Failed to log clinic action by give id list is null.');
-                return;
+            function showSelfReportsDialog(userId) {
+                if (userId) {
+                    _lastSelfReportDoc = null; // refresh.
+                    loadSelfReports(userId, function(reportList, lastDocument) {
+                        if (!_.isEmpty(reportList)) {
+                            let _dialog = SelfReportDialog();
+                            _dialog.show($('.right_col'), reportList);
+                        } else {
+                            new PNotify({
+                                type: 'info',
+                                text: 'No self reports found.'
+                            });
+                        }
+                    });
+                } else {
+                    console.warn('Failed to show self report dialog given user id is null.');
+                }
             }
 
-            let _userId = userIds.shift();
-            if (_userId) {
-                logClinicAction(_userId, staffId, action, function() {
-                    logClinicActions(userIds, staffId, action);
+            function loadTestResults(userId, startAt, callback) {
+                let _callback = callback || _.noop,
+                    _userRef = _db.collection('users').doc(userId);
+
+                // Do request
+                let query = _db.collection('test_results').where('owner', '==', _userRef);
+
+                if (!!startAt) {
+                    query = query.startAfter(startAt);
+                }
+                query = query.orderBy('result_date', 'desc');
+                query.limit(TEST_RESULT_PAGE_SIZE)
+                    .get().then(function(snapshot) {
+                        let testList = [],
+                            lastDoc;
+                        if (!!!snapshot.empty) {
+                            lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                            snapshot.forEach(function(doc) {
+                                let history = doc.data();
+                                testList.push(history);
+                            });
+                        } else {
+                            // no items
+                        }
+
+                        _callback(testList, lastDoc);
+                    });
+                    // TODO: if error
+            }
+
+            function loadSelfReports(userId, callback) {
+                if (userId) {
+                    let _callback = callback || _.noop,
+                    _userRef = _db.collection('users').doc(userId);
+
+                    let _query = _db.collection('self_reports')
+                                    .where('score', '>', 0)
+                                    .where('owner', '==', _userRef);
+
+                    // do query
+                    _query.get().then(function(snapshot) {
+                        let _reportList = [],
+                            _lastDoc;
+
+                        if (!snapshot.empty) {
+                            _lastDoc = _.last(snapshot.docs);
+                            snapshot.forEach(function(doc) {
+                                let _report = doc.data();
+                                _reportList.push(_report);
+                            });
+
+                            // Sorting is not possible on the firestore.
+                            _reportList = _.sortBy(_reportList, function(report) {
+                                return -report.ts.seconds
+                            });
+                        } else {
+                            // there is no reports.
+                        }
+
+                        _callback(_reportList, _lastDoc);
+                    });
+                } else {
+                    console.warn('Failed to load self reports by ginve id is null.');
+                }
+            }
+
+            function getSelectedUsers() {
+                return _.map(_table.getSelectedData(), function(data) {
+                    return _.pick(data, 'id', 'name');
                 });
             }
-        }
 
-        function _clearSelectedItem() {
-            // Clear dropdown filter
-            _.each($('.filter-dropdown'), function(item) {
-                item.value = '';
-            }) ;
-            _selectedFilters = null;
-        }
+            function loadCurrentUser(callback) {
+                let _callback = callback || _.noop;
+                if (!_currentUser) {
+                    _db.collection('users').doc(firebase.auth().currentUser.uid).get().then(function(doc) {
+                        if (doc) {
+                            _currentUser = doc.data();
+                            _currentUser.documentId = doc.id;
+                        }
 
-        function _clearUserSearchBox() {
-            // Clear user searchbox
-            $('.user-serach-box').val('');
-        }
+                        _callback(_currentUser);
+                    });
+                } else {
+                    _callback(_currentUser);
+                }
+            }
 
-        function displayUser(userId, callback) {
-            callback = callback || _.noop;
+            function createMesage(userId, title, message) {
+                if (!!userId && !!message) {
+                    loadCurrentUser(function(currentUser) {
+                        doCreateMessage([userId], currentUser.documentId, currentUser.fullname, title, message);
+                    });
+                } else {
+                    console.warn('Failed to send message, given params cannot be null.');
+                }
+            }
 
-            if (!!userId) {
-                _table.clearData();
+            function createMesages(userIds, title, message) {
+                if (!!userIds && !!message) {
+                    loadCurrentUser(function(currentUser) {
+                        doCreateMessage(userIds, currentUser.documentId, currentUser.fullname, title, message);
+                    });
+                } else {
+                    console.warn('Failed to send messages, given params cannot be null.');
+                }
+            }
+
+            function doCreateMessage(userIds, fromId, fromName, title, message) {
+                let data = userIds.shift();
+                if (!!data) {
+                    let newData = {
+                        from_user: fromId,
+                        to_user: data.id,
+                        to_name: data.name,
+                        action: 4,
+                        title: title,
+                        message: message,
+                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    if (fromName) {
+                        newData.from_name = fromName;
+                    }
+                    _db.collection('messages').doc().set(newData).then(function() {
+                        doCreateMessage(userIds, fromId, title, message);
+                    }).catch(function() {
+                        doCreateMessage(userIds, fromId, title, message);
+                    });
+                }
+            }
+
+            function doUpdateStatus(userIds, type, status, callback, data) {
+                // TODO: multiple status
+                let _userData = userIds.shift(),
+                    _callback = callback || _.noop,
+                    _data = _.extend({}, data),
+                    _pass = false;
+                if (_userData) {
+                    if (type === STATUS_TYPE.CLINIC) {
+                        _data.clinic_status = status;
+                    } else if (type === STATUS_TYPE.OP) {
+                        _data.op_status = status;
+                    } else if (type === STATUS_TYPE.COMMAND) {
+                        if (status === COMMAND_STATUS_VALUE.REFER_TEST) {
+                            _data.test_referred = true;
+                            _data.clinic_status = CLINIC_STATUS_VALUE['quarantine-required'];
+                        } else if (status == OP_STATUS_VALUE['quarantine-confirmed']) {
+                            _data.op_status = status;
+                            _data.clinic_status = CLINIC_STATUS_VALUE['none'];
+                        }
+                    } else {
+                        _pass = true;
+                    }
+
+                    if (!_pass) {
+                        _db.collection('users').doc(_userData.id).set(_data, {
+                            merge: true
+                        }).then(function() {
+                            doUpdateStatus(userIds, type, status, callback, data);
+                        }).catch(function() {
+                            doUpdateStatus(userIds, type, status, callback, data);
+                        });
+                    } else {
+                        doUpdateStatus(userIds, type, status, callback, data);
+                    }
+                } else {
+                    _callback();
+                }
+            }
+
+            function logClinicAction(userId, staffId, action, callback) {
+                let _callback = callback || _.noop;
+                if (!_.isString(userId) || _.isEmpty(userId)) {
+                    console.warn('Failed to log clinic action by given user id is null.');
+                    _callback();
+                    return;
+                }
+                if (_.isEmpty(staffId)) {
+                    console.log('Staff id is null, try use logged user.');
+                }
+                if (!_.isNumber(action)) {
+                    console.warn('Failed to log clinic action, action should be number.');
+                    _callback();
+                    return;
+                }
+
+                let _log = firebase.app().functions('asia-east2').httpsCallable('logClinicAction'),
+                    _staffId = staffId || firebase.auth().currentUser.uid,
+                    _userId = userId;
+
+                // do request
+                _log({
+                    userId: _userId,
+                    staffId: _staffId,
+                    action: action
+                }).then(function(result) {
+                    _callback();
+                });
+            }
+
+            function logClinicActions(userIds, staffId, action) {
+                if (!_.isArray(userIds)) {
+                    console.warn('Failed to log clinic action by give id list is null.');
+                    return;
+                }
+
+                let _userId = userIds.shift();
+                if (_userId) {
+                    logClinicAction(_userId, staffId, action, function() {
+                        logClinicActions(userIds, staffId, action);
+                    });
+                }
+            }
+
+            function _clearSelectedItem() {
+                // Clear dropdown filter
+                _.each($('.filter-dropdown'), function(item) {
+                    item.value = '';
+                }) ;
+                _selectedFilters = null;
+            }
+
+            function _clearUserSearchBox() {
+                // Clear user searchbox
+                $('.user-serach-box').val('');
+            }
+
+            function displayUser(userId, callback) {
+                callback = callback || _.noop;
+
+                if (!!userId) {
+                    _table.clearData();
+
+                    if (!_loadingUsers) {
+                        _loadingUsers = true;
+
+                        loadUser(userId, function(user) {
+                            // render user.
+                            _clearSelectedItem();
+                            if (_.isObject(user) && !_.isEmpty(user)) {
+                                addUserItem(user);
+                                callback();
+                            } else {
+                                let container = $('.user-item-container');
+                                container.append('<div class="user-item-container-empty">No users</div>');
+                                console.warn('Failed to display user for ' + userId);
+                            }
+                            _loadingUsers = false;
+                        });
+                    } else {
+                        console.debug("Already loading users.");
+                        callback();
+                    }
+                } else {
+                    callback();
+                }
+            }
+
+            function displayUsers(filters, clean, callback) {
+                callback = callback || _.noop;
+
+                // Clear User search box
+                _clearUserSearchBox();
+
+                let container = $('.user-item-container');
+                if (!!clean) {
+                    _table.clearData();
+                }
 
                 if (!_loadingUsers) {
                     _loadingUsers = true;
+                    _selectedFilters = filters;
+                    loadUsers(_lastUserSnapShot, filters, function(users, lastSnapShot) {
+                        if (!!lastSnapShot) {
+                            _lastUserSnapShot = lastSnapShot;
+                        }
 
-                    loadUser(userId, function(user) {
-                        // render user.
-                        _clearSelectedItem();
-                        if (_.isObject(user) && !_.isEmpty(user)) {
-                            addUserItem(user);
-                            callback();
-                        } else {
-                            let container = $('.user-item-container');
+                        // render users.
+                        if (!_.isEmpty(users)) {
+                            addUserItems(users);
+                        } else if (container.children().length <= 0) {
                             container.append('<div class="user-item-container-empty">No users</div>');
-                            console.warn('Failed to display user for ' + userId);
                         }
                         _loadingUsers = false;
+                        callback();
                     });
                 } else {
                     console.debug("Already loading users.");
                     callback();
                 }
-            } else {
-                callback();
-            }
-        }
-
-        function displayUsers(filters, clean, callback) {
-            callback = callback || _.noop;
-
-            // Clear User search box
-            _clearUserSearchBox();
-
-            let container = $('.user-item-container');
-            if (!!clean) {
-                _table.clearData();
             }
 
-            if (!_loadingUsers) {
-                _loadingUsers = true;
-                _selectedFilters = filters;
-                loadUsers(_lastUserSnapShot, filters, function(users, lastSnapShot) {
-                    if (!!lastSnapShot) {
-                        _lastUserSnapShot = lastSnapShot;
-                    }
+            function loadUser(userId, callback) {
+                let _callback = callback || _.noop;
 
-                    // render users.
-                    if (!_.isEmpty(users)) {
-                        addUserItems(users);
-                    } else if (container.children().length <= 0) {
-                        container.append('<div class="user-item-container-empty">No users</div>');
+                _db.collection('users').doc(userId).get().then(function(snapshot) {
+                    if (!!snapshot) {
+                        let user = snapshot.data();
+                        if (user) {
+                            user.documentId = userId;
+                        }
+
+                        callback(user);
+                    } else {
+                        callback();
                     }
-                    _loadingUsers = false;
-                    callback();
                 });
-            } else {
-                console.debug("Already loading users.");
-                callback();
-            }
-        }
-
-        function loadUser(userId, callback) {
-            let _callback = callback || _.noop;
-
-            _db.collection('users').doc(userId).get().then(function(snapshot) {
-                if (!!snapshot) {
-                    let user = snapshot.data();
-                    if (user) {
-                        user.documentId = userId;
-                    }
-
-                    callback(user);
-                } else {
-                    callback();
+                if (_.isFunction(_snapshotUnsubscriber)) {
+                    _snapshotUnsubscriber();
                 }
-            });
-            if (_.isFunction(_snapshotUnsubscriber)) {
-                _snapshotUnsubscriber();
-            }
-            _snapshotUnsubscriber = _db.collection('users').doc(userId).onSnapshot(function(doc) {
-                if (doc) {
-                    var user = doc.data();
-                    if (user) {
-                        user.documentId = doc.id;
-                        updateUserItem(user);
-                    }
-                } else {
-                    console.log('Received subscribe event but there is no user for id ', userId);
-                }
-            }, function(error) {
-                console.warn("Received new user data, but there was an error.", error);
-            });
-        }
-
-        function loadUsers(startAt, filters, callback) {
-            var query;
-            query = _db.collection('users').orderBy('fullname')
-            if (!!startAt) {
-                // Paging
-                query = query.startAfter(startAt)
-            }
-            query = query.limit(USER_PAGE_SIZE);
-
-            // Adds filter if has
-            if (!!filters) {
-                _.each(filters, function(value, key) {
-                    query = query.where(key, '==', value);
-                });
-            }
-
-            // do query
-            query.get().then(function(snapshots) {
-                var users = [],
-                    lastSnapShot;
-                if (!!!snapshots.empty) {
-                    lastSnapShot = snapshots.docs[snapshots.docs.length - 1];
-                    snapshots.forEach(function(doc) {
-                        let user = doc.data();
-                        user.documentId = doc.id;
-                        users.push(user);
-                    });
-                } else {
-                    // no more users.
-                }
-
-                callback(users, lastSnapShot);
-            }).catch(function(error) {
-                console.warn('Failed to load users from server.', error);
-                callback();
-            });
-            if (_.isFunction(_snapshotUnsubscriber)) {
-                _snapshotUnsubscriber();
-            }
-            _snapshotUnsubscriber = query.onSnapshot(function(snapshot) {
-                snapshot.docChanges().forEach(function(change) {
-                    // handle only changed user
-                    if (change.type === 'modified' && !!!snapshot.empty) {
-                        snapshot.forEach(function(doc) {
-                            var user = doc.data();
+                _snapshotUnsubscriber = _db.collection('users').doc(userId).onSnapshot(function(doc) {
+                    if (doc) {
+                        var user = doc.data();
+                        if (user) {
                             user.documentId = doc.id;
-
                             updateUserItem(user);
-                        });
+                        }
+                    } else {
+                        console.log('Received subscribe event but there is no user for id ', userId);
                     }
+                }, function(error) {
+                    console.warn("Received new user data, but there was an error.", error);
                 });
-            }, function(error) {
-                console.warn("Received new user data, but there was an error.", error);
-            })
-        }
-
-        // TODO: Deprecated(210303)
-        function getSelectedFilters() {
-            let _filters = {},
-                _groupStatus = GROUP_STATUS_VALUE[$('.group .group-filter-btn.selected').attr('id')],
-                _userStatus = STATUS_VALUE[$('.user .user-filter-btn.selected').attr('id')];
-
-            if (_groupStatus) {
-                _filters.group = _groupStatus;
             }
-            if (_.isNumber(_userStatus)) {
-                _filters.user = _userStatus;
-            }
-            return _filters;
-        }
 
-        function refreshUserList() {
-            _lastUserSnapShot = null;
-            displayUsers(_selectedFilters, true, function() {
-                $('.user-item-loader-btn').removeClass('loading');
-            });
-        }
-
-        function removeUserItems(userIds) {
-            _.each(userIds, function(id) {
-                $('.user-item[uid="' + id + '"]').detach().remove();
-            });
-        }
-
-        function getUrlParameter(sParam) {
-            var sPageURL = window.location.search.substring(1),
-                sURLVariables = sPageURL.split('&'),
-                sParameterName,
-                i;
-
-            for (i = 0; i < sURLVariables.length; i++) {
-                sParameterName = sURLVariables[i].split('=');
-
-                if (sParameterName[0] === sParam) {
-                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            function loadUsers(startAt, filters, callback) {
+                var query;
+                query = _db.collection('users').orderBy('fullname')
+                if (!!startAt) {
+                    // Paging
+                    query = query.startAfter(startAt)
                 }
-            }
-        };
+                query = query.limit(USER_PAGE_SIZE);
 
-        function initHandlers() {
-            $('.user-item-loader-btn').click(function() {
-                let _this = $(this);
-                _this.addClass('loading');
-                displayUsers(_selectedFilters, false, function () {
-                    _this.removeClass('loading');
+                // Adds filter if has
+                if (!!filters) {
+                    _.each(filters, function(value, key) {
+                        query = query.where(key, '==', value);
+                    });
+                }
+
+                // do query
+                query.get().then(function(snapshots) {
+                    var users = [],
+                        lastSnapShot;
+                    if (!!!snapshots.empty) {
+                        lastSnapShot = snapshots.docs[snapshots.docs.length - 1];
+                        snapshots.forEach(function(doc) {
+                            let user = doc.data();
+                            user.documentId = doc.id;
+                            users.push(user);
+                        });
+                    } else {
+                        // no more users.
+                    }
+
+                    callback(users, lastSnapShot);
+                }).catch(function(error) {
+                    console.warn('Failed to load users from server.', error);
+                    callback();
                 });
-            });
-            $('.discover-hotspot-btn').click(function() {
-                window.alert('Not ready yet!');
-            })
-
-            $('.user-serach-box').keypress(function(event) {
-                let _keycode = (event.keyCode ? event.keyCode : event.which),
-                    _value = $(this).val().trim();
-                if(_keycode == '13' && _value) {
-                    displayUser(_value);
-                    return;
-                    window.location.hash = '#' + _value;
+                if (_.isFunction(_snapshotUnsubscriber)) {
+                    _snapshotUnsubscriber();
                 }
-            });
-            $('.searchbox-icon').click(function() {
-                let _value = $('.user-serach-box').val().trim();
-                if(_value) {
-                    displayUser(_value);
-                    return;
-                    window.location.hash = '#' + _value;
-                }
-            });
+                _snapshotUnsubscriber = query.onSnapshot(function(snapshot) {
+                    snapshot.docChanges().forEach(function(change) {
+                        // handle only changed user
+                        if (change.type === 'modified' && !!!snapshot.empty) {
+                            snapshot.forEach(function(doc) {
+                                var user = doc.data();
+                                user.documentId = doc.id;
 
-            // init filter buttons.
-            initFilterButton();
-
-            // [OP] init confirm quarantine button
-            $('.command-btn.confirm-quarantine').click(function() {
-                if (!$(this).hasClass('disabled')) {
-                    let userIds = getSelectedUsers();
-                    if (!_.isEmpty(userIds)) {
-                        if (window.confirm('Have you confirmed the selected persons are in QUARANTINE?')) {
-                            let idList = _.pluck(userIds, 'id');
-                            doUpdateStatus(userIds, STATUS_TYPE.COMMAND, OP_STATUS_VALUE['quarantine-confirmed'], function() {
-                                logClinicActions(idList, null, CLINIC_ACTION.QUARANTINE_CONFIRMED);
-
-                                new PNotify({
-                                    type: 'success',
-                                    text: 'Successfully changed status.'
-                                });
-                                refreshUserList();
+                                updateUserItem(user);
                             });
                         }
-                    } else {
-                        new PNotify({
-                            type: 'error',
-                            text: 'You must select the target users.'
-                        });
-                        console.warn('Failed to update quarantine confrimed status, cannot find selsected users.');
-                    }
-                }
-            });
-            // [OP] init confirm isolation
-            $('.command-btn.confirm-isolation').click(function() {
-                if (!$(this).hasClass('disabled')) {
-                    let userIds = getSelectedUsers();
-                    if (!_.isEmpty(userIds)) {
-                        if (window.confirm('Have you confirmed the selected persons are in ISOLATION?')) {
-                            let idList = _.pluck(userIds, 'id');
-                            doUpdateStatus(userIds, STATUS_TYPE.OP, OP_STATUS_VALUE['isolation-confirmed'], function() {
-                                logClinicActions(idList, null, CLINIC_ACTION.ISOLATION_CONFIRMED);
-
-                                new PNotify({
-                                    type: 'success',
-                                    text: 'Successfully changed status.'
-                                });
-                                refreshUserList();
-                            });
-                        }
-                    } else {
-                        new PNotify({
-                            type: 'error',
-                            text: 'You must select the target users.'
-                        });
-                        console.warn('Failed to update isolation confrimed status, cannot find selsected users.');
-                    }
-                }
-            });
-            // [CLINIC] init refer test
-            $('.command-btn.refer').click(function() {
-                if (!$(this).hasClass('disabled')) {
-                    let userIds = getSelectedUsers();
-                    if (!_.isEmpty(userIds)) {
-                        if (window.confirm('Do you want the selected persons to get tested?')) {
-                            let idList = _.pluck(userIds, 'id');
-                            doUpdateStatus(userIds, STATUS_TYPE.COMMAND, COMMAND_STATUS_VALUE.REFER_TEST, function() {
-                                logClinicActions(idList, null, CLINIC_ACTION.REFER_TEST);
-
-                                new PNotify({
-                                    type: 'success',
-                                    text: 'Successfully refer test.'
-                                });
-                                refreshUserList();
-                            });
-                        }
-                    } else {
-                        new PNotify({
-                            type: 'error',
-                            text: 'You must select the target users.'
-                        });
-                        console.warn('Failed to update test-referred status, cannot find selsected users.');
-                    }
-                }
-            });
-            // [CLINIC] init release
-            $('.command-btn.release-clinic').click(function() {
-                if (!$(this).hasClass('disabled')) {
-                    let userIds = getSelectedUsers();
-                    if (!_.isEmpty(userIds)) {
-                        if (window.confirm('Do you confirm that the selected persons currently have no risk of COVID-19?')) {
-                            let idList = _.pluck(userIds, 'id');
-                            doUpdateStatus(userIds, STATUS_TYPE.CLINIC, CLINIC_STATUS_VALUE['none'], function() {
-                                logClinicActions(idList, null, CLINIC_ACTION.CLINIC_RELEASE);
-
-                                new PNotify({
-                                    type: 'success',
-                                    text: 'Successfully release.'
-                                });
-                                refreshUserList();
-                            });
-                        }
-                    } else {
-                        new PNotify({
-                            type: 'error',
-                            text: 'You must select the target users.'
-                        });
-                        console.warn('Failed to update none status, cannot find selsected users.');
-                    }
-                }
-            });
-            // [OP] init release
-            $('.command-btn.release-op').click(function() {
-                if (!$(this).hasClass('disabled')) {
-                    let userIds = getSelectedUsers();
-                    if (!_.isEmpty(userIds)) {
-                        if (window.confirm('Do you confirm that the selected persons do not require quarantine or isolation?')) {
-                            let idList = _.pluck(userIds, 'id');
-                            doUpdateStatus(userIds, STATUS_TYPE.OP, OP_STATUS_VALUE['none'], function() {
-                                logClinicActions(idList, null, CLINIC_ACTION.OP_RELEASE);
-
-                                new PNotify({
-                                    type: 'success',
-                                    text: 'Successfully release.'
-                                });
-                                refreshUserList();
-                            }, {
-                                clinic_status: CLINIC_STATUS_VALUE['none'] // Op release should be set with clinic none
-                            });
-                        }
-                    } else {
-                        new PNotify({
-                            type: 'error',
-                            text: 'You must select the target users.'
-                        });
-                        console.warn('Failed to update none status, cannot find selsected users.');
-                    }
-                }
-            });
-            // init quarantine
-            $('.command-btn.quarantine').click(function() {
-                if (!$(this).hasClass('disabled')) {
-                    let userIds = getSelectedUsers();
-                    if (!_.isEmpty(userIds)) {
-                        if (window.confirm('Do you want to quarantine the selected persons?')) {
-                            let idList = _.pluck(userIds, 'id');
-                            doUpdateStatus(userIds, STATUS_TYPE.CLINIC, CLINIC_STATUS_VALUE['quarantine-required'], function() {
-                                logClinicActions(idList, null, CLINIC_ACTION.QUARANTINE_ORDERED);
-
-                                new PNotify({
-                                    type: 'success',
-                                    text: 'Successfully release.'
-                                });
-                                refreshUserList();
-                            });
-                        }
-                    } else {
-                        new PNotify({
-                            type: 'error',
-                            text: 'You must select the target users.'
-                        });
-                        console.warn('Failed to update none status, cannot find selsected users.');
-                    }
-                }
-            });
-            // init quarantine
-            $('.command-btn.isolate').click(function() {
-                if (!$(this).hasClass('disabled')) {
-                    let userIds = getSelectedUsers();
-                    if (!_.isEmpty(userIds)) {
-                        if (window.confirm('Do you want to isolation the selected persons?')) {
-                            let idList = _.pluck(userIds, 'id');
-                            doUpdateStatus(userIds, STATUS_TYPE.CLINIC, CLINIC_STATUS_VALUE['isolation-required'], function() {
-                                logClinicActions(idList, null, CLINIC_ACTION.ISOLATION_ORDERED);
-
-                                new PNotify({
-                                    type: 'success',
-                                    text: 'Successfully release.'
-                                });
-                                refreshUserList();
-                            });
-                        }
-                    } else {
-                        new PNotify({
-                            type: 'error',
-                            text: 'You must select the target users.'
-                        });
-                        console.warn('Failed to update none status, cannot find selsected users.');
-                    }
-                }
-            });
-
-
-            // init create message button
-            $('.command-btn.message').click(function() {
-                if (!$(this).hasClass('disabled')) {
-                    let userIds = getSelectedUsers();
-                    if (!!userIds && userIds.length > 0) {
-                        showMessageWithDialog(userIds);
-                    } else {
-                        new PNotify({
-                            type: 'error',
-                            text: 'You must select the target users.'
-                        });
-                        console.warn('Failed to show message dialog by cannot find selected users.');
-                    }
-                }
-            });
-            // init Noty
-            PNotify.prototype.options.delay = 5000;
-            PNotify.prototype.options.styling = 'bootstrap3';
-            // PNotify.prototype.options.stack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
-            // PNotify.prototype.options.addclass = 'stack-bottomright';
-        }
-
-        function _getKeyByValue(object, value) {
-            return Object.keys(object).find(key => object[key] === value);
-        }
-
-        function _getFilters(filterId, filterValue) {
-            let _filters = _selectedFilters || {},
-                _key = FIRESTORE_KEY[filterId],
-                _oldValue = null;
-            if (_.isEmpty(filterValue)) {
-                _oldValue = _filters[_key];
-                delete _filters[_key];
-            } else {
-                if (filterId in DROPDOWN_FILTER_VALUE) {
-                    _filters[_key] = DROPDOWN_FILTER_VALUE[filterId][filterValue];
-                } else {
-                    console.log(filterId + " not in list.");
-                }
+                    });
+                }, function(error) {
+                    console.warn("Received new user data, but there was an error.", error);
+                })
             }
-
-            if (Object.keys(_filters).length == 0) {
-                // There muse be at least one filter item.
-                // Returns the last set filter when all filters change to None.
-                _filters[FIRESTORE_KEY[filterId]] = _oldValue;
-                $('#' + filterId)[0].value = _getKeyByValue(DROPDOWN_FILTER_VALUE[filterId], _oldValue);
-                return null;
-            } else {
-                return _filters;
-            }
-        }
-
-        function _handleCommandButton(filterValue) {
-            // handle command buttons
-            // TODO: Handle filtervalue when and filters?
-            if (filterValue === 'quarantine-required') {
-                $('.command-btn.confirm-quarantine').removeClass('disabled');
-            } else {
-                $('.command-btn.confirm-quarantine').addClass('disabled');
-            }
-
-            if (filterValue === 'isolation-required') {
-                $('.command-btn.confirm-isolation').removeClass('disabled');
-            } else {
-                $('.command-btn.confirm-isolation').addClass('disabled');
-            }
-
-            if (filterValue === 'quarantine-required' || filterValue === 'isolation-required') {
-                $('.command-btn.release-op').removeClass('disabled');
-            } else {
-                $('.command-btn.release-op').addClass('disabled');
-            }
-
-            if (filterValue === 'close-contact' || filterValue === 'symptom-suspected') {
-                $('.command-btn.release-clinic').removeClass('disabled');
-                $('.command-btn.quarantine').removeClass('disabled');
-                $('.command-btn.isolate').removeClass('disabled');
-            } else {
-                $('.command-btn.release-clinic').addClass('disabled');
-                $('.command-btn.quarantine').addClass('disabled');
-                $('.command-btn.isolate').addClass('disabled');
-            }
-        }
-
-        function initFilterButton(type) {
-            // $('.' + type + ' .user-filter-btn').click(function() {
 
             // TODO: Deprecated(210303)
-            $('.user-filter-btn').click(function() {
-                _lastUserSnapShot = null; // reset paging
+            function getSelectedFilters() {
+                let _filters = {},
+                    _groupStatus = GROUP_STATUS_VALUE[$('.group .group-filter-btn.selected').attr('id')],
+                    _userStatus = STATUS_VALUE[$('.user .user-filter-btn.selected').attr('id')];
 
-                if ($(this).hasClass('selected')) {
-                    $(this).removeClass('selected');
-                    let _filters = getSelectedFilters();
+                if (_groupStatus) {
+                    _filters.group = _groupStatus;
+                }
+                if (_.isNumber(_userStatus)) {
+                    _filters.user = _userStatus;
+                }
+                return _filters;
+            }
+
+            function refreshUserList() {
+                _lastUserSnapShot = null;
+                displayUsers(_selectedFilters, true, function() {
+                    $('.user-item-loader-btn').removeClass('loading');
+                });
+            }
+
+            function removeUserItems(userIds) {
+                _.each(userIds, function(id) {
+                    $('.user-item[uid="' + id + '"]').detach().remove();
+                });
+            }
+
+            function getUrlParameter(sParam) {
+                var sPageURL = window.location.search.substring(1),
+                    sURLVariables = sPageURL.split('&'),
+                    sParameterName,
+                    i;
+
+                for (i = 0; i < sURLVariables.length; i++) {
+                    sParameterName = sURLVariables[i].split('=');
+
+                    if (sParameterName[0] === sParam) {
+                        return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                    }
+                }
+            };
+
+            function initHandlers() {
+                $('.user-item-loader-btn').click(function() {
+                    let _this = $(this);
+                    _this.addClass('loading');
+                    displayUsers(_selectedFilters, false, function () {
+                        _this.removeClass('loading');
+                    });
+                });
+                $('.discover-hotspot-btn').click(function() {
+                    window.alert('Not ready yet!');
+                })
+
+                $('.user-serach-box').keypress(function(event) {
+                    let _keycode = (event.keyCode ? event.keyCode : event.which),
+                        _value = $(this).val().trim();
+                    if(_keycode == '13' && _value) {
+                        displayUser(_value);
+                        return;
+                        window.location.hash = '#' + _value;
+                    }
+                });
+                $('.searchbox-icon').click(function() {
+                    let _value = $('.user-serach-box').val().trim();
+                    if(_value) {
+                        displayUser(_value);
+                        return;
+                        window.location.hash = '#' + _value;
+                    }
+                });
+
+                // init filter buttons.
+                initFilterButton();
+
+                // [OP] init confirm quarantine button
+                $('.command-btn.confirm-quarantine').click(function() {
+                    if (!$(this).hasClass('disabled')) {
+                        let userIds = getSelectedUsers();
+                        if (!_.isEmpty(userIds)) {
+                            if (window.confirm('Have you confirmed the selected persons are in QUARANTINE?')) {
+                                let idList = _.pluck(userIds, 'id');
+                                doUpdateStatus(userIds, STATUS_TYPE.COMMAND, OP_STATUS_VALUE['quarantine-confirmed'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.QUARANTINE_CONFIRMED);
+
+                                    new PNotify({
+                                        type: 'success',
+                                        text: 'Successfully changed status.'
+                                    });
+                                    refreshUserList();
+                                });
+                            }
+                        } else {
+                            new PNotify({
+                                type: 'error',
+                                text: 'You must select the target users.'
+                            });
+                            console.warn('Failed to update quarantine confrimed status, cannot find selsected users.');
+                        }
+                    }
+                });
+                // [OP] init confirm isolation
+                $('.command-btn.confirm-isolation').click(function() {
+                    if (!$(this).hasClass('disabled')) {
+                        let userIds = getSelectedUsers();
+                        if (!_.isEmpty(userIds)) {
+                            if (window.confirm('Have you confirmed the selected persons are in ISOLATION?')) {
+                                let idList = _.pluck(userIds, 'id');
+                                doUpdateStatus(userIds, STATUS_TYPE.OP, OP_STATUS_VALUE['isolation-confirmed'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.ISOLATION_CONFIRMED);
+
+                                    new PNotify({
+                                        type: 'success',
+                                        text: 'Successfully changed status.'
+                                    });
+                                    refreshUserList();
+                                });
+                            }
+                        } else {
+                            new PNotify({
+                                type: 'error',
+                                text: 'You must select the target users.'
+                            });
+                            console.warn('Failed to update isolation confrimed status, cannot find selsected users.');
+                        }
+                    }
+                });
+                // [CLINIC] init refer test
+                $('.command-btn.refer').click(function() {
+                    if (!$(this).hasClass('disabled')) {
+                        let userIds = getSelectedUsers();
+                        if (!_.isEmpty(userIds)) {
+                            if (window.confirm('Do you want the selected persons to get tested?')) {
+                                let idList = _.pluck(userIds, 'id');
+                                doUpdateStatus(userIds, STATUS_TYPE.COMMAND, COMMAND_STATUS_VALUE.REFER_TEST, function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.REFER_TEST);
+
+                                    new PNotify({
+                                        type: 'success',
+                                        text: 'Successfully refer test.'
+                                    });
+                                    refreshUserList();
+                                });
+                            }
+                        } else {
+                            new PNotify({
+                                type: 'error',
+                                text: 'You must select the target users.'
+                            });
+                            console.warn('Failed to update test-referred status, cannot find selsected users.');
+                        }
+                    }
+                });
+                // [CLINIC] init release
+                $('.command-btn.release-clinic').click(function() {
+                    if (!$(this).hasClass('disabled')) {
+                        let userIds = getSelectedUsers();
+                        if (!_.isEmpty(userIds)) {
+                            if (window.confirm('Do you confirm that the selected persons currently have no risk of COVID-19?')) {
+                                let idList = _.pluck(userIds, 'id');
+                                doUpdateStatus(userIds, STATUS_TYPE.CLINIC, CLINIC_STATUS_VALUE['none'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.CLINIC_RELEASE);
+
+                                    new PNotify({
+                                        type: 'success',
+                                        text: 'Successfully release.'
+                                    });
+                                    refreshUserList();
+                                });
+                            }
+                        } else {
+                            new PNotify({
+                                type: 'error',
+                                text: 'You must select the target users.'
+                            });
+                            console.warn('Failed to update none status, cannot find selsected users.');
+                        }
+                    }
+                });
+                // [OP] init release
+                $('.command-btn.release-op').click(function() {
+                    if (!$(this).hasClass('disabled')) {
+                        let userIds = getSelectedUsers();
+                        if (!_.isEmpty(userIds)) {
+                            if (window.confirm('Do you confirm that the selected persons do not require quarantine or isolation?')) {
+                                let idList = _.pluck(userIds, 'id');
+                                doUpdateStatus(userIds, STATUS_TYPE.OP, OP_STATUS_VALUE['none'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.OP_RELEASE);
+
+                                    new PNotify({
+                                        type: 'success',
+                                        text: 'Successfully release.'
+                                    });
+                                    refreshUserList();
+                                }, {
+                                    clinic_status: CLINIC_STATUS_VALUE['none'] // Op release should be set with clinic none
+                                });
+                            }
+                        } else {
+                            new PNotify({
+                                type: 'error',
+                                text: 'You must select the target users.'
+                            });
+                            console.warn('Failed to update none status, cannot find selsected users.');
+                        }
+                    }
+                });
+                // init quarantine
+                $('.command-btn.quarantine').click(function() {
+                    if (!$(this).hasClass('disabled')) {
+                        let userIds = getSelectedUsers();
+                        if (!_.isEmpty(userIds)) {
+                            if (window.confirm('Do you want to quarantine the selected persons?')) {
+                                let idList = _.pluck(userIds, 'id');
+                                doUpdateStatus(userIds, STATUS_TYPE.CLINIC, CLINIC_STATUS_VALUE['quarantine-required'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.QUARANTINE_ORDERED);
+
+                                    new PNotify({
+                                        type: 'success',
+                                        text: 'Successfully release.'
+                                    });
+                                    refreshUserList();
+                                });
+                            }
+                        } else {
+                            new PNotify({
+                                type: 'error',
+                                text: 'You must select the target users.'
+                            });
+                            console.warn('Failed to update none status, cannot find selsected users.');
+                        }
+                    }
+                });
+                // init quarantine
+                $('.command-btn.isolate').click(function() {
+                    if (!$(this).hasClass('disabled')) {
+                        let userIds = getSelectedUsers();
+                        if (!_.isEmpty(userIds)) {
+                            if (window.confirm('Do you want to isolation the selected persons?')) {
+                                let idList = _.pluck(userIds, 'id');
+                                doUpdateStatus(userIds, STATUS_TYPE.CLINIC, CLINIC_STATUS_VALUE['isolation-required'], function() {
+                                    logClinicActions(idList, null, CLINIC_ACTION.ISOLATION_ORDERED);
+
+                                    new PNotify({
+                                        type: 'success',
+                                        text: 'Successfully release.'
+                                    });
+                                    refreshUserList();
+                                });
+                            }
+                        } else {
+                            new PNotify({
+                                type: 'error',
+                                text: 'You must select the target users.'
+                            });
+                            console.warn('Failed to update none status, cannot find selsected users.');
+                        }
+                    }
+                });
+
+
+                // init create message button
+                $('.command-btn.message').click(function() {
+                    if (!$(this).hasClass('disabled')) {
+                        let userIds = getSelectedUsers();
+                        if (!!userIds && userIds.length > 0) {
+                            showMessageWithDialog(userIds);
+                        } else {
+                            new PNotify({
+                                type: 'error',
+                                text: 'You must select the target users.'
+                            });
+                            console.warn('Failed to show message dialog by cannot find selected users.');
+                        }
+                    }
+                });
+                // init Noty
+                PNotify.prototype.options.delay = 5000;
+                PNotify.prototype.options.styling = 'bootstrap3';
+                // PNotify.prototype.options.stack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
+                // PNotify.prototype.options.addclass = 'stack-bottomright';
+            }
+
+            function _getKeyByValue(object, value) {
+                return Object.keys(object).find(key => object[key] === value);
+            }
+
+            function _getFilters(filterId, filterValue) {
+                let _filters = _selectedFilters || {},
+                    _key = FIRESTORE_KEY[filterId],
+                    _oldValue = null;
+                if (_.isEmpty(filterValue)) {
+                    _oldValue = _filters[_key];
+                    delete _filters[_key];
+                } else {
+                    if (filterId in DROPDOWN_FILTER_VALUE) {
+                        _filters[_key] = DROPDOWN_FILTER_VALUE[filterId][filterValue];
+                    } else {
+                        console.log(filterId + " not in list.");
+                    }
+                }
+
+                if (Object.keys(_filters).length == 0) {
+                    // There muse be at least one filter item.
+                    // Returns the last set filter when all filters change to None.
+                    _filters[FIRESTORE_KEY[filterId]] = _oldValue;
+                    $('#' + filterId)[0].value = _getKeyByValue(DROPDOWN_FILTER_VALUE[filterId], _oldValue);
+                    return null;
+                } else {
+                    return _filters;
+                }
+            }
+
+            function _handleCommandButton(filterValue) {
+                // handle command buttons
+                // TODO: Handle filtervalue when and filters?
+                if (filterValue === 'quarantine-required') {
+                    $('.command-btn.confirm-quarantine').removeClass('disabled');
+                } else {
+                    $('.command-btn.confirm-quarantine').addClass('disabled');
+                }
+
+                if (filterValue === 'isolation-required') {
+                    $('.command-btn.confirm-isolation').removeClass('disabled');
+                } else {
+                    $('.command-btn.confirm-isolation').addClass('disabled');
+                }
+
+                if (filterValue === 'quarantine-required' || filterValue === 'isolation-required') {
+                    $('.command-btn.release-op').removeClass('disabled');
+                } else {
+                    $('.command-btn.release-op').addClass('disabled');
+                }
+
+                if (filterValue === 'close-contact' || filterValue === 'symptom-suspected') {
+                    $('.command-btn.release-clinic').removeClass('disabled');
+                    $('.command-btn.quarantine').removeClass('disabled');
+                    $('.command-btn.isolate').removeClass('disabled');
+                } else {
+                    $('.command-btn.release-clinic').addClass('disabled');
+                    $('.command-btn.quarantine').addClass('disabled');
+                    $('.command-btn.isolate').addClass('disabled');
+                }
+            }
+
+            function initFilterButton(type) {
+                // $('.' + type + ' .user-filter-btn').click(function() {
+
+                // TODO: Deprecated(210303)
+                $('.user-filter-btn').click(function() {
+                    _lastUserSnapShot = null; // reset paging
+
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected');
+                        let _filters = getSelectedFilters();
+
+                        // check all deselected
+                        if (_.isEmpty(_filters)) {
+                            // display default user list.
+                            displayUsers(null, true, function() {
+                                $('.user-item-loader-btn').removeClass('loading');
+                            });
+                        } else {
+                            displayUsers(_filters, true, function() {
+                                $('.user-item-loader-btn').removeClass('loading');
+                            });
+                        }
+                    } else {
+                        $('.user-filter-btn').removeClass('selected');
+                        $(this).addClass('selected');
+
+                        displayUsers(getSelectedFilters(), true, function() {
+                            $('.user-item-loader-btn').removeClass('loading');
+                        });
+                    }
+                });
+
+                $('.filter-dropdown').change(function() {
+                    let _filters = _getFilters(this.id, this.value);
 
                     // check all deselected
                     if (_.isEmpty(_filters)) {
-                        // display default user list.
-                        displayUsers(null, true, function() {
-                            $('.user-item-loader-btn').removeClass('loading');
-                        });
+                        window.alert("Please set at least one filter.");
                     } else {
+                        _lastUserSnapShot = null; // reset paging
                         displayUsers(_filters, true, function() {
                             $('.user-item-loader-btn').removeClass('loading');
                         });
+                        _handleCommandButton(this.value);
                     }
-                } else {
-                    $('.user-filter-btn').removeClass('selected');
-                    $(this).addClass('selected');
+                });
 
-                    displayUsers(getSelectedFilters(), true, function() {
-                        $('.user-item-loader-btn').removeClass('loading');
+            }
+
+            function initTableView() {
+                if (!_table) {
+                     _table = new Tabulator('#user-table', {
+                        layout: 'fitColumns',
+                        columnVertAlign: 'middle',
+                        headerSort: false, // disable header sort for all columns
+                        placeholder: 'No Users',
+                        columns: [
+                            {formatter: 'rowSelection', titleFormatter: 'rowSelection', resizable: false, width: 30, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', headerSort: false, cellClick: function(e, cell) {
+                                cell.getRow().toggleSelect();
+                            }},
+                            {title: 'Name', field: 'name', minWidth: 175, widthGrow: 3, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
+                                let data = cell.getRow().getData();
+                                let nameCell = $('<div class="user-item-cell name">'),
+                                    nameContainer = $('<div class="user-item-content-container name">'),
+                                    profile = $('<div class="user-item-avatar">'),
+                                    nameLabel = $('<div class="user-item-name-label">'),
+                                    idLabel = $('<div class="user-item-id-label">');
+                                nameCell.append(profile, nameContainer);
+                                nameContainer.append(nameLabel, idLabel);
+
+                                onRendered(function() {
+                                    // Updates the profile image
+                                    let profileUrl = DOWNLOAD_URL_BUILDER({
+                                        type: 'image',
+                                        id: data.id
+                                    });
+                                    $('<img/>')
+                                        .load(function() {
+                                            $(cell.getElement()).find('.user-item-avatar').css('background-image', 'url(' + profileUrl + ')');
+                                        })
+                                        .attr('src', profileUrl);
+                                    });
+                                nameLabel.text(data.name);
+                                idLabel.text('(' + data.id + ')');
+
+                                return nameCell.prop('outerHTML');
+                            }},
+                            {title: 'Location', field: 'location', minWidth: 135, widthGrow: 2, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
+                                let location = cell.getValue();
+                                let locationCell = $('<div class="user-item-cell location">'),
+                                    campIcon = $('<div class="user-item-loc-icn camp">'),
+                                    transitIcon = $('<div class="user-item-loc-icn transit">'),
+                                    tunnelIcon = $('<div class="user-item-loc-icn tunnel">');
+                                    locationCell.append(campIcon, $('<div class="user-item-loc-arrow-icn">'), transitIcon,
+                                        $('<div class="user-item-loc-arrow-icn">'), tunnelIcon);
+
+                                // handle location
+                                let activeIcon = null;
+                                if (location == 1) {
+                                    // outside
+                                    activeIcon = transitIcon;
+                                } else if (location == 100) {
+                                    // in a camp
+                                    activeIcon = campIcon;
+                                } else if (location == 1000) {
+                                    // in the tunnel
+                                    activeIcon = tunnelIcon;
+                                }
+                                activeIcon && activeIcon.addClass('active');
+
+                                return locationCell.prop('outerHTML');
+                            }},
+                            {title: 'Status', field: 'status', width: 50, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
+                            {title: 'Gender', field: 'gender', width: 40, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
+                            {title: 'Nationality', field: 'nationality', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
+                            {title: 'Employer', field: 'employer', width: 45, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
+                            {title: 'Camp', field: 'camp', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
+                            {title: 'Room', field: 'room', width: 55, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
+                            {title: 'Phone', field: 'phone', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
+                            {title: 'Department', field: 'department', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
+                            {title: 'PV<br/>Area', field: 'pvArea', width: 40, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
+                            {title: 'Job Category', field: 'jobCat1', widthGrow: 2, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
+                                let data = cell.getRow().getData();
+                                let jobContainer = $('<div class="user-item-cell job">'),
+                                    jobCat1Label = $('<div class="user-item-label jobcat1">'),
+                                    jobCat2Label = $('<div class="user-item-label jobcat2">');
+                                jobContainer.append(jobCat1Label, jobCat2Label);
+
+                                jobCat1Label.text(data.jobCat1);
+                                jobCat2Label.text(data.jobCat2);
+
+                                return jobContainer.prop('outerHTML');
+                            }},
+                            {title: 'App<br />Installed', field: 'appInstalled', resizable: false, width: 50, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: 'tickCross'},
+                            {title: 'Pre<br />Meds', field: 'hasPreMeds', resizable: false, width: 50, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', tooltip: function(cell) {
+                                let preMeds = cell.getValue() && cell.getRow().getData().preMeds,
+                                    preMedMessage = '';
+                                // handle pre medical info
+                                if (_.isArray(preMeds) && !_.isEmpty(preMeds)) {
+                                    let _key,
+                                        _display;
+                                    _.each(preMeds, function(info) {
+                                        _key = info.replace('sign_in.form.', '');
+                                        _display = PRE_MED_DISPLAY[_key];
+                                        if (_display) {
+                                            preMedMessage +=  _display + ', ';
+                                        } else {
+                                            console.warn('Failed to parse pre medical codition, unknown key.', info);
+                                        }
+                                    });
+                                    preMedMessage = preMedMessage.slice(0, -2);
+                                }
+
+                                return preMedMessage;
+                            }, formatter: 'tickCross', formatterParams: {
+                                allowTruthy : true
+                            }},
+                            {title: 'Commands', field: 'commands', width: 70, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
+                                let data = cell.getRow().getData();
+                                let commandsCell = $('<div class="user-item-cell commands">'),
+                                    historyButton = $('<div class="user-item-btn history">'),
+                                    selfReportsButton = $('<div class="user-item-btn self-reports">');
+                                    commandsCell.append(historyButton, selfReportsButton);
+
+                                onRendered(function() {
+                                    let $cell = $(cell.getElement());
+                                    $cell.find('.user-item-btn.history').click(function() {
+                                        showHistoryDialog(cell.getData().id);
+                                    });
+                                    $cell.find('.user-item-btn.self-reports').click(function() {
+                                        showSelfReportsDialog(cell.getData().id);
+                                    });
+                                });
+
+                                return commandsCell.prop('outerHTML');
+                            }}
+                        ]
                     });
                 }
-            });
-
-            $('.filter-dropdown').change(function() {
-                let _filters = _getFilters(this.id, this.value);
-
-                // check all deselected
-                if (_.isEmpty(_filters)) {
-                    window.alert("Please set at least one filter.");
-                } else {
-                    _lastUserSnapShot = null; // reset paging
-                    displayUsers(_filters, true, function() {
-                        $('.user-item-loader-btn').removeClass('loading');
-                    });
-                    _handleCommandButton(this.value);
-                }
-            });
-
-        }
-
-        function initTableView() {
-            if (!_table) {
-                 _table = new Tabulator('#user-table', {
-                    layout: 'fitColumns',
-                    columnVertAlign: 'middle',
-                    headerSort: false, // disable header sort for all columns
-                    placeholder: 'No Users',
-                    columns: [
-                        {formatter: 'rowSelection', titleFormatter: 'rowSelection', resizable: false, width: 30, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', headerSort: false, cellClick: function(e, cell) {
-                            cell.getRow().toggleSelect();
-                        }},
-                        {title: 'Name', field: 'name', minWidth: 175, widthGrow: 3, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
-                            let data = cell.getRow().getData();
-                            let nameCell = $('<div class="user-item-cell name">'),
-                                nameContainer = $('<div class="user-item-content-container name">'),
-                                profile = $('<div class="user-item-avatar">'),
-                                nameLabel = $('<div class="user-item-name-label">'),
-                                idLabel = $('<div class="user-item-id-label">');
-                            nameCell.append(profile, nameContainer);
-                            nameContainer.append(nameLabel, idLabel);
-
-                            onRendered(function() {
-                                // Updates the profile image
-                                let profileUrl = DOWNLOAD_URL_BUILDER({
-                                    type: 'image',
-                                    id: data.id
-                                });
-                                $('<img/>')
-                                    .load(function() {
-                                        $(cell.getElement()).find('.user-item-avatar').css('background-image', 'url(' + profileUrl + ')');
-                                    })
-                                    .attr('src', profileUrl);
-                                });
-                            nameLabel.text(data.name);
-                            idLabel.text('(' + data.id + ')');
-
-                            return nameCell.prop('outerHTML');
-                        }},
-                        {title: 'Location', field: 'location', minWidth: 135, widthGrow: 2, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
-                            let location = cell.getValue();
-                            let locationCell = $('<div class="user-item-cell location">'),
-                                campIcon = $('<div class="user-item-loc-icn camp">'),
-                                transitIcon = $('<div class="user-item-loc-icn transit">'),
-                                tunnelIcon = $('<div class="user-item-loc-icn tunnel">');
-                                locationCell.append(campIcon, $('<div class="user-item-loc-arrow-icn">'), transitIcon,
-                                    $('<div class="user-item-loc-arrow-icn">'), tunnelIcon);
-
-                            // handle location
-                            let activeIcon = null;
-                            if (location == 1) {
-                                // outside
-                                activeIcon = transitIcon;
-                            } else if (location == 100) {
-                                // in a camp
-                                activeIcon = campIcon;
-                            } else if (location == 1000) {
-                                // in the tunnel
-                                activeIcon = tunnelIcon;
-                            }
-                            activeIcon && activeIcon.addClass('active');
-
-                            return locationCell.prop('outerHTML');
-                        }},
-                        {title: 'Status', field: 'status', width: 50, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                        {title: 'Gender', field: 'gender', width: 40, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                        {title: 'Nationality', field: 'nationality', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                        {title: 'Employer', field: 'employer', width: 45, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                        {title: 'Camp', field: 'camp', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                        {title: 'Room', field: 'room', width: 55, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                        {title: 'Phone', field: 'phone', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                        {title: 'Department', field: 'department', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                        {title: 'PV<br/>Area', field: 'pvArea', width: 40, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                        {title: 'Job Category', field: 'jobCat1', widthGrow: 2, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
-                            let data = cell.getRow().getData();
-                            let jobContainer = $('<div class="user-item-cell job">'),
-                                jobCat1Label = $('<div class="user-item-label jobcat1">'),
-                                jobCat2Label = $('<div class="user-item-label jobcat2">');
-                            jobContainer.append(jobCat1Label, jobCat2Label);
-
-                            jobCat1Label.text(data.jobCat1);
-                            jobCat2Label.text(data.jobCat2);
-
-                            return jobContainer.prop('outerHTML');
-                        }},
-                        {title: 'App<br />Installed', field: 'appInstalled', resizable: false, width: 50, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: 'tickCross'},
-                        {title: 'Pre<br />Meds', field: 'hasPreMeds', resizable: false, width: 50, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', tooltip: function(cell) {
-                            let preMeds = cell.getValue() && cell.getRow().getData().preMeds,
-                                preMedMessage = '';
-                            // handle pre medical info
-                            if (_.isArray(preMeds) && !_.isEmpty(preMeds)) {
-                                let _key,
-                                    _display;
-                                _.each(preMeds, function(info) {
-                                    _key = info.replace('sign_in.form.', '');
-                                    _display = PRE_MED_DISPLAY[_key];
-                                    if (_display) {
-                                        preMedMessage +=  _display + ', ';
-                                    } else {
-                                        console.warn('Failed to parse pre medical codition, unknown key.', info);
-                                    }
-                                });
-                                preMedMessage = preMedMessage.slice(0, -2);
-                            }
-
-                            return preMedMessage;
-                        }, formatter: 'tickCross', formatterParams: {
-                            allowTruthy : true
-                        }},
-                        {title: 'Commands', field: 'commands', width: 70, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
-                            let data = cell.getRow().getData();
-                            let commandsCell = $('<div class="user-item-cell commands">'),
-                                historyButton = $('<div class="user-item-btn history">'),
-                                selfReportsButton = $('<div class="user-item-btn self-reports">');
-                                commandsCell.append(historyButton, selfReportsButton);
-
-                            onRendered(function() {
-                                let $cell = $(cell.getElement());
-                                $cell.find('.user-item-btn.history').click(function() {
-                                    showHistoryDialog(cell.getData().id);
-                                });
-                                $cell.find('.user-item-btn.self-reports').click(function() {
-                                    showSelfReportsDialog(cell.getData().id);
-                                });
-                            });
-
-                            return commandsCell.prop('outerHTML');
-                        }}
-                    ]
-                });
-            }
-        }
-
-        // Classes
-        function CreateMessageDialog() {
-            let _views
-                _callback = _.noop;
-
-            function render() {
-                let container = $('<div class="c-modal-dialog cmessage-dialog">'),
-                    contentContainer = $('<div class="c-modal-dialog-content cmessage-dialog-content">'),
-                    closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">'),
-                    messaegSelector = $('<select name="message" class="cmessage-selector dialog-selector">');
-                    titleTextbox = $('<input type="text" class="dialog-textbox cmessage-dialog-title-textbox" placeholder="Stay Home">'),
-                    messageTextarea = $('<textarea class="dialog-textarea cmessage-dialog-message-textarea" placeholder="Please do not come to work today.\nOne of our medical staff will be in contact soon.">');
-                let sendButton = $('<div class="dialog-btn cmessage-dialog-send-btn">'),
-                    sendButtonLabel = $('<div class="cmessage-dialog-send-btn-label">Send</div>'),
-                    sendButtonIcon = $('<div class="cmessage-dialog-send-btn-icon">');
-
-                container.append(contentContainer);
-                contentContainer.append(closeButton, messaegSelector, titleTextbox, messageTextarea, sendButton);
-                sendButton.append(sendButtonLabel, sendButtonIcon);
-
-                messaegSelector.append($('<option value="pre" selected="selected">Pre-defined Message</option>'))
-                    .append($('<option value="stay">Stay home</option>'))
-                    .append($('<option value="test">Get your test</option>'))
-                    .append($('<option value="report">Report immediately</option>'));
-
-                // init handlers
-                $(document).keyup(function(e) {
-                    if (e.key === "Escape") {
-                        hide();
-                    }
-                });
-                messaegSelector.change(function() {
-                    let selected = $('option:selected', this);
-                    if (selected.val() === 'pre') {
-                        titleTextbox.val('');
-                    } else {
-                        titleTextbox.val(selected.text());
-                    }
-                });
-                container.click(function() {
-                    // hide();
-                });
-                closeButton.click(function() {
-                    hide();
-                })
-                sendButton.click(function() {
-                    let title = titleTextbox.val(),
-                        message = messageTextarea.val();
-
-                    if (title.trim().length > 0) {
-                        _callback({
-                            title: title,
-                            message: message
-                        });
-                    } else {
-                        window.alert('Please enter title.');
-                    }
-                });
-                titleTextbox.change(function() {
-                    if ($(this).val().trim().length <= 0) {
-                        // TODO:
-                    }
-                });
-
-                // Store views
-                _views = {};
-                _views.container = container;
             }
 
-            function show(parent, callback) {
-                _callback = callback || _.noop;
-                render();
-
-                parent.append(_views.container);
-            }
-
-            function hide() {
-                _views.container.remove();
-                _views = null;
-                _callback = _.noop;
-            }
-
-            return {
-                show: show,
-                hide: hide
-            }
-        }
-
-        function TestHistoryDialog() {
-            let _views = {}
-                _histories = [],
-                _callbacks = {
-                    selectedLoadMore: _.noop
-                };
-
-            function show(parent, histories, callbacks) {
-                _histories = histories || [];
-                _callbacks = callbacks || {
-                    selectedLoadMore: _.noop
-                };
-
-                let container = $('<div class="history-dialog c-modal-dialog">'),
-                    closeButton = $('<div class="history-dialog-close-btn c-modal-dialog-close-btn">'),
-                    contentContainer = $('<div class="hd-content-container c-modal-dialog-content">'),
-                    historyTitleContainer = $('<div class="hd-history-title-container">'),
-                    historyItemsContainer = $('<div class="hd-history-items-container">');
-                let loadMoreButton = $('<div class="hd-dialog-loader-btn">')
-                    .append($('<div class="hd-dialog-loader-icon">'))
-                    .append($('<div class="hd-dialog-loader-label">Load more</div>'));
-
-                container.append(contentContainer);
-                contentContainer.append(closeButton, historyTitleContainer, historyItemsContainer, loadMoreButton);
-                historyTitleContainer.append(
-                    $('<div class="shi-title-label schedule-date">Schedule Date</div>'),
-                    $('<div class="shi-title-label test-date">Test Date</div>'),
-                    $('<div class="shi-title-label result-date">Result Date</div>'),
-                    $('<div class="shi-title-label expiry-date">Expiry Date</div>'),
-                    $('<div class="shi-title-label location">Location</div>'),
-                    $('<div class="shi-title-label underlying">Underlying Illness</div>'),
-                    $('<div class="shi-title-label reason">Reason for Test</div>'),
-                    $('<div class="shi-title-label type">Type</div>'),
-                    $('<div class="shi-title-label result">Result</div>'),
-                    $('<div class="shi-title-label remarks">Remarks</div>'),
-                    $('<div class="shi-title-label clearance">Clearance</div>'),
-                    $('<div class="shi-title-label owner-name">Owner</div>'),
-                    $('<div class="shi-title-label reporter-name">Reporter</div>'),
-                    $('<div class="shi-title-label attachment">Attachment</div>')
-                );
-
-                parent.append(container);
-
-                // init handler
-                // TODO: modal click
-                closeButton.click(function() {
-                    hide();
-                });
-                $(document).keyup(function(e) {
-                    if (e.key === "Escape") {
-                        hide();
-                    }
-                });
-                loadMoreButton.click(function() {
-                    _callbacks.selectedLoadMore();
-                });
-
-                _views.container = container;
-                _views.contentContainer = contentContainer;
-                _views.historyItemsContainer = historyItemsContainer;
-                _views.closeButton = closeButton;
-                _views.loadMoreButton = loadMoreButton;
-
-                addHistoryItems(_histories);
-            }
-
-            function hide() {
-                _views.container.detach().remove();
-            }
-
-            function doLoading(loading) {
-                if (loading) {
-                    _views.loadMoreButton.addClass('loading');
-                } else {
-                    _views.loadMoreButton.removeClass('loading');
-                }
-            }
-
-            function addHistoryItems(histories) {
-                let container = _views.historyItemsContainer;
-                _.each(histories, function(history) {
-                    let viewItem = HistoryItem(history);
-                    container.append(viewItem.render());
-                });
-            }
-
-            function HistoryItem(model) {
-                const REASON_FOR_TEST_DISPLAY = {
-                    1: '1st recovery test',
-                    2: '2nd recovery test',
-                    3: '1st test from Closed Contact',
-                    4: '2nd test from Closed Contact',
-                    5: '1st test from Travel(In-bound)',
-                    6: 'Confirmation test from SK COVID center',
-                    7: '2end test from Travel(In-bound)',
-                    8: 'Multi-interfacing Personnel',
-                    9: 'New Employee',
-                    10: 'Others'
-                },
-                TYPE_DISPLAY = {
-                    1: 'Fitness test',
-                    2: 'Mass test',
-                    3: 'MOHS',
-                    4: 'Regular test',
-                    5: 'Other test'
-                },
-                RESULT_DISPLAY = {
-                    1: 'Positive',
-                    '-1': 'Negative',
-                    0: 'Waiting',
-                    2: 'Inconclusive',
-                    3: 'Others',
-                    11: 'Fit to work',
-                    '-11': 'Not fit to work'
-                },
-                CLEARANCE_DISPLAY = {
-                    1: 'Cleared',
-                    2: 'Pending',
-                    3: 'Regular check on-going',
-                    4: 'Others'
-                };
-
-                let _views = {}
-                    _model = model,
-                    _owner = null,
-                    _reporter = null;
-
+            // Classes
+            function CreateMessageDialog() {
+                let _views
+                    _callback = _.noop;
 
                 function render() {
-                    let container = $('<div class="status-history-item">'),
-                        upperContainer = $('<div class="shi-upper-container">'),
-                        lowerContainer = $('<div class="shi-lower-container">');
-                    let scheduleDateLabel = $('<div class="shi-value-label schedule-date">'),
-                        testDateLabel = $('<div class="shi-value-label test-date">'),
-                        resultDateLabel = $('<div class="shi-value-label result-date">'),
-                        expiryDateLabel = $('<div class="shi-value-label expiry-date">'),
-                        locationLabel = $('<div class="shi-value-label location">'),
-                        underlyingLabel = $('<div class="shi-value-label underlying">'),
-                        reasonForTestLabel = $('<div class="shi-value-label reson-test">'),
-                        typeLabel = $('<div class="shi-value-label type">'),
-                        resultLabel = $('<div class="shi-value-label result">'),
-                        remarksLabel = $('<div class="shi-value-label remarks">'),
-                        clearanceLabel = $('<div class="shi-value-label clearance">'),
-                        ownerNameLabel = $('<div class="shi-value-label owner-name">'),
-                        reporterNameLabel = $('<div class="shi-value-label reporter-name">'),
-                        attachmentContainer = $('<div class="shi-attachment-container">');
+                    let container = $('<div class="c-modal-dialog cmessage-dialog">'),
+                        contentContainer = $('<div class="c-modal-dialog-content cmessage-dialog-content">'),
+                        closeButton = $('<div class="c-modal-dialog-close-btn cmessage-dialog-close-btn">'),
+                        messaegSelector = $('<select name="message" class="cmessage-selector dialog-selector">');
+                        titleTextbox = $('<input type="text" class="dialog-textbox cmessage-dialog-title-textbox" placeholder="Stay Home">'),
+                        messageTextarea = $('<textarea class="dialog-textarea cmessage-dialog-message-textarea" placeholder="Please do not come to work today.\nOne of our medical staff will be in contact soon.">');
+                    let sendButton = $('<div class="dialog-btn cmessage-dialog-send-btn">'),
+                        sendButtonLabel = $('<div class="cmessage-dialog-send-btn-label">Send</div>'),
+                        sendButtonIcon = $('<div class="cmessage-dialog-send-btn-icon">');
 
-                        container.append(upperContainer, lowerContainer);
-                        upperContainer.append(scheduleDateLabel, testDateLabel, resultDateLabel, expiryDateLabel,
-                            locationLabel, underlyingLabel, reasonForTestLabel, typeLabel, resultLabel,
-                            remarksLabel, clearanceLabel, ownerNameLabel, reporterNameLabel, attachmentContainer);
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, messaegSelector, titleTextbox, messageTextarea, sendButton);
+                    sendButton.append(sendButtonLabel, sendButtonIcon);
 
-                    // store views.
-                    _views.container = container;
-                    _views.scheduleDateLabel = scheduleDateLabel;
-                    _views.testDateLabel = testDateLabel;
-                    _views.resultDateLabel = resultDateLabel;
-                    _views.expiryDateLabel = expiryDateLabel;
-                    _views.locationLabel = locationLabel;
-                    _views.underlyingLabel = underlyingLabel;
-                    _views.reasonForTestLabel = reasonForTestLabel;
-                    _views.typeLabel = typeLabel;
-                    _views.resultLabel = resultLabel;
-                    _views.remarksLabel = remarksLabel;
-                    _views.clearanceLabel = clearanceLabel;
-                    _views.ownerNameLabel = ownerNameLabel;
-                    _views.reporterNameLabel = reporterNameLabel;
-                    _views.attachmentContainer = attachmentContainer;
+                    messaegSelector.append($('<option value="pre" selected="selected">Pre-defined Message</option>'))
+                        .append($('<option value="stay">Stay home</option>'))
+                        .append($('<option value="test">Get your test</option>'))
+                        .append($('<option value="report">Report immediately</option>'));
 
-                    update(_model);
-
-                    return container;
-                }
-
-                function update(model) {
-                    _model = model;
-
-                    let scheduleDate = testDate = resultDate = expiryDate = 'N/A';
-
-                    if (_model.schedule_date) {
-                        scheduleDate = new Date(model.schedule_date.seconds * 1000).toLocaleString();
-                    }
-                    _views.scheduleDateLabel.text(scheduleDate);
-
-                    if (_model.test_date) {
-                        testDate = new Date(model.test_date.seconds * 1000).toLocaleString();
-                    }
-                    _views.testDateLabel.text(testDate);
-
-                    if (_model.result_date) {
-                        resultDate = new Date(model.result_date.seconds * 1000).toLocaleString();
-                    }
-                    _views.resultDateLabel.text(resultDate);
-
-                    if (_model.expiry_date) {
-                        expiryDate = new Date(model.expiry_date.seconds * 1000).toLocaleString();
-                    }
-                    _views.expiryDateLabel.text(expiryDate);
-
-                    _views.locationLabel.text(_model.location || 'N/A');
-                    _views.underlyingLabel.text(_model.underlying_illness || 'N/A');
-                    _views.reasonForTestLabel.text(REASON_FOR_TEST_DISPLAY[_model.reason_for_test] || 'N/A');
-                    _views.typeLabel.text(TYPE_DISPLAY[_model.type] || 'N/A');
-                    _views.resultLabel.text(RESULT_DISPLAY[_model.result] || 'N/A');
-                    _views.remarksLabel.text(_model.remarks || 'N/A');
-                    _views.clearanceLabel.text(CLEARANCE_DISPLAY[_model.clearance] || 'N/A');
-
-                    if (_model.owner) {
-                        _model.owner.get().then(function(doc) {
-                            if (doc) {
-                                _owner = doc.data();
-                                _owner.documentId = doc.id;
-
-                                _views.ownerNameLabel.text(_owner.fullname || 'Unnamed');
-                            }
-                        });
-                    }
-
-                    if (_model.reporter) {
-                        _model.reporter.get().then(function(doc) {
-                            _reporter = doc.data();
-                            _reporter.documentId = doc.id;
-
-                            _views.reporterNameLabel.text(_reporter.fullname || 'Unnamed');
-                        })
-                    }
-
-                    // draw attachment
-                    if (_model.attachment) {
-                        let viewItem = $('<div class="shi-attachment">');
-                        viewItem.click(function() {
-                            window.open(DOWNLOAD_URL_BUILDER({
-                                type: 'file',
-                                id: _model.attachment
-                            }));
-                        });
-
-                        _views.attachmentContainer.append(viewItem);
-                    }
-                }
-
-                return {
-                    render: render,
-                    update: update
-                }
-            }
-
-            return {
-                show: show,
-                hide: hide,
-                doLoading: doLoading,
-                addHistories: addHistoryItems
-            }
-        }
-
-        function SelfReportDialog() {
-            let _views = {},
-                _model;
-
-            function render() {
-                let container = $('<div class="self-test-dialog c-modal-dialog">'),
-                    closeButton = $('<div class="self-test-dialog-close-btn c-modal-dialog-close-btn">'),
-                    contentContainer = $('<div class="sr-content-container c-modal-dialog-content">'),
-                    titleContainer = $('<div class="sr-title-container">'),
-                    itemsContainer = $('<div class="sr-items-container">');
-
-                container.append(contentContainer);
-                contentContainer.append(closeButton, titleContainer, itemsContainer);
-                titleContainer.append(
-                    $('<div class="sr-title-label">Contacted</div>'),
-                    $('<div class="sr-title-label">Cough</div>'),
-                    $('<div class="sr-title-label">Fever</div>'),
-                    $('<div class="sr-title-label">Headache</div>'),
-                    $('<div class="sr-title-label">No smell taste</div>'),
-                    $('<div class="sr-title-label">Short breath</div>'),
-                    $('<div class="sr-title-label">Soar throat</div>'),
-                    $('<div class="sr-title-label">Body temperature</div>'),
-                    $('<div class="sr-title-label">Etc</div>'),
-                    $('<div class="sr-title-label">Owner</div>'),
-                    $('<div class="sr-title-label">Reporter</div>'),
-                    $('<div class="sr-title-label">Time</div>')
-                );
-
-                closeButton.click(function() {
-                    hide();
-                });
-                $(document).keyup(function(e) {
-                    if (e.key === "Escape") {
+                    // init handlers
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                        }
+                    });
+                    messaegSelector.change(function() {
+                        let selected = $('option:selected', this);
+                        if (selected.val() === 'pre') {
+                            titleTextbox.val('');
+                        } else {
+                            titleTextbox.val(selected.text());
+                        }
+                    });
+                    container.click(function() {
+                        // hide();
+                    });
+                    closeButton.click(function() {
                         hide();
-                    }
-                });
+                    })
+                    sendButton.click(function() {
+                        let title = titleTextbox.val(),
+                            message = messageTextarea.val();
 
-                _views = {
-                    container: container,
-                    itemsContainer: itemsContainer
-                };
-            }
+                        if (title.trim().length > 0) {
+                            _callback({
+                                title: title,
+                                message: message
+                            });
+                        } else {
+                            window.alert('Please enter title.');
+                        }
+                    });
+                    titleTextbox.change(function() {
+                        if ($(this).val().trim().length <= 0) {
+                            // TODO:
+                        }
+                    });
 
-            function show(parent, reportList) {
-                render();
+                    // Store views
+                    _views = {};
+                    _views.container = container;
+                }
 
-                parent.append(_views.container);
-                addItems(reportList);
-            }
+                function show(parent, callback) {
+                    _callback = callback || _.noop;
+                    render();
 
-            function hide() {
-                if (_views) {
+                    parent.append(_views.container);
+                }
+
+                function hide() {
                     _views.container.remove();
                     _views = null;
+                    _callback = _.noop;
+                }
+
+                return {
+                    show: show,
+                    hide: hide
                 }
             }
 
-            function addItems(reports) {
-                let container = _views.itemsContainer;
-                _.each(reports, function(report) {
-                    let viewItem = ReportItem(report);
-                    container.append(viewItem.render());
-                });
-            }
-
-            function ReportItem(model) {
-                let _model = model,
-                    _owner = null,
-                    _reporter = null,
-                    _views = {};
-
-                function render() {
-                    let container = $('<div class="report-item">');
-                    let contactedLabel = $('<div class="r-value-label contacted">'),
-                        coughLabel = $('<div class="r-value-label cough">'),
-                        etcLabel = $('<div class="r-value-label etc">'),
-                        feverLabel = $('<div class="r-value-label fever">'),
-                        headacheLabel = $('<div class="r-value-label headache">'),
-                        noSmellTasteLabel = $('<div class="r-value-label no-smell-teaste">'),
-                        ownerLabel = $('<div class="r-value-label owner">'),
-                        reporterLabel = $('<div class="r-value-label reporter">'),
-                        scoreLabel = $('<div class="r-value-label score">'),
-                        shortBreathLabel = $('<div class="r-value-label short-breath">'),
-                        soarThroatLabel = $('<div class="r-value-label soar-throat">'),
-                        bodyTempLabel = $('<div class="r-value-label bt">'),
-                        timeLabel = $('<div class="r-value-label time">');
-
-                    container.append(contactedLabel, coughLabel, feverLabel, headacheLabel, noSmellTasteLabel,
-                        shortBreathLabel, soarThroatLabel, bodyTempLabel, etcLabel, ownerLabel, reporterLabel,
-                        timeLabel);
-
-                    _views = {
-                        contactedLabel: contactedLabel,
-                        coughLabel: coughLabel,
-                        feverLabel: feverLabel,
-                        headacheLabel: headacheLabel,
-                        noSmellTasteLabel: noSmellTasteLabel,
-                        shortBreathLabel: shortBreathLabel,
-                        soarThroatLabel: soarThroatLabel,
-                        bodyTempLabel: bodyTempLabel,
-                        etcLabel: etcLabel,
-                        ownerLabel: ownerLabel,
-                        reporterLabel: reporterLabel,
-                        timeLabel: timeLabel
+            function TestHistoryDialog() {
+                let _views = {}
+                    _histories = [],
+                    _callbacks = {
+                        selectedLoadMore: _.noop
                     };
 
-                    update(model);
+                function show(parent, histories, callbacks) {
+                    _histories = histories || [];
+                    _callbacks = callbacks || {
+                        selectedLoadMore: _.noop
+                    };
 
-                    return container;
+                    let container = $('<div class="history-dialog c-modal-dialog">'),
+                        closeButton = $('<div class="history-dialog-close-btn c-modal-dialog-close-btn">'),
+                        contentContainer = $('<div class="hd-content-container c-modal-dialog-content">'),
+                        historyTitleContainer = $('<div class="hd-history-title-container">'),
+                        historyItemsContainer = $('<div class="hd-history-items-container">');
+                    let loadMoreButton = $('<div class="hd-dialog-loader-btn">')
+                        .append($('<div class="hd-dialog-loader-icon">'))
+                        .append($('<div class="hd-dialog-loader-label">Load more</div>'));
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, historyTitleContainer, historyItemsContainer, loadMoreButton);
+                    historyTitleContainer.append(
+                        $('<div class="shi-title-label schedule-date">Schedule Date</div>'),
+                        $('<div class="shi-title-label test-date">Test Date</div>'),
+                        $('<div class="shi-title-label result-date">Result Date</div>'),
+                        $('<div class="shi-title-label expiry-date">Expiry Date</div>'),
+                        $('<div class="shi-title-label location">Location</div>'),
+                        $('<div class="shi-title-label underlying">Underlying Illness</div>'),
+                        $('<div class="shi-title-label reason">Reason for Test</div>'),
+                        $('<div class="shi-title-label type">Type</div>'),
+                        $('<div class="shi-title-label result">Result</div>'),
+                        $('<div class="shi-title-label remarks">Remarks</div>'),
+                        $('<div class="shi-title-label clearance">Clearance</div>'),
+                        $('<div class="shi-title-label owner-name">Owner</div>'),
+                        $('<div class="shi-title-label reporter-name">Reporter</div>'),
+                        $('<div class="shi-title-label attachment">Attachment</div>')
+                    );
+
+                    parent.append(container);
+
+                    // init handler
+                    // TODO: modal click
+                    closeButton.click(function() {
+                        hide();
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                        }
+                    });
+                    loadMoreButton.click(function() {
+                        _callbacks.selectedLoadMore();
+                    });
+
+                    _views.container = container;
+                    _views.contentContainer = contentContainer;
+                    _views.historyItemsContainer = historyItemsContainer;
+                    _views.closeButton = closeButton;
+                    _views.loadMoreButton = loadMoreButton;
+
+                    addHistoryItems(_histories);
                 }
 
-                function update(model) {
-                    _model = model;
+                function hide() {
+                    _views.container.detach().remove();
+                }
 
-                    _views.contactedLabel.text(_model.contacted ? 'Yes' : 'No');
-                    _views.contactedLabel.addClass(_model.contacted ? 'warn' : '');
-                    _views.coughLabel.text(_model.cough ? 'Yes' : 'No');
-                    _views.coughLabel.addClass(_model.cough ? 'warn' : '');
-                    _views.feverLabel.text(_model.fever ? 'Yes' : 'No');
-                    _views.feverLabel.addClass(_model.fever ? 'warn' : '');
-                    _views.headacheLabel.text(_model.headache ? 'Yes' : 'No');
-                    _views.headacheLabel.addClass(_model.headache ? 'warn' : '');
-                    _views.noSmellTasteLabel.text(_model.no_smell_taste ? 'Yes' : 'No');
-                    _views.noSmellTasteLabel.addClass(_model.no_smell_taste ? 'warn' : '');
-                    _views.shortBreathLabel.text(_model.short_breath ? 'Yes' : 'No');
-                    _views.shortBreathLabel.addClass(_model.short_breath ? 'warn' : '');
-                    _views.soarThroatLabel.text(_model.soar_throat ? 'Yes' : 'No');
-                    _views.soarThroatLabel.addClass(_model.soar_throat ? 'warn' : '');
-                    _views.bodyTempLabel.text(_.isNumber(_model.bt) ? _model.bt + '\xB0' : 'N/A');
-                    _views.etcLabel.text(_model.etc || 'N/A');
-                    _views.timeLabel.text(new Date(_model.ts.seconds * 1000).toLocaleString());
+                function doLoading(loading) {
+                    if (loading) {
+                        _views.loadMoreButton.addClass('loading');
+                    } else {
+                        _views.loadMoreButton.removeClass('loading');
+                    }
+                }
 
-                    if (_model.owner) {
-                        _model.owner.get().then(function(doc) {
-                            if (doc) {
-                                _owner = doc.data();
-                                _owner.documentId = doc.id;
+                function addHistoryItems(histories) {
+                    let container = _views.historyItemsContainer;
+                    _.each(histories, function(history) {
+                        let viewItem = HistoryItem(history);
+                        container.append(viewItem.render());
+                    });
+                }
 
-                                _views.ownerLabel.text(_owner.fullname || 'Unnamed');
-                            }
-                        });
+                function HistoryItem(model) {
+                    const REASON_FOR_TEST_DISPLAY = {
+                        1: '1st recovery test',
+                        2: '2nd recovery test',
+                        3: '1st test from Closed Contact',
+                        4: '2nd test from Closed Contact',
+                        5: '1st test from Travel(In-bound)',
+                        6: 'Confirmation test from SK COVID center',
+                        7: '2end test from Travel(In-bound)',
+                        8: 'Multi-interfacing Personnel',
+                        9: 'New Employee',
+                        10: 'Others'
+                    },
+                    TYPE_DISPLAY = {
+                        1: 'Fitness test',
+                        2: 'Mass test',
+                        3: 'MOHS',
+                        4: 'Regular test',
+                        5: 'Other test'
+                    },
+                    RESULT_DISPLAY = {
+                        1: 'Positive',
+                        '-1': 'Negative',
+                        0: 'Waiting',
+                        2: 'Inconclusive',
+                        3: 'Others',
+                        11: 'Fit to work',
+                        '-11': 'Not fit to work'
+                    },
+                    CLEARANCE_DISPLAY = {
+                        1: 'Cleared',
+                        2: 'Pending',
+                        3: 'Regular check on-going',
+                        4: 'Others'
+                    };
+
+                    let _views = {}
+                        _model = model,
+                        _owner = null,
+                        _reporter = null;
+
+
+                    function render() {
+                        let container = $('<div class="status-history-item">'),
+                            upperContainer = $('<div class="shi-upper-container">'),
+                            lowerContainer = $('<div class="shi-lower-container">');
+                        let scheduleDateLabel = $('<div class="shi-value-label schedule-date">'),
+                            testDateLabel = $('<div class="shi-value-label test-date">'),
+                            resultDateLabel = $('<div class="shi-value-label result-date">'),
+                            expiryDateLabel = $('<div class="shi-value-label expiry-date">'),
+                            locationLabel = $('<div class="shi-value-label location">'),
+                            underlyingLabel = $('<div class="shi-value-label underlying">'),
+                            reasonForTestLabel = $('<div class="shi-value-label reson-test">'),
+                            typeLabel = $('<div class="shi-value-label type">'),
+                            resultLabel = $('<div class="shi-value-label result">'),
+                            remarksLabel = $('<div class="shi-value-label remarks">'),
+                            clearanceLabel = $('<div class="shi-value-label clearance">'),
+                            ownerNameLabel = $('<div class="shi-value-label owner-name">'),
+                            reporterNameLabel = $('<div class="shi-value-label reporter-name">'),
+                            attachmentContainer = $('<div class="shi-attachment-container">');
+
+                            container.append(upperContainer, lowerContainer);
+                            upperContainer.append(scheduleDateLabel, testDateLabel, resultDateLabel, expiryDateLabel,
+                                locationLabel, underlyingLabel, reasonForTestLabel, typeLabel, resultLabel,
+                                remarksLabel, clearanceLabel, ownerNameLabel, reporterNameLabel, attachmentContainer);
+
+                        // store views.
+                        _views.container = container;
+                        _views.scheduleDateLabel = scheduleDateLabel;
+                        _views.testDateLabel = testDateLabel;
+                        _views.resultDateLabel = resultDateLabel;
+                        _views.expiryDateLabel = expiryDateLabel;
+                        _views.locationLabel = locationLabel;
+                        _views.underlyingLabel = underlyingLabel;
+                        _views.reasonForTestLabel = reasonForTestLabel;
+                        _views.typeLabel = typeLabel;
+                        _views.resultLabel = resultLabel;
+                        _views.remarksLabel = remarksLabel;
+                        _views.clearanceLabel = clearanceLabel;
+                        _views.ownerNameLabel = ownerNameLabel;
+                        _views.reporterNameLabel = reporterNameLabel;
+                        _views.attachmentContainer = attachmentContainer;
+
+                        update(_model);
+
+                        return container;
                     }
 
-                    if (_model.reporter) {
-                        _model.reporter.get().then(function(doc) {
-                            _reporter = doc.data();
-                            _reporter.documentId = doc.id;
+                    function update(model) {
+                        _model = model;
 
-                            _views.reporterLabel.text(_reporter.fullname || 'Unnamed');
-                        })
+                        let scheduleDate = testDate = resultDate = expiryDate = 'N/A';
+
+                        if (_model.schedule_date) {
+                            scheduleDate = new Date(model.schedule_date.seconds * 1000).toLocaleString();
+                        }
+                        _views.scheduleDateLabel.text(scheduleDate);
+
+                        if (_model.test_date) {
+                            testDate = new Date(model.test_date.seconds * 1000).toLocaleString();
+                        }
+                        _views.testDateLabel.text(testDate);
+
+                        if (_model.result_date) {
+                            resultDate = new Date(model.result_date.seconds * 1000).toLocaleString();
+                        }
+                        _views.resultDateLabel.text(resultDate);
+
+                        if (_model.expiry_date) {
+                            expiryDate = new Date(model.expiry_date.seconds * 1000).toLocaleString();
+                        }
+                        _views.expiryDateLabel.text(expiryDate);
+
+                        _views.locationLabel.text(_model.location || 'N/A');
+                        _views.underlyingLabel.text(_model.underlying_illness || 'N/A');
+                        _views.reasonForTestLabel.text(REASON_FOR_TEST_DISPLAY[_model.reason_for_test] || 'N/A');
+                        _views.typeLabel.text(TYPE_DISPLAY[_model.type] || 'N/A');
+                        _views.resultLabel.text(RESULT_DISPLAY[_model.result] || 'N/A');
+                        _views.remarksLabel.text(_model.remarks || 'N/A');
+                        _views.clearanceLabel.text(CLEARANCE_DISPLAY[_model.clearance] || 'N/A');
+
+                        if (_model.owner) {
+                            _model.owner.get().then(function(doc) {
+                                if (doc) {
+                                    _owner = doc.data();
+                                    _owner.documentId = doc.id;
+
+                                    _views.ownerNameLabel.text(_owner.fullname || 'Unnamed');
+                                }
+                            });
+                        }
+
+                        if (_model.reporter) {
+                            _model.reporter.get().then(function(doc) {
+                                _reporter = doc.data();
+                                _reporter.documentId = doc.id;
+
+                                _views.reporterNameLabel.text(_reporter.fullname || 'Unnamed');
+                            })
+                        }
+
+                        // draw attachment
+                        if (_model.attachment) {
+                            let viewItem = $('<div class="shi-attachment">');
+                            viewItem.click(function() {
+                                window.open(DOWNLOAD_URL_BUILDER({
+                                    type: 'file',
+                                    id: _model.attachment
+                                }));
+                            });
+
+                            _views.attachmentContainer.append(viewItem);
+                        }
+                    }
+
+                    return {
+                        render: render,
+                        update: update
                     }
                 }
 
                 return {
-                    render: render,
-                    update: update
+                    show: show,
+                    hide: hide,
+                    doLoading: doLoading,
+                    addHistories: addHistoryItems
                 }
             }
 
-            return {
-                show: show,
-                hide: hide,
-                addItems: addItems
+            function SelfReportDialog() {
+                let _views = {},
+                    _model;
+
+                function render() {
+                    let container = $('<div class="self-test-dialog c-modal-dialog">'),
+                        closeButton = $('<div class="self-test-dialog-close-btn c-modal-dialog-close-btn">'),
+                        contentContainer = $('<div class="sr-content-container c-modal-dialog-content">'),
+                        titleContainer = $('<div class="sr-title-container">'),
+                        itemsContainer = $('<div class="sr-items-container">');
+
+                    container.append(contentContainer);
+                    contentContainer.append(closeButton, titleContainer, itemsContainer);
+                    titleContainer.append(
+                        $('<div class="sr-title-label">Contacted</div>'),
+                        $('<div class="sr-title-label">Cough</div>'),
+                        $('<div class="sr-title-label">Fever</div>'),
+                        $('<div class="sr-title-label">Headache</div>'),
+                        $('<div class="sr-title-label">No smell taste</div>'),
+                        $('<div class="sr-title-label">Short breath</div>'),
+                        $('<div class="sr-title-label">Soar throat</div>'),
+                        $('<div class="sr-title-label">Body temperature</div>'),
+                        $('<div class="sr-title-label">Etc</div>'),
+                        $('<div class="sr-title-label">Owner</div>'),
+                        $('<div class="sr-title-label">Reporter</div>'),
+                        $('<div class="sr-title-label">Time</div>')
+                    );
+
+                    closeButton.click(function() {
+                        hide();
+                    });
+                    $(document).keyup(function(e) {
+                        if (e.key === "Escape") {
+                            hide();
+                        }
+                    });
+
+                    _views = {
+                        container: container,
+                        itemsContainer: itemsContainer
+                    };
+                }
+
+                function show(parent, reportList) {
+                    render();
+
+                    parent.append(_views.container);
+                    addItems(reportList);
+                }
+
+                function hide() {
+                    if (_views) {
+                        _views.container.remove();
+                        _views = null;
+                    }
+                }
+
+                function addItems(reports) {
+                    let container = _views.itemsContainer;
+                    _.each(reports, function(report) {
+                        let viewItem = ReportItem(report);
+                        container.append(viewItem.render());
+                    });
+                }
+
+                function ReportItem(model) {
+                    let _model = model,
+                        _owner = null,
+                        _reporter = null,
+                        _views = {};
+
+                    function render() {
+                        let container = $('<div class="report-item">');
+                        let contactedLabel = $('<div class="r-value-label contacted">'),
+                            coughLabel = $('<div class="r-value-label cough">'),
+                            etcLabel = $('<div class="r-value-label etc">'),
+                            feverLabel = $('<div class="r-value-label fever">'),
+                            headacheLabel = $('<div class="r-value-label headache">'),
+                            noSmellTasteLabel = $('<div class="r-value-label no-smell-teaste">'),
+                            ownerLabel = $('<div class="r-value-label owner">'),
+                            reporterLabel = $('<div class="r-value-label reporter">'),
+                            scoreLabel = $('<div class="r-value-label score">'),
+                            shortBreathLabel = $('<div class="r-value-label short-breath">'),
+                            soarThroatLabel = $('<div class="r-value-label soar-throat">'),
+                            bodyTempLabel = $('<div class="r-value-label bt">'),
+                            timeLabel = $('<div class="r-value-label time">');
+
+                        container.append(contactedLabel, coughLabel, feverLabel, headacheLabel, noSmellTasteLabel,
+                            shortBreathLabel, soarThroatLabel, bodyTempLabel, etcLabel, ownerLabel, reporterLabel,
+                            timeLabel);
+
+                        _views = {
+                            contactedLabel: contactedLabel,
+                            coughLabel: coughLabel,
+                            feverLabel: feverLabel,
+                            headacheLabel: headacheLabel,
+                            noSmellTasteLabel: noSmellTasteLabel,
+                            shortBreathLabel: shortBreathLabel,
+                            soarThroatLabel: soarThroatLabel,
+                            bodyTempLabel: bodyTempLabel,
+                            etcLabel: etcLabel,
+                            ownerLabel: ownerLabel,
+                            reporterLabel: reporterLabel,
+                            timeLabel: timeLabel
+                        };
+
+                        update(model);
+
+                        return container;
+                    }
+
+                    function update(model) {
+                        _model = model;
+
+                        _views.contactedLabel.text(_model.contacted ? 'Yes' : 'No');
+                        _views.contactedLabel.addClass(_model.contacted ? 'warn' : '');
+                        _views.coughLabel.text(_model.cough ? 'Yes' : 'No');
+                        _views.coughLabel.addClass(_model.cough ? 'warn' : '');
+                        _views.feverLabel.text(_model.fever ? 'Yes' : 'No');
+                        _views.feverLabel.addClass(_model.fever ? 'warn' : '');
+                        _views.headacheLabel.text(_model.headache ? 'Yes' : 'No');
+                        _views.headacheLabel.addClass(_model.headache ? 'warn' : '');
+                        _views.noSmellTasteLabel.text(_model.no_smell_taste ? 'Yes' : 'No');
+                        _views.noSmellTasteLabel.addClass(_model.no_smell_taste ? 'warn' : '');
+                        _views.shortBreathLabel.text(_model.short_breath ? 'Yes' : 'No');
+                        _views.shortBreathLabel.addClass(_model.short_breath ? 'warn' : '');
+                        _views.soarThroatLabel.text(_model.soar_throat ? 'Yes' : 'No');
+                        _views.soarThroatLabel.addClass(_model.soar_throat ? 'warn' : '');
+                        _views.bodyTempLabel.text(_.isNumber(_model.bt) ? _model.bt + '\xB0' : 'N/A');
+                        _views.etcLabel.text(_model.etc || 'N/A');
+                        _views.timeLabel.text(new Date(_model.ts.seconds * 1000).toLocaleString());
+
+                        if (_model.owner) {
+                            _model.owner.get().then(function(doc) {
+                                if (doc) {
+                                    _owner = doc.data();
+                                    _owner.documentId = doc.id;
+
+                                    _views.ownerLabel.text(_owner.fullname || 'Unnamed');
+                                }
+                            });
+                        }
+
+                        if (_model.reporter) {
+                            _model.reporter.get().then(function(doc) {
+                                _reporter = doc.data();
+                                _reporter.documentId = doc.id;
+
+                                _views.reporterLabel.text(_reporter.fullname || 'Unnamed');
+                            })
+                        }
+                    }
+
+                    return {
+                        render: render,
+                        update: update
+                    }
+                }
+
+                return {
+                    show: show,
+                    hide: hide,
+                    addItems: addItems
+                }
             }
-        }
-    })();
-</script>
-{% endblock javascripts %}
+        })();
+    </script>
+    {% endblock javascripts %}
+</div>

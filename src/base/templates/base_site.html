@@ -1,134 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    {% block head %} {% block meta %}
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <head>
+        {% block head %} {% block meta %}
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <!-- Meta, title, CSS, favicons, etc. -->
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
         <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-      {% endblock meta %}
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {% endblock meta %}
 
-      <title>Smart Control System</title>
+        <title>Smart Control System</title>
 
-      {% block stylesheets %}
+        {% block stylesheets %}
         <!-- Favicon -->
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
         <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
         <!-- Bootstrap -->
-        <link href="{{ url_for('static', filename='vendors/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+        <link
+            href="{{ url_for('static', filename='vendors/bootstrap/dist/css/bootstrap.min.css') }}"
+            rel="stylesheet"
+        />
         <!-- Font Awesome -->
-        <link href="{{ url_for('static', filename='vendors/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
+        <link
+            href="{{ url_for('static', filename='vendors/font-awesome/css/font-awesome.min.css') }}"
+            rel="stylesheet"
+        />
         <!-- bootstrap-progressbar
         <link href="{{ url_for('static', filename='vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css') }}" rel="stylesheet">
         -->
         <!-- PNotify -->
-        <link href="{{ url_for('static', filename='vendors/pnotify/dist/pnotify.css') }}" rel="stylesheet">
-        <link href="{{ url_for('static', filename='vendors/pnotify/dist/pnotify.buttons.css') }}" rel="stylesheet">
-        <link href="{{ url_for('static', filename='vendors/pnotify/dist/pnotify.nonblock.css') }}" rel="stylesheet">
-      {% endblock stylesheets %}
-      <!-- Custom Theme Style -->
-      {% if current_user.level == 6 %}
-        <link href="{{ url_for('static', filename='build/css/custom_moi.css') }}" rel="stylesheet">
-      {% else %}
-        <link href="{{ url_for('static', filename='build/css/custom.css') }}" rel="stylesheet">
-      {% endif %}
+        <link href="{{ url_for('static', filename='vendors/pnotify/dist/pnotify.css') }}" rel="stylesheet" />
+        <link href="{{ url_for('static', filename='vendors/pnotify/dist/pnotify.buttons.css') }}" rel="stylesheet" />
+        <link href="{{ url_for('static', filename='vendors/pnotify/dist/pnotify.nonblock.css') }}" rel="stylesheet" />
+        {% endblock stylesheets %}
+        <!-- Custom Theme Style -->
+        {% if current_user.level == 6 %}
+        <link href="{{ url_for('static', filename='build/css/custom_moi.css') }}" rel="stylesheet" />
+        {% else %}
+        <link href="{{ url_for('static', filename='build/css/custom.css') }}" rel="stylesheet" />
+        {% endif %}
 
-      <!-- load early scripts -->
-      <!-- jQuery -->
-      <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js') }}"></script>
-      <!-- Bootstrap -->
-      <script src="{{ url_for('static', filename='vendors/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+        <!-- load early scripts -->
+        <!-- jQuery -->
+        <script src="{{ url_for('static', filename='vendors/jquery/dist/jquery.min.js') }}"></script>
+        <!-- Bootstrap -->
+        <script src="{{ url_for('static', filename='vendors/bootstrap/dist/js/bootstrap.min.js') }}"></script>
 
-      <!-- for firebase -->
-      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-app.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-auth.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-functions.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-firestore.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-firestore.js"></script>
-    {% endblock head %}
-  </head>
+        <!-- for firebase -->
+        <script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-functions.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-database.js"></script>
+        {% endblock head %}
+    </head>
 
-  <body class="{% block body_class %}nav-md {% endblock body_class %}" oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
-    <!-- Notification Message (jslee,180828) -->
-    {% if error_msg %}
-      <script>
-        onload = function() {
-          new PNotify({
-            title: '{{ error_msg.title }}',
-            text: '{{ error_msg.msg }}',
-            type: 'error',
-            icon: false,
-            hide: true,
-            styling: 'bootstrap3'
-        });
-        }
-      </script>
-    {% else %}
-      {% if info_msg %}
+    <body
+        class="{% block body_class %}nav-md {% endblock body_class %}"
+        oncontextmenu="return false"
+        onselectstart="return false"
+        ondragstart="return false"
+    >
+        <!-- Notification Message (jslee,180828) -->
+        {% if error_msg %}
         <script>
-          onload = function() {
-            new PNotify({
-              title: '{{ info_msg.title }}',
-              text: '{{ info_msg.msg }}',
-              type: 'success',
-              hide: true,
-              icon: false,
-              styling: 'bootstrap3'
-          });
-          }
+            onload = function () {
+                new PNotify({
+                    title: '{{ error_msg.title }}',
+                    text: '{{ error_msg.msg }}',
+                    type: 'error',
+                    icon: false,
+                    hide: true,
+                    styling: 'bootstrap3'
+                });
+            };
         </script>
-      {% endif %}
-    {% endif %}
-
-    {% block body %}
-      {% block topSidebar %}
-        {% include "site_template/top_sidebar.html" %}
-      {% endblock topSidebar %}
-      <div class="container body">
-        <div class="main_container">
-
-          {% block sidebar %}
-            <div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
-              {% include "site_template/sidebar.html" %}
-            </div>
-          {% endblock sidebar %}
-
-          {% block top_navigation %}
-
-            <div class="top_nav">
-              {%with _title=self.title() %}
-                {% include "site_template/top_navigation.html" %}
-              {% endwith %}
-            </div>
-          {% endblock top_navigation %}
-
-          {% block content %}
-            <!-- {{ content }} -->
-          {% endblock content %}
-
-          {% block footer %}
-            <div class="custom-footer">
-              <div class="left-container">
-                <div class="image-container">
-                  <img src="/static/images/logo-smart_control_system.svg">
+        {% else %} {% if info_msg %}
+        <script>
+            onload = function () {
+                new PNotify({
+                    title: '{{ info_msg.title }}',
+                    text: '{{ info_msg.msg }}',
+                    type: 'success',
+                    hide: true,
+                    icon: false,
+                    styling: 'bootstrap3'
+                });
+            };
+        </script>
+        {% endif %} {% endif %} {% block body %} {% block topSidebar %} {% include "site_template/top_sidebar.html" %}
+        {% endblock topSidebar %}
+        <div class="container body">
+            <div class="main_container">
+                {% block sidebar %}
+                <div
+                    class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}"
+                >
+                    {% include "site_template/sidebar.html" %}
                 </div>
-              </div>
-              <div class="right-container">
-                <div class="image-container" style="display:inline-block;">
-                  <img src="/static/images/logo--adnoc.png">
-                  <img src="/static/images/logo--sk_enc.png">
-                  <img src="/static/images/logo--mproject.png">
+                {% endblock sidebar %} {% block top_navigation %}
+
+                <div class="top_nav">
+                    {%with _title=self.title() %} {% include "site_template/top_navigation.html" %} {% endwith %}
                 </div>
-              </div>
+                {% endblock top_navigation %} {% block content %}
+                <!-- {{ content }} -->
+                {% endblock content %} {% block footer %}
+                <div class="custom-footer">
+                    <div class="left-container">
+                        <div class="image-container">
+                            <img src="/static/images/logo-smart_control_system.svg" />
+                        </div>
+                    </div>
+                    <div class="right-container">
+                        <div class="image-container" style="display: inline-block">
+                            <img src="/static/images/logo--adnoc.png" />
+                            <img src="/static/images/logo--sk_enc.png" />
+                            <img src="/static/images/logo--mproject.png" />
+                        </div>
+                    </div>
+                </div>
+                {% endblock footer %}
             </div>
-          {% endblock footer %}
         </div>
-      </div>
 
-      {% block javascripts %}
+        {% block javascripts %}
         <!-- FastClick -->
         <script src="{{ url_for('static', filename='vendors/fastclick/lib/fastclick.js') }}"></script>
         <!-- NProgress
@@ -164,19 +162,19 @@
 
         <!-- Custom function(jslee) -->
         <script>
-          function copyToClipboard(value) {
-            var copyText = document.getElementById(value);
-            copyText.select();
-            document.execCommand("copy");
-            alert("Copied to clipboard");
-          }
-          $(function () {
-            $('[data-toggle-tip="tooltip"]').tooltip();
-          });
+            function copyToClipboard(value) {
+                var copyText = document.getElementById(value);
+                copyText.select();
+                document.execCommand('copy');
+                alert('Copied to clipboard');
+            }
+            $(function () {
+                $('[data-toggle-tip="tooltip"]').tooltip();
+            });
         </script>
-      {% endblock %}
-      <!-- Custom Theme Scripts -->
-      <script src="{{ url_for('static', filename='build/js/custom.js') }}"></script>
-    {% endblock body %}
-  </body>
+        {% endblock %}
+        <!-- Custom Theme Scripts -->
+        <script src="{{ url_for('static', filename='build/js/custom.js') }}"></script>
+        {% endblock body %}
+    </body>
 </html>

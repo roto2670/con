@@ -1,200 +1,178 @@
 <style type="text/css">
-  .sk-main {
-    background-color: #E0002A;
-  }
-  .sk-sub {
-    background-color: #EF8009;
-  }
-  .menu-profile {
-    position: absolute;
-    bottom: 1em;
-    width: 100%;
-    padding: 0 1em;
-    text-align: center;
-    color: #e6e6e6;
-  }
-  .mf-name-label {
-    font-weight: 500;
-  }
-  .mf-id-label {
-    font-size: 0.8em;
-    color: #d8d8d8;
-  }
+    .sk-main {
+        background-color: #e0002a;
+    }
+    .sk-sub {
+        background-color: #ef8009;
+    }
+    .menu-profile {
+        position: absolute;
+        bottom: 1em;
+        width: 100%;
+        padding: 0 1em;
+        text-align: center;
+        color: #e6e6e6;
+    }
+    .mf-name-label {
+        font-weight: 500;
+    }
+    .mf-id-label {
+        font-size: 0.8em;
+        color: #d8d8d8;
+    }
 </style>
 
 <div class="left_col scroll-view">
-  {% if current_user.level == 6 %}
-  <script>
-    window.location.href = "/moi";
-  </script>
-  {% endif %}
-  <!-- sidebar menu -->
-  <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+    {% if current_user.level == 6 %}
+    <script>
+        window.location.href = '/moi';
+    </script>
+    {% endif %}
+    <!-- sidebar menu -->
+    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+        <div class="nav_title nav_sm_hidden sub_side_top_tile">
+            <div style="display: inline-block">
+                <i class="fa fa-users"></i>
+            </div>
+            <div style="display: inline-block">WINVID HR</div>
+        </div>
+        <br /><br /><br />
 
-    <div class="nav_title nav_sm_hidden sub_side_top_tile">
-      <div style="display: inline-block">
-        <i class="fa fa-medkit"></i>
-      </div>
-      <div style="display: inline-block">
-        COVID-19
-      </div>
-    </div>
-    <br><br><br>
+        <div class="menu_section">
+            <ul class="nav side-menu nav_sm_hidden">
+                {% if current_user.level in [0, 1, 7, 8, 9] %}
+                <li>
+                    <a href="/covid19"> <i class="fa fa-columns"></i>Dashboard </a>
+                </li>
+                <li>
+                    <a href="/covid19/dashboard"> <i class="fa fa-medkit"></i>COVID-19</a>
+                </li>
+                {% endif %} {% if current_user.level in [0, 7, 8, 9] %}
+                <li>
+                    <a href="/covid19/users"> <i class="fa fa-users"></i>Staff List </a>
+                </li>
+                {% if current_user.level != 9 %}
+                <li>
+                    <a href="/covid19/notifications"> <i class="fa fa-bell"></i>Messages </a>
+                </li>
+                {% endif %} {% endif %} {% if current_user.level in [0, 7, 9] %}
+                <li>
+                    <a href="/covid19/managedata"> <i class="fa fa-database"></i>Manage Data </a>
+                </li>
+                {% endif %} {% if current_user.level in [0, 7] %}
+                <li>
+                    <a href="/covid19/news"> <i class="fa fa-newspaper-o"></i>News </a>
+                </li>
+                <li>
+                    <a href="/covid19/kiosks"> <i class="fa fa-tablet"></i>Kiosks </a>
+                </li>
+                <li>
+                    <a href="/covid19/accesslogs"> <i class="fa fa-search"></i>Access Logs </a>
+                </li>
+                <li>
+                    <a href="/covid19/survey"> <i class="fa fa-tasks"></i>Surveys </a>
+                </li>
+                <li>
+                    <a href="/covid19/settings"> <i class="fa fa-cogs"></i>Settings </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
 
-    <div class="menu_section">
-      <ul class="nav side-menu nav_sm_hidden">
-        {% if current_user.level in [0, 1, 7, 8, 9] %}
-        <li>
-          <a href="/covid19">
-            <i class="fa fa-columns"></i>Dashboard
-          </a>
-        </li>
-        {% endif %}
-        {% if current_user.level in [0, 7, 8, 9] %}
-        <li>
-          <a href="/covid19/users">
-            <i class="fa fa-users"></i>Staff List
-          </a>
-        </li>
-          {% if current_user.level != 9 %}
-          <li>
-            <a href="/covid19/notifications">
-              <i class="fa fa-bell"></i>Messages
-            </a>
-          </li>
-          {% endif %}
-        {% endif %}
-        {% if current_user.level in [0, 7, 9] %}
-        <li>
-          <a href="/covid19/managedata">
-            <i class="fa fa-database"></i>Manage Data
-          </a>
-        </li>
-        {% endif %}
-        {% if current_user.level in [0, 7] %}
-        <li>
-          <a href="/covid19/news">
-            <i class="fa fa-newspaper-o"></i>News
-          </a>
-        </li>
-        <li>
-          <a href="/covid19/kiosks">
-            <i class="fa fa-tablet"></i>Kiosks
-          </a>
-        </li>
-        <li>
-          <a href="/covid19/accesslogs">
-            <i class="fa fa-search"></i>Access Logs
-          </a>
-        </li>
-        <li>
-          <a href="/covid19/survey">
-            <i class="fa fa-tasks"></i>Surveys
-          </a>
-        </li>
-        <li>
-          <a href="/covid19/settings">
-            <i class="fa fa-cogs"></i>Settings
-          </a>
-        </li>
-        {% endif %}
-      </ul>
+        <div class="menu-profile">
+            <div class="mf-name-label"></div>
+            <div class="mf-id-label"></div>
+        </div>
     </div>
-
-    <div class="menu-profile">
-      <div class="mf-name-label"></div>
-      <div class="mf-id-label"></div>
-    </div>
-  </div>
 </div>
 
 {% block javascripts %}
 <script>
-  (function() {
-    let TOKEN_KEY = '__fb_auth_tk__';
+    (function() {
+      let TOKEN_KEY = '__fb_auth_tk__';
 
-    // init style
-    $('.top_sidebar_menu').addClass('sk-main');
-    $('.left_col').addClass('sk-sub');
+      // init style
+      $('.top_sidebar_menu').addClass('sk-main');
+      $('.left_col').addClass('sk-sub');
 
-    // Initialize firebase
-    var fbaseConfig = {
-      apiKey: "AIzaSyAF1L8Ckq9O_7Atrdn0eZDTBHoyxeSS5JI",
-      authDomain: "skec-fujairah-3a656.firebaseapp.com",
-      databaseURL: "https://skec-fujairah-3a656.firebaseio.com",
-      projectId: "skec-fujairah-3a656",
-      storageBucket: "skec-fujairah-3a656.appspot.com",
-      messagingSenderId: "892956044896",
-      appId: "1:892956044896:web:2a2c4945497c1d547e1d05",
-      measurementId: "G-FN21V51YZQ"
-    };
+      // Initialize firebase
+      var fbaseConfig = {
+        apiKey: "AIzaSyAF1L8Ckq9O_7Atrdn0eZDTBHoyxeSS5JI",
+        authDomain: "skec-fujairah-3a656.firebaseapp.com",
+        databaseURL: "https://skec-fujairah-3a656.firebaseio.com",
+        projectId: "skec-fujairah-3a656",
+        storageBucket: "skec-fujairah-3a656.appspot.com",
+        messagingSenderId: "892956044896",
+        appId: "1:892956044896:web:2a2c4945497c1d547e1d05",
+        measurementId: "G-FN21V51YZQ"
+      };
 
-    // Initialzie Firebase
-    firebase.initializeApp(fbaseConfig);
+      // Initialzie Firebase
+      firebase.initializeApp(fbaseConfig);
 
-    // init Handlers
-    $('.notsupported').click(function() {
-      window.alert('Not ready yet!');
-    });
-
-    // Firebase Auth
-    // Try get logged user first.
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        displayProfile();
-        console.debug('Logged user, skip custom login');
-      } else {
-        console.log('There is no logged user, try custom login without cache.');
-        authToFirebase(function() {
-          displayProfile();
-        });
-      }
-    });
-
-    function authToFirebase(callback) {
-      let _callback = callback || _.noop;
-      let functions = firebase.app().functions('asia-east2'),
-        auth = functions.httpsCallable('auth'),
-        emiratesId = '{{current_user.emirates_id | safe}}',
-        level = {{current_user.level | safe}};
-
-      if (!emiratesId || emiratesId == 'None') {
-        window.alert('Cannot found your Covid ID. please check your ID.');
-      }
-
-      auth({
-        'emirates_id': emiratesId,
-        'code': 'web!-adMIN-P2rm',
-        'device_id': 'web'
-      }).then(function(result) {
-        firebase.auth().signInWithCustomToken(result.data.token)
-          .then(function() {
-            displayProfile();
-            console.log('Firebase custom login success.');
-          })
-          .catch(function(error) {
-            console.error('Firebase login was fail.', error.code, error.message);
-          });
+      // init Handlers
+      $('.notsupported').click(function() {
+        window.alert('Not ready yet!');
       });
-    }
 
-    function displayProfile() {
-      let _currentUser = firebase.auth().currentUser;
-      if (_currentUser) {
-        firebase.firestore().collection('users').doc(_currentUser.uid).get().then(function(doc) {
-            let user = doc.data();
-            if (user) {
-              $('.mf-name-label').text(user.fullname);
-              $('.mf-id-label').text(doc.id);
-            } else {
-              console.warn('Failed to display current user\'s profile by cannot found current user by given id.',
-                _currentUser.uid);
-            }
+      // Firebase Auth
+      // Try get logged user first.
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          displayProfile();
+          console.debug('Logged user, skip custom login');
+        } else {
+          console.log('There is no logged user, try custom login without cache.');
+          authToFirebase(function() {
+            displayProfile();
+          });
+        }
+      });
+
+      function authToFirebase(callback) {
+        let _callback = callback || _.noop;
+        let functions = firebase.app().functions('asia-east2'),
+          auth = functions.httpsCallable('auth'),
+          emiratesId = '{{current_user.emirates_id | safe}}',
+          level = {{current_user.level | safe}};
+
+        if (!emiratesId || emiratesId == 'None') {
+          window.alert('Cannot found your Covid ID. please check your ID.');
+        }
+
+        auth({
+          'emirates_id': emiratesId,
+          'code': 'web!-adMIN-P2rm',
+          'device_id': 'web'
+        }).then(function(result) {
+          firebase.auth().signInWithCustomToken(result.data.token)
+            .then(function() {
+              displayProfile();
+              console.log('Firebase custom login success.');
+            })
+            .catch(function(error) {
+              console.error('Firebase login was fail.', error.code, error.message);
+            });
         });
-      } else {
-        console.warn('Failed to display current user\'s profile by cannot found current user.');
       }
-    }
-  })();
+
+      function displayProfile() {
+        let _currentUser = firebase.auth().currentUser;
+        if (_currentUser) {
+          firebase.firestore().collection('users').doc(_currentUser.uid).get().then(function(doc) {
+              let user = doc.data();
+              if (user) {
+                $('.mf-name-label').text(user.fullname);
+                $('.mf-id-label').text(doc.id);
+              } else {
+                console.warn('Failed to display current user\'s profile by cannot found current user by given id.',
+                  _currentUser.uid);
+              }
+          });
+        } else {
+          console.warn('Failed to display current user\'s profile by cannot found current user.');
+        }
+      }
+    })();
 </script>
 {% endblock javascripts %}

@@ -1,0 +1,270 @@
+{% extends "base_site.html" %} {% block sidebar %}
+<div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_covid19.html" %}
+</div>
+{% endblock sidebar %} {% block stylesheets %} {{ super() }}
+<link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/ag-grid.min.css" />
+<link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/meterial.min.css" />
+<link type="text/css" rel="stylesheet" href="static/css/common.css" />
+<link type="text/css" rel="stylesheet" href="static/css/covid19_dashboard.css" />
+<link type="text/css" rel="stylesheet" href="static/css/vendors/animate/animate.min.css" />
+{% endblock stylesheets %} {% block title %}{% endblock title %} {% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="sub-title-container status-container">COVID-19 Overview</div>
+
+    <div class="cd-row-container">
+        <div class="cd-sub-title-label">Manpower Status</div>
+        <div class="cd-sub-contents-container">
+            <div class="cd-col cd-col-2 overall">
+                <div class="cd-overall-title-label">Overall</div>
+                <div class="cd-overall-value-label">N/A</div>
+            </div>
+            <div class="cd-col cd-col-10">
+                <div class="cd-grid manpower ag-theme-material"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cd-row-container">
+        <div class="cd-sub-title-label">PASS Extension Status</div>
+        <div class="cd-sub-contents-container">
+            <div class="cd-col cd-col-12">
+                <div class="cd-grid pass ag-theme-material"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %} {% block javascripts %} {{ super() }}
+<script src="static/js/vendor/grid/ag-grid-enterprise.min.js"></script>
+<script src="static/js/vendor/moment/moment.min.js"></script>
+<script src="static/js/vendor/moment/moment-timezone-with-data.min.js"></script>
+<script>
+    (function() {
+        const IS_INTERNAL = {{is_internal|tojson}};
+        const LICENSE_KEY = "For_Trialing_ag-Grid_Only-Not_For_Real_Development_Or_Production_Projects-Valid_Until-15_May_2021_[v2]_MTYyMTAzMzIwMDAwMA==900dc7d0cef292aa92ae47777b3bbdf8";
+
+        const _db = firebase.database();
+        let _manpowerGridOptions = {},
+            _passGridOptions = {};
+
+        // Init
+        initGrids();
+        display();
+
+        function initGrids() {
+            _initManPowerGrid();
+            _initPassExtensionStatusGrid();
+        }
+
+        function display() {
+            _loadData();
+        }
+
+        function _initManPowerGrid() {
+            _manpowerGridOptions = {
+                animateRows: true,
+                defaultColDef: {
+                    flex: 1,
+                    minWidth: 130,
+                    sortable: false,
+                    resizable: true,
+                    editable: false,
+                    filter: false,
+                    suppressMenu: true,
+                    type: 'numericColumn',
+                    valueFormatter: (params) => {
+                        if (_.isNumber(params.value)) {
+                            return _toNumberString(params.value);
+                        }
+                        return 'N/A';
+                    }
+                },
+                columnDefs: [
+                    {
+                        headerName: '',
+                        field: 'kind',
+                        width: 75,
+                        minWidth: 75,
+                        flex: false,
+                        pinned: 'left',
+                        valueFormatter: (params) => params.value,
+                    },
+                    {
+                        headerName: 'Total',
+                        field: 'total'
+                    },
+                    {
+                        headerName: 'On-Duty',
+                        field: 'on_duty'
+                    },
+                    {
+                        headerName: 'In Vacation',
+                        field: 'on_vacation'
+                    },
+                    {
+                        headerName: 'Existing',
+                        field: 'rtw_e'
+                    },
+                    {
+                        headerName: 'New Comer',
+                        field: 'rtw_n'
+                    },
+                    {
+                        headerName: 'Today\'s On-Site',
+                        field: ''
+                    }
+                ],
+                rowData: [{id:'ug'}, {id:'ag'}],
+                getRowNodeId: (data) => {
+                    return data.id;
+                }
+            };
+            new agGrid.Grid($('.cd-grid.manpower').get(0), _manpowerGridOptions);
+        }
+
+        function _initPassExtensionStatusGrid() {
+            _passGridOptions = {
+                animateRows: true,
+                defaultColDef: {
+                    flex: 1,
+                    minWidth: 140,
+                    sortable: false,
+                    resizable: true,
+                    editable: false,
+                    filter: false,
+                    suppressMenu: true,
+                    type: 'numericColumn',
+                    valueFormatter: (params) => {
+                        if (_.isObject(params.value) && !_.isEmpty(params.value)) {
+                            return {
+                                inProgress: _toNumberString(params.value.in_progress),
+                                noProgress: _toNumberString(params.value.total - params.value.in_progress),
+                                total: _toNumberString(params.value.total)
+                            };
+                        }
+                    },
+                    cellRenderer: (params) => {
+                        const _widget = document.createElement('div');
+                        if (params.valueFormatted) {
+                            _widget.innerHTML = '';
+                            if (params.valueFormatted.noProgress <= 0) {
+                                _widget.innerHTML = `<span>${params.valueFormatted.noProgress}</span>`;
+                            } else {
+                                _widget.innerHTML = `<span class="cell-number-negative-label">${params.valueFormatted.noProgress}</span>`;
+                            }
+                            _widget.innerHTML = _widget.innerHTML + `
+                                /<span>${params.valueFormatted.total}</span>
+                            `;
+
+                            return _widget;
+                        }
+
+                        return 'N/A';
+                    }
+                },
+                columnDefs: [
+                    {
+                        headerName: '',
+                        field: 'kind',
+                        width: 130,
+                        minWidth: 130,
+                        pinned: 'left',
+                        valueFormatter: (params) => params.value,
+                        cellRenderer: (params) => {
+                            return params.value;
+                        }
+                    },
+                    {
+                        headerName: 'Visa',
+                        field: 'visa'
+                    },
+                    {
+                        headerName: 'CICPA',
+                        field: 'cicpa'
+                    },
+                    {
+                        headerName: 'Emirate ID',
+                        field: 'emirates_id'
+                    },
+                    {
+                        headerName: 'Labor Card',
+                        field: 'lc'
+                    },
+                    {
+                        headerName: 'Health Insurance',
+                        field: 'hi'
+                    },
+                    {
+                        headerName: 'MFC',
+                        field: 'mfc'
+                    },
+                    {
+                        headerName: 'Heavy Vehicle',
+                        field: 'heavy_vehicle'
+                    },
+                    {
+                        headerName: 'Light Vehicle',
+                        field: 'light_vehicle'
+                    }
+                ],
+                rowData: [{id:'expiry'}, {id:'urgent'}, {id:'warning'}, {id:'expired'}],
+                getRowNodeId: (data) => {
+                    return data.id;
+                }
+            };
+            new agGrid.Grid($('.cd-grid.pass').get(0), _passGridOptions);
+        }
+
+        function _loadData() {
+            _db.ref('stats/personnel/daily').on('value', (snapshot) => {
+                const _data = snapshot.val();
+                _updateManpowerStatus(_data);
+                _updatePassExtensionStatus(_data.pass_status);
+            });
+        }
+
+        function _updateManpowerStatus(data) {
+            // Overall
+            $('.cd-overall-value-label').text(_toNumberString(data.total));
+
+            // Manpower
+            const _ugData = data.ug,
+                _agData = data.ag;
+            _ugData.id = 'ug';
+            _ugData.kind = 'UG';
+            _agData.id = 'ag';
+            _agData.kind = 'AG';
+
+            _manpowerGridOptions.api.getRowNode(_ugData.id).setData(_ugData);
+            _manpowerGridOptions.api.getRowNode(_agData.id).setData(_agData);
+        }
+
+        function _updatePassExtensionStatus(data) {
+                let _passRows = _.map(_.zip(data.visa, data.cicpa, data.emirates_id, data.lc, data.hi, data.mfc,
+                    data.heavy_vehicle, data.light_vehicle), (valueList) => {
+                        return _.object(['visa', 'cicpa', 'emirates_id', 'lc', 'hi', 'mfc', 'heavy_vehicle',
+                            'light_vehicle'], valueList);
+                    });
+                _passRows = _.rest(_passRows); // Remove values in '0', firebase db returned null values in 0 index.
+
+                _passRows[0].id = 'expiry';
+                _passRows[0].kind = 'Expiry Soon';
+                _passRows[1].id = 'urgent';
+                _passRows[1].kind = 'Urgent Action';
+                _passRows[2].id = 'warning';
+                _passRows[2].kind = 'Warning';
+                _passRows[3].id = 'expired';
+                _passRows[3].kind = 'Expired';
+
+                _.each(_passRows, (rowData) => {
+                    _passGridOptions.api.getRowNode(rowData.id).setData(rowData);
+                });
+        }
+
+        function _toNumberString(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+    })();
+</script>
+{% endblock javascripts %}
