@@ -1,3 +1,22 @@
+.ag-theme-material div.ag-row {
+    font-size: 1.4em;
+    font-weight: 500;
+}
+.ag-cell {
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+}
+.ag-header-cell {
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+}
+.ag-header-cell-text {
+    font-size: 1.2em;
+}
+.grid-row-column {
+    font-weight: normal;
+}
+
 .cd-row-container {
     width: 100%;
     margin-bottom: 2.6em;
@@ -24,10 +43,18 @@
     margin-bottom: 0.4em;
 }
 
+.cd-overall-icn {
+    width: 5em;
+    height: 5em;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url(../img/icn_worker.svg);
+}
 .cd-overall-title-label {
     text-align: center;
     font-weight: 500;
-    font-size: 2em;
+    font-size: 1.4em;
     color: #969696;
 }
 .cd-overall-value-label {
@@ -38,6 +65,7 @@
     display: flex;
     flex-direction: column;
     align-self: center;
+    align-items: center;
 }
 
 .cd-col {

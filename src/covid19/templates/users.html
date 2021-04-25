@@ -31,160 +31,148 @@
     </div>
 
     <div class="top-upper-container">
-        <!-- RTW Process-->
-        <div class="user-filter-container rtw">
-            <!-- TODO: style display is none-->
-            <!-- <div class="user-filter-top-container">
-                <div class="user-filter-title-icn"></div>
-                <div class="user-filter-title-label">RTW Process</div>
-                <div class="user-folder-icn"></div>
-                <div class="user-folder-title-label">Filter Function</div>
+        <div class="user-filter-folder-btn filter">
+            <div class="user-folder-icn"></div>
+            <div class="user-folder-title-label">Filter Function</div>
+        </div>
+        <div class="filter-buttons-container filter">
+            <div class="user-dropdown-container">
+                <div class="user-dropdown-top-container">
+                    <div class="user-dropdown-title-icn"></div>
+                    <div class="user-dropdown-title-label">Work Status</div>
+                </div>
+                <div class="user-dropdown-bottom-container">
+                    <select id="workStatus" class="filter-dropdown">
+                        <option value="" selected>None</option>
+                        <option value="onduty">On Duty</option>
+                        <option value="quarantined">Quarantined</option>
+                        <option value="isolated">Isolation</option>
+                        <option value="hospitalized">Hospitalized</option>
+                        <option value="hospitalized-icu">Hospitalized ICU</option>
+                        <option value="terminated">Termination</option>
+                        <option value="resigned">Resigned</option>
+                        <option value="demobilization">Demobilization</option>
+                        <option value="vacation">Vacation</option>
+                        <option value="b-trip">Business Trip</option>
+                        <option value="others">Others</option>
+                    </select>
+                </div>
             </div>
-            <div class="user-filter-bottom-container">
-                <div class="user-filter-left-container"></div>
-                <div class="user-filter-right-container">
-                    <div class="user-filter-title-label"></div>
-                    <div class="user-filter-button-container">
-                        <div class="user-filter-button"></div>
-                    </div>
+            <div class="user-dropdown-container">
+                <div class="user-dropdown-top-container">
+                    <div class="user-dropdown-title-icn"></div>
+                    <div class="user-dropdown-title-label">Clinic Status</div>
                 </div>
-            </div> -->
-            <div class="user-filter-bottom-container">
-                <div class="user-dropdown-container">
-                    <div class="user-dropdown-top-container">
-                        <div class="user-dropdown-title-icn"></div>
-                        <div class="user-dropdown-title-label">Work Status</div>
-                    </div>
-                    <div class="user-dropdown-bottom-container">
-                        <select id="workStatus" class="filter-dropdown">
-                            <option value="" selected>None</option>
-                            <option value="onduty">On Duty</option>
-                            <option value="quarantined">Quarantined</option>
-                            <option value="isolated">Isolation</option>
-                            <option value="hospitalized">Hospitalized</option>
-                            <option value="hospitalized-icu">Hospitalized ICU</option>
-                            <option value="terminated">Termination</option>
-                            <option value="resigned">Resigned</option>
-                            <option value="demobilization">Demobilization</option>
-                            <option value="vacation">Vacation</option>
-                            <option value="b-trip">Business Trip</option>
-                            <option value="others">Others</option>
-                        </select>
-                    </div>
+                <div class="user-dropdown-bottom-container">
+                    <select id="clinicStatus" class="filter-dropdown">
+                        <option value="">None</option>
+                        <option value="close-contact">Close Contact</option>
+                        <option value="symptom-suspected" selected>Symptom Suspected</option>
+                        <option value="quarantine-required">Quarantine Required</option>
+                        <option value="isolation-required">Isolation Required</option>
+                    </select>
                 </div>
-                <div class="user-dropdown-container">
-                    <div class="user-dropdown-top-container">
-                        <div class="user-dropdown-title-icn"></div>
-                        <div class="user-dropdown-title-label">Clinic Status</div>
-                    </div>
-                    <div class="user-dropdown-bottom-container">
-                        <select id="clinicStatus" class="filter-dropdown">
-                            <option value="">None</option>
-                            <option value="close-contact">Close Contact</option>
-                            <option value="symptom-suspected" selected>Symptom Suspected</option>
-                            <option value="quarantine-required">Quarantine Required</option>
-                            <option value="isolation-required">Isolation Required</option>
-                        </select>
-                    </div>
+            </div>
+            <div class="user-dropdown-container">
+                <div class="user-dropdown-top-container">
+                    <div class="user-dropdown-title-icn"></div>
+                    <div class="user-dropdown-title-label">OP Status</div>
                 </div>
-                <div class="user-dropdown-container">
-                    <div class="user-dropdown-top-container">
-                        <div class="user-dropdown-title-icn"></div>
-                        <div class="user-dropdown-title-label">OP Status</div>
-                    </div>
-                    <div class="user-dropdown-bottom-container">
-                        <select id="opStatus" class="filter-dropdown">
-                            <option value="" selected>None</option>
-                            <option value="quarantine-confirmed">Quarantine Confirmed</option>
-                            <option value="isolation-confirmed">Isolation Confirmed</option>
-                        </select>
-                    </div>
+                <div class="user-dropdown-bottom-container">
+                    <select id="opStatus" class="filter-dropdown">
+                        <option value="" selected>None</option>
+                        <option value="quarantine-confirmed">Quarantine Confirmed</option>
+                        <option value="isolation-confirmed">Isolation Confirmed</option>
+                    </select>
                 </div>
-                <div class="user-dropdown-container">
-                    <div class="user-dropdown-top-container">
-                        <div class="user-dropdown-title-icn"></div>
-                        <div class="user-dropdown-title-label">Staff</div>
-                    </div>
-                    <div class="user-dropdown-bottom-container">
-                        <select id="staff" class="filter-dropdown">
-                            <option value="" selected>None</option>
-                            <option value="admin">Admin</option>
-                            <option value="clinic">Clinic</option>
-                        </select>
-                    </div>
+            </div>
+            <div class="user-dropdown-container">
+                <div class="user-dropdown-top-container">
+                    <div class="user-dropdown-title-icn"></div>
+                    <div class="user-dropdown-title-label">Staff</div>
                 </div>
-                <div class="user-dropdown-container">
-                    <div class="user-dropdown-top-container">
-                        <div class="user-dropdown-title-icn"></div>
-                        <div class="user-dropdown-title-label">Group</div>
-                    </div>
-                    <div class="user-dropdown-bottom-container">
-                        <select id="group" class="filter-dropdown">
-                            <option value="" selected>None</option>
-                            <option value="group-ag">A/G</option>
-                            <option value="group-ug">U/G</option>
-                        </select>
-                    </div>
+                <div class="user-dropdown-bottom-container">
+                    <select id="staff" class="filter-dropdown">
+                        <option value="" selected>None</option>
+                        <option value="admin">Admin</option>
+                        <option value="clinic">Clinic</option>
+                    </select>
                 </div>
-                <div class="user-dropdown-container">
-                    <div class="user-dropdown-top-container">
-                        <div class="user-dropdown-title-icn"></div>
-                        <div class="user-dropdown-title-label">Test Referred</div>
+            </div>
+            <div class="user-dropdown-container">
+                <div class="user-dropdown-top-container">
+                    <div class="user-dropdown-title-icn"></div>
+                    <div class="user-dropdown-title-label">Group</div>
+                </div>
+                <div class="user-dropdown-bottom-container">
+                    <select id="group" class="filter-dropdown">
+                        <option value="" selected>None</option>
+                        <option value="group-ag">A/G</option>
+                        <option value="group-ug">U/G</option>
+                    </select>
+                </div>
+            </div>
+            <div class="user-dropdown-container">
+                <div class="user-dropdown-top-container">
+                    <div class="user-dropdown-title-icn"></div>
+                    <div class="user-dropdown-title-label">Test Referred</div>
+                </div>
+                <div class="user-dropdown-bottom-container">
+                    <select id="testReferred" class="filter-dropdown">
+                        <option value="" selected>None</option>
+                        <option value="test-referred">Test Referred</option>
+                    </select>
+                </div>
+            </div>
+            <div class="user-filter-container admin">
+                <!-- TODO: style display is none-->
+                <div class="user-filter-top-container" style="display: none">
+                    <!-- TODO: style height-->
+                    <div class="user-filter-title-icn" style="height: 1.7em"></div>
+                    <div class="user-filter-title-label">Admin/HR Affairs</div>
+                </div>
+                <div class="user-filter-bottom-container">
+                    <div class="user-dropdown-container">
+                        <div class="user-dropdown-top-container">
+                            <div class="user-dropdown-title-icn"></div>
+                            <div class="user-dropdown-title-label">CICPA Pass</div>
+                        </div>
+                        <div class="user-dropdown-bottom-container">
+                            <select id="cicpaPass" class="filter-dropdown">
+                                <option value="" selected>None</option>
+                                <option value="good">Good</option>
+                                <option value="expiring-soon">Expiring Soon</option>
+                                <option value="expired">Expired</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="user-dropdown-bottom-container">
-                        <select id="testReferred" class="filter-dropdown">
-                            <option value="" selected>None</option>
-                            <option value="test-referred">Test Referred</option>
-                        </select>
+                    <div class="user-dropdown-container">
+                        <div class="user-dropdown-top-container">
+                            <div class="user-dropdown-title-icn"></div>
+                            <div class="user-dropdown-title-label">VISA</div>
+                        </div>
+                        <div class="user-dropdown-bottom-container">
+                            <select id="visa" class="filter-dropdown">
+                                <option value="" selected>None</option>
+                                <option value="good">Good</option>
+                                <option value="expiring-soon">Expiring Soon</option>
+                                <option value="expired">Expired</option>
+                                >
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="top-upper-container">
-        <!-- Admin/HR Affairs-->
-        <div class="user-filter-container admin">
-            <!-- TODO: style display is none-->
-            <div class="user-filter-top-container" style="display: none">
-                <!-- TODO: style height-->
-                <div class="user-filter-title-icn" style="height: 1.7em"></div>
-                <div class="user-filter-title-label">Admin/HR Affairs</div>
-            </div>
-            <div class="user-filter-bottom-container">
-                <div class="user-dropdown-container">
-                    <div class="user-dropdown-top-container">
-                        <div class="user-dropdown-title-icn"></div>
-                        <div class="user-dropdown-title-label">CICPA Pass</div>
-                    </div>
-                    <div class="user-dropdown-bottom-container">
-                        <select id="cicpaPass" class="filter-dropdown">
-                            <option value="" selected>None</option>
-                            <option value="good">Good</option>
-                            <option value="expiring-soon">Expiring Soon</option>
-                            <option value="expired">Expired</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="user-dropdown-container">
-                    <div class="user-dropdown-top-container">
-                        <div class="user-dropdown-title-icn"></div>
-                        <div class="user-dropdown-title-label">VISA</div>
-                    </div>
-                    <div class="user-dropdown-bottom-container">
-                        <select id="visa" class="filter-dropdown">
-                            <option value="" selected>None</option>
-                            <option value="good">Good</option>
-                            <option value="expiring-soon">Expiring Soon</option>
-                            <option value="expired">Expired</option>
-                            >
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+    <!-- Command Buttons -->
+    {% if current_user.level in [0, 7, 8] %}
+    <div class="user-filter-folder-btn command">
+        <div class="user-folder-icn"></div>
+        <div class="user-folder-title-label">Command Function</div>
     </div>
-    <div class="top-lower-container">
-        {% if current_user.level in [0, 7, 8] %}
+    <div class="filter-buttons-container command">
         <div class="user-filter-container clinic-command">
             <div class="user-filter-top-container">
                 <div class="user-filter-title-icn"></div>
@@ -246,14 +234,15 @@
             </div>
             {% endif %}
         </div>
-        <div class="content-container">
-            <div id="user-table" class="user-table"></div>
-            <div class="user-item-loader-btn loading">
-                <div class="user-item-loader-icon"></div>
-                <div class="user-item-loader-label">Load more</div>
-            </div>
+    </div>
+    <div class="content-container">
+        <div id="user-table" class="user-table"></div>
+        <div class="user-item-loader-btn loading">
+            <div class="user-item-loader-icon"></div>
+            <div class="user-item-loader-label">Load more</div>
         </div>
     </div>
+</div>
     {% endblock content %} {% block javascripts %} {{ super() }}
     <!-- Load table module -->
     <link href="static/js/vendor/table/tabulator.min.css" rel="stylesheet" />
@@ -998,6 +987,26 @@
 
                 // init filter buttons.
                 initFilterButton();
+                $('.user-filter-folder-btn.filter').click(function() {
+                    let _buttonContainer = $('.filter-buttons-container.filter');
+                    if (_buttonContainer.hasClass('unfold')) {
+                        $(this).removeClass('unfold');
+                        _buttonContainer.removeClass('unfold');
+                    } else {
+                        $(this).addClass('unfold');
+                        _buttonContainer.addClass('unfold');
+                    }
+                });
+                $('.user-filter-folder-btn.command').click(function() {
+                    let _buttonContainer = $('.filter-buttons-container.command');
+                    if (_buttonContainer.hasClass('unfold')) {
+                        $(this).removeClass('unfold');
+                        _buttonContainer.removeClass('unfold');
+                    } else {
+                        $(this).addClass('unfold');
+                        _buttonContainer.addClass('unfold');
+                    }
+                });
 
                 // [OP] init confirm quarantine button
                 $('.command-btn.confirm-quarantine').click(function() {
@@ -1270,8 +1279,6 @@
             }
 
             function initFilterButton(type) {
-                // $('.' + type + ' .user-filter-btn').click(function() {
-
                 // TODO: Deprecated(210303)
                 $('.user-filter-btn').click(function() {
                     _lastUserSnapShot = null; // reset paging
@@ -1320,7 +1327,8 @@
 
             function initTableView() {
                 if (!_table) {
-                     _table = new Tabulator('#user-table', {
+                    _table = new Tabulator('#user-table', {
+                        maxHeight: 768,
                         layout: 'fitColumns',
                         columnVertAlign: 'middle',
                         headerSort: false, // disable header sort for all columns

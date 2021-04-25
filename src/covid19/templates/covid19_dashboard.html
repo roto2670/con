@@ -17,6 +17,7 @@
         <div class="cd-sub-contents-container">
             <div class="cd-col cd-col-2 overall">
                 <div class="cd-overall-title-label">Overall</div>
+                <div class="cd-overall-icn"></div>
                 <div class="cd-overall-value-label">N/A</div>
             </div>
             <div class="cd-col cd-col-10">
@@ -66,7 +67,6 @@
                 animateRows: true,
                 defaultColDef: {
                     flex: 1,
-                    minWidth: 130,
                     sortable: false,
                     resizable: true,
                     editable: false,
@@ -89,6 +89,7 @@
                         flex: false,
                         pinned: 'left',
                         valueFormatter: (params) => params.value,
+                        cellClass: 'grid-row-column'
                     },
                     {
                         headerName: 'Total',
@@ -128,7 +129,6 @@
                 animateRows: true,
                 defaultColDef: {
                     flex: 1,
-                    minWidth: 140,
                     sortable: false,
                     resizable: true,
                     editable: false,
@@ -153,8 +153,7 @@
                             } else {
                                 _widget.innerHTML = `<span class="cell-number-negative-label">${params.valueFormatted.noProgress}</span>`;
                             }
-                            _widget.innerHTML = _widget.innerHTML + `
-                                /<span>${params.valueFormatted.total}</span>
+                            _widget.innerHTML = _widget.innerHTML + `/<span>${params.valueFormatted.total}</span>
                             `;
 
                             return _widget;
@@ -170,6 +169,7 @@
                         width: 130,
                         minWidth: 130,
                         pinned: 'left',
+                        cellClass: 'grid-row-column',
                         valueFormatter: (params) => params.value,
                         cellRenderer: (params) => {
                             return params.value;
