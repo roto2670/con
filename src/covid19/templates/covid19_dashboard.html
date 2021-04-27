@@ -3,268 +3,717 @@
     {% include "site_template/sidebar_covid19.html" %}
 </div>
 {% endblock sidebar %} {% block stylesheets %} {{ super() }}
-<link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/ag-grid.min.css" />
-<link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/meterial.min.css" />
 <link type="text/css" rel="stylesheet" href="static/css/common.css" />
 <link type="text/css" rel="stylesheet" href="static/css/covid19_dashboard.css" />
 <link type="text/css" rel="stylesheet" href="static/css/vendors/animate/animate.min.css" />
 {% endblock stylesheets %} {% block title %}{% endblock title %} {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
-    <div class="sub-title-container status-container">COVID-19 Overview</div>
+    <div class="sub-title-container status-container">
+        Overview
+        <div class="status-maximize-btn"></div>
+    </div>
 
-    <div class="cd-row-container">
-        <div class="cd-sub-title-label">Manpower Status</div>
-        <div class="cd-sub-contents-container">
-            <div class="cd-col cd-col-2 overall">
-                <div class="cd-overall-title-label">Overall</div>
-                <div class="cd-overall-icn"></div>
-                <div class="cd-overall-value-label">N/A</div>
+    <!-- Status widget -->
+    <div class="content-container status-widgets">
+        <div class="status-minimize-btn"></div>
+        <div class="w-upper-container">
+            <div class="status-widget confirmed">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon confirmed"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Confirmed</div>
+                </div>
             </div>
-            <div class="cd-col cd-col-10">
-                <div class="cd-grid manpower ag-theme-material"></div>
+
+            <div class="status-widget deaths">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon death"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Deaths</div>
+                </div>
+            </div>
+
+            <div class="status-widget recovered">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon recovered"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Recovered</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-middle-container upper">
+            <div class="status-widget actptv small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon actptv"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Active/Positive</div>
+                </div>
+            </div>
+
+            <div class="status-widget quarantined small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon quarantined"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Quarantined</div>
+                </div>
+            </div>
+
+            <div class="status-widget isolated small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon isolated"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Isolated</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-middle-container lower">
+            <div class="status-widget close-contact small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon close-contact"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Close contacts</div>
+                </div>
+            </div>
+
+            <div class="status-widget symptomatics small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon symptomatics"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Suspected<br />Symptom</div>
+                </div>
+            </div>
+
+            <div class="status-widget hospitalized small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon hospitalized"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Hospitalized</div>
+                </div>
+            </div>
+
+            <div class="status-widget self-asse small">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon self-asse"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-up status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Self-Assessments</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-lower-container">
+            <div class="status-title-widget alertphase wide">
+                <div class="status-title-widget-upper-container">Alert Phase</div>
+                <div class="status-title-widget-lower-container">
+                    <div class="status-title-widget-icon"></div>
+                    <div class="status-title-widget-title-label">Level</div>
+                    <div class="status-title-widget-value-label">N/A</div>
+                </div>
+            </div>
+
+            <div class="status-widget cconfirmed">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon uae"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Confirmed</div>
+                </div>
+            </div>
+
+            <div class="status-widget cdeaths">
+                <div class="status-w-left-container">
+                    <div class="status-widget-icon uae"></div>
+                </div>
+                <div class="status-w-right-container">
+                    <div class="status-w-right-upper-container">
+                        <div class="status-w-value-label">N/A</div>
+                        <div class="status-w-pct-container">
+                            <i class="fa fa-caret-down status-w-pct-icon pstv"></i>
+                            <div class="status-w-pct-label">-</div>
+                        </div>
+                    </div>
+                    <div class="status-w-right-lower-container status-w-title-label">Deaths</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="cd-row-container">
-        <div class="cd-sub-title-label">PASS Extension Status</div>
-        <div class="cd-sub-contents-container">
-            <div class="cd-col cd-col-12">
-                <div class="cd-grid pass ag-theme-material"></div>
-            </div>
-        </div>
+    <!-- Alerts message items -->
+    <div class="sub-title-container">Alerts</div>
+    <div class="content-container alerts"></div>
+    <div class="alert-item-loader-btn loading">
+        <div class="alert-item-loader-icon"></div>
+        <div class="alert-item-loader-label">Load more</div>
     </div>
 </div>
 
 {% endblock content %} {% block javascripts %} {{ super() }}
-<script src="static/js/vendor/grid/ag-grid-enterprise.min.js"></script>
 <script src="static/js/vendor/moment/moment.min.js"></script>
 <script src="static/js/vendor/moment/moment-timezone-with-data.min.js"></script>
 <script>
     (function() {
-        const IS_INTERNAL = {{is_internal|tojson}};
-        const LICENSE_KEY = "For_Trialing_ag-Grid_Only-Not_For_Real_Development_Or_Production_Projects-Valid_Until-15_May_2021_[v2]_MTYyMTAzMzIwMDAwMA==900dc7d0cef292aa92ae47777b3bbdf8";
+        const IS_INTERNAL = {{is_internal|tojson}},
+        STAT_DISPLAY_NAME = {
+            'active_positives': "Active/Positive",
+            'confirmed': "Confirmed",
+            'country_total_cases': "Country Total Cases",
+            'country_total_deaths': "Country Total Deaths",
+            'deaths': "Deaths",
+            'quarantined': "Quarantined",
+            'recovered': "Recovered",
+            'suspected': "Suspected",
+            'ts': "Last Time"
+        },
+        STAT_TYPE_KEY = {
+            'active_positives': "actptv",
+            'confirmed': "confirmed",
+            'country_total_cases': "cconfirmed",
+            'country_total_deaths': "cdeaths",
+            'deaths': "deaths",
+            'quarantined': "quarantined",
+            'recovered': "recovered",
+            'suspected': "suspected",
+            'hospitalized': "hospitalized",
+            'close_contacts': "close-contact",
+            'symptomatics': "symptomatics",
+            'selfassessments': "self-asse",
+            'isolated': "isolated",
+            'alert_phase': "alertphase"
+        },
+        USER_MENU_URL_PREFIX = 'users',
+        ALERT_PAGE_SIZE = 5,
+        TIMEZONE = 'Asia/Dubai';
 
-        const _db = firebase.database();
-        let _manpowerGridOptions = {},
-            _passGridOptions = {};
+        let _db = firebase.firestore(),
+            _loadingAlerts = false,
+            _lastAlertSnapshot,
+            _currentStats,
+            _yesterdayStats;
+
 
         // Init
-        initGrids();
+        initHandlers();
         display();
 
-        function initGrids() {
-            agGrid.LicenseManager.setLicenseKey(LICENSE_KEY);
-            _initManPowerGrid();
-            _initPassExtensionStatusGrid();
-        }
 
-        function display() {
-            _loadData();
-        }
+        function initHandlers() {
+            $('.alert-item-loader-btn').click(function() {
+                let _this = $(this);
+                _this.addClass('loading');
+                displayAlerts(function () {
+                    _this.removeClass('loading');
+                });
+            });
 
-        function _initManPowerGrid() {
-            _manpowerGridOptions = {
-                animateRows: true,
-                defaultColDef: {
-                    flex: 1,
-                    sortable: false,
-                    resizable: true,
-                    editable: false,
-                    filter: false,
-                    suppressMenu: true,
-                    type: 'numericColumn',
-                    valueFormatter: (params) => {
-                        if (_.isNumber(params.value)) {
-                            return _toNumberString(params.value);
-                        }
-                        return 'N/A';
-                    }
-                },
-                columnDefs: [
-                    {
-                        headerName: '',
-                        field: 'kind',
-                        width: 75,
-                        minWidth: 75,
-                        flex: false,
-                        pinned: 'left',
-                        valueFormatter: (params) => params.value,
-                        cellClass: 'grid-row-column'
-                    },
-                    {
-                        headerName: 'Total',
-                        field: 'total'
-                    },
-                    {
-                        headerName: 'On-Duty',
-                        field: 'on_duty'
-                    },
-                    {
-                        headerName: 'In Vacation',
-                        field: 'on_vacation'
-                    },
-                    {
-                        headerName: 'Existing',
-                        field: 'rtw_e'
-                    },
-                    {
-                        headerName: 'New Comer',
-                        field: 'rtw_n'
-                    },
-                    {
-                        headerName: 'Today\'s On-Site',
-                        field: ''
-                    }
-                ],
-                rowData: [{id:'ug'}, {id:'ag'}],
-                getRowNodeId: (data) => {
-                    return data.id;
-                }
-            };
-            new agGrid.Grid($('.cd-grid.manpower').get(0), _manpowerGridOptions);
-        }
-
-        function _initPassExtensionStatusGrid() {
-            _passGridOptions = {
-                animateRows: true,
-                defaultColDef: {
-                    flex: 1,
-                    sortable: false,
-                    resizable: true,
-                    editable: false,
-                    filter: false,
-                    suppressMenu: true,
-                    type: 'numericColumn',
-                    valueFormatter: (params) => {
-                        if (_.isObject(params.value) && !_.isEmpty(params.value)) {
-                            return {
-                                inProgress: _toNumberString(params.value.in_progress),
-                                noProgress: _toNumberString(params.value.total - params.value.in_progress),
-                                total: _toNumberString(params.value.total)
-                            };
-                        }
-                    },
-                    cellRenderer: (params) => {
-                        const _widget = document.createElement('div');
-                        if (params.valueFormatted) {
-                            _widget.innerHTML = '';
-                            if (params.valueFormatted.noProgress <= 0) {
-                                _widget.innerHTML = `<span>${params.valueFormatted.noProgress}</span>`;
-                            } else {
-                                _widget.innerHTML = `<span class="cell-number-negative-label">${params.valueFormatted.noProgress}</span>`;
-                            }
-                            _widget.innerHTML = _widget.innerHTML + `/<span>${params.valueFormatted.total}</span>
-                            `;
-
-                            return _widget;
-                        }
-
-                        return 'N/A';
-                    }
-                },
-                columnDefs: [
-                    {
-                        headerName: '',
-                        field: 'kind',
-                        width: 130,
-                        minWidth: 130,
-                        pinned: 'left',
-                        cellClass: 'grid-row-column',
-                        valueFormatter: (params) => params.value,
-                        cellRenderer: (params) => {
-                            return params.value;
-                        }
-                    },
-                    {
-                        headerName: 'Visa',
-                        field: 'visa'
-                    },
-                    {
-                        headerName: 'CICPA',
-                        field: 'cicpa'
-                    },
-                    {
-                        headerName: 'Emirate ID',
-                        field: 'emirates_id'
-                    },
-                    {
-                        headerName: 'Labor Card',
-                        field: 'lc'
-                    },
-                    {
-                        headerName: 'Health Insurance',
-                        field: 'hi'
-                    },
-                    {
-                        headerName: 'MFC',
-                        field: 'mfc'
-                    },
-                    {
-                        headerName: 'Heavy Vehicle',
-                        field: 'heavy_vehicle'
-                    },
-                    {
-                        headerName: 'Light Vehicle',
-                        field: 'light_vehicle'
-                    }
-                ],
-                rowData: [{id:'expiry'}, {id:'urgent'}, {id:'warning'}, {id:'expired'}],
-                getRowNodeId: (data) => {
-                    return data.id;
-                }
-            };
-            new agGrid.Grid($('.cd-grid.pass').get(0), _passGridOptions);
-        }
-
-        function _loadData() {
-            _db.ref('stats/personnel/daily').on('value', (snapshot) => {
-                const _data = snapshot.val();
-                _updateManpowerStatus(_data);
-                _updatePassExtensionStatus(_data.pass_status);
+            // handle maximize and minimize.
+            $('.status-maximize-btn').click(function() {
+                $('.status-widgets').addClass('maximize');
+                $('.status-minimize-btn').show();
+            });
+            $('.status-minimize-btn').click(function() {
+                $('.status-widgets').removeClass('maximize');
+                $('.status-minimize-btn').hide();
             });
         }
 
-        function _updateManpowerStatus(data) {
-            // Overall
-            $('.cd-overall-value-label').text(_toNumberString(data.total));
+        function initSnapshots() {
+            // listening new stats.
+            _db.collection('covid19_stats')
+                .orderBy('ts', 'desc')
+                .limit(1)
+                .onSnapshot(function(snapshot) {
+                    snapshot.docChanges().forEach(function(change) {
+                        if (change.type === 'added' || change.type === 'modified')
+                        var data;
+                        if (!!!snapshot.empty) {
+                            data = snapshot.docs[snapshot.docs.length - 1].data();
+                        }
 
-            // Manpower
-            const _ugData = data.ug,
-                _agData = data.ag;
-            _ugData.id = 'ug';
-            _ugData.kind = 'UG';
-            _agData.id = 'ag';
-            _agData.kind = 'AG';
+                        // Check updates item is not exist.
+                        if (change.type === 'added' && _currentStats.documentId == data.id) {
+                            console.warn('Received add new stats data,but it\'s the same document as current.');
+                            return;
+                        }
+                        console.log('Received ' + change.type + ' stats. try update.');
 
-            _manpowerGridOptions.api.getRowNode(_ugData.id).setData(_ugData);
-            _manpowerGridOptions.api.getRowNode(_agData.id).setData(_agData);
+                        // update stat value view
+                        if (!!data) {
+                            updateStats(data);
+
+                            // check ts is none(when server fetching...)
+                            let todayDate = new Date();
+                            if (!data.ts) {
+                                data.ts = {
+                                    seconds: todayDate.getTime() / 1000
+                                };
+                            }
+
+                            // check date changed.
+                            {# if (isFutureDay(new Date(_yesterdayStats.ts.seconds * 1000), todayDate)) {
+                                _yesterdayStats = _currentStats;
+                            } #}
+                            if (change.type === 'added') {
+                                _yesterdayStats = _currentStats;
+                            }
+
+                            // Updates the view.
+                            updateCompareStats(_yesterdayStats, data);
+
+                            // refresh current stats
+                            _currentStats = data;
+                            _currentStats.documentId = data.id;
+                        } else {
+                            console.warn('Received new stats data, but cannot parse data from shapshot.');
+                        }
+                    });
+            }, function(error) {
+                console.warn("Received new stats data, but there was an error.", error);
+            })
         }
 
-        function _updatePassExtensionStatus(data) {
-                let _passRows = _.map(_.zip(data.visa, data.cicpa, data.emirates_id, data.lc, data.hi, data.mfc,
-                    data.heavy_vehicle, data.light_vehicle), (valueList) => {
-                        return _.object(['visa', 'cicpa', 'emirates_id', 'lc', 'hi', 'mfc', 'heavy_vehicle',
-                            'light_vehicle'], valueList);
-                    });
-                _passRows = _.rest(_passRows); // Remove values in '0', firebase db returned null values in 0 index.
+        function display() {
+            // defaults minimize
+            $('.status-widgets').removeClass('maximize');
+            $('.status-minimize-btn').hide();
 
-                _passRows[0].id = 'expiry';
-                _passRows[0].kind = 'Expiry Soon';
-                _passRows[1].id = 'urgent';
-                _passRows[1].kind = 'Urgent Action';
-                _passRows[2].id = 'warning';
-                _passRows[2].kind = 'Warning';
-                _passRows[3].id = 'expired';
-                _passRows[3].kind = 'Expired';
+            loadStats(function(today, yesterday) {
+                // store today
+                _currentStats = today;
+                _yesterdayStats = yesterday;
+                _currentStats.documentId = today.id;
+                _yesterdayStats.documentId = yesterday.id;
 
-                _.each(_passRows, (rowData) => {
-                    _passGridOptions.api.getRowNode(rowData.id).setData(rowData);
+                updateStats(today);
+
+                // update compare view
+                if (!!yesterday) {
+                    updateCompareStats(yesterday, today);
+                }
+
+                initSnapshots(); // init handlers
+            });
+
+            // Load alerts
+            displayAlerts(function() {
+                $('.alert-item-loader-btn').removeClass('loading');
+            });
+        }
+
+        function updateStats(stats) {
+            // Display stats
+            $('.status-widget.confirmed .status-w-value-label').text(getStatDisplayName(stats.confirmed));
+            $('.status-widget.deaths .status-w-value-label').text(getStatDisplayName(stats.deaths));
+            $('.status-widget.recovered .status-w-value-label').text(getStatDisplayName(stats.recovered));
+
+            $('.status-widget.actptv .status-w-value-label').text(getStatDisplayName(stats.active_positives));
+            $('.status-widget.quarantined .status-w-value-label').text(getStatDisplayName(stats.quarantined));
+            $('.status-widget.isolated .status-w-value-label').text(getStatDisplayName(stats.isolated));
+
+            $('.status-widget.close-contact .status-w-value-label').text(getStatDisplayName(stats.close_contacts));
+            $('.status-widget.symptomatics .status-w-value-label').text(getStatDisplayName(stats.symptomatics));
+            $('.status-widget.hospitalized .status-w-value-label').text(getStatDisplayName(stats.hospitalized));
+            $('.status-widget.self-asse .status-w-value-label').text(getStatDisplayName(stats.selfassessments));
+
+            // handle alert phase
+            if (stats.alert_phase == 0) {
+                $('.status-title-widget.alertphase .status-title-widget-title-label').text('');
+                $('.status-title-widget.alertphase .status-title-widget-value-label').text('Normal');
+            } else {
+                $('.status-title-widget.alertphase .status-title-widget-title-label').text('Level');
+                $('.status-title-widget.alertphase .status-title-widget-value-label').text(
+                    getStatDisplayName(stats.alert_phase));
+
+                // Fill colors by level
+                $('.status-widgets').addClass('level' + stats.alert_phase);
+            }
+            $('.status-widget.cconfirmed .status-w-value-label').text(getStatDisplayName(stats.country_total_cases));
+            $('.status-widget.cdeaths .status-w-value-label').text(getStatDisplayName(stats.country_total_deaths));
+        }
+
+        function updateCompareStats(source, target) {
+            if (!!source && !!target) {
+                let targetTypes = _.keys(_.omit(target, 'avg_new_cases', 'avg_new_deaths', 'country_avg_new_cases',
+                    'country_avg_new_deaths', 'headcount', 'ts', 'recovered', 'documentId'));
+                _.each(targetTypes, function(type) {
+                    updateCompareStat(type, source[type], target[type]);
+                });
+
+                // good for the increase
+                targetTypes = ['recovered', 'selfassessments'];
+                _.each(targetTypes, function(type) {
+                    updateCompareStat(type, source[type], target[type], true);
+                });
+            } else {
+                console.warn('Cannot update compare stats, by given args is null.', source, target)
+            }
+        }
+
+        function updateCompareStat(type, source, target, reverse, valueLabel, arrowWidget) {
+            if (_.isNumber(source) || _.isNumber(target)) {
+                let label = valueLabel || $('.status-widget.' + STAT_TYPE_KEY[type] + ' .status-w-pct-label'),
+                    arrow = arrowWidget || $('.status-widget.' + STAT_TYPE_KEY[type] + ' .status-w-pct-icon'),
+                    different = (target || 0) - (source || 0);
+
+                    arrow.removeClass('fa-caret-down fa-caret-up pstv ngtv');
+                    if (!!!reverse) {
+                        if (different > 0) {
+                            arrow.addClass('fa-caret-up ngtv');
+                        } else {
+                            arrow.addClass('fa-caret-down pstv');
+                        }
+                    } else {
+                        if (different > 0) {
+                            arrow.addClass('fa-caret-up pstv');
+                        } else {
+                            arrow.addClass('fa-caret-down ngtv');
+                        }
+                    }
+
+                    label.text(different);
+            } else {
+                console.warn('Cannot update compare stat, by given source or target are not numbers.', source,
+                    target);
+            }
+        }
+
+        function loadStats(callback) {
+            _db.collection('covid19_stats')
+                .orderBy('ts', 'desc')
+                .limit(2).get().then((snapshots) => {
+                    var today = {},
+                        yesterday;
+
+                    if (!snapshots.empty) {
+                        today = snapshots.docs[snapshots.docs.length - 1].data();
+                    }
+                    if (snapshots.docs.length > 1) {
+                        // has yesterday
+                        yesterday = today;
+                        today = snapshots.docs[snapshots.docs.length - 2].data();
+                    }
+                    callback(today, yesterday);
                 });
         }
 
-        function _toNumberString(number) {
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        function displayAlerts(callback) {
+            callback = callback || _.noop;
+            if (!_loadingAlerts) {
+                _loadingAlerts = true;
+                loadAlerts(_lastAlertSnapshot, function(users, lastSnapshot) {
+                    if (!!lastSnapshot) {
+                        _lastAlertSnapshot = lastSnapshot;
+                    }
+
+                    // render alert items.
+                    let container = $('.content-container.alerts');
+                    $.each(users, function(index, user) {
+                        let viewItem = AlertItem(user, {
+                            goToUser: function(userId) {
+                                goToUserMenu(userId);
+                            }
+                        });
+                        container.append(viewItem.render());
+                    });
+
+                    _loadingAlerts = false;
+                    callback();
+                });
+            } else {
+                console.debug("Already loading users.");
+                callback();
+            }
+        }
+
+        function loadAlerts(startAt, callback) {
+            var ref,
+                query;
+            if (!!startAt) {
+                // Paging
+                ref = _db.collection('messages')
+                    .orderBy('ts', 'desc')
+                    .startAfter(startAt)
+                    .limit(ALERT_PAGE_SIZE)
+            } else {
+                // Query first time.
+                ref = _db.collection('messages')
+                    .orderBy('ts', 'desc')
+                    .limit(ALERT_PAGE_SIZE);
+            }
+
+            // make a query
+            query = ref.where('type', '==', 1);
+            query = ref.where('to_user', '==', '1');
+
+            // do query
+            query.get().then(function(snapshots) {
+                var alerts = [],
+                    lastSnapShot;
+                if (!!!snapshots.empty) {
+                    lastSnapShot = snapshots.docs[snapshots.docs.length - 1];
+                    snapshots.forEach(function(doc) {
+                        alerts.push(doc.data());
+                    });
+                } else {
+                    // no more alerts.
+                }
+
+                callback(alerts, lastSnapShot);
+            }).catch(function(error) {
+                console.warn('Failed to load alerts from server.', error);
+                callback();
+            });
+        }
+
+        function getStatDisplayName(value) {
+            if (_.isNumber(value)) {
+                return value;
+            }
+            return 'N/A';
+        }
+
+        function goToUserMenu(id) {
+            if (!!id) {
+                window.location = USER_MENU_URL_PREFIX + '?id=' + encodeURIComponent(id);
+            }
+        }
+
+        function isIPUrl() {
+            return isIP(window.location.origin);
+        }
+
+        function isIP( address ){
+            r = RegExp('^http[s]?:\/\/((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])');
+            return r.test( address )
+        }
+
+        function isFutureDay(source, target) {
+            let result = false;
+            if (source && target)  {
+                let convertedSource = moment(source).tz(TIMEZONE),
+                    convertedTarget = moment(target).tz(TIMEZONE);
+                let sourceFullYear = convertedSource.year(),
+                    sourceMonth = convertedSource.month(),
+                    sourceDate = convertedSource.day(),
+                    targetFullYear = convertedTarget.year(),
+                    targetMonth = convertedTarget.month(),
+                    targetDate = convertedTarget.day();
+
+                return sourceFullYear < targetFullYear || sourceMonth < targetMonth ||
+                    sourceDate < targetDate;
+            } else {
+                console.warn('Cannot check date by given source or target is null.');
+            }
+
+            return result;
+        }
+
+
+        function StatItem(value, displayName) {
+            function render () {
+                return ;
+            }
+
+            return {
+                render: render
+            }
+        }
+
+        function AlertItem(model, callbacks) {
+            const DOWNLOAD_URL_BUILDERS = {
+                    INTERNAL: _.template('//172.16.5.8:10443/api/download/image/<%= id %>'),
+                    EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/download/image/<%= id %>')
+                },
+                DOWNLOAD_URL_BUILDER = IS_INTERNAL? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
+
+            let _model = model,
+                _callbacks = callbacks || {
+                    goToUser: _.noop
+                },
+                _views = {};
+
+            function render() {
+                let container = $('<div class="alert-item">');
+                let profile = $('<div class="alert-item-avatar">');
+                let contentContainer = $('<div class="alert-item-content-container">'),
+                    titleLabel = $('<div class="alert-item-title-label">'),
+                    descLabel = $('<div class="alert-item-desc-label">');
+                let bottomContainer = $('<div class="alert-item-bottom-container">'),
+                    locationContainer = $('<div class="alert-item-location-container">'),
+                    campIcon = $('<div class="alert-item-loc-icn camp">'),
+                    transitIcon = $('<div class="alert-item-loc-icn transit">'),
+                    tunnelIcon = $('<div class="alert-item-loc-icn tunnel">'),
+                    nameLabel = $('<div class="alert-item-name-label">'),
+                    timeagoLabel = $('<div class="alert-item-timeago-label">');
+                let messageButton = $('<div class="alert-item-msg-btn">')
+                let closeButton = $('<div class="alert-item-close-btn">')
+
+                container.append(profile, contentContainer, messageButton, timeagoLabel, closeButton);
+                contentContainer.append(titleLabel, descLabel, bottomContainer);
+                bottomContainer.append(locationContainer, nameLabel);
+                locationContainer.append(campIcon, $('<div class="alert-item-loc-arrow-icn">'), transitIcon,
+                    $('<div class="alert-item-loc-arrow-icn">'), tunnelIcon);
+
+                // init handlers
+                profile.click(function() {
+                    _callbacks.goToUser(model.from_user);
+                });
+                nameLabel.click(function() {
+                    _callbacks.goToUser(model.from_user);
+                });
+
+                // store views
+                _views.container = container;
+                _views.profile = profile;
+                _views.titleLabel = titleLabel;
+                _views.descLabel = descLabel;
+                _views.campIcon = campIcon,
+                _views.transitIcon = transitIcon,
+                _views.tunnelIcon = tunnelIcon,
+                _views.nameLabel = nameLabel;
+                _views.messageButton = messageButton;
+                _views.closeButton = closeButton;
+                _views.timeagoLabel = timeagoLabel;
+
+                update(_model);
+
+                return container;
+            }
+
+            function update(model) {
+                _model = model;
+
+                _views.titleLabel.text(model.title || '-');
+                _views.descLabel.text(model.message || '-');
+                _views.timeagoLabel.text($.timeago(model.ts.seconds * 1000) || '-')
+                _views.nameLabel.text(model.from_name || '');
+
+                // load profile image
+                let profileUrl = DOWNLOAD_URL_BUILDER({
+                    id: model.from_user
+                });
+                $('<img/>')
+                    .load(function() {
+                        _views.profile.css('background-image', 'url(' + profileUrl + ')');
+                    })
+                    .attr('src', profileUrl);
+
+                // get user for location
+                _db.collection('users').doc(model.from_user).get().then(function(doc) {
+                    if (!!doc) {
+                        let user = doc.data();
+
+                        // draw location
+                        _.each([_views.campIcon, _views.transitIcon, _views.tunnelIcon], function(element) {
+                            element.removeClass('active');
+                        });
+                        let activeIcon = null;
+                        if (user.location == 1) {
+                            // outside
+                            activeIcon = _views.transitIcon;
+                        } else if (user.location == 100) {
+                            // in a camp
+                            activeIcon = _views.campIcon;
+                        } else if (user.location == 1000) {
+                            // in the tunnel
+                            activeIcon = _views.tunnelIcon;
+                        }
+                        activeIcon && activeIcon.addClass('active');
+                    }
+                });
+            }
+
+            return {
+                render: render,
+                update: update
+            }
         }
     })();
 </script>
