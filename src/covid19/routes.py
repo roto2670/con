@@ -43,6 +43,12 @@ def route_default():
     return redirect('/')
 
 
+@blueprint.route('/dashboard')
+@util.require_login
+def route_covid19_dashboard():
+  return render_template("covid19_dashboard.html", is_internal=is_internal(request))
+
+
 @blueprint.route('/users')
 @util.require_login
 def route_users():
