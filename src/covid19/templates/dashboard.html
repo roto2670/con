@@ -10,7 +10,7 @@
 <link type="text/css" rel="stylesheet" href="static/css/vendors/animate/animate.min.css" />
 {% endblock stylesheets %} {% block title %}{% endblock title %} {% block content %}
 <div id="scroll-style-hidden" class="right_col base" role="main">
-    <div class="sub-title-container status-container">COVID-19 Overview</div>
+    <div class="sub-title-container status-container">Overview</div>
 
     <div class="cd-row-container">
         <div class="cd-sub-title-label">Manpower Status</div>
@@ -66,6 +66,8 @@
         function _initManPowerGrid() {
             _manpowerGridOptions = {
                 animateRows: true,
+                rowClass: 'cd-grid-manpower-row',
+                rowHeight: 190,
                 defaultColDef: {
                     flex: 1,
                     sortable: false,
@@ -74,6 +76,12 @@
                     filter: false,
                     suppressMenu: true,
                     type: 'numericColumn',
+                    cellStyle: {
+                        'height': '100%',
+                        'display': 'flex ',
+                        'justify-content': 'flex-end',
+                        'align-items': 'center ',
+                    },
                     valueFormatter: (params) => {
                         if (_.isNumber(params.value)) {
                             return _toNumberString(params.value);

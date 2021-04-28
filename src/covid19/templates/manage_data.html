@@ -91,6 +91,10 @@
                     <div class="download-title-label">Master</div>
                     <div class="log-download-btn" id="master">Master file</div>
                 </div>
+                <div class="download-sub-container pivot">
+                    <div class="download-title-label">Master Pivot Table</div>
+                    <div class="log-download-btn" id="pivot">Master Pivot Table</div>
+                </div>
                 <div class="download-sub-container logs">
                     <div class="download-title-label">Logs</div>
                     <div class="log-download-btn-container">
@@ -247,6 +251,12 @@
                   DATA_TYPE = "DATA",
                   UPLOAD_FINISH_TYPE = "UPLOAD_FINISH",
                   OPEN_TYPE = "OPEN";
+            
+            // Resources
+            const PIVOT_FILE = {
+                PATH:'static/res/master_file_pivot_table.xlsx',
+                NAME: 'Master_File_Pivot_Table.xlsx'
+            } 
 
             let _db = firebase.firestore(),
                 _stats,
@@ -508,10 +518,14 @@
                         fileType = 'res';
                     }
 
-                    downloadURI(DOWNLOAD_URL_BUILDER({
-                        type: fileType,
-                        id: DONWLOAD_FILENAME[type]
-                    }));
+                    if (type === 'pivot') {
+                        downloadURI(PIVOT_FILE.PATH, PIVOT_FILE.NAME);
+                    } else {
+                        downloadURI(DOWNLOAD_URL_BUILDER({
+                            type: fileType,
+                            id: DONWLOAD_FILENAME[type]
+                        }));
+                    }
                 });
 
                 // handle run script button
@@ -734,6 +748,9 @@
                         $('.uc-mf-date-label').text(new Date(data.time * 1000).toLocaleString());
                     }
                 });
+
+                // For pivot file
+                $(".log-download-btn#pivot").text(`Master Pivot Table(${new Date('2021/04/28').toLocaleDateString()})`);
             }
 
             function loadDownloadFile(type) {

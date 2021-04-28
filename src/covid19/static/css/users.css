@@ -53,10 +53,19 @@
     margin-left: 0.6em;
     font-size: 1.2em;
 }
+.user-filter-selector-title {
+    font-size: 1.1em;
+    color: #0c0c0c;
+}
+.user-filter-selector-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 1.2em;
+}
 .user-filter-container {
     display: inline-flex;
+    flex-direction: column;
     flex-wrap: wrap;
-    flex-flow: column;
     margin-right: 1.2em;
 }
 .user-filter-top-container {
@@ -68,6 +77,9 @@
     display: flex;
     flex-wrap: nowrap;
 }
+.filter-dropdown.none {
+    background-color: #bdbdbd;
+}
 .filter-buttons-container {
     max-height: 0;
     overflow: hidden;
@@ -76,7 +88,7 @@
     transition: max-height 300ms ease-in-out;
 }
 .filter-buttons-container.unfold {
-    max-height: 10em;
+    max-height: 35em;
 }
 .user-filter-title-icn {
     width: 1.3em;
@@ -348,11 +360,12 @@
     background-repeat: no-repeat;
     background-position: center;
     border-radius: 0.2em;
+    margin-right: 0.2em !important;
     cursor: pointer;
     box-shadow: 1px 1px #c1c1c1;
 }
 .user-item-btn:nth-child(1) {
-    margin-left: 0;
+    margin-right: 0;
 }
 .user-item-btn.history {
     background-image: url(../img/icn_history.svg);
@@ -730,6 +743,7 @@
     flex-wrap: wrap;
     flex-flow: column;
     margin-right: 1.2em;
+    margin-bottom: 0.6em;
 }
 .user-dropdown-top-container {
     display: flex;

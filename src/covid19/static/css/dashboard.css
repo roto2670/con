@@ -11,7 +11,7 @@
     padding-right: 0.4em;
 }
 .ag-header-cell-text {
-    font-size: 1.2em;
+    font-size: 2em;
     white-space: normal !important;
     word-break: break-word;
     text-align: right;
@@ -25,9 +25,12 @@
     padding: 0 0.2em !important;
 }
 
+.cd-grid-manpower-row {
+    font-size: 2.8em !important;
+}
 .cd-row-container {
     width: 100%;
-    margin-bottom: 2.6em;
+    margin-bottom: 1em;
 
     display: flex;
     flex-wrap: nowrap;
@@ -48,12 +51,15 @@
 .cd-sub-title-label {
     font-size: 1.4em;
     color: #4e4e4e;
-    margin-bottom: 0.4em;
+    margin-bottom: 0.2em;
+}
+.cd-grid-manpower-column {
+    justify-content: center;
 }
 
 .cd-overall-icn {
-    width: 5em;
-    height: 5em;
+    width: 10em;
+    height: 10em;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -62,12 +68,12 @@
 .cd-overall-title-label {
     text-align: center;
     font-weight: 500;
-    font-size: 1.4em;
+    font-size: 2.8em;
     color: #969696;
 }
 .cd-overall-value-label {
     text-align: center;
-    font-size: 3em;
+    font-size: 6em;
 }
 .cd-col.overall {
     display: flex;
@@ -97,7 +103,7 @@
     box-sizing: border-box;
 }
 .cd-grid.manpower {
-    height: 13em;
+    height: 35em;
 }
 .cd-grid.pass {
     height: 21em;

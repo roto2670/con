@@ -36,130 +36,240 @@
             <div class="user-folder-title-label">Filter Function</div>
         </div>
         <div class="filter-buttons-container filter">
-            <div class="user-dropdown-container">
-                <div class="user-dropdown-top-container">
-                    <div class="user-dropdown-title-icn"></div>
-                    <div class="user-dropdown-title-label">Work Status</div>
-                </div>
-                <div class="user-dropdown-bottom-container">
-                    <select id="workStatus" class="filter-dropdown">
-                        <option value="" selected>None</option>
-                        <option value="onduty">On Duty</option>
-                        <option value="quarantined">Quarantined</option>
-                        <option value="isolated">Isolation</option>
-                        <option value="hospitalized">Hospitalized</option>
-                        <option value="hospitalized-icu">Hospitalized ICU</option>
-                        <option value="terminated">Termination</option>
-                        <option value="resigned">Resigned</option>
-                        <option value="demobilization">Demobilization</option>
-                        <option value="vacation">Vacation</option>
-                        <option value="b-trip">Business Trip</option>
-                        <option value="others">Others</option>
-                    </select>
-                </div>
-            </div>
-            <div class="user-dropdown-container">
-                <div class="user-dropdown-top-container">
-                    <div class="user-dropdown-title-icn"></div>
-                    <div class="user-dropdown-title-label">Clinic Status</div>
-                </div>
-                <div class="user-dropdown-bottom-container">
-                    <select id="clinicStatus" class="filter-dropdown">
-                        <option value="">None</option>
-                        <option value="close-contact">Close Contact</option>
-                        <option value="symptom-suspected" selected>Symptom Suspected</option>
-                        <option value="quarantine-required">Quarantine Required</option>
-                        <option value="isolation-required">Isolation Required</option>
-                    </select>
-                </div>
-            </div>
-            <div class="user-dropdown-container">
-                <div class="user-dropdown-top-container">
-                    <div class="user-dropdown-title-icn"></div>
-                    <div class="user-dropdown-title-label">OP Status</div>
-                </div>
-                <div class="user-dropdown-bottom-container">
-                    <select id="opStatus" class="filter-dropdown">
-                        <option value="" selected>None</option>
-                        <option value="quarantine-confirmed">Quarantine Confirmed</option>
-                        <option value="isolation-confirmed">Isolation Confirmed</option>
-                    </select>
-                </div>
-            </div>
-            <div class="user-dropdown-container">
-                <div class="user-dropdown-top-container">
-                    <div class="user-dropdown-title-icn"></div>
-                    <div class="user-dropdown-title-label">Staff</div>
-                </div>
-                <div class="user-dropdown-bottom-container">
-                    <select id="staff" class="filter-dropdown">
-                        <option value="" selected>None</option>
-                        <option value="admin">Admin</option>
-                        <option value="clinic">Clinic</option>
-                    </select>
-                </div>
-            </div>
-            <div class="user-dropdown-container">
-                <div class="user-dropdown-top-container">
-                    <div class="user-dropdown-title-icn"></div>
-                    <div class="user-dropdown-title-label">Group</div>
-                </div>
-                <div class="user-dropdown-bottom-container">
-                    <select id="group" class="filter-dropdown">
-                        <option value="" selected>None</option>
-                        <option value="group-ag">A/G</option>
-                        <option value="group-ug">U/G</option>
-                    </select>
-                </div>
-            </div>
-            <div class="user-dropdown-container">
-                <div class="user-dropdown-top-container">
-                    <div class="user-dropdown-title-icn"></div>
-                    <div class="user-dropdown-title-label">Test Referred</div>
-                </div>
-                <div class="user-dropdown-bottom-container">
-                    <select id="testReferred" class="filter-dropdown">
-                        <option value="" selected>None</option>
-                        <option value="test-referred">Test Referred</option>
-                    </select>
-                </div>
-            </div>
-            <div class="user-filter-container admin">
-                <!-- TODO: style display is none-->
-                <div class="user-filter-top-container" style="display: none">
-                    <!-- TODO: style height-->
-                    <div class="user-filter-title-icn" style="height: 1.7em"></div>
-                    <div class="user-filter-title-label">Admin/HR Affairs</div>
-                </div>
-                <div class="user-filter-bottom-container">
-                    <div class="user-dropdown-container">
-                        <div class="user-dropdown-top-container">
-                            <div class="user-dropdown-title-icn"></div>
-                            <div class="user-dropdown-title-label">CICPA Pass</div>
-                        </div>
-                        <div class="user-dropdown-bottom-container">
-                            <select id="cicpaPass" class="filter-dropdown">
-                                <option value="" selected>None</option>
-                                <option value="good">Good</option>
-                                <option value="expiring-soon">Expiring Soon</option>
-                                <option value="expired">Expired</option>
-                            </select>
-                        </div>
+            <div class="user-filter-selector-title hr">HR</div>
+            <div class="user-filter-selector-container" id="hr">
+                <!-- Work Status -->
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Work Status</div>
                     </div>
-                    <div class="user-dropdown-container">
-                        <div class="user-dropdown-top-container">
-                            <div class="user-dropdown-title-icn"></div>
-                            <div class="user-dropdown-title-label">VISA</div>
-                        </div>
-                        <div class="user-dropdown-bottom-container">
-                            <select id="visa" class="filter-dropdown">
-                                <option value="" selected>None</option>
-                                <option value="good">Good</option>
-                                <option value="expiring-soon">Expiring Soon</option>
-                                <option value="expired">Expired</option>
-                                >
-                            </select>
-                        </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="workStatus" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="onduty">On Duty</option>
+                            <option value="quarantined">Quarantined</option>
+                            <option value="isolated">Isolation</option>
+                            <option value="hospitalized">Hospitalized</option>
+                            <option value="hospitalized-icu">Hospitalized ICU</option>
+                            <option value="terminated">Termination</option>
+                            <option value="resigned">Resigned</option>
+                            <option value="demobilization">Demobilization</option>
+                            <option value="vacation">Vacation</option>
+                            <option value="b-trip">Business Trip</option>
+                            <option value="rtw-e">RTW E</option>
+                            <option value="rtw-n">RTW N</option>
+                            <option value="others">Others</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Group -->
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Group</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="group" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="group-ag">A/G</option>
+                            <option value="group-ug">U/G</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Category</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="category" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="skec">SK</option>
+                            <option value="skec-direct">SK-direct</option>
+                            <option value="manpower">Manpower-Supply</option>
+                            <option value="subcon">Sub-con</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="user-filter-selector-title pass">PASS Extension</div>
+            <div class="user-filter-selector-container" id="pass">
+                <!-- Emirates -->
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Emirates ID</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="emirates" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="good">Good</option>
+                            <option value="expiring-soon">Expiring Soon</option>
+                            <option value="urgent">Urgent Action</option>
+                            <option value="warning">Warning</option>
+                            <option value="expired">Expired</option>
+                            <option value="mute">Mute</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- H-Insurance -->
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">H-Insurance</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="insurance" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="good">Good</option>
+                            <option value="expiring-soon">Expiring Soon</option>
+                            <option value="urgent">Urgent Action</option>
+                            <option value="warning">Warning</option>
+                            <option value="expired">Expired</option>
+                            <option value="mute">Mute</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Labor card -->
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Labor Card</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="laborCard" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="good">Good</option>
+                            <option value="expiring-soon">Expiring Soon</option>
+                            <option value="urgent">Urgent Action</option>
+                            <option value="warning">Warning</option>
+                            <option value="expired">Expired</option>
+                            <option value="mute">Mute</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- MFC -->
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">MFC</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="mfc" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="good">Good</option>
+                            <option value="expiring-soon">Expiring Soon</option>
+                            <option value="urgent">Urgent Action</option>
+                            <option value="warning">Warning</option>
+                            <option value="expired">Expired</option>
+                            <option value="mute">Mute</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- RTW -->
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">RTW</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="rtw" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="approval">Approval</option>
+                            <option value="temp">Temp Pass</option>
+                            <option value="visa">Visa</option>
+                            <option value="mfc">MFC</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">CICPA Pass</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="cicpaPass" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="good">Good</option>
+                            <option value="expiring-soon">Expiring Soon</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">VISA</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="visa" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="good">Good</option>
+                            <option value="expiring-soon">Expiring Soon</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="user-filter-selector-title covid">COVID-19</div>
+            <div class="user-filter-selector-container" id="covid">
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Clinic Status</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="clinicStatus" class="filter-dropdown">
+                            <option value="">None</option>
+                            <option value="close-contact">Close Contact</option>
+                            <option value="symptom-suspected" selected>Symptom Suspected</option>
+                            <option value="quarantine-required">Quarantine Required</option>
+                            <option value="isolation-required">Isolation Required</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">OP Status</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="opStatus" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="quarantine-confirmed">Quarantine Confirmed</option>
+                            <option value="isolation-confirmed">Isolation Confirmed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Role</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="staff" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="admin">Admin</option>
+                            <option value="clinic">Clinic</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="user-dropdown-container">
+                    <div class="user-dropdown-top-container">
+                        <div class="user-dropdown-title-icn"></div>
+                        <div class="user-dropdown-title-label">Test Referred</div>
+                    </div>
+                    <div class="user-dropdown-bottom-container">
+                        <select id="testReferred" class="filter-dropdown none">
+                            <option value="" selected>None</option>
+                            <option value="test-referred">Test Referred</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -284,7 +394,9 @@
                 'demobilization': 8,
                 'vacation': 9,
                 'b-trip': 10,
-                'others': 11
+                'others': 11,
+                'rtw-e': 20,
+                'rtw-n': 21
             },
             CLINIC_STATUS_VALUE = {
                 'none': 1,
@@ -301,9 +413,24 @@
                 "group-ug": "U/G"
             },
             EXPIRING_STATUS_VALUE = {
-                'expired': -1,
-                'expiring-soon': 0,
-                'good': 1
+                'mute': -1,
+                'good': 0,
+                'expiring-soon': 1,
+                'urgent': 2,
+                'warning': 3,
+                'expired': 4
+            },
+            RTW_STATUS_VALUE = {
+                'approval': 1,
+                'temp': 2,
+                'visa': 3,
+                'mfc': 4
+            },
+            CATEGORY_STATUS_VALUE = {
+                'skec': 'SKEC',
+                'skec-direct': 'SKEC Direct',
+                'manpower': 'Manpower',
+                'subcon': 'Sub-con'
             },
             OP_STATUS_VALUE = {
                 'none': 1,
@@ -338,11 +465,17 @@
                 'clinicStatus': 'clinic_status',
                 'opStatus': 'op_status',
                 'staff': 'role',
-                'group': 'pv_area',
+                'group': 'area',
                 'testReferred': 'test_referred',
                 'cicpaPass': 'cicpa_no_status',
                 'visa': 'visa_status',
                 'passport': 'passport_status',
+                'category': 'category',
+                'emirates': 'emirates_id_status',
+                'insurance': 'insurance_status',
+                'laborCard': 'lc_status',
+                'mfc': 'mfc_status',
+                'rtw': 'rtw_status'
             },
             DROPDOWN_FILTER_VALUE = {
                 'workStatus': STATUS_VALUE,
@@ -353,6 +486,12 @@
                 'testReferred': CLINIC_TEST_REFERRED,
                 'cicpaPass': EXPIRING_STATUS_VALUE,
                 'visa': EXPIRING_STATUS_VALUE,
+                'category': CATEGORY_STATUS_VALUE,
+                'emirates': EXPIRING_STATUS_VALUE,
+                'insurance': EXPIRING_STATUS_VALUE,
+                'laborCard': EXPIRING_STATUS_VALUE,
+                'mfc': EXPIRING_STATUS_VALUE,
+                'rtw': RTW_STATUS_VALUE
             }
             const PRE_MED_DISPLAY = {
                 diabetes: 'Diabetes',
@@ -857,8 +996,8 @@
             }
 
             function loadUsers(startAt, filters, callback) {
-                var query;
-                query = _db.collection('users').orderBy('fullname')
+                var query = null;
+                query = _db.collection('users');
                 if (!!startAt) {
                     // Paging
                     query = query.startAfter(startAt)
@@ -969,7 +1108,7 @@
 
                 $('.user-serach-box').keypress(function(event) {
                     let _keycode = (event.keyCode ? event.keyCode : event.which),
-                        _value = $(this).val().trim();
+                        _value = $(this).val().trim().toUpperCase();
                     if(_keycode == '13' && _value) {
                         displayUser(_value);
                         return;
@@ -977,7 +1116,7 @@
                     }
                 });
                 $('.searchbox-icon').click(function() {
-                    let _value = $('.user-serach-box').val().trim();
+                    let _value = $('.user-serach-box').val().trim().toUpperCase();
                     if(_value) {
                         displayUser(_value);
                         return;
@@ -1309,12 +1448,15 @@
                 });
 
                 $('.filter-dropdown').change(function() {
-                    let _filters = _getFilters(this.id, this.value);
+                    const _parent = $(this).parent().parent().parent(),
+                        _selectedType = _parent.attr('id'),
+                        _filters = _getFilters(this.id, this.value);
 
                     // check all deselected
                     if (_.isEmpty(_filters)) {
                         window.alert("Please set at least one filter.");
                     } else {
+                        this.value ? $(this).removeClass('none') : $(this).addClass('none'); // Brush up style
                         _lastUserSnapShot = null; // reset paging
                         displayUsers(_filters, true, function() {
                             $('.user-item-loader-btn').removeClass('loading');
