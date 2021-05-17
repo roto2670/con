@@ -109,6 +109,18 @@
                         <div class="log-download-btn" id="clinic_reports">Clinic Report</div>
                         <div class="log-download-run-btn btn" id="clinic_reports">Run</div>
                     </div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="temperature">Daily Manpower and Temperature Measuring Status </div>
+                        <div class="log-download-run-btn btn" id="temperature">Run</div>
+                    </div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="day_food">Day-Shfit Daily Food Status </div>
+                        <div class="log-download-run-btn btn" id="day_food">Run</div>
+                    </div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="night_food">Night-Shift Daily Food Status </div>
+                        <div class="log-download-run-btn btn" id="night_food">Run</div>
+                    </div>
                 </div>
                 <div class="download-sub-container qr">
                     <div class="download-title-label">QR Codes</div>
@@ -199,14 +211,20 @@
                     app_usage: 'daily_app_usage_report.csv',
                     observation: 'observation_report.csv',
                     qr_codes: 'qrcodes.zip',
-                    clinic_reports: 'clinic_reports.csv'
+                    clinic_reports: 'clinic_reports.csv',
+                    temperature : 'temperature.xlsx',
+                    day_food: 'day_foods.xlsx',
+                    night_food: 'ngiht_foods.xlsx'
                 },
                 DOWNLOAD_FILE_DISPLAY = {
                     master: 'Master file',
                     app_usage: 'Daily app usage report',
                     observation: 'Observation report',
                     qr_codes: 'All QR codes',
-                    clinic_reports: 'Clinic Reports'
+                    clinic_reports: 'Clinic Reports',
+                    temperature : 'Daily Manpower and Temperature Measuring Status',
+                    day_food: 'Day-Shift Daily Food Status',
+                    night_food: 'Night-Shift Daily Food Status'
                 },
                 UPLOAD_RESULT_STATUS = {
                     success: 0,
@@ -223,21 +241,29 @@
                     app_usage: 2,
                     observation: 3,
                     qr_codes: 8,
-                    clinic_reports: 9
-
+                    clinic_reports: 9,
+                    temperature: 11,
+                    day_food: 12,
+                    night_food: 12
                 },
                 RUN_SCRIPT_MESSAGE = {
                     SUCCESS: {
                         app_usage: 'Genearted an app usage report.',
                         observation: 'Generated an observation report.',
                         qr_codes: 'Generating QR codes, Please reload after a few minutes.',
-                        clinic_reports: 'Generated a clinic report.'
+                        clinic_reports: 'Generated a clinic report.',
+                        temperature: 'Generated a daily manpower and temperature status.',
+                        day_food: 'Generated a day/night-shift daily food status.',
+                        night_food: 'Generated a day/night-shift daily food status.'
                     },
                     ERROR: {
                         app_usage: 'Failed to generation an app usage report. Check the logs in Settings menu.',
                         observation: 'Failed to generation an observation report. Check the logs in Settings menu.',
                         qr_codes: 'Failed to start QR codes generation. Please try again later.',
                         clinic_reports: 'Failed to generation a clinic report. Check the logs in Settings menu.',
+                        temperature: 'Failed to daily manpower and temperature status. Check the logs in Settings menu.',
+                        day_food: 'Failed to day/night-shift daily food status. Check the logs in Settings menu.',
+                        night_food: 'Failed to day/night-shift daily food status. Check the logs in Settings menu.'
                     },
                     BUSY: {
                         qr_codes: 'Already generating QR codes. Please check later.'
@@ -251,12 +277,12 @@
                   DATA_TYPE = "DATA",
                   UPLOAD_FINISH_TYPE = "UPLOAD_FINISH",
                   OPEN_TYPE = "OPEN";
-            
+
             // Resources
             const PIVOT_FILE = {
                 PATH:'static/res/master_file_pivot_table.xlsx',
                 NAME: 'Master_File_Pivot_Table.xlsx'
-            } 
+            }
 
             let _db = firebase.firestore(),
                 _stats,
@@ -558,7 +584,7 @@
 
                 // add lisnter for daily app usage reports.
                 $('.log-download-run-btn#app_usage').click(function() {
-                    if (window.confirm('Aure you sure?')) {
+                    if (window.confirm('Are you sure?')) {
                         runScript('app_usage');
                         new PNotify({
                             type: 'info',
@@ -577,8 +603,28 @@
 
                 // add lisnter for clinic reports.
                 $('.log-download-run-btn#clinic_reports').click(function() {
-                    if (window.confirm('Aure you sure?')) {
+                    if (window.confirm('Are you sure?')) {
                         runScript('clinic_reports');
+                    }
+                });
+
+                // add lisnter for temperature.
+                $('.log-download-run-btn#temperature').click(function() {
+                    if (window.confirm('Are you sure?')) {
+                        runScript('temperature');
+                    }
+                });
+
+                // add lisnter for day_food.
+                $('.log-download-run-btn#day_food').click(function() {
+                    if (window.confirm('Are you sure?')) {
+                        runScript('day_food');
+                    }
+                });
+                // add lisnter for night-food.
+                $('.log-download-run-btn#night_food').click(function() {
+                    if (window.confirm('Are you sure?')) {
+                        runScript('night_food');
                     }
                 });
             }
@@ -793,6 +839,9 @@
                     _loadFileTime('app_usage');
                     _loadFileTime('observation');
                     _loadFileTime('clinic_reports');
+                    _loadFileTime('temperature');
+                    _loadFileTime('day_food');
+                    _loadFileTime('night_food');
                     _loadFileTime('qr_codes');
                 }
             }
