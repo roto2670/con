@@ -346,7 +346,7 @@
         </div>
     </div>
     <div class="content-container">
-        <div id="user-table" class="user-table"></div>
+        <div id="user-table" class="user-table ag-theme-material"></div>
         <div class="user-item-loader-btn loading">
             <div class="user-item-loader-icon"></div>
             <div class="user-item-loader-label">Load more</div>
@@ -355,9 +355,7 @@
 </div>
     {% endblock content %} {% block javascripts %} {{ super() }}
     <!-- Load table module -->
-    <link href="static/js/vendor/table/tabulator.min.css" rel="stylesheet" />
-    <script type="text/javascript" src="static/js/vendor/table/tabulator.min.js"></script>
-    <script type="text/javascript" src="static/js/vendor/table/jquery_wrapper.min.js"></script>
+    <script src="static/js/vendor/grid/ag-grid-enterprise.min.js"></script>
 
     <script>
         (function() {
@@ -367,6 +365,7 @@
                     EXTERNAL: _.template('//skec-fujairah.loc8.dev:10443/api/download/<%= type %>/<%= id %>')
                 },
                 DOWNLOAD_URL_BUILDER = IS_INTERNAL? DOWNLOAD_URL_BUILDERS.INTERNAL : DOWNLOAD_URL_BUILDERS.EXTERNAL;
+            const LICENSE_KEY = "CompanyName=Kith Creative Inc.,LicensedApplication=SCS,LicenseType=SingleApplication,LicensedConcurrentDeveloperCount=1,LicensedProductionInstancesCount=0,AssetReference=AG-015479,ExpiryDate=9_May_2022_[v2]_MTY1MjA1MDgwMDAwMA==94d947d25667951aa892d1334d29ff9b";
 
             const STATUS_DISPLAY = {
                 '0': 'Not Registered',
@@ -514,11 +513,12 @@
                 chronic_renal: 'Chronic Renal Disease'
             };
             const DEFAULT_FILTER = CLINIC_STATUS_VALUE['symptom-suspected'];
-            let USER_PAGE_SIZE = 10,
+            let USER_PAGE_SIZE = 15,
                 TEST_RESULT_PAGE_SIZE = 10;
 
             let _db = firebase.firestore(),
                 _table = null;
+            let _gridOptions = null;
             let _lastUserSnapShot,
                 _snapshotUnsubscriber = null,
                 _lastTestResultDoc,
@@ -531,7 +531,8 @@
 
             function start() {
                 initHandlers();
-                initTableView();
+                // initTableView();
+                initGridView();
                 let userId = getUrlParameter('id');
                 if (!!!userId) {
                     // TODO: use setSelectedFilter
@@ -556,52 +557,23 @@
             }
 
             function addUserItem(user) {
-                if (user) {
-                    _table.addData({
-                        name: user.fullname || '-',
-                        id: user.documentId || '-',
-                        location: user.location,
-                        status: STATUS_DISPLAY[user.status] || '-',
-                        gender: user.gender || '-',
-                        nationality: user.nationality || '-',
-                        employer: user.employer || '-',
-                        camp: user.camp || '-',
-                        room: user.room || '-',
-                        phone: user.phone_number || '-',
-                        department: user.department || '-',
-                        pvArea: user.pv_area || '-',
-                        jobCat1: user.job_cat1 || '-',
-                        jobCat2: user.job_cat2 || '-',
-                        timeago: $.timeago(user.ts.seconds * 1000) || '-',
-                        appInstalled: !_.isEmpty(user.f_token),
-                        hasPreMeds: !_.isEmpty(user.pre_med_conds),
-                        preMeds: user.pre_med_conds
-                    });
-                    // TODO: adds in cache
+                if (!user) {
+                    console.warn('Failed to add user in list by given user model is null');
+                    return;
                 }
+
+                _gridOptions.api.applyTransaction({
+                    add: [user]
+                });
             }
 
             function updateUserItem(user) {
-                _table.updateData([{
-                    name: user.fullname || '-',
-                    id: user.documentId || '-',
-                    location: user.location,
-                    status: STATUS_DISPLAY[user.status] || '-',
-                    gender: user.gender || '-',
-                    nationality: user.nationality || '-',
-                    employer: user.employer || '-',
-                    camp: user.camp || '-',
-                    room: user.room || '-',
-                    phone: user.phone_number || '-',
-                    department: user.department || '-',
-                    pvArea: user.pv_area || '-',
-                    jobCat1: user.job_cat1 || '-',
-                    jobCat2: user.job_cat2 || '-',
-                    timeago: $.timeago(user.ts.seconds * 1000) || '-',
-                    appInstalled: !_.isEmpty(user.f_token),
-                    hasPreMeds: !_.isEmpty(user.pre_med_conds),
-                    preMeds: user.pre_med_conds
-                }]);
+                let _row = _gridOptions.api.getRowNode(user.documentId);
+                if (_row) {
+                    _gridOptions.api.applyTransaction({
+                        update: [user]
+                    });
+                }
             }
 
             function showMessageWithDialog(userIds) {
@@ -737,9 +709,12 @@
             }
 
             function getSelectedUsers() {
-                return _.map(_table.getSelectedData(), function(data) {
-                    return _.pick(data, 'id', 'name');
-                });
+                return _gridOptions.api.getSelectedNodes().map(function(node) {
+                    return {
+                        id: node.data.documentId,
+                        name: node.data.fullname
+                    }
+                })
             }
 
             function loadCurrentUser(callback) {
@@ -901,7 +876,7 @@
                 callback = callback || _.noop;
 
                 if (!!userId) {
-                    _table.clearData();
+                    _gridOptions.api.setRowData([]);
 
                     if (!_loadingUsers) {
                         _loadingUsers = true;
@@ -936,7 +911,7 @@
 
                 let container = $('.user-item-container');
                 if (!!clean) {
-                    _table.clearData();
+                    _gridOptions.api.setRowData([]);
                 }
 
                 if (!_loadingUsers) {
@@ -1464,7 +1439,192 @@
                         _handleCommandButton(this.value);
                     }
                 });
+            }
 
+            function initGridView() {
+                // Set license key
+                agGrid.LicenseManager.setLicenseKey(LICENSE_KEY);
+
+                _gridOptions = {
+                    animateRows: true,
+                    rowClass: 'user-table-row',
+                    rowSelection: 'multiple',
+                    getRowNodeId: function(data) {
+                        return data.documentId;
+                    },
+                    defaultColDef: {
+                        flex: 1,
+                        sortable: false,
+                        resizable: true,
+                        editable: false,
+                        filter: false,
+                        suppressMenu: true,
+                        cellStyle: {
+                            'height': '100%'
+                        }
+                    },
+                    columnDefs: [
+                        {
+                            headerName: 'Name',
+                            flex: 2,
+                            minWidth: 200,
+                            checkboxSelection: true,
+                            cellRenderer: function(params) {
+                                let data = params.data;
+                                let nameCell = $('<div class="user-item-cell name">'),
+                                    nameContainer = $('<div class="user-item-content-container name">'),
+                                    profile = $('<div class="user-item-avatar">'),
+                                    nameLabel = $('<div class="user-item-name-label">'),
+                                    idLabel = $('<div class="user-item-id-label">');
+                                nameCell.append(profile, nameContainer);
+                                nameContainer.append(nameLabel, idLabel);
+
+                                // Updates the profile image
+                                let profileUrl = DOWNLOAD_URL_BUILDER({
+                                    type: 'image',
+                                    id: data.documentId
+                                });
+                                $('<img/>')
+                                    .load(function() {
+                                        $(cell.getElement()).find('.user-item-avatar').css('background-image', 'url(' + profileUrl + ')');
+                                    })
+                                    .attr('src', profileUrl);
+
+                                nameLabel.text(data.fullname);
+                                idLabel.text('(' + data.documentId + ')');
+                                console.log(data);
+
+                                return nameCell.prop('outerHTML');
+                            }
+                        },
+                        {
+                            headerName: 'Location',
+                            field: 'location',
+                            minWidth: 190,
+                            cellRenderer: function(data) {
+                                let location = data.data.location;
+                                let locationCell = $('<div class="user-item-cell location">'),
+                                    campIcon = $('<div class="user-item-loc-icn camp">'),
+                                    transitIcon = $('<div class="user-item-loc-icn transit">'),
+                                    tunnelIcon = $('<div class="user-item-loc-icn tunnel">');
+                                    locationCell.append(campIcon, $('<div class="user-item-loc-arrow-icn">'), transitIcon,
+                                        $('<div class="user-item-loc-arrow-icn">'), tunnelIcon);
+
+                                // handle location
+                                let activeIcon = null;
+                                if (location == 1) {
+                                    // outside
+                                    activeIcon = transitIcon;
+                                } else if (location == 100) {
+                                    // in a camp
+                                    activeIcon = campIcon;
+                                } else if (location == 1000) {
+                                    // in the tunnel
+                                    activeIcon = tunnelIcon;
+                                }
+                                activeIcon && activeIcon.addClass('active');
+
+                                return locationCell.prop('outerHTML');
+                            }
+                        },
+                        {
+                            headerName: 'Status',
+                            field: 'status',
+                            valueFormatter: function(data) {
+                                return STATUS_DISPLAY[data.value] || ''
+                            }
+                        },
+                        {
+                            headerName: 'Gender',
+                            field: 'gender'
+                        },
+                        {
+                            headerName: 'Nationality',
+                            field: 'nationality'
+                        },
+                        {
+                            headerName: 'Employer',
+                            field: 'employer'
+                        },
+                        {
+                            headerName: 'Camp',
+                            field: 'camp'
+                        },
+                        {
+                            headerName: 'Room',
+                            field: 'room'
+                        },
+                        {
+                            headerName: 'Phone Number',
+                            field: 'phone_number'
+                        },
+                        {
+                            headerName: 'Department',
+                            field: 'department'
+                        },
+                        {
+                            headerName: 'PV Area',
+                            field: 'pv_area'
+                        },
+                        {
+                            headerName: 'Job Category',
+                            cellRenderer: (params) => {
+                                let _jobCategory1 = params.data.job_cat1 || '',
+                                    _jobCategory2= params.data.job_cat2 || '';
+                                
+                                if (_jobCategory1) {
+                                    if (_jobCategory2) {
+                                        return `${_jobCategory1}/${_jobCategory2}`
+                                    }
+                                    return _jobCategory1;
+                                }
+
+                                return _jobCategory2;
+                            }
+                        },
+                        {
+                            headerName: 'App Installed',
+                            field: 'f_token',
+                            width: 30,
+                            cellRenderer: function(params) {
+                                if (params.data.f_token) {
+                                    let _widget = $('<i class="fa fa-check" aria-hidden="true">');
+                                    return _widget.get(0);
+                                }
+                            }
+                        },
+                        {
+                            headerName: 'Pre Meds',
+                            field: 'pre_meds',
+                            width: 50,
+                            cellRenderer: function(params) {
+                                let preMeds = params.data.pre_meds,
+                                    preMedMessage = '';
+                                // handle pre medical info
+                                if (_.isArray(preMeds) && !_.isEmpty(preMeds)) {
+                                    let _key,
+                                        _display;
+                                    _.each(preMeds, function(info) {
+                                        _key = info.replace('sign_in.form.', '');
+                                        _display = PRE_MED_DISPLAY[_key];
+                                        if (_display) {
+                                            preMedMessage +=  _display + ', ';
+                                        } else {
+                                            console.warn('Failed to parse pre medical codition, unknown key.', info);
+                                        }
+                                    });
+                                    preMedMessage = preMedMessage.slice(0, -2);
+                                }
+
+                                console.log(preMedMessage); 
+
+                                return preMedMessage;
+                            }
+                        }
+                    ]
+                };
+
+                new agGrid.Grid($('.user-table').get(0), _gridOptions);
             }
 
             function initTableView() {

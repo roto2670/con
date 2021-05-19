@@ -231,12 +231,37 @@
 .discover-hotspot-btn-label {
 }
 .content-container {
+    width: 100%;
+    height: 50em;
 }
 
 .user-table {
     margin-top: 2em;
+    width: 100%;
+    height: 100%;
 }
 
+.ag-cell-value {
+    display: flex;
+}
+.ag-header-cell-label {
+    justify-content: center;
+}
+.ag-theme-material .ag-header-cell {
+    text-align: center;
+    padding-left: 0.2em !important;
+    padding-right: 0.2em !important;
+}
+.ag-theme-material .ag-cell {
+    text-align: center;
+    padding-left: 0.2em !important;
+    padding-right: 0.2em !important;
+}
+.user-table-row {
+}
+.user-table-row:hover {
+    background-color: #ef80092b;
+}
 .user-item-container-empty {
     text-align: center;
     font-size: 1.2em;
