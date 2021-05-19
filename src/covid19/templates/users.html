@@ -513,6 +513,10 @@
                 chronic_renal: 'Chronic Renal Disease'
             };
             const DEFAULT_FILTER = CLINIC_STATUS_VALUE['symptom-suspected'];
+            const GRID_CACHE_KEY = {
+                USERS: '_u_grid_sts'
+            }
+
             let USER_PAGE_SIZE = 15,
                 TEST_RESULT_PAGE_SIZE = 10;
 
@@ -531,7 +535,6 @@
 
             function start() {
                 initHandlers();
-                // initTableView();
                 initGridView();
                 let userId = getUrlParameter('id');
                 if (!!!userId) {
@@ -1334,6 +1337,31 @@
                 return Object.keys(object).find(key => object[key] === value);
             }
 
+            function _saveGridStates(key, columnApi) {
+                const _savedState = columnApi.getColumnState();
+                localStorage.setItem(key, JSON.stringify(_savedState));
+
+                console.log('Saved grid states.');
+            }
+
+            function _loadGridStates(key, columnApi) {
+                try {
+                    const _savedState = JSON.parse(localStorage.getItem(key));
+                    if (_savedState) {
+                        columnApi.applyColumnState({
+                            state: _savedState,
+                            applyOrder: true
+                        });
+
+                        console.log('Loaded grid states.');
+                    }
+                } catch (error) {
+                    // nothing.
+                    console.warn('Failed to load grid states.', error);
+                }
+            }
+
+
             function _getFilters(filterId, filterValue) {
                 let _filters = _selectedFilters || {},
                     _key = FIRESTORE_KEY[filterId],
@@ -1456,12 +1484,42 @@
                         flex: 1,
                         sortable: false,
                         resizable: true,
-                        editable: false,
+                        editable: true,
                         filter: false,
                         suppressMenu: true,
                         cellStyle: {
                             'height': '100%'
                         }
+                    },
+                    onColumnVisible: ({ columnApi }) => {
+                        _saveGridStates(GRID_CACHE_KEY.USERS, columnApi);
+                    },
+                    onColumnResized: ({ columnApi }) => {
+                        _saveGridStates(GRID_CACHE_KEY.USERS, columnApi);
+                    },
+                    onColumnMoved: ({ columnApi }) => {
+                        _saveGridStates(GRID_CACHE_KEY.USERS, columnApi);
+                    },
+                    sideBar: {
+                        toolPanels: [
+                            {
+                                id: 'columns',
+                                labelDefault: 'Columns',
+                                labelKey: 'columns',
+                                iconKey: 'columns',
+                                toolPanel: 'agColumnsToolPanel',
+                                toolPanelParams: {
+                                    suppressRowGroups: true,
+                                    suppressValues: true,
+                                    suppressPivots: true,
+                                    suppressPivotMode: true,
+                                    suppressSideButtons: true,
+                                    suppressColumnFilter: true,
+                                    suppressColumnSelectAll: true,
+                                    suppressColumnExpandAll: true
+                                }
+                            }
+                        ]
                     },
                     columnDefs: [
                         {
@@ -1492,7 +1550,6 @@
 
                                 nameLabel.text(data.fullname);
                                 idLabel.text('(' + data.documentId + ')');
-                                console.log(data);
 
                                 return nameCell.prop('outerHTML');
                             }
@@ -1501,6 +1558,7 @@
                             headerName: 'Location',
                             field: 'location',
                             minWidth: 190,
+                            editable: false,
                             cellRenderer: function(data) {
                                 let location = data.data.location;
                                 let locationCell = $('<div class="user-item-cell location">'),
@@ -1530,6 +1588,7 @@
                         {
                             headerName: 'Status',
                             field: 'status',
+                            editable: false,
                             valueFormatter: function(data) {
                                 return STATUS_DISPLAY[data.value] || ''
                             }
@@ -1560,14 +1619,16 @@
                         },
                         {
                             headerName: 'Department',
-                            field: 'department'
+                            field: 'department',
                         },
                         {
                             headerName: 'PV Area',
-                            field: 'pv_area'
+                            field: 'pv_area',
+                            editable: false
                         },
                         {
                             headerName: 'Job Category',
+                            editable: false,
                             cellRenderer: (params) => {
                                 let _jobCategory1 = params.data.job_cat1 || '',
                                     _jobCategory2= params.data.job_cat2 || '';
@@ -1586,6 +1647,7 @@
                             headerName: 'App Installed',
                             field: 'f_token',
                             width: 30,
+                            editable: false,
                             cellRenderer: function(params) {
                                 if (params.data.f_token) {
                                     let _widget = $('<i class="fa fa-check" aria-hidden="true">');
@@ -1597,6 +1659,7 @@
                             headerName: 'Pre Meds',
                             field: 'pre_meds',
                             width: 50,
+                            editable: false,
                             cellRenderer: function(params) {
                                 let preMeds = params.data.pre_meds,
                                     preMedMessage = '';
@@ -1616,8 +1679,6 @@
                                     preMedMessage = preMedMessage.slice(0, -2);
                                 }
 
-                                console.log(preMedMessage); 
-
                                 return preMedMessage;
                             }
                         }
@@ -1625,139 +1686,7 @@
                 };
 
                 new agGrid.Grid($('.user-table').get(0), _gridOptions);
-            }
-
-            function initTableView() {
-                if (!_table) {
-                    _table = new Tabulator('#user-table', {
-                        maxHeight: 768,
-                        layout: 'fitColumns',
-                        columnVertAlign: 'middle',
-                        headerSort: false, // disable header sort for all columns
-                        placeholder: 'No Users',
-                        columns: [
-                            {formatter: 'rowSelection', titleFormatter: 'rowSelection', resizable: false, width: 30, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', headerSort: false, cellClick: function(e, cell) {
-                                cell.getRow().toggleSelect();
-                            }},
-                            {title: 'Name', field: 'name', minWidth: 175, widthGrow: 3, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
-                                let data = cell.getRow().getData();
-                                let nameCell = $('<div class="user-item-cell name">'),
-                                    nameContainer = $('<div class="user-item-content-container name">'),
-                                    profile = $('<div class="user-item-avatar">'),
-                                    nameLabel = $('<div class="user-item-name-label">'),
-                                    idLabel = $('<div class="user-item-id-label">');
-                                nameCell.append(profile, nameContainer);
-                                nameContainer.append(nameLabel, idLabel);
-
-                                onRendered(function() {
-                                    // Updates the profile image
-                                    let profileUrl = DOWNLOAD_URL_BUILDER({
-                                        type: 'image',
-                                        id: data.id
-                                    });
-                                    $('<img/>')
-                                        .load(function() {
-                                            $(cell.getElement()).find('.user-item-avatar').css('background-image', 'url(' + profileUrl + ')');
-                                        })
-                                        .attr('src', profileUrl);
-                                    });
-                                nameLabel.text(data.name);
-                                idLabel.text('(' + data.id + ')');
-
-                                return nameCell.prop('outerHTML');
-                            }},
-                            {title: 'Location', field: 'location', minWidth: 135, widthGrow: 2, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
-                                let location = cell.getValue();
-                                let locationCell = $('<div class="user-item-cell location">'),
-                                    campIcon = $('<div class="user-item-loc-icn camp">'),
-                                    transitIcon = $('<div class="user-item-loc-icn transit">'),
-                                    tunnelIcon = $('<div class="user-item-loc-icn tunnel">');
-                                    locationCell.append(campIcon, $('<div class="user-item-loc-arrow-icn">'), transitIcon,
-                                        $('<div class="user-item-loc-arrow-icn">'), tunnelIcon);
-
-                                // handle location
-                                let activeIcon = null;
-                                if (location == 1) {
-                                    // outside
-                                    activeIcon = transitIcon;
-                                } else if (location == 100) {
-                                    // in a camp
-                                    activeIcon = campIcon;
-                                } else if (location == 1000) {
-                                    // in the tunnel
-                                    activeIcon = tunnelIcon;
-                                }
-                                activeIcon && activeIcon.addClass('active');
-
-                                return locationCell.prop('outerHTML');
-                            }},
-                            {title: 'Status', field: 'status', width: 50, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                            {title: 'Gender', field: 'gender', width: 40, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                            {title: 'Nationality', field: 'nationality', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                            {title: 'Employer', field: 'employer', width: 45, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                            {title: 'Camp', field: 'camp', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                            {title: 'Room', field: 'room', width: 55, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                            {title: 'Phone', field: 'phone', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                            {title: 'Department', field: 'department', headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                            {title: 'PV<br/>Area', field: 'pvArea', width: 40, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle'},
-                            {title: 'Job Category', field: 'jobCat1', widthGrow: 2, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
-                                let data = cell.getRow().getData();
-                                let jobContainer = $('<div class="user-item-cell job">'),
-                                    jobCat1Label = $('<div class="user-item-label jobcat1">'),
-                                    jobCat2Label = $('<div class="user-item-label jobcat2">');
-                                jobContainer.append(jobCat1Label, jobCat2Label);
-
-                                jobCat1Label.text(data.jobCat1);
-                                jobCat2Label.text(data.jobCat2);
-
-                                return jobContainer.prop('outerHTML');
-                            }},
-                            {title: 'App<br />Installed', field: 'appInstalled', resizable: false, width: 50, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: 'tickCross'},
-                            {title: 'Pre<br />Meds', field: 'hasPreMeds', resizable: false, width: 50, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', tooltip: function(cell) {
-                                let preMeds = cell.getValue() && cell.getRow().getData().preMeds,
-                                    preMedMessage = '';
-                                // handle pre medical info
-                                if (_.isArray(preMeds) && !_.isEmpty(preMeds)) {
-                                    let _key,
-                                        _display;
-                                    _.each(preMeds, function(info) {
-                                        _key = info.replace('sign_in.form.', '');
-                                        _display = PRE_MED_DISPLAY[_key];
-                                        if (_display) {
-                                            preMedMessage +=  _display + ', ';
-                                        } else {
-                                            console.warn('Failed to parse pre medical codition, unknown key.', info);
-                                        }
-                                    });
-                                    preMedMessage = preMedMessage.slice(0, -2);
-                                }
-
-                                return preMedMessage;
-                            }, formatter: 'tickCross', formatterParams: {
-                                allowTruthy : true
-                            }},
-                            {title: 'Commands', field: 'commands', width: 70, headerHozAlign: 'center', hozAlign: 'center', vertAlign: 'middle', formatter: function(cell, formatterParams, onRendered) {
-                                let data = cell.getRow().getData();
-                                let commandsCell = $('<div class="user-item-cell commands">'),
-                                    historyButton = $('<div class="user-item-btn history">'),
-                                    selfReportsButton = $('<div class="user-item-btn self-reports">');
-                                    commandsCell.append(historyButton, selfReportsButton);
-
-                                onRendered(function() {
-                                    let $cell = $(cell.getElement());
-                                    $cell.find('.user-item-btn.history').click(function() {
-                                        showHistoryDialog(cell.getData().id);
-                                    });
-                                    $cell.find('.user-item-btn.self-reports').click(function() {
-                                        showSelfReportsDialog(cell.getData().id);
-                                    });
-                                });
-
-                                return commandsCell.prop('outerHTML');
-                            }}
-                        ]
-                    });
-                }
+                _loadGridStates(GRID_CACHE_KEY.USERS, _gridOptions.columnApi);
             }
 
             // Classes

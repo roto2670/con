@@ -48,6 +48,11 @@ def route_default():
 def route_covid19_dashboard():
   return render_template("covid19_dashboard.html", is_internal=is_internal(request))
 
+@blueprint.route('/camp-dashboard')
+@util.require_login
+def route_camp_dashboard():
+  return render_template("camp_dashboard.html", is_internal=is_internal(request))
+
 
 @blueprint.route('/users')
 @util.require_login
@@ -95,3 +100,9 @@ def route_settings():
 @util.require_login
 def route_survey():
   return render_template("survey.html", is_internal=is_internal(request))
+
+
+@blueprint.route('/rooms')
+@util.require_login
+def route_rooms():
+  return render_template("rooms.html", is_internal=is_internal(request))
