@@ -1,0 +1,69 @@
+{% extends "base_site.html" %} {% block sidebar %}
+<div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_covid19.html" %}
+</div>
+{% endblock sidebar %} {% block stylesheets %} {{ super() }}
+<link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/ag-grid.min.css" />
+<link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/theme.min.css" />
+<link type="text/css" rel="stylesheet" href="static/css/common.css" />
+<link type="text/css" rel="stylesheet" href="static/css/rooms.css" />
+{% endblock stylesheets %} {% block title %}{% endblock title %} {% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="user-filter-bottom-container">
+        <div class="user-searchbox-container">
+            <input type="text" class="user-serach-box hidden-textfield" placeholder="ID" />
+            <div class="searchbox-icon"></div>
+        </div>
+        <div class="save-master-btn">Save to Master File</div>
+    </div>
+    <div class="users-table ag-theme-material"></div>
+
+    <!-- Rooms -->
+    <div class="user-filter-folder-btn filter unfold">
+        <div class="user-folder-icn"></div>
+        <div class="user-folder-title-label">Filter Function</div>
+    </div>
+    <div class="filter-buttons-container filter unfold">
+        <div class="user-filter-container">
+            <div class="filter-container">
+                <div class="filter-title-label">Room</div>
+                <div id="full" class="user-filter-btn full">Vacancies</div>
+            </div>
+            <div class="filter-container">
+                <div class="filter-title-label">Category</div>
+                <div id="categories" class="user-filter-btn categories disabled">None</div>
+            </div>
+            <div class="filter-container">
+                <div class="filter-title-label">Department</div>
+                <div id="departments" class="user-filter-btn departments disabled">None</div>
+            </div>
+            <div class="filter-container">
+                <div class="filter-title-label">Food</div>
+                <div id="foods" class="user-filter-btn foods disabled">None</div>
+            </div>
+            <div class="filter-container">
+                <div class="filter-title-label">Nationality</div>
+                <div id="nationalities" class="user-filter-btn nationalities disabled">None</div>
+            </div>
+            <div class="filter-container">
+                <div class="filter-title-label">Religion</div>
+                <div id="religions" class="user-filter-btn religions disabled">None</div>
+            </div>
+        </div>
+    </div>
+    <!-- table -->
+    <div class="rooms-table ag-theme-material"></div>
+    <div class="rooms-item-loader-btn loading">
+        <div class="rooms-item-loader-icon"></div>
+        <div class="rooms-item-loader-label">Load more</div>
+    </div>
+</div>
+{% endblock content %} {% block javascripts %} {{ super() }}
+<script>
+    (function() {
+        window.IS_INTERNAL = {{is_internal|tojson}};
+    })();
+</script>
+<script src="static/js/vendor/grid/ag-grid-enterprise.min.js"></script>
+<script src="static/js/rooms.js"></script>
+{% endblock javascripts %}

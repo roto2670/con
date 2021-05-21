@@ -1,0 +1,46 @@
+{% extends "base_site.html" %} {% block sidebar %}
+<div class="nav_sidebar_hidden col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
+    {% include "site_template/sidebar_covid19.html" %}
+</div>
+{% endblock sidebar %} {% block stylesheets %} {{ super() }}
+<link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/ag-grid.min.css" />
+<link type="text/css" rel="stylesheet" href="static/js/vendor/grid/css/material.min.css" />
+<link type="text/css" rel="stylesheet" href="static/css/common.css" />
+<link type="text/css" rel="stylesheet" href="static/css/camp_dashboard.css" />
+<link type="text/css" rel="stylesheet" href="static/css/vendors/animate/animate.min.css" />
+{% endblock stylesheets %} {% block title %}{% endblock title %} {% block content %}
+<div id="scroll-style-hidden" class="right_col base" role="main">
+    <div class="sub-title-container status-container">Overview</div>
+
+    <div class="cd-row-container unfold">
+        <div class="cd-sub-title-btn">
+            <div class="cd-sub-title-icon"></div>
+            <div class="cd-sub-title-label">Camps</div>
+        </div>
+        <div class="cd-sub-contents-container">
+            <div class="cd-grid camp ag-theme-material"></div>
+        </div>
+    </div>
+
+    <div class="cd-row-container unfold">
+        <div class="cd-sub-title-btn">
+            <div class="cd-sub-title-icon"></div>
+            <div class="cd-sub-title-label">Usages</div>
+        </div>
+        <div class="cd-sub-contents-container">
+            <div class="cd-grid usage ag-theme-material"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %} {% block javascripts %} {{ super() }}
+<script src="static/js/vendor/grid/ag-grid-enterprise.min.js"></script>
+<script src="static/js/vendor/moment/moment.min.js"></script>
+<script src="static/js/vendor/moment/moment-timezone-with-data.min.js"></script>
+<script>
+    (function() {
+        window.IS_INTERNAL = {{is_internal|tojson}};
+    })();
+</script>
+<script src="static/js/camp_dashboard.js"></script>
+{% endblock javascripts %}
