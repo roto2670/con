@@ -116,7 +116,6 @@
                     minWidth: 130,
                     pinned: 'left',
                     cellClass: 'grid-row-column',
-                    // valueFormatter: (params) => params.value,
                     cellRenderer: (params) => {
                         const _widget = document.createElement('div');
                         _widget.innerHTML = `${params.valueFormatted}`;
@@ -167,6 +166,7 @@
         const _db = firebase.database();
         let _manpowerGridOptions = {},
             _passGridOptions = {};
+        let _currentOnSiteInterval = -1;
 
         // Init
         initGrids();
@@ -183,6 +183,7 @@
 
         function display() {
             _loadData();
+            _loadTodayOnSite();
         }
 
         function _initManPowerGrid() {
@@ -190,6 +191,7 @@
                 animateRows: true,
                 rowClass: 'cd-grid-manpower-row',
                 rowHeight: 190,
+                headerHeight: 80,
                 defaultColDef: {
                     flex: 1,
                     sortable: false,
@@ -244,7 +246,7 @@
                     },
                     {
                         headerName: 'Today\'s On-Site',
-                        field: ''
+                        field: 'onsite_total'
                     }
                 ],
                 rowData: [{id:'ug'}, {id:'ag'}],
@@ -271,6 +273,7 @@
         }
 
         function _loadData() {
+            _db.ref('stats/personnel/daily').off();
             _db.ref('stats/personnel/daily').on('value', (snapshot) => {
                 const _data = snapshot.val();
                 _updateManpowerStatus(_data);
@@ -278,6 +281,29 @@
                 _updatePassExtensionStatus(_passGridOptions.ag.api, _data.ag?.pass_status);
                 _updatePassExtensionStatus(_passGridOptions.ug.api, _data?.ug.pass_status);
             });
+        }
+
+        function _loadTodayOnSite() {
+            const _intervalId = _getTodayOnSiteInterval();
+            if (_currentOnSiteInterval !== _intervalId) {
+                _db.ref(`stats/staff/interval/0`).off();
+                _db.ref(`stats/staff/interval/1`).off();
+                _db.ref(`stats/staff/interval/${_intervalId}`).on('value', (snapshot) => {
+                    const _data = snapshot.val();
+                    _updateOnSite(_data);
+                });
+            }
+            _currentOnSiteInterval = _intervalId;
+        }
+
+        function _getTodayOnSiteInterval() {
+            let _nowHour = moment().hour();
+            return (_nowHour >= 5 && _nowHour < 17) ? 0 : 1;
+        }
+
+        function _updateOnSite(data) {
+            _manpowerGridOptions.api.getRowNode('ug').setData('onsite_total', data.ug.total);
+            _manpowerGridOptions.api.getRowNode('ag').setData('onsite_total', data.ag.total);
         }
 
         function _updateManpowerStatus(data) {
