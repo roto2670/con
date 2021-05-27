@@ -184,6 +184,7 @@
         function display() {
             _loadData();
             _loadTodayOnSite();
+            setInterval(_loadTodayOnSite, 1000 * 60 * 30); // 30min
         }
 
         function _initManPowerGrid() {
@@ -284,16 +285,17 @@
         }
 
         function _loadTodayOnSite() {
-            const _intervalId = _getTodayOnSiteInterval();
-            if (_currentOnSiteInterval !== _intervalId) {
-                _db.ref(`stats/staff/interval/0`).off();
-                _db.ref(`stats/staff/interval/1`).off();
-                _db.ref(`stats/staff/interval/${_intervalId}`).on('value', (snapshot) => {
-                    const _data = snapshot.val();
-                    _updateOnSite(_data);
-                });
-            }
-            _currentOnSiteInterval = _intervalId;
+                const _intervalId = _getTodayOnSiteInterval();
+                if (_currentOnSiteInterval !== _intervalId) {
+                    _db.ref(`stats/staff/interval/0`).off();
+                    _db.ref(`stats/staff/interval/1`).off();
+                    _db.ref(`stats/staff/interval/${_intervalId}`).on('value', (snapshot) => {
+                        const _data = snapshot.val();
+                        _updateOnSite(_data);
+                    });
+                }
+                _currentOnSiteInterval = _intervalId;
+                console.log('update');
         }
 
         function _getTodayOnSiteInterval() {
@@ -302,8 +304,8 @@
         }
 
         function _updateOnSite(data) {
-            _manpowerGridOptions.api.getRowNode('ug').setData('onsite_total', data.ug.total);
-            _manpowerGridOptions.api.getRowNode('ag').setData('onsite_total', data.ag.total);
+            _manpowerGridOptions.api.getRowNode('ug').setDataValue('onsite_total', data?.UG?.total);
+            _manpowerGridOptions.api.getRowNode('ag').setDataValue('onsite_total', data?.AG?.total);
         }
 
         function _updateManpowerStatus(data) {
