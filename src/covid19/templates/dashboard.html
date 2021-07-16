@@ -166,7 +166,6 @@
         const _db = firebase.database();
         let _manpowerGridOptions = {},
             _passGridOptions = {};
-        let _currentOnSiteInterval = -1;
 
         // Init
         initGrids();
@@ -246,8 +245,12 @@
                         field: 'rtw_n'
                     },
                     {
-                        headerName: 'Today\'s On-Site',
-                        field: 'onsite_total'
+                        headerName: 'Today\'s On-Site (Day)',
+                        field: 'onsite_total_day'
+                    },
+                    {
+                        headerName: 'Today\'s On-Site (Night)',
+                        field: 'onsite_total_night'
                     }
                 ],
                 rowData: [{id:'ug'}, {id:'ag'}],
@@ -285,27 +288,18 @@
         }
 
         function _loadTodayOnSite() {
-                const _intervalId = _getTodayOnSiteInterval();
-                if (_currentOnSiteInterval !== _intervalId) {
-                    _db.ref(`stats/staff/interval/0`).off();
-                    _db.ref(`stats/staff/interval/1`).off();
-                    _db.ref(`stats/staff/interval/${_intervalId}`).on('value', (snapshot) => {
-                        const _data = snapshot.val();
-                        _updateOnSite(_data);
-                    });
-                }
-                _currentOnSiteInterval = _intervalId;
-                console.log('update');
-        }
-
-        function _getTodayOnSiteInterval() {
-            let _nowHour = moment().hour();
-            return (_nowHour >= 5 && _nowHour < 17) ? 0 : 1;
+            _db.ref(`stats/staff/interval`).on('value', (snapshot) => {
+                const _data = snapshot.val();
+                _updateOnSite(_data);
+            });
+            console.log('Update today on-ste count.');
         }
 
         function _updateOnSite(data) {
-            _manpowerGridOptions.api.getRowNode('ug').setDataValue('onsite_total', data?.UG?.total);
-            _manpowerGridOptions.api.getRowNode('ag').setDataValue('onsite_total', data?.AG?.total);
+            _manpowerGridOptions.api.getRowNode('ug').setDataValue('onsite_total_day', data[0]?.UG?.total);
+            _manpowerGridOptions.api.getRowNode('ag').setDataValue('onsite_total_day', data[0]?.AG?.total);
+            _manpowerGridOptions.api.getRowNode('ug').setDataValue('onsite_total_night', data[1]?.UG?.total);
+            _manpowerGridOptions.api.getRowNode('ag').setDataValue('onsite_total_night', data[1]?.AG?.total);
         }
 
         function _updateManpowerStatus(data) {
