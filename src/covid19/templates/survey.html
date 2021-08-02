@@ -594,7 +594,7 @@
         function loadSurvey(startAt, callback) {
             let _callback = callback || _.noop;
 
-            let ref = _db.collection('polls'),
+            let ref = _db.collection('polls').orderBy('ts', 'desc'),
                 query;
 
             query = ref.limit(PAGE_SIZE);
@@ -803,6 +803,7 @@
 
                 if (_model.active) {
                     title = "(ACTIVE) " + _model.title.en;
+                    _views.container.addClass('active');
                     _views.statisticsButton.show();
                 } else {
                     if (_.isEmpty(_model.start_ts)) {
@@ -811,6 +812,7 @@
                         title = "(FINISHED) " + _model.title.en;
                         _views.statisticsButton.show();
                     }
+                    _views.container.removeClass('active');
                 }
 
                 // set id and order using by jquery

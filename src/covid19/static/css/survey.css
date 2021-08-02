@@ -64,6 +64,9 @@
     margin-bottom: 0.8em;
     background-color: #FCFCFC;
 }
+.survey-item.active {
+    background-color: rgba(239, 128, 9, 0.3);
+}
 
 .ni-survey-item-ghost {
     opacity: 0.5;
@@ -147,7 +150,7 @@
 
 .ni-timeago-label {
     font-size: 0.8em;
-    color: #C6C6C8;
+    color: #A6A6A8;
     margin-left: auto;
     margin-top: auto;
 }
