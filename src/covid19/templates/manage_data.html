@@ -106,10 +106,6 @@
                         <div class="log-download-run-btn btn" id="observation">Run</div>
                     </div>
                     <div class="log-download-btn-container">
-                        <div class="log-download-btn" id="clinic_reports">Clinic Report</div>
-                        <div class="log-download-run-btn btn" id="clinic_reports">Run</div>
-                    </div>
-                    <div class="log-download-btn-container">
                         <div class="log-download-btn" id="temperature">Daily Manpower and Temperature Measuring Status </div>
                     </div>
                     <div class="log-download-btn-container">
@@ -117,6 +113,31 @@
                     </div>
                     <div class="log-download-btn-container">
                         <div class="log-download-btn" id="night_food">Night-Shift Daily Food Status </div>
+                    </div>
+                </div>
+                <div class="download-sub-container selfreport">
+                    <div class="download-title-label">Self Report</div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="clinic_reports_1">Clinic Report #1</div>
+                        <div class="log-download-run-btn btn" id="clinic_reports_1">Run</div>
+                    </div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="clinic_reports_2">Clinic Report #2</div>
+                    </div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="clinic_reports_3">Clinic Report #3</div>
+                    </div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="clinic_reports_4">Clinic Report #4</div>
+                    </div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="clinic_reports_5">Clinic Report #5</div>
+                    </div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="clinic_reports_6">Clinic Report #6</div>
+                    </div>
+                    <div class="log-download-btn-container">
+                        <div class="log-download-btn" id="clinic_reports_7">Clinic Report #7</div>
                     </div>
                 </div>
                 <div class="download-sub-container qr">
@@ -208,7 +229,13 @@
                     app_usage: 'daily_app_usage_report.csv',
                     observation: 'observation_report.csv',
                     qr_codes: 'qrcodes.zip',
-                    clinic_reports: 'clinic_reports.csv',
+                    clinic_reports_1: 'clinic_reports_1.csv',
+                    clinic_reports_2: 'clinic_reports_2.csv',
+                    clinic_reports_3: 'clinic_reports_3.csv',
+                    clinic_reports_4: 'clinic_reports_4.csv',
+                    clinic_reports_5: 'clinic_reports_5.csv',
+                    clinic_reports_6: 'clinic_reports_6.csv',
+                    clinic_reports_7: 'clinic_reports_7.csv',
                     temperature : 'temperature.xlsx',
                     day_food: 'day_foods.xlsx',
                     night_food: 'night_foods.xlsx'
@@ -218,7 +245,13 @@
                     app_usage: 'Daily app usage report',
                     observation: 'Observation report',
                     qr_codes: 'All QR codes',
-                    clinic_reports: 'Clinic Reports',
+                    clinic_reports_1: 'Clinic Reports_1',
+                    clinic_reports_2: 'Clinic Reports_2',
+                    clinic_reports_3: 'Clinic Reports_3',
+                    clinic_reports_4: 'Clinic Reports_4',
+                    clinic_reports_5: 'Clinic Reports_5',
+                    clinic_reports_6: 'Clinic Reports_6',
+                    clinic_reports_7: 'Clinic Reports_7',
                     temperature : 'Daily Manpower and Temperature Measuring Status',
                     day_food: 'Day-Shift Daily Food Status',
                     night_food: 'Night-Shift Daily Food Status'
@@ -238,7 +271,7 @@
                     app_usage: 2,
                     observation: 3,
                     qr_codes: 8,
-                    clinic_reports: 9,
+                    clinic_reports_1: 9,
                     temperature: 11,
                     day_food: 12,
                     night_food: 12
@@ -248,7 +281,7 @@
                         app_usage: 'Genearted an app usage report.',
                         observation: 'Generated an observation report.',
                         qr_codes: 'Generating QR codes, Please reload after a few minutes.',
-                        clinic_reports: 'Generated a clinic report.',
+                        clinic_reports_1: 'Generated a clinic report.',
                         temperature: 'Generated a daily manpower and temperature status.',
                         day_food: 'Generated a day/night-shift daily food status.',
                         night_food: 'Generated a day/night-shift daily food status.'
@@ -257,7 +290,7 @@
                         app_usage: 'Failed to generation an app usage report. Check the logs in Settings menu.',
                         observation: 'Failed to generation an observation report. Check the logs in Settings menu.',
                         qr_codes: 'Failed to start QR codes generation. Please try again later.',
-                        clinic_reports: 'Failed to generation a clinic report. Check the logs in Settings menu.',
+                        clinic_reports_1: 'Failed to generation a clinic report. Check the logs in Settings menu.',
                         temperature: 'Failed to daily manpower and temperature status. Check the logs in Settings menu.',
                         day_food: 'Failed to day/night-shift daily food status. Check the logs in Settings menu.',
                         night_food: 'Failed to day/night-shift daily food status. Check the logs in Settings menu.'
@@ -599,9 +632,9 @@
                 });
 
                 // add lisnter for clinic reports.
-                $('.log-download-run-btn#clinic_reports').click(function() {
+                $('.log-download-run-btn#clinic_reports_1').click(function() {
                     if (window.confirm('Are you sure?')) {
-                        runScript('clinic_reports');
+                        runScript('clinic_reports_1');
                     }
                 });
 
@@ -808,22 +841,22 @@
                                 id: DONWLOAD_FILENAME[type]
                             });
 
-                        button.text(DOWNLOAD_FILE_DISPLAY[type] + '(Fetching creation date...)');
+                        button.text(DOWNLOAD_FILE_DISPLAY[type] + ' (Fetching creation date...)');
                         $.getJSON(requestUrl, function(data) {
                             if (data && data.time) {
                                 let time = new Date(data.time * 1000),
                                     timeDisplay = time.toLocaleString();
-                                button.text(DOWNLOAD_FILE_DISPLAY[type] + '(' + timeDisplay + ')');
+                                button.text(DOWNLOAD_FILE_DISPLAY[type] + ' (' + timeDisplay + ')');
 
                                 // Store.
                                 _downloadFilesTime[type] = time;
                             } else if (data.code == 3) {
-                                button.text(DOWNLOAD_FILE_DISPLAY[type] + '(Generating...)');
+                                button.text(DOWNLOAD_FILE_DISPLAY[type] + ' (Generating...)');
                             } else {
-                                button.text(DOWNLOAD_FILE_DISPLAY[type] + '(N/A)');
+                                button.text(DOWNLOAD_FILE_DISPLAY[type] + ' (N/A)');
                             }
                         }).fail(function() {
-                            button.text(DOWNLOAD_FILE_DISPLAY[type] + '(N/A)');
+                            button.text(DOWNLOAD_FILE_DISPLAY[type] + ' (N/A)');
                         });
                     }
                 }
@@ -835,7 +868,13 @@
                     _loadFileTime('master');
                     _loadFileTime('app_usage');
                     _loadFileTime('observation');
-                    _loadFileTime('clinic_reports');
+                    _loadFileTime('clinic_reports_1');
+                    _loadFileTime('clinic_reports_2');
+                    _loadFileTime('clinic_reports_3');
+                    _loadFileTime('clinic_reports_4');
+                    _loadFileTime('clinic_reports_5');
+                    _loadFileTime('clinic_reports_6');
+                    _loadFileTime('clinic_reports_7');
                     _loadFileTime('temperature');
                     _loadFileTime('day_food');
                     _loadFileTime('night_food');
