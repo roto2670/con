@@ -49,6 +49,17 @@
             </div>
         </div>
     </div>
+    <div class="cd-row-container sub">
+        <div class="cd-sub-title-btn">
+            <div class="cd-sub-title-icon"></div>
+            <div class="cd-sub-title-label">Sub-con PASS Extension Status - UG</div>
+        </div>
+        <div class="cd-sub-contents-container">
+            <div class="cd-col cd-col-12">
+                <div class="cd-grid pass ug-subcon ag-theme-material"></div>
+            </div>
+        </div>
+    </div>
 
     <div class="cd-row-container unfold">
         <div class="cd-sub-title-btn">
@@ -58,6 +69,17 @@
         <div class="cd-sub-contents-container">
             <div class="cd-col cd-col-12">
                 <div class="cd-grid pass ag ag-theme-material"></div>
+            </div>
+        </div>
+    </div>
+    <div class="cd-row-container sub">
+        <div class="cd-sub-title-btn">
+            <div class="cd-sub-title-icon"></div>
+            <div class="cd-sub-title-label">Sub-con PASS Extension Status - AG</div>
+        </div>
+        <div class="cd-sub-contents-container">
+            <div class="cd-col cd-col-12">
+                <div class="cd-grid pass ag-subcon ag-theme-material"></div>
             </div>
         </div>
     </div>
@@ -190,7 +212,7 @@
             _manpowerGridOptions = {
                 animateRows: true,
                 rowClass: 'cd-grid-manpower-row',
-                rowHeight: 190,
+                rowHeight: 120,
                 headerHeight: 80,
                 defaultColDef: {
                     flex: 1,
@@ -217,8 +239,7 @@
                     {
                         headerName: '',
                         field: 'kind',
-                        width: 75,
-                        minWidth: 75,
+                        minWidth: 90,
                         flex: false,
                         pinned: 'left',
                         valueFormatter: (params) => params.value,
@@ -253,7 +274,7 @@
                         field: 'onsite_total_night'
                     }
                 ],
-                rowData: [{id:'ug'}, {id:'ag'}],
+                rowData: [{id:'ug'}, {id:'ag'}, {id:'common'}],
                 getRowNodeId: (data) => {
                     return data.id;
                 }
@@ -267,13 +288,23 @@
         }
 
         function _initAgPassExtensionStatusGrid() {
+            // for AG
             _passGridOptions.ag = _.clone(PASS_GRID_OPTIONS);
             new agGrid.Grid($('.cd-grid.pass.ag').get(0), _passGridOptions.ag);
+
+            // for ag/sub-con
+            _passGridOptions.agSubCon = _.clone(PASS_GRID_OPTIONS);
+            new agGrid.Grid($('.cd-grid.pass.ag-subcon').get(0), _passGridOptions.agSubCon);
         }
 
         function _initUgPassExtensionStatusGrid() {
+            // For UG
             _passGridOptions.ug = _.clone(PASS_GRID_OPTIONS);
             new agGrid.Grid($('.cd-grid.pass.ug').get(0), _passGridOptions.ug);
+
+            // for ug sub-con
+            _passGridOptions.ugSubCon = _.clone(PASS_GRID_OPTIONS);
+            new agGrid.Grid($('.cd-grid.pass.ug-subcon').get(0), _passGridOptions.ugSubCon);
         }
 
         function _loadData() {
@@ -281,9 +312,11 @@
             _db.ref('stats/personnel/daily').on('value', (snapshot) => {
                 const _data = snapshot.val();
                 _updateManpowerStatus(_data);
-                _updatePassExtensionStatus(_passGridOptions.total.api, _data.pass_status);
+                _updatePassExtensionStatus(_passGridOptions.total.api, _data?.pass_status);
                 _updatePassExtensionStatus(_passGridOptions.ag.api, _data.ag?.pass_status);
-                _updatePassExtensionStatus(_passGridOptions.ug.api, _data?.ug.pass_status);
+                _updatePassExtensionStatus(_passGridOptions.agSubCon.api, _data.ag?.subcon_pass_status);
+                _updatePassExtensionStatus(_passGridOptions.ug.api, _data?.ug?.pass_status);
+                _updatePassExtensionStatus(_passGridOptions.ugSubCon.api, _data?.ug?.subcon_pass_status);
             });
         }
 
@@ -307,15 +340,19 @@
             $('.cd-overall-value-label').text(_toNumberString(data.total));
 
             // Manpower
-            const _ugData = data.ug,
-                _agData = data.ag;
+            const _ugData = data.ug || {},
+                _agData = data.ag || {},
+                _commonData = data.common || {};
             _ugData.id = 'ug';
             _ugData.kind = 'UG';
             _agData.id = 'ag';
             _agData.kind = 'AG';
+            _commonData.id = 'common';
+            _commonData.kind = 'Common';
 
             _manpowerGridOptions.api.getRowNode(_ugData.id).setData(_ugData);
             _manpowerGridOptions.api.getRowNode(_agData.id).setData(_agData);
+            _manpowerGridOptions.api.getRowNode(_commonData.id).setData(_commonData);
         }
 
         function _updatePassExtensionStatus(api, data) {
