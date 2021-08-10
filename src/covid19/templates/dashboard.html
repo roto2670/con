@@ -331,8 +331,10 @@
         function _updateOnSite(data) {
             _manpowerGridOptions.api.getRowNode('ug').setDataValue('onsite_total_day', data[0]?.UG?.total);
             _manpowerGridOptions.api.getRowNode('ag').setDataValue('onsite_total_day', data[0]?.AG?.total);
+            _manpowerGridOptions.api.getRowNode('common').setDataValue('onsite_total_day', data[0]?.COMMON?.total);
             _manpowerGridOptions.api.getRowNode('ug').setDataValue('onsite_total_night', data[1]?.UG?.total);
             _manpowerGridOptions.api.getRowNode('ag').setDataValue('onsite_total_night', data[1]?.AG?.total);
+            _manpowerGridOptions.api.getRowNode('common').setDataValue('onsite_total_night', data[1]?.COMMON?.total);
         }
 
         function _updateManpowerStatus(data) {
