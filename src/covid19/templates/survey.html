@@ -1668,6 +1668,14 @@
                                 question: question.q[_defaultLang]
                             });
                         })
+                        let nullAnswer = statsModel[`${questionIndex}-null`];
+                        if (nullAnswer) {
+                            rowData.push({
+                                name: "Misanswer",
+                                choice: statsModel[`${questionIndex}-null`],
+                                question: question.q[_defaultLang]
+                            });
+                        }
                     });
                     _optionTableOptions.rowData = rowData;
 
@@ -1708,11 +1716,15 @@
                         };
                         // let keyFindIndex = [];
                         _.each(mainKey.split('_'), function(optionKey, questionIndex) {
-                            rowData['q' + questionIndex] = surveyModel.questions[questionIndex].choices[_defaultLang][optionKey];
+                            let value = surveyModel.questions[questionIndex].choices[_defaultLang][optionKey];
+                            if (value) {
+                                rowData['q' + questionIndex] = value;
+                            } else {
+                                rowData['q' + questionIndex] = "Misanswer";
+                            }
                         });
                         rowDataList.push(rowData);
                     });
-
                     // Make a row data for table
                     _.each(surveyModel.questions, function(question, questionIndex) {
                             // calc row span
