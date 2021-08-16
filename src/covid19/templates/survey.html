@@ -1727,11 +1727,6 @@
                     });
                     // Make a row data for table
                     _.each(surveyModel.questions, function(question, questionIndex) {
-                            // calc row span
-                            let rowSpanSize = _.reduce(_.rest(_.map(surveyModel.questions, function(question) {
-                                return _.size(question.choices);
-                            }), questionIndex + 1));
-
                             let fieldId = 'q' + questionIndex;
                             // Define header
                             columnDefList.push({
