@@ -103,7 +103,8 @@ REVERSE_ACCESS_POINT = {
 }
 OPERATOR_COUNT_KEY = {
   ACCESS_1_ID: ACCESS_1_OPERATOR_ID,
-  ACCESS_2_ID: ACCESS_2_OPERATOR_ID
+  ACCESS_2_ID: ACCESS_2_OPERATOR_ID,
+  MUCK_ID: MUCK_ID
 }
 
 # {{{ Location
@@ -949,10 +950,12 @@ def _check_equip_operator_count(tags):
 
 
 def _handle_operator_count(operator_key, gid, device_data=None):
-  if WORKER_COUNT.has_data(operator_key, gid):
-    WORKER_COUNT.delete_data(operator_key, gid)
-  else:
-    WORKER_COUNT.set_data(operator_key, gid, device_data)
+  if operator_key != MUCK_ID:
+    # Check only AT1 and AT2
+    if WORKER_COUNT.has_data(operator_key, gid):
+      WORKER_COUNT.delete_data(operator_key, gid)
+    else:
+      WORKER_COUNT.set_data(operator_key, gid, device_data)
 
 
 def _send_equip_log(log):
