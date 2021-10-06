@@ -85,7 +85,7 @@ def reg_beacon():
     new_id_hash.update(mac_addr.encode('utf-8'))
     new_id = new_id_hash.hexdigest()
     security = uuid.uuid4().hex[:24]
-    logging.info("## Beacon name : %s, uuid : %s, major : %s, minor : %s",
+    logging.info("## Register New Beacon name : %s, uuid : %s, major : %s, minor : %s",
                  name, _uuid, _major, _minor)
     value = {
       "id": new_id,

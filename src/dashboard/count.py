@@ -969,6 +969,9 @@ EQUIP_EXIT_TEXT_2 = "{} came out {}. But it entered {}"
 
 def _set_equip_count(key, org_id, gid, hid):
   device_info = get_device_data_info(gid)
+  if not device_info:
+    logging.info(f"Can not find device. {key} {gid} {hid}")
+    return
   device_name = device_info.get('name', '')
   device_tag = _get_tags(device_info['tags'])
   if not device_tag:
