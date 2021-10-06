@@ -91,7 +91,12 @@ def internal_new_beacon_register():
     _uuid = data.get('uuid')
     _major = data.get('major')
     _minor = data.get('minor')
+
+    device_id = str(device_id)
+    _major = int(_major)
+    _minor = int(_minor)
     tag = _get_tag_from_res_group(res_group)
+
     if not tag:
       logging.warning(f"## Can not find tag. res group : {res_group}")
       return json.dumps(False)
@@ -138,8 +143,8 @@ def internal_new_beacon_register():
     logging.info("## Register new beacon from external resp : %s", ret)
     local_apis.update_new_beacon_info(value, WHITE_LIST)
     return json.dumps(True)
-  except:
-    logging.exception(f"##Raise error while new beacon register. data : {data}")
+  except Exception as e:
+    logging.exception(f"##Raise error while new beacon register. data : {data} {e}")
     return json.dumps(False)
 
 
