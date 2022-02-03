@@ -912,6 +912,33 @@ def _check_start_end_count(user_id, device_id, device_name):
     logging.debug("%s(%s) is count start.", device_id, device_name)
 
 
+def get_total_count():
+  at1_count = WORKER_COUNT.get_data_size(ACCESS_1_ID)
+  at2_count = WORKER_COUNT.get_data_size(ACCESS_2_ID)
+  at1_op_count = WORKER_COUNT.get_data_size(ACCESS_1_OPERATOR_ID)
+  at2_op_count = WORKER_COUNT.get_data_size(ACCESS_2_OPERATOR_ID)
+  at1_equip_count = BEACONS_COUNT.get_data_size(ACCESS_1_ID)
+  at2_equip_count = BEACONS_COUNT.get_data_size(ACCESS_2_ID)
+  data = {
+    "worker" : {
+      "at1": at1_count + at1_op_count,
+      "at2": at2_count + at2_op_count
+    },
+    "equipment": {
+      "at1": at1_equip_count,
+      "at2": at2_equip_count
+    },
+    "total": {
+      "at1": at1_count + at1_op_count + at1_equip_count,
+      "at2": at2_count + at2_op_count + at2_equip_count,
+      "worker": at1_count + at1_op_count + at2_count + at2_op_count,
+      "equipment": at1_equip_count + at2_equip_count,
+      "total": at1_count + at2_count + at1_op_count + at2_op_count + at1_equip_count + at2_equip_count
+    }
+  }
+  return data
+
+
 def get_total_worker():
   at1_count = WORKER_COUNT.get_data_size(ACCESS_1_ID)
   at2_count = WORKER_COUNT.get_data_size(ACCESS_2_ID)

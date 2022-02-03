@@ -194,6 +194,23 @@ def get_total_covid_count():
   return json.dumps(_total_count)
 
 
+@blueprint.route('/count/counting/total', methods=['GET'])
+@util.require_login
+def get_total_count():
+  """
+  Request
+    ex) /count/counting/total
+  Response
+    ex) {
+          "worker": {"at1": 0, "at2": 0},
+          "equipment" : {"at1": 0, "at2": 0},
+          "total": {"at1": 0, "at2": 0, "worker": 0, "equipment": 0, "total": 0}
+        }
+  """
+  data = count.get_total_count()
+  return json.dumps(data)
+
+
 @blueprint.route('/count/equip/counting/<key>', methods=['GET'])
 @util.require_login
 def get_equip_count(key):
