@@ -195,7 +195,6 @@ def get_total_covid_count():
 
 
 @blueprint.route('/count/counting/total', methods=['GET'])
-@util.require_login
 def get_total_count():
   """
   Request
